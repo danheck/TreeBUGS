@@ -57,8 +57,14 @@ callingBetaMPT<-function(DataFormulas,
 
   data=list()
   index=1
-  for(i in 1:length(Trees)){data[[index]]=paste("items",Trees[i],sep=".");index=index+1}
-  for(i in 1:length(Trees)){data[[index]]=paste("response",Trees[i],sep=".");index=index+1}
+  for(i in 1:length(Trees)){
+    data[[index]]=paste("items",Trees[i],sep=".")
+    index=index+1
+  }
+  for(i in 1:length(Trees)){
+    data[[index]]=paste("response",Trees[i],sep=".")
+    index=index+1
+  }
   data[[index]]="subjs"
 
 
@@ -71,10 +77,11 @@ callingBetaMPT<-function(DataFormulas,
     samples = jags.parallel(data,
                             inits=NULL,
                             parameters.to.save=parametervector,
-                            model.file = modelfile, n.iter=n.iter,
+                            model.file = modelfile,
+                            n.iter=n.iter,
                             n.burnin=n.burnin,
                             n.chains=n.chains,
-                            DIC=T)
+                            DIC=T,...)
     if(autojags){
       recompile(samples)
       samples.upd <- autojags(samples, n.update = n.update)

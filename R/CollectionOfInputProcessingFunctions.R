@@ -113,8 +113,6 @@ getParameter<-function(TreeData){
 
 readSubjectData<-function(data,answers){
 
-  # Data=read.csv(data)
-
   if(sum(names(data)%in%answers)!=length(answers)){
     if(dim(data)[2]!=length(answers)){
       cat("Number of answers differs in eqn and csv file")

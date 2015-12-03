@@ -23,7 +23,7 @@
 #' \itemize{
 #'  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
 #'  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
-#'  \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{\link{mcmc.list}} for analysis with the \link{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
+#'  \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{mcmc.list} for analysis with the \code{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
 #'  \item \code{sampler}: the type of sampler used (standard: \code{"JAGS"})
 #' }
 #' @author Nina R. Arnold, Denis Arnold, Daniel Heck
@@ -64,8 +64,11 @@ mpt2BetaMPT<-function(eqnfile,  # statistical model stuff
   }
 
   Tree=readMultiTree(eqnfile)
-  SubjData=readSubjectData(data,unique(Tree$Answers))
-  Tree=mergeBranches(Tree,names(SubjData))
+  data=readSubjectData(data,unique(Tree$Answers))
+  # reorder data:
+  data <- data[,sort(unique(Tree$Answers))]
+
+  Tree=mergeBranches(Tree,names(data))
   tHoutput=thetaHandling(Tree,restrictions)
   SubPar=tHoutput[[1]]
   Tree=tHoutput[[2]]
@@ -75,7 +78,7 @@ mpt2BetaMPT<-function(eqnfile,  # statistical model stuff
                             data,
                             modelfile=modelfilename,
                             numberOfParameters=max(SubPar$theta),
-                            parameters,
+                            # parameters,
                             n.iter=n.iter,
                             n.burnin=n.burnin,
                             n.thin=n.thin,
