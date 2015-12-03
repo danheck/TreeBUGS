@@ -11,12 +11,12 @@
 #'  @param n.thin Thinning rate.
 #'  @param sampler The Sampler to be used. Options are JAGS, OpenBUGS or WinBUGS.
 #'         Note that you need to install the sampler on your computer.
+#' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.
 #'  @param printresults Whether a summary of the results should be printed.
 #'  @param savetable Whether the results should be saved to the hard drive.
 #'  @param ... Arguments to be passed to other methods.
 #'  @author Nina R. Arnold, Denis Arnold
 #'  @export
-
 callingBetaMPT<-function(DataFormulas,
                          datafile,
                          modelfile,
@@ -28,6 +28,7 @@ callingBetaMPT<-function(DataFormulas,
                          n.update= 10,
                          n.thin=2,
                          sampler="JAGS",
+                         autojags=TRUE,
                          printresults = FALSE,
                          savetable = FALSE,
                          ...){
@@ -70,15 +71,22 @@ callingBetaMPT<-function(DataFormulas,
     W=diag(numberOfParameters)
     data[[index+1]]="W"
     parametervector=unlist(parameters)
-    samples = jags.parallel(data, inits=NULL, parameters.to.save=parametervector, model.file = modelfile, n.chains=3, DIC=T)
-    recompile(samples)
-    samples.upd <- autojags(samples, n.update = n.update)
-    samples=samples.upd
+    samples = jags.parallel(data,
+                            inits=NULL,
+                            parameters.to.save=parametervector,
+                            model.file = modelfile,
+                            n.chains=3,
+                            DIC=T)
+    if(autojags){
+      recompile(samples)
+      samples.upd <- autojags(samples, n.update = n.update)
+      samples=samples.upd
+    }
 
   }else{
   if(sampler%in%c("openbugs","OpenBUGS","winbugs","WinBUGS")){
 
-  samples = bugs(data,
+    samples = bugs(data,
                  inits=NULL,
                  parameters,
                  model.file = modelfile,
@@ -91,6 +99,8 @@ callingBetaMPT<-function(DataFormulas,
                  debug=F,
                  program = sampler,
                  ...)
+    # get coda samples (better to process afterwards)
+    # tmp <- capture.output({samples <- read.bugs(out)})
   }else{
     print(paste("Unknown sampler:",sampler))
   }

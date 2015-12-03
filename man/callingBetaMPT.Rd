@@ -7,8 +7,8 @@
 callingBetaMPT(DataFormulas, datafile, modelfile, numberOfParameters = 0,
   parameters = list("theta", "alph", "bet", "mnb", "varp"),
   parestfile = "ResultsBetaMPT.txt", n.iter = 1e+05, n.burnin = NULL,
-  n.update = 10, n.thin = 2, sampler = "JAGS", printresults = FALSE,
-  savetable = FALSE, ...)
+  n.update = 10, n.thin = 2, sampler = "JAGS", autojags = TRUE,
+  printresults = FALSE, savetable = FALSE, ...)
 }
 \arguments{
 \item{DataFormulas}{Ouptut of mergeBranches()}
@@ -32,7 +32,9 @@ callingBetaMPT(DataFormulas, datafile, modelfile, numberOfParameters = 0,
 \item{n.thin}{Thinning rate.}
 
 \item{sampler}{The Sampler to be used. Options are JAGS, OpenBUGS or WinBUGS.
-       Note that you need to install the sampler on your computer.}
+Note that you need to install the sampler on your computer.}
+
+\item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.}
 
 \item{printresults}{Whether a summary of the results should be printed.}
 

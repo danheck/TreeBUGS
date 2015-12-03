@@ -12,13 +12,14 @@
 #' @param n.burnin Burnin period.
 #' @param n.thin Thinning rate.
 #' @param sampler Which sampler should be used? Default is "JAGS", further options are "OpenBUGS" and "WinBugs"
+#' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.
 #' @param ... Arguments to be passed to other methods.
 #' @author Nina R. Arnold, Denis Arnold
 #' @export
 
 mpt2BetaMPT<-function(eqnfile,
                    subjdata,
-                   restrictions,
+                   restrictions = NULL,
                    modelfilename=NULL,
                    alpha="dunif(1,5000)",
                    beta="dunif(1,5000)",
@@ -28,28 +29,53 @@ mpt2BetaMPT<-function(eqnfile,
                    n.burnin=50000,
                    n.thin=2,
                    sampler="JAGS",
+                   autojags=TRUE,
                    ...){
 
   if(is.null(modelfilename)){
     modelfilename=tempfile(pattern="MODELFILE",fileext=".txt")
   }
+
+
   Tree=readMultiTree(eqnfile)
   SubjData=readSubjectData(subjdata,unique(Tree$Answers))
   Tree=mergeBranches(Tree,names(SubjData))
   tHoutput=thetaHandling(Tree,restrictions)
   SubPar=tHoutput[[1]]
   Tree=tHoutput[[2]]
-  makeModelDescription(modelfilename,Tree,max(SubPar$theta),alpha,beta,sampler)
-  callingBetaMPT(Tree,
-                 subjdata,
-                 modelfile=modelfilename,
-                 numberOfParameters=max(SubPar$theta),
-                 parameters,
-                 parestfile,
-                 n.iter=n.iter,
-                 n.burnin=n.burnin,
-                 n.thin=n.thin,
-                 sampler=sampler,
-                 ...)
+  makeModelDescription(modelfilename,Tree,max(SubPar$theta),
+                       alpha,beta,sampler)
+  mcmc <- callingBetaMPT(Tree,
+                            subjdata,
+                            modelfile=modelfilename,
+                            numberOfParameters=max(SubPar$theta),
+                            parameters,
+                            parestfile,
+                            n.iter=n.iter,
+                            n.burnin=n.burnin,
+                            n.thin=n.thin,
+                            sampler=sampler,
+                            autojags=autojags,
+                            ...)
 
+  thetaNames <- tHoutput[[1]][,1:2]
+  # Beta MPT: rename parameters and get specific summaries
+  summary <- summarizeBetaMPT(mcmc, thetaNames, sampler=sampler)
+
+  mptInfo <- list(thetaNames = thetaNames,
+                  eqnfile=eqnfile,
+                  subjdata=subjdata,
+                  restrictions=restrictions)
+
+  # class structure for TreeBUGS
+  fittedModel <- list(summary=summary,
+                      mptInfo=mptInfo,
+                      mcmc=mcmc,
+                      sampler=sampler,
+                      call=match.call()  )
+
+  class(fittedModel) <- "betaMPT"
+  return(fittedModel)
 }
+
+

@@ -1,0 +1,110 @@
+---
+title: "TreeBUGS: Hierarchical MPT Modeling"
+author: "Daniel W. Heck, Denis Arnold, Nina Arndold"
+date: "`r Sys.Date()`"
+output:
+      rmarkdown::html_vignette:
+vignette: >
+  %\VignetteIndexEntry{TreeBUGS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+## General Procedure of Using TreeBUGS
+
+In the most simple user scenario, the following steps are required:
+
+1. Save MPT model file on disk in .eqn format
+2. Save individual data to .csv file (comma separated, rows=persons, columns=labeled categories)
+3. Call `mpt2BetaMPT` or `mpt2TraitMPT` (exact code below)
+4. Summarize and plot results
+
+In the following, these steps are explained in more detail. Note that TreeBUGS requires a valid installation of the software JAGS (http://mcmc-jags.sourceforge.net/).
+
+## Save MPT model file
+
+The model needs to be passed in the standard .eqn file format (e.g., as in multiTree; Moshagen, 2010). As an example, consider the most simple two-high-threshold model (2HTM), each line defines a single processing path containing tree label, category label, and model equations. Note that the model equations should not contain any spaces:
+
+```
+# Title: 2HTM
+Target    Hit    Do
+Target    Hit    (1-Do)*g
+Target    Miss   (1-Do)*(1-g)
+Lure      FA     (1-Dn)*g
+Lure      CR     (1-Dn)*(1-g)
+Lure      CR     (1-Dn)
+``` 
+
+As an input for TreeBUGS, the model file (e.g., `"2htm.txt"`) needs to be saved in the current working directory. Otherwise, the path to the file must be fully specified (e.g., `C:/models/2htm.txt`).
+
+## Save Individual Data
+
+As a standard, the data are provided in a comma-separated text file (.csv) as:
+
+```
+"Hit", "Miss", "FA", "CR"
+20,      10,      5,    25
+13,       7,      9,    21 
+.....
+
+```
+
+As for the .eqn file, the data file can either be specified as `data_ind.csv` if it is in the current working directory, or as an absolute path (e.g., `"C:/models/data_ind.csv"`). Alternatively, a data.frame or matrix with appropriate column names (i.e., category labels) can be provided.
+
+## Fit Hierarchical MPT Model
+
+An hierarchical **Beta-MPT model** is fitted with the following code:
+
+```{r, eval=FALSE}
+beta2HTM <- mpt2BetaMPT(eqnfile="2htm.txt",              # .eqn file
+                        subjdata="data_ind.csv",         # individual data
+                        restrictions=c("do=dn"),         # parameter restrictions (or path to file)
+                        modelfilename = "jags_model_file.txt"   # export JAGS model file
+                        )
+
+```
+
+## Summarize and Plot Model
+
+To get an overview of the parameter estimates including convergence statistics, use:
+
+```{r}
+summary(beta2HTM)
+```
+
+To plot parameter estimates, use:
+
+```{r}
+plot(beta2HTM,     # fitted model
+     includeIndividual=TRUE   # whether to plot individual estimates
+     )
+```
+
+
+
+
+
+#################### EXAMPLES
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))

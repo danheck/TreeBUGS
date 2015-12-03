@@ -4,10 +4,11 @@
 \alias{mpt2BetaMPT}
 \title{Userinterface to use BUGS}
 \usage{
-mpt2BetaMPT(eqnfile, subjdata, restrictions, modelfilename = NULL,
+mpt2BetaMPT(eqnfile, subjdata, restrictions = NULL, modelfilename = NULL,
   alpha = "dunif(1,5000)", beta = "dunif(1,5000)",
   parameters = list("theta", "alph", "bet", "mnb", "varp"), parestfile,
-  n.iter = 1e+05, n.burnin = 50000, n.thin = 2, sampler = "JAGS", ...)
+  n.iter = 1e+05, n.burnin = 50000, n.thin = 2, sampler = "JAGS",
+  autojags = TRUE, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the Multitree.}
@@ -34,6 +35,8 @@ Default is to write this information to the tempdir as required by CRAN standard
 \item{n.thin}{Thinning rate.}
 
 \item{sampler}{Which sampler should be used? Default is "JAGS", further options are "OpenBUGS" and "WinBugs"}
+
+\item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.}
 
 \item{...}{Arguments to be passed to other methods.}
 }
