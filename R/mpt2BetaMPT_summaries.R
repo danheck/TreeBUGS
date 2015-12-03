@@ -3,7 +3,7 @@
 summarizeBetaMPT <- function(mcmc, thetaNames, sampler="JAGS"){
 
   # number of parameters
-  S <- length(unique(thetaNames[,"theta"]))
+  S <- max(thetaNames[,"theta"])
 
   if(sampler %in% c("JAGS","jags")){
     N <- dim(mcmc$BUGSoutput$mean$theta)[2]
@@ -34,9 +34,9 @@ summarizeBetaMPT <- function(mcmc, thetaNames, sampler="JAGS"){
     summary <- list(meanParameters=meanParameters,
                     individParameters=individParameters,
                     fitStatistics=c("DIC"=mcmc$BUGSoutput$DIC,
-                                    "T1.observed"=NA,
-                                    "T1.predicted"=NA,
-                                    "p.T1"=NA))
+                                    "T1.observed"=mcmc$BUGSoutput$mean$T1.obs,
+                                    "T1.predicted"=mcmc$BUGSoutput$mean$T1.pred,
+                                    "p.T1"=mcmc$BUGSoutput$mean$p.T1))
   }else{
     warning("Clean MPT summary statistics only available when using JAGS.")
     summary <- mcmc$BUGSoutput$summary

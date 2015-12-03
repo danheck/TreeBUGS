@@ -18,9 +18,12 @@ In the most simple user scenario, the following steps are required:
 1. Save MPT model file on disk in .eqn format
 2. Save individual data to .csv file (comma separated, rows=persons, columns=labeled categories)
 3. Call `mpt2BetaMPT` or `mpt2TraitMPT` (exact code below)
-4. Summarize and plot results
+4. Check convergence of MCMC chains
+5. Summarize and plot results
 
 In the following, these steps are explained in more detail. Note that TreeBUGS requires a valid installation of the software JAGS (http://mcmc-jags.sourceforge.net/).
+
+
 
 ## Save MPT model file
 
@@ -38,6 +41,8 @@ Lure      CR     (1-Dn)
 
 As an input for TreeBUGS, the model file (e.g., `"2htm.txt"`) needs to be saved in the current working directory. Otherwise, the path to the file must be fully specified (e.g., `C:/models/2htm.txt`).
 
+
+
 ## Save Individual Data
 
 As a standard, the data are provided in a comma-separated text file (.csv) as:
@@ -52,18 +57,48 @@ As a standard, the data are provided in a comma-separated text file (.csv) as:
 
 As for the .eqn file, the data file can either be specified as `data_ind.csv` if it is in the current working directory, or as an absolute path (e.g., `"C:/models/data_ind.csv"`). Alternatively, a data.frame or matrix with appropriate column names (i.e., category labels) can be provided.
 
+
+
 ## Fit Hierarchical MPT Model
 
 An hierarchical **Beta-MPT model** is fitted with the following code:
 
 ```{r, eval=FALSE}
 beta2HTM <- mpt2BetaMPT(eqnfile="2htm.txt",              # .eqn file
-                        subjdata="data_ind.csv",         # individual data
+                        data="data_ind.csv",             # individual data
                         restrictions=c("do=dn"),         # parameter restrictions (or path to file)
                         modelfilename = "jags_model_file.txt"   # export JAGS model file
                         )
 
 ```
+
+## Check convergence of MCMC chains
+
+The functions `mpt2BetaMPT` and `mpt2TraitMPT` include the original samples from the MCMC sampler for convergence checks. Basically, these samples can be accessed by `fittedModel$mcmc`:
+
+```{r, eval=FALSE}
+# Traceplots (posterior values as a function of sample number)
+traceplot(fittedModel$mcmc,    # fitted model
+          mfrow = c(3,3)      # number of rows and columns
+          )
+```
+
+Further convergence checks are available in the convergence diagniostic package \link{coda}. Before using these functions, the MCMC samples must be transformed to a `mcmc.list`:
+
+```{r, eval=FALSE}
+# load coda library
+library(coda)
+
+# transform R2JAGS output to mcmc.list:
+codaModel <- as.mcmc.list(fittedModel$mcmc$BUGSoutput)
+
+# Auto-correlation plots:
+acfplot(codaModel)
+
+# 
+```
+
+See \link{R2JAGS} for further convergence statistics and plots.
 
 ## Summarize and Plot Model
 

@@ -4,24 +4,18 @@
 \alias{callingBetaMPT}
 \title{Calling the Sampler (JAGS or OpenBUGS or WinBUGS)}
 \usage{
-callingBetaMPT(DataFormulas, datafile, modelfile, numberOfParameters = 0,
-  parameters = list("theta", "alph", "bet", "mnb", "varp"),
-  parestfile = "ResultsBetaMPT.txt", n.iter = 1e+05, n.burnin = NULL,
-  n.update = 10, n.thin = 2, sampler = "JAGS", autojags = TRUE,
-  printresults = FALSE, savetable = FALSE, ...)
+callingBetaMPT(DataFormulas, data, modelfile, numberOfParameters = 0,
+  n.iter = 1e+05, n.burnin = NULL, n.update = 10, n.thin = 2,
+  n.chains = 3, sampler = "JAGS", autojags = TRUE, ...)
 }
 \arguments{
 \item{DataFormulas}{Ouptut of mergeBranches()}
 
-\item{datafile}{Full path to cvs file with the data.}
+\item{data}{data frame with frequencies}
 
 \item{modelfile}{Full path to the model description file. (Made with makeModelDescription())}
 
 \item{numberOfParameters}{How many parameters does the model have}
-
-\item{parameters}{List with parameters that should be returned from the sampler.}
-
-\item{parestfile}{Name of the file to with the estimates should be stored.}
 
 \item{n.iter}{Number of iterations.}
 
@@ -31,14 +25,12 @@ callingBetaMPT(DataFormulas, datafile, modelfile, numberOfParameters = 0,
 
 \item{n.thin}{Thinning rate.}
 
+\item{n.chains}{number of MCMC chains}
+
 \item{sampler}{The Sampler to be used. Options are JAGS, OpenBUGS or WinBUGS.
 Note that you need to install the sampler on your computer.}
 
 \item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.}
-
-\item{printresults}{Whether a summary of the results should be printed.}
-
-\item{savetable}{Whether the results should be saved to the hard drive.}
 
 \item{...}{Arguments to be passed to other methods.}
 }
@@ -46,6 +38,6 @@ Note that you need to install the sampler on your computer.}
 Calling the Sampler (JAGS or OpenBUGS or WinBUGS)
 }
 \author{
-Nina R. Arnold, Denis Arnold
+Nina R. Arnold, Denis Arnold, Daniel W. Heck
 }
 

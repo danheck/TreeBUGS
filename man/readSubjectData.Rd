@@ -4,10 +4,10 @@
 \alias{readSubjectData}
 \title{Read the subject data from file}
 \usage{
-readSubjectData(file, answers)
+readSubjectData(data, answers)
 }
 \arguments{
-\item{file}{is the data stored in a .csv file}
+\item{data}{the data as data.frame}
 
 \item{answers}{is the unique of the $Answers from TreeData which is $Answers after mergeBrachnes()}
 }

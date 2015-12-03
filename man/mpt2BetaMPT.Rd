@@ -2,31 +2,26 @@
 % Please edit documentation in R/mpt2BetaMPT.R
 \name{mpt2BetaMPT}
 \alias{mpt2BetaMPT}
-\title{Userinterface to use BUGS}
+\title{Fit a Hierarchical Beta-MPT Model}
 \usage{
-mpt2BetaMPT(eqnfile, subjdata, restrictions = NULL, modelfilename = NULL,
-  alpha = "dunif(1,5000)", beta = "dunif(1,5000)",
-  parameters = list("theta", "alph", "bet", "mnb", "varp"), parestfile,
-  n.iter = 1e+05, n.burnin = 50000, n.thin = 2, sampler = "JAGS",
-  autojags = TRUE, ...)
+mpt2BetaMPT(eqnfile, data, restrictions = NULL,
+  transformedParameters = NULL, alpha = "dunif(1,5000)",
+  beta = "dunif(1,5000)", n.iter = 1e+05, n.burnin = 50000, n.thin = 2,
+  n.chains = 3, modelfilename = NULL, parEstFile = NULL,
+  sampler = "JAGS", autojags = TRUE, ...)
 }
 \arguments{
-\item{eqnfile}{The (full path to the) file that specifies the Multitree.}
+\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
 
-\item{subjdata}{The (full path to the) cvs file with the data.}
+\item{data}{The (full path to the) cvs file with the data (comma separated; category labels in first row)}
 
-\item{restrictions}{The (full path to the) file that specifies which parameters should be constants and which should be equal.}
+\item{restrictions}{Optional: The (full path to the) file that specifies which parameters should be constants and which should be equal. Alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
 
-\item{modelfilename}{Name that the modelfile that is made by the function to work with WinBUGS should get.
-Default is to write this information to the tempdir as required by CRAN standards.}
+\item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
 
-\item{alpha}{Model parameter.}
+\item{alpha}{Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).}
 
-\item{beta}{Model parameter.}
-
-\item{parameters}{List of parameters that WinBUGS should return.}
-
-\item{parestfile}{Name of the file to which the results should be stored.}
+\item{beta}{Second hyperprior, see \code{alpha}}
 
 \item{n.iter}{Number of iterations.}
 
@@ -34,16 +29,32 @@ Default is to write this information to the tempdir as required by CRAN standard
 
 \item{n.thin}{Thinning rate.}
 
-\item{sampler}{Which sampler should be used? Default is "JAGS", further options are "OpenBUGS" and "WinBugs"}
+\item{n.chains}{number of MCMC chains}
+
+\item{modelfilename}{Name that the modelfile that is made by the function to work with WinBUGS should get.
+Default is to write this information to the tempdir as required by CRAN standards.}
+
+\item{parEstFile}{Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")}
+
+\item{sampler}{Which sampler should be used? Default is "JAGS". Further options are "OpenBUGS" and "WinBugs" (without MPT specific summary and plotting functions)}
 
 \item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.}
 
-\item{...}{Arguments to be passed to other methods.}
+\item{...}{Arguments to be passed to the sampling function (default: \code{\link{jags.parallel}}.}
+}
+\value{
+a list of the class \code{betaMPT} with the objects:
+\itemize{
+ \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
+ \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
+ \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{\link{mcmc.list}} for analysis with the \link{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
+ \item \code{sampler}: the type of sampler used (standard: \code{"JAGS"})
+}
 }
 \description{
-Userinterface to use BUGS
+Fits a Beta-MPT model based on a standard MPT model file (.eqn) and individual data table (.csv).
 }
 \author{
-Nina R. Arnold, Denis Arnold
+Nina R. Arnold, Denis Arnold, Daniel Heck
 }
 

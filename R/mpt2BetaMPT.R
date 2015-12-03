@@ -1,33 +1,50 @@
-#' Userinterface to use BUGS
-#' @param eqnfile The (full path to the) file that specifies the Multitree.
-#' @param subjdata The (full path to the) cvs file with the data.
-#' @param restrictions  The (full path to the) file that specifies which parameters should be constants and which should be equal.
+#' Fit a Hierarchical Beta-MPT Model
+#'
+#' Fits a Beta-MPT model based on a standard MPT model file (.eqn) and individual data table (.csv).
+#'
+#' @param eqnfile The (full path to the) file that specifies the MPT model (standard .eqn syntax)
+#' @param data The (full path to the) cvs file with the data (comma separated; category labels in first row)
+#' @param restrictions  Optional: The (full path to the) file that specifies which parameters should be constants and which should be equal. Alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
+#' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
 #' @param modelfilename Name that the modelfile that is made by the function to work with WinBUGS should get.
 #'        Default is to write this information to the tempdir as required by CRAN standards.
-#' @param alpha Model parameter.
-#' @param beta Model parameter.
-#' @param parameters List of parameters that WinBUGS should return.
-#' @param parestfile Name of the file to which the results should be stored.
+#' @param alpha Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).
+#' @param beta Second hyperprior, see \code{alpha}
+#' @param parEstFile Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")
 #' @param n.iter Number of iterations.
 #' @param n.burnin Burnin period.
 #' @param n.thin Thinning rate.
-#' @param sampler Which sampler should be used? Default is "JAGS", further options are "OpenBUGS" and "WinBugs"
+#' @param n.chains number of MCMC chains
+#' @param sampler Which sampler should be used? Default is "JAGS". Further options are "OpenBUGS" and "WinBugs" (without MPT specific summary and plotting functions)
 #' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.
-#' @param ... Arguments to be passed to other methods.
-#' @author Nina R. Arnold, Denis Arnold
+#' @param ... Arguments to be passed to the sampling function (default: \code{\link{jags.parallel}}.
+#'
+#' @return a list of the class \code{betaMPT} with the objects:
+#' \itemize{
+#'  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
+#'  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
+#'  \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{\link{mcmc.list}} for analysis with the \link{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
+#'  \item \code{sampler}: the type of sampler used (standard: \code{"JAGS"})
+#' }
+#' @author Nina R. Arnold, Denis Arnold, Daniel Heck
 #' @export
 
-mpt2BetaMPT<-function(eqnfile,
-                   subjdata,
+mpt2BetaMPT<-function(eqnfile,  # statistical model stuff
+                   data,
                    restrictions = NULL,
-                   modelfilename=NULL,
+                   transformedParameters=NULL,
                    alpha="dunif(1,5000)",
                    beta="dunif(1,5000)",
-                   parameters=list("theta", "alph", "bet", "mnb", "varp"),
-                   parestfile,
+
+                   # MCMC stuff:
                    n.iter=100000,
                    n.burnin=50000,
                    n.thin=2,
+                   n.chains=3,
+
+                   # File Handling stuff:
+                   modelfilename=NULL,
+                   parEstFile = NULL,
                    sampler="JAGS",
                    autojags=TRUE,
                    ...){
@@ -36,9 +53,18 @@ mpt2BetaMPT<-function(eqnfile,
     modelfilename=tempfile(pattern="MODELFILE",fileext=".txt")
   }
 
+  ### read data
+  if(is.matrix(data) | is.data.frame(data)){
+    data <- as.data.frame(data)
+  }else{
+    data = read.csv(data, header=TRUE)
+  }
+  if(any(is.na(data))){
+    warning("Check for missings in the data.")
+  }
 
   Tree=readMultiTree(eqnfile)
-  SubjData=readSubjectData(subjdata,unique(Tree$Answers))
+  SubjData=readSubjectData(data,unique(Tree$Answers))
   Tree=mergeBranches(Tree,names(SubjData))
   tHoutput=thetaHandling(Tree,restrictions)
   SubPar=tHoutput[[1]]
@@ -46,14 +72,14 @@ mpt2BetaMPT<-function(eqnfile,
   makeModelDescription(modelfilename,Tree,max(SubPar$theta),
                        alpha,beta,sampler)
   mcmc <- callingBetaMPT(Tree,
-                            subjdata,
+                            data,
                             modelfile=modelfilename,
                             numberOfParameters=max(SubPar$theta),
                             parameters,
-                            parestfile,
                             n.iter=n.iter,
                             n.burnin=n.burnin,
                             n.thin=n.thin,
+                            n.chains=n.chains,
                             sampler=sampler,
                             autojags=autojags,
                             ...)
@@ -64,7 +90,7 @@ mpt2BetaMPT<-function(eqnfile,
 
   mptInfo <- list(thetaNames = thetaNames,
                   eqnfile=eqnfile,
-                  subjdata=subjdata,
+                  data=data,
                   restrictions=restrictions)
 
   # class structure for TreeBUGS
@@ -73,6 +99,12 @@ mpt2BetaMPT<-function(eqnfile,
                       mcmc=mcmc,
                       sampler=sampler,
                       call=match.call()  )
+
+  # write results
+  if(!(missing(parEstFile) | is.null(parEstFile))){
+    write.table(summary,  file=parEstFile, sep ="\t",
+                na="NA",dec=".",row.names=T,col.names=T,quote=F)
+  }
 
   class(fittedModel) <- "betaMPT"
   return(fittedModel)

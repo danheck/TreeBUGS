@@ -7,13 +7,16 @@
 \method{plot}{betaMPT}(x, includeIndividual = TRUE, ...)
 }
 \arguments{
-\item{x}{a fitted Beta-MPT model (see \link{mpt2BetaMPT})}
+\item{x}{a fitted Beta-MPT model (see \code{\link{mpt2BetaMPT}})}
 
 \item{includeIndividual}{whether to plot individual estimates}
 
-\item{...}{further arguments passed to the standard \link{plot} function}
+\item{...}{further arguments passed to the standard \code{\link{plot}} function}
 }
 \description{
 Plot Beta-MPT Parameter Estimates
+}
+\author{
+Daniel Heck
 }
 

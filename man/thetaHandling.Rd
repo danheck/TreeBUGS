@@ -4,12 +4,12 @@
 \alias{thetaHandling}
 \title{Set constants, replace parameters for thetas}
 \usage{
-thetaHandling(MergedTree, file)
+thetaHandling(MergedTree, restrictions)
 }
 \arguments{
 \item{MergedTree}{is the output of mergeBranches}
 
-\item{file}{The (full path to the) file that specifies which parameters should be constants and which should be equal}
+\item{restrictions}{Either the (full path to the) file that specifies which parameters should be constants and which should be equal; or a list of parameter restrictions}
 }
 \description{
 Set constants, replace parameters for thetas

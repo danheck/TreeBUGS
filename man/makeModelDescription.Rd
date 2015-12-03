@@ -24,6 +24,6 @@ makeModelDescription(filename, DataFormulas, nthetas, alpha = "dunif(1,5000)",
 Make the model description file needed by WinBUGS.
 }
 \author{
-Nina R. Arnold, Denis Arnold
+Nina R. Arnold, Denis Arnold, Daniel Heck
 }
 
