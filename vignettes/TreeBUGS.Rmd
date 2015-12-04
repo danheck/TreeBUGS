@@ -1,6 +1,6 @@
 ---
 title: "TreeBUGS: Hierarchical MPT Modeling"
-author: "Daniel W. Heck, Denis Arnold, Nina Arndold"
+author: "Daniel W. Heck, Denis Arnold, Nina Arnold"
 date: "`r Sys.Date()`"
 output:
       rmarkdown::html_vignette:
