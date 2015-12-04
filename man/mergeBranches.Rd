@@ -4,12 +4,10 @@
 \alias{mergeBranches}
 \title{Unique branches for each Tree with the same answer and sum the corresponing formulas}
 \usage{
-mergeBranches(TreeData, DataNames)
+mergeBranches(TreeData)
 }
 \arguments{
 \item{TreeData}{Data returned from readMultiTree()}
-
-\item{DataNames}{Vector containing the names in order of the data file}
 }
 \description{
 Unique branches for each Tree with the same answer and sum the corresponing formulas

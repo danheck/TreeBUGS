@@ -66,12 +66,16 @@ mpt2BetaMPT<-function(eqnfile,  # statistical model stuff
   Tree=readMultiTree(eqnfile)
   data=readSubjectData(data,unique(Tree$Answers))
   # reorder data:
-  data <- data[,sort(unique(Tree$Answers))]
+  # data <- data[,sort(unique(Tree$Answers))] OLD Daniel fix
 
-  Tree=mergeBranches(Tree,names(data))
+  Tree=mergeBranches(Tree) # OLD mergeBranches ,names(data))
+
   tHoutput=thetaHandling(Tree,restrictions)
   SubPar=tHoutput[[1]]
   Tree=tHoutput[[2]]
+
+  data=data[,Tree$Answers] #ordering data according to Tree
+
   makeModelDescription(modelfilename,Tree,max(SubPar$theta),
                        alpha,beta,sampler)
   mcmc <- callingBetaMPT(Tree,

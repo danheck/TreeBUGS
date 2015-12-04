@@ -55,11 +55,10 @@ readMultiTree<-function(file){
 
 #' Unique branches for each Tree with the same answer and sum the corresponing formulas
 #' @param TreeData Data returned from readMultiTree()
-#' @param DataNames Vector containing the names in order of the data file
 #' @author Nina R. Arnold, Denis Arnold
 #' @export
 
-mergeBranches<-function(TreeData, DataNames){ # Unique branches for each Tree with one answer and sum the corresponing formulas
+mergeBranches<-function(TreeData){ # OLD ,DataNames){ # Unique branches for each Tree with one answer and sum the corresponing formulas
 
   Trees=unique(TreeData$Trees)
   TreesUniqueAnswers=list()
@@ -84,7 +83,7 @@ mergeBranches<-function(TreeData, DataNames){ # Unique branches for each Tree wi
   }
 
   MergedTree=NewTrees[-1,]
-  MergedTree=MergedTree[order(MergedTree$Answers)[order(DataNames)],]
+  MergedTree=MergedTree[order(MergedTree$Trees),]
 
   return(MergedTree)
 }
