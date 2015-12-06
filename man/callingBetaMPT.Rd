@@ -5,8 +5,8 @@
 \title{Calling the Sampler (JAGS or OpenBUGS or WinBUGS)}
 \usage{
 callingBetaMPT(DataFormulas, data, modelfile, numberOfParameters = 0,
-  n.iter = 1e+05, n.burnin = NULL, n.update = 10, n.thin = 2,
-  n.chains = 3, sampler = "JAGS", autojags = TRUE, ...)
+  transformedPar = NULL, n.iter = 1e+05, n.burnin = NULL, n.update = 10,
+  n.thin = 2, n.chains = 3, sampler = "JAGS", autojags = TRUE, ...)
 }
 \arguments{
 \item{DataFormulas}{Ouptut of mergeBranches()}
@@ -16,6 +16,8 @@ callingBetaMPT(DataFormulas, data, modelfile, numberOfParameters = 0,
 \item{modelfile}{Full path to the model description file. (Made with makeModelDescription())}
 
 \item{numberOfParameters}{How many parameters does the model have}
+
+\item{transformedPar}{vector with names of transformed parameter to be sampled (e.g., parameter differences)}
 
 \item{n.iter}{Number of iterations.}
 

@@ -75,13 +75,20 @@ mpt2BetaMPT<-function(eqnfile,  # statistical model stuff
   Tree=tHoutput[[2]]
 
   data=data[,Tree$Answers] #ordering data according to Tree
+  thetaNames <- tHoutput[[1]][,1:2]
 
-  makeModelDescription(modelfilename,Tree,max(SubPar$theta),
-                       alpha,beta,sampler)
+  # transformed parameters
+  transformedPar <- getTransformed(thetaNames, transformedParameters)
+
+  makeModelDescription(modelfilename,Tree ,max(SubPar$theta),
+                       alpha=alpha,beta = beta,
+                       sampler=sampler,
+                       parString=transformedPar$modelstring)
   mcmc <- callingBetaMPT(Tree,
                             data,
                             modelfile=modelfilename,
                             numberOfParameters=max(SubPar$theta),
+                            transformedPar=transformedPar$transformedParameters,
                             # parameters,
                             n.iter=n.iter,
                             n.burnin=n.burnin,
@@ -91,9 +98,9 @@ mpt2BetaMPT<-function(eqnfile,  # statistical model stuff
                             autojags=autojags,
                             ...)
 
-  thetaNames <- tHoutput[[1]][,1:2]
   # Beta MPT: rename parameters and get specific summaries
-  summary <- summarizeBetaMPT(mcmc, thetaNames, sampler=sampler)
+  summary <- summarizeBetaMPT(mcmc, thetaNames, sampler=sampler,
+                              transformedParameters=transformedPar$transformedParameters)
 
   mptInfo <- list(thetaNames = thetaNames,
                   eqnfile=eqnfile,

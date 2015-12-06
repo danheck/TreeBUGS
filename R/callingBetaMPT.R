@@ -4,6 +4,7 @@
 #'  @param modelfile Full path to the model description file. (Made with makeModelDescription())
 #'  @param numberOfParameters How many parameters does the model have
 # not necessary:  @param parameters List with parameters that should be returned from the sampler.
+#'  @param transformedPar vector with names of transformed parameter to be sampled (e.g., parameter differences)
 #'  @param n.iter Number of iterations.
 #'  @param n.burnin Burnin period.
 #'  @param n.update Update paramater for JAGS
@@ -20,6 +21,7 @@ callingBetaMPT<-function(DataFormulas,
                          data,
                          modelfile,
                          numberOfParameters=0,
+                         transformedPar=NULL,
                          # not necessary:parameters = list("theta", "alph", "bet", "mnb", "varp"),
                          n.iter=100000,
                          n.burnin=NULL,
@@ -73,7 +75,9 @@ callingBetaMPT<-function(DataFormulas,
   if(sampler%in%c("jags","JAGS")){
     W=diag(numberOfParameters)
     data[[index+1]]="W"
-    parametervector=c(unlist(parameters), "T1.obs","T1.pred","p.T1")
+    parametervector=c(unlist(parameters),
+                      "T1.obs","T1.pred","p.T1","p.T1ind",
+                      transformedPar)
     samples = jags.parallel(data,
                             inits=NULL,
                             parameters.to.save=parametervector,

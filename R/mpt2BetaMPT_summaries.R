@@ -1,6 +1,6 @@
 
 # internal function to process R2JAGS output
-summarizeBetaMPT <- function(mcmc, thetaNames, sampler="JAGS"){
+summarizeBetaMPT <- function(mcmc, thetaNames, sampler="JAGS", transformedParameters=NULL){
 
   # number of parameters
   S <- max(thetaNames[,"theta"])
@@ -30,13 +30,21 @@ summarizeBetaMPT <- function(mcmc, thetaNames, sampler="JAGS"){
                                         ID=1:N, Statistic=c("Mean","Median","SD"))
 
     # goodness of fit and deviance
+    if(is.null(transformedParameters)){
+      transPar <- NULL}
+    else{
+      transPar <- mcmc$BUGSoutput$summary[transformedParameters,colsel, drop=FALSE]
+    }
 
     summary <- list(meanParameters=meanParameters,
                     individParameters=individParameters,
-                    fitStatistics=c("DIC"=mcmc$BUGSoutput$DIC,
-                                    "T1.observed"=mcmc$BUGSoutput$mean$T1.obs,
-                                    "T1.predicted"=mcmc$BUGSoutput$mean$T1.pred,
-                                    "p.T1"=mcmc$BUGSoutput$mean$p.T1))
+                    fitStatistics=list(
+                      "overall"=c("DIC"=mcmc$BUGSoutput$DIC,
+                                  "T1.observed"=mcmc$BUGSoutput$mean$T1.obs,
+                                  "T1.predicted"=mcmc$BUGSoutput$mean$T1.pred,
+                                  "p.T1"=mcmc$BUGSoutput$mean$p.T1),
+                      "p.T1individual"=mcmc$BUGSoutput$mean$p.T1ind),
+                    transformedParameters=transPar)
   }else{
     warning("Clean MPT summary statistics only available when using JAGS.")
     summary <- mcmc$BUGSoutput$summary
@@ -52,11 +60,18 @@ print.summary.betaMPT <- function(x,  ...){
     print(x)
   }else{
     cat("Mean parameters on group level:\n")
-    print(x$meanParameters$mean)
+    print(round(x$meanParameters$mean, 5))
     cat("\nVariance of parameters across individuals:\n")
-    print(x$meanParameters$variance)
-    cat("\nModel fit statistics:\n")
-    print(x$fitStatistics)
+    print(round(x$meanParameters$variance, 5))
+    cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
+    print(round(x$fitStatistics$overall, 4))
+    cat("\nPoster predictive p-values for individual data sets:\n")
+    print(round(x$fitStatistics$p.T1individual, 4))
+    if(!is.null(x$transformedParameters)){
+      cat("\nTransformed parameters:\n")
+      print(round(x$transformedParameters, 4))
+    }
+
   }
 }
 
@@ -78,8 +93,8 @@ print.betaMPT <- function(x,  ...){
   if(!x$sampler %in% c("jags", "JAGS")){
     warning("\nClean MPT summary only available when fitting with JAGS.")
   }else{
-    print(cbind("Group Mean" = x$summary$meanParameters$mean[,1],
-                "Group Variance" = x$summary$meanParameters$variance[,1]))
+    print(round(cbind("Group Mean" = x$summary$meanParameters$mean[,1],
+                "Group Variance" = x$summary$meanParameters$variance[,1]),5))
   }
   cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
 }

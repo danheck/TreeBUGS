@@ -5,7 +5,7 @@
 \title{Make the model description file needed by WinBUGS.}
 \usage{
 makeModelDescription(filename, DataFormulas, nthetas, alpha = "dunif(1,5000)",
-  beta = "dunif(1,5000)", sampler = "JAGS")
+  beta = "dunif(1,5000)", sampler = "JAGS", parString = "")
 }
 \arguments{
 \item{filename}{The name that the model description file should get}
@@ -19,6 +19,8 @@ makeModelDescription(filename, DataFormulas, nthetas, alpha = "dunif(1,5000)",
 \item{beta}{Value for betha}
 
 \item{sampler}{Which sampler should be used? Default is "JAGS", further options are "OpenBUGS" and "WinBugs"}
+
+\item{parString}{additional lines added to sample transformed parameters (e.g., parameter differences for testing)}
 }
 \description{
 Make the model description file needed by WinBUGS.

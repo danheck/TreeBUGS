@@ -5,6 +5,7 @@
 #' @param alpha Value for alpha
 #' @param beta Value for betha
 #' @param sampler Which sampler should be used? Default is "JAGS", further options are "OpenBUGS" and "WinBugs"
+#' @param parString  additional lines added to sample transformed parameters (e.g., parameter differences for testing)
 #' @author Nina R. Arnold, Denis Arnold, Daniel Heck
 #' @export
 
@@ -14,7 +15,8 @@ makeModelDescription<-function(filename,
                                nthetas,
                                alpha="dunif(1,5000)",
                                beta="dunif(1,5000)",
-                               sampler="JAGS"){
+                               sampler="JAGS",
+                               parString=""){
 
   Trees=unique(DataFormulas$Trees)
   NOT=length(Trees)
@@ -106,8 +108,42 @@ makeModelDescription<-function(filename,
     # get means of expected and predicted frequencies:
 
   }
+
+  cat("\n\n### T1statistic for individual data:\n", file=filename,append=T)
+  cat("T1ind.obs[n] <- 0", file=filename,append=T )
+  for(i in 1:NOT){
+    cat("+ sum( (response.",Trees[i],"[n,] - n.expected.",Trees[i],"[n,])^2/n.expected.",Trees[i],"[n,])",
+        sep="", file=filename,append=T)
+  }
+
+  # T1 for predicted means:
+  cat("\nT1ind.pred[n] <- 0", file=filename,append=T )
+  for(i in 1:NOT){
+    cat("+ sum( (response.",Trees[i],".pred[n,] - n.expected.",Trees[i],"[n,])^2/n.expected.",Trees[i],"[n,])", sep="", file=filename,append=T)
+  }
+  # 	T1.obs <- sum( (freq.mean-n.mean)^2/n.mean)
+  # 	T1.pred <- sum( (pred.mean-n.mean)^2/n.mean)
+  cat("\np.T1ind[n] <- T1ind.pred[n] > T1ind.obs[n]\n",  file=filename,append=T)
+
+
+  ### individual analysis:
+#   T1ind.obs[n] <- 0+
+#     sum( (response.A[n,] - n.expected.A[n,])^2/n.expected.A[n,])+
+#     sum( (response.B[n,] - n.expected.B[n,])^2/n.expected.B[n,])+
+#     sum( (response.N[n,] - n.expected.N[n,])^2/n.expected.N[n,])
+#
+#   T1ind.pred[n] <- 0+
+#     sum( (response.A.pred[n,] - n.expected.A[n,])^2/n.expected.A[n,])+
+#     sum( (response.B.pred[n,] - n.expected.B[n,])^2/n.expected.B[n,])+
+#     sum( (response.N.pred[n,] - n.expected.N[n,])^2/n.expected.N[n,])
+#
+#   p.T1ind[n] <- T1ind.pred[n] > T1ind.obs[n]
+
   cat("}\n",file=filename,append=T)
 
+
+
+  cat("\n\n### T1 statistic for aggregated data:\n", file=filename,append=T)
   for(i in 1:NOT){
     cat("for(k in 1:",ncatPerTree[i],") {\n",sep="",file=filename,append=T)
     cat("n.expected.",Trees[i],".mean[k] <- mean(n.expected.",Trees[i],"[,k])\n",
@@ -135,7 +171,7 @@ makeModelDescription<-function(filename,
 
 }
 	### Transformed parameters:
-
+  cat(parString, file=filename, append = TRUE)
 
   cat("}\n",file=filename,append=T)
 }
