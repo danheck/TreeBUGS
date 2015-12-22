@@ -1,0 +1,11 @@
+
+TreeBUGS 0.2.0 (December 2015)
+===========
+
+* Implementation of Beta-MPT and latent-trait MPT model: betaMPT() ; traitMPT()
+* Sample and summarize transformed parameters (e.g., "deltaD=d1-d2")
+* Posterior predictive checks (T1 statistic for group and individual data)
+* Basic summary and plotting functionality
+* Functions to generate data according to the Beta-MPT: genBetaMPT()
+* Package vignette with examples: vignette("TreeBUGS")
+* Checking EQN file for consistency (identifiability etc.): readEQN()

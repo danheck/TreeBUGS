@@ -2,6 +2,7 @@
 title: "TreeBUGS: Hierarchical MPT Modeling"
 author: "Daniel W. Heck, Denis Arnold, Nina Arnold"
 date: "`r Sys.Date()`"
+number_section: true
 output:
       rmarkdown::html_vignette:
 vignette: >
@@ -15,9 +16,9 @@ vignette: >
 
 In the most simple user scenario, the following steps are required:
 
-1. Save MPT model file on disk in .eqn format
-2. Save individual data to .csv file (comma separated, rows=persons, columns=labeled categories)
-3. Call `mpt2BetaMPT` or `mpt2TraitMPT` (exact code below)
+1. Define path to existing MPT model file in .eqn format (cf. multiTree; Moshagen, 2010)
+2. Define path to data set with individual frequencies (.csv file: comma separated, rows=persons, columns=labeled categories)
+3. Call one of the fitting functions `betaMPT` or `traitMPT` (exact code below)
 4. Check convergence of MCMC chains
 5. Summarize and plot results
 
@@ -25,9 +26,9 @@ In the following, these steps are explained in more detail. Note that TreeBUGS r
 
 
 
-## Save MPT model file
+### MPT model file in EQN syntax
 
-The model needs to be passed in the standard .eqn file format (e.g., as in multiTree; Moshagen, 2010). As an example, consider the most simple two-high-threshold model (2HTM), each line defines a single processing path containing tree label, category label, and model equations. Note that the model equations should not contain any spaces:
+The model needs to be passed in the standard .eqn file format (e.g., as in multiTree; Moshagen, 2010). As an example, consider the most simple two-high-threshold model (2HTM), each line defines a single processing path containing tree label, category label, and model equations:
 
 ```
 # Title: 2HTM
@@ -39,16 +40,26 @@ Lure      CR     (1-Dn)*(1-g)
 Lure      CR     (1-Dn)
 ``` 
 
-As an input for TreeBUGS, the model file (e.g., `"2htm.txt"`) needs to be saved in the current working directory. Otherwise, the path to the file must be fully specified (e.g., `C:/models/2htm.txt`).
+Note that model equations require the multiplication sign `*` and parameters should not be summarized, e.g., by `a^2*(1-a)`. As an input for TreeBUGS, the model file (e.g., `"2htm.txt"`) needs to be saved in the current working directory. Otherwise, the path to the file must be fully specified (e.g., `C:/models/2htm.txt`). To check how TreeBUGS interprets a given .eqn-file, use `readEQN("pathToFile.eqn", paramOrder=TRUE)` 
+
+Equality restrictions on the MPT parameters can either be provided in a list:
+```{r, eval=FALSE}
+restrictions = list("Dn=Do", "g=0.5")
+```
+or by a path to a text file on the hard drive (e.g., `restrictions="pathToFile.txt"`) that contains the equality constraints:
+```
+Dn=Do
+g=0.5
+```
 
 
 
-## Save Individual Data
+### Data Set with Individual Frequencies
 
-As a standard, the data are provided in a comma-separated text file (.csv) as:
+As default, the data are provided in a comma-separated text file (.csv) in the following format:
 
 ```
-"Hit", "Miss", "FA", "CR"
+Hit, Miss, FA, CR
 20,      10,      5,    25
 13,       7,      9,    21 
 15,       5,      6,    14
@@ -56,26 +67,31 @@ As a standard, the data are provided in a comma-separated text file (.csv) as:
 
 ```
 
-As for the .eqn file, the data file can either be specified as `data_ind.csv` if it is in the current working directory, or as an absolute path (e.g., `"C:/models/data_ind.csv"`). Alternatively, a data.frame or matrix with appropriate column names (i.e., category labels) can be provided.
+Note that the first line contains the category labels (must match the category labels from the .eqn-file) and all other rows contain individual frequencies. Similarly as for the .eqn file, the path to the data file can either be specified as `data_ind.csv` if it is in the current working directory, or as an absolute path (e.g., `"C:/models/data_ind.csv"`). 
+
+Alternatively, a data.frame or matrix with appropriate column names (i.e., category labels) can be provided.
 
 
 
-## Fit Hierarchical MPT Model
+### Fit Hierarchical MPT Model
 
 An hierarchical **Beta-MPT model** is fitted with the following code:
 
 ```{r, eval=FALSE}
-beta2HTM <- mpt2BetaMPT(eqnfile="2htm.txt",              # .eqn file
-                        data="data_ind.csv",             # individual data
-                        restrictions=c("do=dn"),         # parameter restrictions (or path to file)
-                        modelfilename = "jags_model_file.txt"   # export JAGS model file
-                        )
+beta.fit <- betaMPT(eqnfile="2htm.txt",              # .eqn file
+                    data="data_ind.csv",             # individual data
+                    restrictions=c("do=dn"),         # parameter restrictions (or path to file)
+                    modelfilename = "jags_model_file.txt"   # export JAGS model file
+)
 
 ```
 
-## Check convergence of MCMC chains
+Similarly, a latent-trait model is fitted by replacing `betaMPT` by `traitMPT`.
 
-The functions `mpt2BetaMPT` and `mpt2TraitMPT` include the original samples from the MCMC sampler for convergence checks. Basically, these samples can be accessed by `fittedModel$mcmc`:
+
+### Check convergence of MCMC chains
+
+The functions `betaMPT` and `traitMPT` return a list including the original samples from the MCMC sampler for convergence checks. Basically, these samples can be accessed by `fittedModel$mcmc`:
 
 ```{r, eval=FALSE}
 # Traceplots (posterior values as a function of sample number)
@@ -101,7 +117,7 @@ acfplot(codaModel)
 
 See \link{R2JAGS} for further convergence statistics and plots.
 
-## Summarize and Plot Model
+### Summarize and Plot Model
 
 To get an overview of the parameter estimates including convergence statistics, use:
 
@@ -117,10 +133,36 @@ plot(beta2HTM,     # fitted model
      )
 ```
 
+## Extended Modeling Possibilities
 
+### Including Covariates
 
+TBA
 
+### Include Transformed Parameters
 
+To test the difference between two core MPT parameters, the functions `betaMPT` and `traitMPT` include the argument `transformedParameters` that allows to sample transformed parameters. For instance, the difference between two MPT parameters can be tested by 
+
+```{r, eval=FALSE}
+transformedParameters = list("deltaG = G_1 - G_2",     # difference of parameters
+                             "G1_larger = G_1 > G_2")  # indicator variable (testing order constraints)
+```
+
+Note that transformed parameters require new, unique labels left of the equality sign `=` and that parameters on the right hand must match with the MPT parameters in the .eqn-file. Note that transformed parameters are computed and monitored on the group-level only.
+
+### Generate Simulated Data Sets
+
+Simulated data sets are in general useful to check the robustness of the estimators and the sample size requirements. TreeBUGS includes functions to generate data sets of individual frequencies for both the Beta-MPT and the latent-trait MPT model. 
+
+```{r, eval=FALSE}
+genDat <- genBetaMPT(N = 100,                             # number of participants     
+                     numItems = c(Target=250, Lure=250),  # number of responses per tree
+                     eqnfile = "2htm.eqn",                # path to MPT file
+                     mean = c(Do=.7, Dn=.7, g=.5),        # true group-level parameters
+                     sd =   c(Do=.1, Dn=.1, g=.05))       # SD of individual parameters
+```
+
+<!---
 #################### EXAMPLES
 ## Figures
 
@@ -144,3 +186,16 @@ Also a quote using `>`:
 
 > "He who gives up [code] safety for [code] speed deserves neither."
 ([via](https://twitter.com/hadleywickham/status/504368538874703872))
+
+--->
+
+## References
+ 
+* Erdfelder, E., Auer, T.-S., Hilbig, B. E., Assfalg, A., Moshagen, M., & Nadarevic, L. (2009). Multinomial processing tree models: A review of the literature. Journal of Psychology, 217, 108–124. http://doi.org/10.1027/0044-3409.217.3.108
+
+* Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70–98. http://doi.org/10.1007/s11336-009-9141-0
+
+* Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42–54. http://doi.org/10.3758/BRM.42.1.42
+
+* Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167–183. http://doi.org/10.1016/j.jmp.2009.06.007
+

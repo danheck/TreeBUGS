@@ -1,13 +1,13 @@
 bibentry("Manual",
 		title="TreeBUGS: Hierarchical MPT Modeling",
-		author="Nina Arnold, Daniel W. Heck, and Denis Arnold",
+		author="Daniel W. Heck, Nina Arnold, and Denis Arnold",
 		year="2015",
-		note="(Version 0.1.1)",
+		note="(Version 0.2.0)",
 		url="http://psycho3.uni-mannheim.de/Home/Research/Software/TreeBUGS/",
 
 		textVersion =
-		paste("Arnold, N., Arnold, D., & Heck, D.W. (2015). ",
-				"TreeBUGS: Hierarchical MPT Modeling (Version 0.1.1). ",
+		paste("Heck, D.W., Arnold, N., & Arnold, D. (2015). ",
+				"TreeBUGS: Hierarchical MPT Modeling (Version 0.2.0). ",
 				"http://psycho3.uni-mannheim.de/Home/Research/Software/TreeBUGS/",
 				sep=""),
 

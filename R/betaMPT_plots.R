@@ -2,7 +2,7 @@
 ############## PLOTTING FUNCTIONS FOR betaMPT
 #' Plot Beta-MPT Parameter Estimates
 #'
-#' @param x a fitted Beta-MPT model (see \code{\link{mpt2BetaMPT}})
+#' @param x a fitted Beta-MPT model (see \code{\link{betaMPT}})
 #' @param includeIndividual whether to plot individual estimates
 #' @param ... further arguments passed to the standard \code{\link{plot}} function
 #' @author Daniel Heck
@@ -33,6 +33,15 @@ plot.betaMPT <- function(x, includeIndividual=TRUE, ...){
   }
 
 
+}
+
+#' Plots for latent-trait MPT models (see \code{\link{traitMPT}}).
+#'
+#' @inheritParams  plot.betaMPT
+#' @author Daniel Heck
+#' @export
+plot.traitMPT <- function(x, includeIndividual=TRUE, ...){
+  plot.betaMPT(x,...)
 }
 
 
