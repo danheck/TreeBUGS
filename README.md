@@ -6,9 +6,9 @@ TreeBUGS is an R package that facilitates using hierarchical multinomial process
 
 In the most simple user scenario, the following steps are required:
 
-1. Save MPT model file on disk in .eqn format (cf. multiTree; Moshagen, 2010)
-2. Save individual data to .csv file (comma separated, rows: persons, columns: labeled categories)
-3. Call `mpt2BetaMPT` or `mpt2TraitMPT` (exact code in manual/vignette)
+1. Define path to existing MPT model file in .eqn format (cf. multiTree; Moshagen, 2010)
+2. Define path to data set with individual frequencies (.csv file: comma separated, rows=persons, columns=labeled categories)
+3. Call `betaMPT` or `traitMPT` (exact code in manual/vignette)
 4. Check convergence of MCMC chains
 5. Summarize and plot results using functions tailored to MPT models
 
