@@ -98,7 +98,9 @@ callingSampler <- function(model,
                             n.iter=n.iter,
                             n.burnin=n.burnin,
                             n.chains=n.chains,
-                            DIC=T,...)
+                            DIC=T,
+                            envir=environment(),
+                            ...)
     if(autojags){
       recompile(samples)
       samples.upd <- autojags(samples, n.update = n.update)

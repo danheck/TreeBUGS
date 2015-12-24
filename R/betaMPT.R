@@ -11,7 +11,7 @@
 #' @param alpha Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).
 #' @param beta Second hyperprior, see \code{alpha}
 #' @param parEstFile Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")
-#' @param n.iter Number of iterations.
+#' @param n.iter Number of iterations (including burnin samples).
 #' @param n.burnin Burnin period.
 #' @param n.thin Thinning rate.
 #' @param n.chains number of MCMC chains
@@ -34,20 +34,20 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     data,
                     restrictions = NULL,
                     transformedParameters = NULL,
-                    alpha = "dunif(1,5000)",
-                    beta = "dunif(1,5000)",
+                    alpha = "dunif(.01,5000)",
+                    beta = "dunif(.01,5000)",
 
                     # MCMC stuff:
-                    n.iter = 100000,
-                    n.burnin = 50000,
-                    n.thin = 2,
-                    n.chains = 3,
+                    n.iter=50000,
+                    n.burnin=5000,
+                    n.thin=5,
+                    n.chains=3,
 
                     # File Handling stuff:
                     modelfilename = NULL,
                     parEstFile = NULL,
                     sampler = "JAGS",
-                    autojags = TRUE,
+                    autojags = FALSE,
                     ...){
 
   if(is.null(modelfilename)){
@@ -72,8 +72,8 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   data <- readSubjectData(data,unique(mergedTree$Category))
 
   tHoutput <- thetaHandling(mergedTree,restrictions)
-  SubPar <- tHoutput[[1]]
-  mergedTree <- tHoutput[[2]]
+  SubPar <- tHoutput$SubPar
+  mergedTree <- tHoutput$mergedTree
 
   data <- data[,mergedTree$Category] #ordering data according to Tree
   thetaNames <- tHoutput[[1]][,1:2]

@@ -32,9 +32,9 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
     ################################### DATA #######################
     cat("data\n",file=filename)
     cat("{\n",file=filename,append=T)
-    cat("for(s in 1:",S,"){\n",sep="",file=filename,append=T)
-    cat("zero[s] <- 0\n",file=filename,append=T)
-    cat("}\n ",file=filename,append=T)
+    # cat("for(s in 1:",S,"){\n",sep="",file=filename,append=T)
+    # cat("zero[s] <- 0\n",file=filename,append=T)
+    # cat("}\n ",file=filename,append=T)
 
 
     ####### for posterior predictive cehck: mean frequencies

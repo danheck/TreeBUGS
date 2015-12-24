@@ -6,9 +6,9 @@
 \usage{
 traitMPT(eqnfile, data, restrictions = NULL, transformedParameters = NULL,
   mu = "dnorm(0,1)", xi = "dunif(0,100)", V = NULL, df = NULL,
-  n.iter = 1e+05, n.burnin = 50000, n.thin = 2, n.chains = 3,
+  n.iter = 50000, n.burnin = 5000, n.thin = 5, n.chains = 3,
   modelfilename = NULL, parEstFile = NULL, sampler = "JAGS",
-  autojags = TRUE, ...)
+  autojags = FALSE, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -27,7 +27,7 @@ traitMPT(eqnfile, data, restrictions = NULL, transformedParameters = NULL,
 
 \item{df}{degrees of freedom for the inverse-Wishart hyperprior for the individual parameters. Minimum is S+1, where S gives the number of core MPT parameters.}
 
-\item{n.iter}{Number of iterations.}
+\item{n.iter}{Number of iterations (including burnin samples).}
 
 \item{n.burnin}{Burnin period.}
 

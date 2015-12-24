@@ -131,8 +131,8 @@ mergeBranches<-function(Tree){ # OLD ,DataNames){ # Unique branches for each Tre
 #     }
 #   }
 #
-#   MergedTree=NewTrees[-1,]
-#   MergedTree=MergedTree[order(MergedTree$Tree),]
+#   mergedTree=NewTrees[-1,]
+#   mergedTree=mergedTree[order(mergedTree$Tree),]
 
   return(NewTree)
 }
@@ -146,11 +146,13 @@ mergeBranches<-function(Tree){ # OLD ,DataNames){ # Unique branches for each Tre
 # #' @export
 getParameter<-function(TreeData){
 
-  Parameter=unique(unlist(strsplit(TreeData$Equation,split="\\*|\\(|\\)|\\-|\\+")))
-  r=c(which(nchar(Parameter)==0),grep("^[0-9]+$|^[0-9]+\\.[0-9]+",Parameter))
+  Parameter=unique(unlist(strsplit(TreeData$Equation,
+                                   split="\\*|\\(|\\)|\\-|\\+")))
+  r=c(which(nchar(Parameter)==0), grep("^[0-9]+$|^[0-9]+\\.[0-9]+", Parameter))
   Parameter=Parameter[-r]
-  Parameter=c(sort(Parameter[grep("[A-Z]",Parameter)]),sort(Parameter[-grep("[A-Z]",Parameter)]))
-  return(Parameter)
+  Parameter=c(sort(Parameter[grep("[A-Z]",Parameter)]),
+              sort(Parameter[-grep("[A-Z]",Parameter)]))
+  return(sort(Parameter))
 
 }
 
@@ -180,103 +182,197 @@ readSubjectData<-function(data,Category){
 
 # #'  Set constants, replace parameters for thetas
 # #'
-# #' @param MergedTree is the output of mergeBranches
+# #' @param mergedTree is the output of mergeBranches
 # #' @param restrictions Either the (full path to the) file that specifies which parameters should be constants and which should # be equal; or a list of parameter restrictions
-# #' @author Nina R. Arnold, Denis Arnold
+# #' @author Nina R. Arnold, Denis Arnold, Daniel Heck
 # #' @export
-thetaHandling<-function(MergedTree,restrictions){
+thetaHandling <-function(mergedTree, restrictions){
 
-  Parameter=getParameter(MergedTree)
-  partrack=Parameter
+  Parameter=getParameter(mergedTree)
 
-  # Handle the constants
-  if(missing(restrictions) | is.null(restrictions)){
-    # no constraints: TODO
-    SubPar=NULL
+  SubPar <- data.frame(Parameter = Parameter,
+                       theta = 1:length(Parameter),
+                       sub="", stringsAsFactors=F)
 
-  }else{
-    # with constraints:
+  ############ only if restrictions are included:
+  if(!is.null(restrictions)){
 
+    # restrictions given as a list
     if(is.list(restrictions)){
-      # restrictions given as a list
-      SubPar <- data.frame(V1 = as.vector(unlist(restrictions)),
-                           stringsAsFactors = FALSE)
+      restrVector <- as.vector(unlist(restrictions))
+
+    # restrictions given as a model file
     }else{
-      # restrictions given as a model file
-      SubPar=read.csv(restrictions,header=F,stringsAsFactors=F)
+      restrVector=read.csv(restrictions,header=F,stringsAsFactors=F)$V1
     }
+    restrVector <- gsub(" ", "", restrVector)
 
-    # actual replacement of parameters:
+    for(k in 1:length(restrVector)){
+      splitRestr <- strsplit(restrVector[k], "=")[[1]]
+      if(length(splitRestr) == 1){
+        warning("Restriction not well defined: Equality sign '=' missing in:\n  ",splitRestr)
+      }else{
+        index <- match(splitRestr, SubPar$Parameter)
+        suppressWarnings(consts <- as.numeric(splitRestr))
+        # consts <- consts[!is.na(consts)]
 
-    numberSubs <- grep("=[0-9]+$|=[0-9]+\\.[0-9]+$",SubPar$V1) # grep("=", SubPar$V1) #
-    replaceConst=data.frame(const="character",sub="character",stringsAsFactors=F)
-    if(length(numberSubs)>0){
-      for(i in 1:length(numberSubs)){
-        X=unlist(strsplit(SubPar$V1[numberSubs[i]],"="))
-        number=grep("^[0-9]+$|^[0-9]+\\.[0-9]+$",X)
-        if(length(number)>1){
-          cat("Variable set to multiple constants")
-          return(-1)
-        }
-        else{
-          for(i in 1:length(X)){
-            if(i!=number){
-              replaceConst=rbind(replaceConst,
-                                 data.frame(const=X[i], sub=X[number]))
-            }
+        if(sum(!is.na(consts)) == 0){
+          # only parameters without constants
+          if(any(is.na(index))){
+            error <- paste0("Restriction contains parameters not contained in the model:\n  ",
+                            paste(splitRestr, collapse="="))
+            stop(error)
           }
-
+          # replace index
+          SubPar[index[2:length(index)], "theta"]<- index[1]
+        }else if(sum(!is.na(consts)) == 1){
+          # contrained to constant values
+          CONST <- consts[!is.na(consts)]
+          if(CONST <0 | CONST >1){
+            error <- paste0("Check parameter restrictions. Constants are not in the interval [0,1]: ",
+                            restrVector[k])
+            warning(error)
+          }
+          SubPar[index[!is.na(index)], "theta"] <- - CONST
+        }else{
+          stop("Restrictions should not contain more than one constant!")
         }
       }
-      replaceConst = replaceConst[-1,]
-      for(i in 1:dim(replaceConst)[1]){
-        MergedTree$Equation=gsub(paste0(
-          "(^|\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\))",
-          replaceConst$const[i],
-          "(\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\)|$)"),
-          paste0("\\1", replaceConst$sub[i],"\\2"),
-          MergedTree$Equation,perl=T)
-      }
-    }
-
-    partrack=partrack[-which(partrack%in%replaceConst$const)]
-
-    # Handle parameters set equal
-    if(length(grep("=[0-9]+$|=[0-9]+\\.[0-9]+$",SubPar$V1))>0){
-      SubPar=SubPar[-grep("=[0-9]+$|=[0-9]+\\.[0-9]+$",SubPar$V1),]
-    }
-    SubPar=strsplit(SubPar,split="=")
-
-    theta=numeric()
-
-    for(i in 1:length(SubPar)){
-      for(j in 1:length(SubPar[[i]])){
-        theta=c(theta,i)
-      }
-
-    }
-    SubPar=data.frame(Par=unlist(SubPar),
-                      theta=theta,
-                      stringsAsFactors=F)
-    SubPar$sub=paste("theta[",SubPar$theta,",n]",sep="")
-
-    partrack=partrack[-which(partrack%in%SubPar$Par)]
-    if(length(partrack)>0){
-      for(i in 1:length(partrack)){
-        SubPar=rbind(SubPar,data.frame(Par=partrack[i],
-                                       theta=max(SubPar$theta+1),
-                                       sub=paste("theta[",max(SubPar$theta)+1,",n]",sep="")))
-      }
-    }
-
-    for(j in 1:length(SubPar$Par)){
-      MergedTree$Equation=gsub(paste("(^|\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\))",SubPar$Par[j],"(\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\)|$)",sep=""),
-                               paste("\\1",SubPar$sub[j],"\\2",sep=""),
-                               MergedTree$Equation,perl=T)
     }
   }
 
-  output=list(SubPar,MergedTree)
+  isConstant <- SubPar$theta <= 0
+
+  ############## replaced constant parameter values:
+  if(sum(isConstant) > 0){
+    constants <- SubPar[isConstant,, drop=FALSE]
+    SubPar <- SubPar[!isConstant,, drop=FALSE]
+    constants$sub <- - constants$theta
+
+    for(j in 1:nrow(constants)){
+      mergedTree$Equation <- gsub(
+        pattern = paste0("(^|\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\))",
+                         constants$Parameter[j],
+                         "(\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\)|$)"),
+        replacement = paste0("\\1",constants$sub[j],"\\2"),
+        mergedTree$Equation, perl=T)
+    }
+#     }
+  }else{
+    constants <- NULL
+  }
+
+  # use new, increasing indices 1....S for parameters:
+  tmp <- unique(SubPar$theta)
+  for(tt in 1:length(tmp)){
+    SubPar$theta[SubPar$theta == tmp[tt]] <- tt
+  }
+
+  ############## replaced constant parameter values:
+  SubPar$sub <- paste0("theta[", SubPar$theta, ",n]")
+  for(j in 1:nrow(SubPar)){
+    mergedTree$Equation <- gsub(
+      pattern = paste0("(^|\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\))",
+                       SubPar$Parameter[j],
+                       "(\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\)|$)"),
+      replacement = paste0("\\1",SubPar$sub[j],"\\2"),
+      mergedTree$Equation, perl=T)
+  }
+
+  #################### OLD VERSION: #############################
+
+#   for(i in 1:nrow(SubPar)){
+#     mergedTree$Equation <- gsub(pattern = SubPar$Parameter[i],
+#                                 replacement = SubPar$sub[i],
+#                                 mergedTree$Equation, fixed = TRUE)
+#   }
+
+#   partrack=Parameter
+#
+#   # Handle the constants
+#   if(missing(restrictions) | is.null(restrictions)){
+#     # no constraints: TODO
+#     SubPar <- NULL
+#     numberSubs <- 0
+#   }else{
+#     # with constraints:
+#
+#     if(is.list(restrictions)){
+#       # restrictions given as a list
+#       SubPar <- data.frame(V1 = as.vector(unlist(restrictions)),
+#                            stringsAsFactors = FALSE)
+#     }else{
+#       # restrictions given as a model file
+#       SubPar=read.csv(restrictions,header=F,stringsAsFactors=F)
+#     }
+#
+#     # actual replacement of parameters:
+#     numberSubs <- grep("=[0-9]+$|=[0-9]+\\.[0-9]+$",SubPar$V1) # grep("=", SubPar$V1) #
+#   }
+#   replaceConst=data.frame(const="character",sub="character",stringsAsFactors=F)
+#   if(any(numberSubs > 0)){
+#     for(i in 1:length(numberSubs)){
+#       X=unlist(strsplit(SubPar$V1[numberSubs[i]],"="))
+#       number=grep("^[0-9]+$|^[0-9]+\\.[0-9]+$",X)
+#       if(length(number)>1){
+#         cat("Variable set to multiple constants")
+#         return(-1)
+#       }
+#       else{
+#         for(i in 1:length(X)){
+#           if(i!=number){
+#             replaceConst=rbind(replaceConst,
+#                                data.frame(const=X[i], sub=X[number]))
+#           }
+#         }
+#
+#       }
+#     }
+#     replaceConst = replaceConst[-1,]
+#     for(i in 1:dim(replaceConst)[1]){
+#       mergedTree$Equation=gsub(paste0(
+#         "(^|\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\))",
+#         replaceConst$const[i],
+#         "(\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\)|$)"),
+#         paste0("\\1", replaceConst$sub[i],"\\2"),
+#         mergedTree$Equation,perl=T)
+#     }
+#   }
+#
+#   partrack=partrack[-which(partrack%in%replaceConst$const)]
+#
+#   # Handle parameters set equal
+#   if(length(grep("=[0-9]+$|=[0-9]+\\.[0-9]+$",SubPar$V1))>0){
+#     SubPar=SubPar[-grep("=[0-9]+$|=[0-9]+\\.[0-9]+$",SubPar$V1),]
+#   }
+#   SubPar=strsplit(SubPar,split="=")
+#
+#   theta=numeric()
+#
+#   for(i in 1:length(SubPar)){
+#     for(j in 1:length(SubPar[[i]])){
+#       theta=c(theta,i)
+#     }
+#
+#   }
+#   SubPar=data.frame(Par=unlist(SubPar),
+#                     theta=theta,
+#                     stringsAsFactors=F)
+#   SubPar$sub=paste("theta[",SubPar$theta,",n]",sep="")
+#
+#   partrack=partrack[-which(partrack%in%SubPar$Par)]
+#   if(length(partrack)>0){
+#     for(i in 1:length(partrack)){
+#       SubPar=rbind(SubPar,data.frame(Par=partrack[i],
+#                                      theta=max(SubPar$theta+1),
+#                                      sub=paste("theta[",max(SubPar$theta)+1,",n]",sep="")))
+#     }
+#   }
+#
+  # for(j in 1:length(SubPar$Par)){
+
+
+  output=list(SubPar = SubPar, mergedTree = mergedTree, constants=constants)
 
   return(output)
 

@@ -5,18 +5,21 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", transformedPar
   # number of parameters
   S <- max(thetaNames[,"theta"])
 
+  idx <- ""
+  if(S>1) idx <- paste0("[",1:S,"]")
+
   if(sampler %in% c("JAGS","jags")){
     N <- dim(mcmc$BUGSoutput$mean$theta)[2]
     # which statistics to select:
     colsel <- c(1:3,5,7:9)
-    uniqueNames <- thetaNames[!duplicated(thetaNames[,"theta"]),"Par"]
+    uniqueNames <- thetaNames[!duplicated(thetaNames[,"theta"]),"Parameter"]
 
     if(model == "betaMPT"){
       # mean and individual parameter estimates
-      mu <- mcmc$BUGSoutput$summary[paste0("mean[",1:S,"]"),colsel]
-      variance <- mcmc$BUGSoutput$summary[paste0("sd[",1:S,"]"),colsel]
-      alpha <- mcmc$BUGSoutput$summary[paste0("alph[",1:S,"]"),colsel]
-      beta <- mcmc$BUGSoutput$summary[paste0("bet[",1:S,"]"),colsel]
+      mu <- mcmc$BUGSoutput$summary[paste0("mean", idx),colsel, drop=FALSE]
+      variance <- mcmc$BUGSoutput$summary[paste0("sd",idx),colsel, drop=FALSE]
+      alpha <- mcmc$BUGSoutput$summary[paste0("alph",idx),colsel, drop=FALSE]
+      beta <- mcmc$BUGSoutput$summary[paste0("bet",idx),colsel, drop=FALSE]
 
       rownames(mu) <-paste0("mean_", uniqueNames)
       rownames(variance) <-paste0("sd_", uniqueNames)
@@ -24,17 +27,17 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", transformedPar
       rownames(beta) <-paste0("beta_", uniqueNames)
       meanParameters <- list(mean=mu, variance=variance, alpha=alpha, beta=beta)
     }else{
-      mu <- mcmc$BUGSoutput$summary[paste0("mu[",1:S,"]"),colsel]
-      mean <- mcmc$BUGSoutput$summary[paste0("mean[",1:S,"]"),colsel]
-      sigma <- mcmc$BUGSoutput$summary[paste0("sigma[",1:S,"]"),colsel]
+      mu <- mcmc$BUGSoutput$summary[paste0("mu",idx),colsel, drop=FALSE]
+      mean <- mcmc$BUGSoutput$summary[paste0("mean",idx),colsel, drop=FALSE]
+      sigma <- mcmc$BUGSoutput$summary[paste0("sigma",idx),colsel, drop=FALSE]
       rho <- rhoNames <- c()
       cnt <- 1
       # if(S>1){
-#         rho <- mcmc$BUGSoutput$summary[paste0("rho[1,",2:S,"]"),colsel]
+      #         rho <- mcmc$BUGSoutput$summary[paste0("rho[1,",2:S,"]"),colsel, drop=FALSE]
       #         rownames(rho) <- paste0("rho[1,",1:S,"]_",uniqueNames[1],"_",uniqueNames[2:S])
       # cnt <- 2
       while(cnt<S){
-        rho <- rbind(rho, mcmc$BUGSoutput$summary[paste0("rho[",cnt,",",(cnt+1):S,"]"),colsel])
+        rho <- rbind(rho, mcmc$BUGSoutput$summary[paste0("rho[",cnt,",",(cnt+1):S,"]"),colsel, drop=FALSE])
         rhoNames <- c(rhoNames,
                       paste0("rho[",uniqueNames[cnt],",",uniqueNames[(cnt+1):S],"]"))
         cnt <- cnt+1
@@ -86,7 +89,7 @@ print.summary.betaMPT <- function(x,  ...){
   }else{
     cat("Mean parameters on group level:\n")
     print(round(x$meanParameters$mean, 4))
-    cat("\nVariance of parameters across individuals:\n")
+    cat("\nStandard deviation of parameters across individuals:\n")
     print(round(x$meanParameters$variance, 4))
 
     cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
@@ -113,6 +116,8 @@ print.summary.traitMPT <- function(x,  ...){
     print(round(x$meanParameters$mu, 4))
     cat("\nStandard deviation of latent-trait values across individuals:\n")
     print(round(x$meanParameters$sigma, 4))
+    cat("\nCorrelations of individual latent-trait values:\n")
+    print(round(x$meanParameters$rho, 4))
 
     cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
     print(round(x$fitStatistics$overall, 4))
@@ -155,7 +160,7 @@ print.betaMPT <- function(x,  ...){
     warning("\nClean MPT summary only available when fitting with JAGS.")
   }else{
     print(round(cbind("Group Mean" = x$summary$meanParameters$mean[,1],
-                "Group Variance" = x$summary$meanParameters$variance[,1]),4))
+                      "Group Variance" = x$summary$meanParameters$variance[,1]),4))
   }
   cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
 }

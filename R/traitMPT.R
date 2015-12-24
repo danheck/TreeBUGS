@@ -31,16 +31,16 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     df=NULL,
 
                     # MCMC stuff:
-                    n.iter=100000,
-                    n.burnin=50000,
-                    n.thin=2,
+                    n.iter=50000,
+                    n.burnin=5000,
+                    n.thin=5,
                     n.chains=3,
 
                     # File Handling stuff:
                     modelfilename=NULL,
                     parEstFile = NULL,
                     sampler="JAGS",
-                    autojags=TRUE,
+                    autojags=FALSE,
                     ...){
 
   if(is.null(modelfilename)){
@@ -65,11 +65,11 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   data <- readSubjectData(data, unique(mergedTree$Category))
 
   tHoutput <- thetaHandling(mergedTree,restrictions)
-  SubPar <- tHoutput[[1]]
-  mergedTree <- tHoutput[[2]]
+  SubPar <- tHoutput$SubPar
+  mergedTree <- tHoutput$mergedTree
 
   data <- data[,mergedTree$Category] #ordering data according to Tree
-  thetaNames <- tHoutput[[1]][,1:2]
+  thetaNames <- SubPar[,1:2]
   S <- max(SubPar$theta)
   isIdentifiable(S, mergedTree)
 
@@ -80,12 +80,10 @@ traitMPT <- function(eqnfile,  # statistical model stuff
 
 
   # hyperpriors
-  S <- max(SubPar$theta)
   if(missing(V) || is.null(V))
     V <- diag(S)
   if(missing(df) || is.null(df))
     df <- S+1
-  isIdentifiable(S, Tree)
 
   makeModelFile(model = "traitMPT",
                 filename = modelfilename,

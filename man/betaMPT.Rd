@@ -5,9 +5,9 @@
 \title{Fit a Hierarchical Beta-MPT Model}
 \usage{
 betaMPT(eqnfile, data, restrictions = NULL, transformedParameters = NULL,
-  alpha = "dunif(1,5000)", beta = "dunif(1,5000)", n.iter = 1e+05,
-  n.burnin = 50000, n.thin = 2, n.chains = 3, modelfilename = NULL,
-  parEstFile = NULL, sampler = "JAGS", autojags = TRUE, ...)
+  alpha = "dunif(.01,5000)", beta = "dunif(.01,5000)", n.iter = 50000,
+  n.burnin = 5000, n.thin = 5, n.chains = 3, modelfilename = NULL,
+  parEstFile = NULL, sampler = "JAGS", autojags = FALSE, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -22,7 +22,7 @@ betaMPT(eqnfile, data, restrictions = NULL, transformedParameters = NULL,
 
 \item{beta}{Second hyperprior, see \code{alpha}}
 
-\item{n.iter}{Number of iterations.}
+\item{n.iter}{Number of iterations (including burnin samples).}
 
 \item{n.burnin}{Burnin period.}
 
