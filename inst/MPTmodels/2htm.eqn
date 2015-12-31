@@ -1,0 +1,7 @@
+# Title (ignored by TreeBUGS): Basic 2HTM for a single test condition
+Target    Hit    Do
+Target    Hit    (1-Do)*g
+Target    Miss   (1-Do)*(1-g)
+Lure      FA     (1-Dn)*g
+Lure      CR     (1-Dn)*(1-g)
+Lure      CR     Dn

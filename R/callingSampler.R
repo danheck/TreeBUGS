@@ -24,6 +24,8 @@ callingSampler <- function(model,
                            modelfile,
                            S,
                            transformedPar=NULL,
+                           covPars=NULL,
+                           covData=NULL,
                            hyperpriors=NULL,
                            n.iter=100000,
                            n.burnin=NULL,
@@ -70,10 +72,17 @@ callingSampler <- function(model,
   data <- c(paste("items",treeNames, sep="."),
             paste("response",treeNames, sep="."),
             "subjs", "S")
-  if(model == "thetaMPT"){
+  if(model == "traitMPT"){
     data <- c(data, "V", "df")
     df <- hyperpriors$df
     V <- hyperpriors$V
+  }
+  if(!is.null(covData)){
+    if(is.character(covData)){
+      covData <- read.csv(covData, header=T, sep= ",",  strip.white = TRUE)
+    }
+    covSD <- apply(covData, 2, sd)
+    data <- c(data, "covData", "covSD")
   }
 #   for(i in 1:length(treeNames)){
 #     data <- c(data,
@@ -90,9 +99,13 @@ callingSampler <- function(model,
     # data <- c(data, "W")
     parametervector=c(unlist(parameters),
                       "T1.obs","T1.pred","p.T1","p.T1ind",
-                      transformedPar)
+                      transformedPar, covPars)
+    # random initial values
+    inits <- function() list(theta=matrix(runif(subjs*S), S, subjs),
+                             alpha=rgamma(S, 2, 1),
+                             beta=rgamma(S, 2, 1))
     samples = jags.parallel(data,
-                            inits=NULL,
+                            inits=inits,
                             parameters.to.save=parametervector,
                             model.file = modelfile,
                             n.iter=n.iter,

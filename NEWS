@@ -1,3 +1,12 @@
+TreeBUGS 0.2.2 (December 2015)
+===========
+
+* Covariates can be included in betaMPT (see arguments covData and covStructure)
+* Data generation for latent trait MPT model: genTraitMPT()
+* Example model files (2HTM and 2HTSM) in library path: /TreeBUGS/MPTmodels/
+* Examples for readEQN and data generation (genBetaMPT, genTraitMPT)
+
+
 
 TreeBUGS 0.2.0 (December 2015)
 ===========

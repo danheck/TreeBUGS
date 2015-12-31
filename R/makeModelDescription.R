@@ -14,6 +14,7 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
                          mergedTree,
                          S,
                          hyperprior, # list (either with alpha+beta or with mu+xi)
+                         covString=NULL,
                          sampler="JAGS",
                          parString=""){
 
@@ -87,6 +88,10 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 
 	######################################### END OF MODEL SPECIFIC HYPERPRIOR PART ##########################
 
+
+	if(model == "betaMPT" & !is.null(covString)){
+	  cat(covString, file=filename, append=T)
+	}
 
 
 	############################## Posterior predictive checks:

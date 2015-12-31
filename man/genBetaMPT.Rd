@@ -2,7 +2,7 @@
 % Please edit documentation in R/genDataMPT.R
 \name{genBetaMPT}
 \alias{genBetaMPT}
-\title{Simulate Data for Beta MPT Models}
+\title{Generate Data for Beta MPT Models}
 \usage{
 genBetaMPT(N, numItems, eqnfile, mean = NULL, sd = NULL, alpha = NULL,
   beta = NULL)
@@ -10,7 +10,7 @@ genBetaMPT(N, numItems, eqnfile, mean = NULL, sd = NULL, alpha = NULL,
 \arguments{
 \item{N}{number of participants}
 
-\item{numItems}{number of responses per tree (possibly a named vector with tree labels)}
+\item{numItems}{number of responses per tree (a named vector with tree labels)}
 
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
 
@@ -22,7 +22,7 @@ genBetaMPT(N, numItems, eqnfile, mean = NULL, sd = NULL, alpha = NULL,
 
 \item{beta}{see \code{alpha}
 
-Data are generated independently from the JAGS model files used for fitting the Beta-MPT model.}
+Data are generated independently from the JAGS model files used for fitting the Beta-MPT model. If data for an equality-constrained version of the MPT model are required, the restrictions need to be hard-coded into the EQN-model file. Note that equal means still result in nonidentical MPT parameters on the individual level!}
 }
 \value{
 a list including the generated frequencies (\code{data}) and the true, underlying parameters (\code{parameters})
@@ -31,12 +31,15 @@ a list including the generated frequencies (\code{data}) and the true, underlyin
 Generating a data file with known parameter structure using the Beta-MPT. Useful for robustness checks.
 }
 \examples{
-\dontrun{
+# Example: Standard Two-High-Threshold Model (2HTM)
+EQNfile <- paste0(.libPaths()[1], "/TreeBUGS/MPTmodels/2htm.eqn")
 genDat <- genBetaMPT(N = 100,
                      numItems = c(Target=250, Lure=250),
-                     eqnfile = "2htm.eqn",
+                     eqnfile = EQNfile,
                      mean = c(Do=.7, Dn=.7, g=.5),
                      sd =   c(Do=.1, Dn=.1, g=.05))
-                     }
+}
+\references{
+Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.
 }
 

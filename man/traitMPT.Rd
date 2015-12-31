@@ -13,9 +13,9 @@ traitMPT(eqnfile, data, restrictions = NULL, transformedParameters = NULL,
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
 
-\item{data}{The (full path to the) cvs file with the data (comma separated; category labels in first row)}
+\item{data}{The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)}
 
-\item{restrictions}{Optional: The (full path to the) file that specifies which parameters should be constants and which should be equal. Alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
+\item{restrictions}{Optional: Either the (full path to the) file that specifies which parameters should be constants and which should be equal; alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
 
 \item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
 

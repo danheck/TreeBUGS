@@ -4,10 +4,12 @@
 \alias{readEQN}
 \title{Read multiTree files}
 \usage{
-readEQN(file, paramOrder = FALSE)
+readEQN(file, restrictions = NULL, paramOrder = FALSE)
 }
 \arguments{
 \item{file}{The (full path to the) file that specifies the multitree MPT file}
+
+\item{restrictions}{Optional: The (full path to the) file that specifies which parameters should be constants and which should be equal. Alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
 
 \item{paramOrder}{if TRUE, the order of MPT parameters as interally used is printed.}
 }
@@ -27,6 +29,14 @@ As an example, the standard two-high threshold model (2HTM) is defined as follow
 \code{Lure}    \tab \tab \code{CorrectReject}   \tab \tab \code{(1-Dn)*(1-g)} \cr
 \code{Lure}    \tab \tab \code{CorrectReject  } \tab \tab \code{Dn}
 }
+}
+\examples{
+# Example: Standard Two-High-Threshold Model (2HTM)
+EQNfile <- paste0(.libPaths()[1], "/TreeBUGS/MPTmodels/2htm.eqn")
+readEQN(file = EQNfile, paramOrder = TRUE)
+
+# with equality constraint:
+readEQN(file = EQNfile, restrictions = list("Dn=Do", "g=0.5"), paramOrder = TRUE)
 }
 \author{
 Daniel Heck, Denis Arnold, Nina Arnold

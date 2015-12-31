@@ -3,8 +3,10 @@
 #' Fits a Beta-MPT model (Smith & Batchelder, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
 #'
 #' @param eqnfile The (full path to the) file that specifies the MPT model (standard .eqn syntax)
-#' @param data The (full path to the) cvs file with the data (comma separated; category labels in first row)
-#' @param restrictions  Optional: The (full path to the) file that specifies which parameters should be constants and which should be equal. Alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
+#' @param data The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)
+#' @param restrictions  Optional: Either the (full path to the) file that specifies which parameters should be constants and which should be equal; alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
+#' @param covData The path to the csv data file for the individual values on the covariates (rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)
+#' @param covStructure  Optional: Either the (full path to the) file that specifies the assigment of covariates to MPT parameters (that is, each row assigns one covariate to one or more parameters separated by a semicolon, e.g., \code{age ; Do Dn}). Can also be provided as a list, e.g., \code{list("age ; Do Dn", "extraversion ; g"}). Default: All combinations included (could be unstable).
 #' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
 #' @param modelfilename Name that the modelfile that is made by the function to work with WinBUGS should get.
 #'        Default is to write this information to the tempdir as required by CRAN standards.
@@ -18,6 +20,8 @@
 #' @param sampler Which sampler should be used? Default is "JAGS". Further options are "OpenBUGS" and "WinBugs" (without MPT specific summary and plotting functions)
 #' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.
 #' @param ... Arguments to be passed to the sampling function (default: \code{\link{jags.parallel}}.
+#'
+#' @details Note that, in the Beta-MPT model, correlations of individual MPT parameters with covariates are sampled. Hence, the covariates do not affect the estimation of the actual Beta-MPT parameters. Therefore, the correlation of covariates with the individual MPT parameters can equivalently be performed after fitting the model using the sampled posterior parameter values stored in \code{betaMPT$mcmc}
 #'
 #' @return a list of the class \code{betaMPT} with the objects:
 #' \itemize{
@@ -33,6 +37,8 @@
 betaMPT <- function(eqnfile,  # statistical model stuff
                     data,
                     restrictions = NULL,
+                    covData = NULL,
+                    covStructure = NULL,
                     transformedParameters = NULL,
                     alpha = "dunif(.01,5000)",
                     beta = "dunif(.01,5000)",
@@ -85,11 +91,22 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                                    thetaNames = thetaNames,
                                    transformedParameters = transformedParameters)
 
+  N <- nrow(data)
+
+  # covariate: get neat table and appropriate JAGS string
+  covTable <- covHandling(covData, covStructure, N, thetaNames)
+
+  covTmp <- covStringBeta(covTable)
+  covString <- covTmp$modelString
+  covPars <- covTmp$covPars
+
+
   makeModelFile(model = "betaMPT",
                 filename = modelfilename,
                 mergedTree = mergedTree ,
                 S = max(SubPar$theta),
                 hyperprior = list(alpha=alpha, beta = beta),
+                covString = covString,
                 sampler = sampler,
                 parString = transformedPar$modelstring)
   mcmc <- callingSampler(model = "betaMPT",
@@ -98,6 +115,8 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                          modelfile = modelfilename,
                          S = max(SubPar$theta),
                          transformedPar = transformedPar$transformedParameters,
+                         covPars = covPars,
+                         covData = covData,
                          # parameters,
                          n.iter = n.iter,
                          n.burnin = n.burnin,
