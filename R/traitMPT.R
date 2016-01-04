@@ -93,7 +93,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                 sampler=sampler,
                 parString=transformedPar$modelstring)
 
-  mcmc <- callingSampler(model = "thetaMPT",
+  mcmc <- callingSampler(model = "traitMPT",
                          mergedTree = mergedTree,
                          data = data,
                          modelfile = modelfilename,

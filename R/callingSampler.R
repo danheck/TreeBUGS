@@ -38,11 +38,11 @@ callingSampler <- function(model,
                            ...){
 
   if(is.na(n.burnin)){n.burnin=n.iter/2}
-  parameters <- list("theta", "alph")
+
   if(model == "betaMPT"){
-    parameters <- c(parameters, list("alph","bet", "mean", "sd"))
+    parameters <- list("theta", "alph","bet", "mean", "sd")
   }else{
-    parameters <- c(parameters, list("mu", "mean", "rho", "sigma"))
+    parameters <- list("theta", "mu", "mean", "rho", "sigma")
   }
 
   responses <- data
@@ -101,10 +101,12 @@ callingSampler <- function(model,
                       "T1.obs","T1.pred","p.T1","p.T1ind",
                       transformedPar, covPars)
     # random initial values
-    inits <- function() list(theta=matrix(runif(subjs*S), S, subjs),
-                             alpha=rgamma(S, 2, 1),
-                             beta=rgamma(S, 2, 1))
-    samples = jags.parallel(data,
+    if(model == "betaMPT"){
+      inits <- function() list(theta=matrix(runif(subjs*S), S, subjs))
+    }else{
+      inits <- NULL
+    }
+    samples <- jags.parallel(data,
                             inits=inits,
                             parameters.to.save=parametervector,
                             model.file = modelfile,
