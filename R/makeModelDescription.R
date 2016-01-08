@@ -74,11 +74,12 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 	######################################### MODEL SPECIFIC HYPERPRIOR PART #################################
 
 	hyperprior <- switch(model,
-	                     "betaMPT" = makeBetaHyperprior(S,
+	                     "betaMPT" = makeBetaHyperprior(S =S ,
 	                                                    alpha = hyperprior$alpha,
 	                                                    beta = hyperprior$beta,
 	                                                    sampler = sampler),
-	                     "traitMPT" = makeTraitHyperprior(S,
+	                     "traitMPT" = makeTraitHyperprior(S = S,
+	                                                      covString = covString,
 	                                                     mu = hyperprior$mu,
 	                                                     xi = hyperprior$xi,
 	                                                     sampler = sampler)
@@ -271,18 +272,14 @@ ifelse(sampler%in%c("openbugs","OpenBUGS","winbugs","WinBUGS"),
 
 ################### Beta-MPT specific hyperprior part
 makeTraitHyperprior <-function(S,
+                               covString,
                                mu = "dnorm(0,1)",
                                xi = "dunif(0,100)",
                                sampler = "JAGS"){
-  modelString <- paste0("
+  modelString <- paste0(covString, "
 
+# hyperpriors
 for(i in 1:subjs) {
-  # probit transformation
-  for(s in 1:S){
-    theta[s,i] <- phi(mu[s] + xi[s]*delta.part.raw[s,i])
-  }
-
-  # hyperpriors
   delta.part.raw[1:S,i] ~ dmnorm(mu.delta.raw[1:S],T.prec.part[1:S,1:S])
 }
 

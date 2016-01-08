@@ -1,3 +1,14 @@
+TreeBUGS 0.2.3 (January 2016)
+===========
+
+* Predictors can be included in traitMPT (same arguments covData and covStructure as in betaMPT)
+* Nice summary for covariates in betaMPT and predictors in traitMPT
+* Checked and fixed data generation and fitting for latent trait and beta MPT model
+* Remaining issue: SD of parameters in betaMPT not precisely estimated
+* Informative error message if N=0 in a tree for a person
+* Updated vignette
+
+
 TreeBUGS 0.2.2 (December 2015)
 ===========
 

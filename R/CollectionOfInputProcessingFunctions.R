@@ -120,7 +120,7 @@ mergeBranches<-function(Tree){ # OLD ,DataNames){ # Unique branches for each Tre
 #   }
 
   NewTree <- data.frame(Tree = rep(treeNames, sapply(catNames, length)),
-                        Category = unlist(catNames),
+                        Category = as.character(unlist(catNames)),
                         Equation = "...", stringsAsFactors = FALSE)
   for(tt in 1:length(treeNames)){
     for(cc in 1:length(catNames[[tt]])){
@@ -195,6 +195,8 @@ readSubjectData<-function(data,Category){
       return(-1)
     }
   }
+
+  data <- data[,Category] #order data columns according to Tree category label order
 
   return(data)
 }

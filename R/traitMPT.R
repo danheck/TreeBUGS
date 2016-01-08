@@ -16,12 +16,17 @@
 #'  \item \code{sampler}: the type of sampler used (standard: \code{"JAGS"})
 #' }
 #' @author Daniel Heck, Denis Arnold, Nina R. Arnold
-#' @references Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
+#' @references
+#' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
+#' Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205-235.
+
 #' @export
 
 traitMPT <- function(eqnfile,  # statistical model stuff
                     data,
                     restrictions = NULL,
+                    covData = NULL,
+                    covStructure = NULL,
                     transformedParameters=NULL,
 
                     # hyperpriors:
@@ -68,7 +73,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   SubPar <- tHoutput$SubPar
   mergedTree <- tHoutput$mergedTree
 
-  data <- data[,mergedTree$Category] #ordering data according to Tree
   thetaNames <- SubPar[,1:2]
   S <- max(SubPar$theta)
   isIdentifiable(S, mergedTree)
@@ -77,7 +81,13 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   transformedPar <- getTransformed(model = "traitMPT",
                                    thetaNames = thetaNames,
                                    transformedParameters = transformedParameters)
+  N <- nrow(data)
+  covTable <- covHandling(covData, covStructure, N, thetaNames)
 
+  # switch transformation part depending on covariates: theta[i] <- phi(... + cov?)
+  covTmp <- covStringTrait(covTable, S=S)
+  covString <- covTmp$modelString
+  covPars <- covTmp$covPars
 
   # hyperpriors
   if(missing(V) || is.null(V))
@@ -90,6 +100,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                 mergedTree = mergedTree ,
                 S = S,
                 hyperprior = list(mu = mu, xi = xi),
+                covString = covString,
                 sampler=sampler,
                 parString=transformedPar$modelstring)
 
@@ -99,6 +110,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          modelfile = modelfilename,
                          S = max(SubPar$theta),
                          transformedPar = transformedPar$transformedParameters,
+                         covPars=covPars,
+                         covData=covData,
                          hyperpriors = list(V=V, df=df),
                          n.iter = n.iter,
                          n.burnin = n.burnin,
@@ -114,6 +127,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                           mcmc = mcmc,
                           thetaNames = thetaNames,
                           sampler = sampler,
+                          covIncluded = !is.null(covData),
                           transformedParameters = transformedPar$transformedParameters)
 
   mptInfo <- list(thetaNames = thetaNames,

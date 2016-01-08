@@ -1,6 +1,6 @@
 
 # internal function to process R2JAGS output
-summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", transformedParameters=NULL){
+summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", covIncluded=FALSE, transformedParameters=NULL){
 
   # number of parameters
   S <- max(thetaNames[,"theta"])
@@ -17,15 +17,21 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", transformedPar
     if(model == "betaMPT"){
       # mean and individual parameter estimates
       mu <- mcmc$BUGSoutput$summary[paste0("mean", idx),colsel, drop=FALSE]
-      variance <- mcmc$BUGSoutput$summary[paste0("sd",idx),colsel, drop=FALSE]
+      SD <- mcmc$BUGSoutput$summary[paste0("sd",idx),colsel, drop=FALSE]
       alpha <- mcmc$BUGSoutput$summary[paste0("alph",idx),colsel, drop=FALSE]
       beta <- mcmc$BUGSoutput$summary[paste0("bet",idx),colsel, drop=FALSE]
 
       rownames(mu) <-paste0("mean_", uniqueNames)
-      rownames(variance) <-paste0("sd_", uniqueNames)
+      rownames(SD) <-paste0("sd_", uniqueNames)
       rownames(alpha) <-paste0("alpha_", uniqueNames)
       rownames(beta) <-paste0("beta_", uniqueNames)
-      meanParameters <- list(mean=mu, variance=variance, alpha=alpha, beta=beta)
+
+      if(covIncluded){
+        selCov <- grepl("cor_", rownames(mcmc$BUGSoutput$summary))
+        corr <- mcmc$BUGSoutput$summary[selCov, colsel, drop=FALSE]
+      }else{r <- NULL}
+      groupParameters <- list(mean=mu, SD=SD, alpha=alpha, beta=beta, corr=corr)
+
     }else{
       mu <- mcmc$BUGSoutput$summary[paste0("mu",idx),colsel, drop=FALSE]
       mean <- mcmc$BUGSoutput$summary[paste0("mean",idx),colsel, drop=FALSE]
@@ -48,7 +54,12 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", transformedPar
       rownames(sigma) <-paste0("latent_sigma_", uniqueNames)
       rownames(rho) <- rhoNames
 
-      meanParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho)
+      if(covIncluded){
+        selCov <- grepl("slope_", rownames(mcmc$BUGSoutput$summary))
+        slope <- mcmc$BUGSoutput$summary[selCov, colsel, drop=FALSE]
+      }else{slope <- NULL}
+
+      groupParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho, slope = slope)
     }
 
     individParameters <- array(c(mcmc$BUGSoutput$mean$theta,
@@ -64,7 +75,7 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", transformedPar
       transPar <- mcmc$BUGSoutput$summary[transformedParameters,colsel, drop=FALSE]
     }
 
-    summary <- list(meanParameters=meanParameters,
+    summary <- list(groupParameters=groupParameters,
                     individParameters=individParameters,
                     fitStatistics=list(
                       "overall"=c("DIC"=mcmc$BUGSoutput$DIC,
@@ -83,14 +94,45 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", transformedPar
 
 #' @export
 print.summary.betaMPT <- function(x,  ...){
-  if(is.null(x$meanParameters)){
+  if(is.null(x$groupParameters)){
     warning("Clean MPT summary only available when fitting with JAGS.")
     print(x)
   }else{
     cat("Mean parameters on group level:\n")
-    print(round(x$meanParameters$mean, 4))
+    print(round(x$groupParameters$mean, 4))
     cat("\nStandard deviation of parameters across individuals:\n")
-    print(round(x$meanParameters$variance, 4))
+    print(round(x$groupParameters$SD, 4))
+
+    cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
+    print(round(x$fitStatistics$overall, 4))
+    cat("\nPoster predictive p-values for individual data sets:\n")
+    print(round(x$fitStatistics$p.T1individual, 4))
+    if(!is.null(x$transformedParameters)){
+      cat("\nTransformed parameters:\n")
+      print(round(x$transformedParameters, 4))
+    }
+    if(!is.null(x$groupParameters$corr)){
+      cat("\nSampled correlations of MPT parameters with covariates:\n")
+      print(round(x$groupParameters$corr, 4))
+    }
+
+  }
+}
+
+#' @export
+print.summary.traitMPT <- function(x,  ...){
+  if(is.null(x$groupParameters)){
+    warning("Clean MPT summary only available when fitting with JAGS.")
+    print(x)
+  }else{
+    cat("Mean parameters on group level:\n")
+    print(round(x$groupParameters$mean, 4))
+    cat("\nMean of latent-trait values across individuals:\n")
+    print(round(x$groupParameters$mu, 4))
+    cat("\nStandard deviation of latent-trait values across individuals:\n")
+    print(round(x$groupParameters$sigma, 4))
+    cat("\nCorrelations of individual latent-trait values:\n")
+    print(round(x$groupParameters$rho, 4))
 
     cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
     print(round(x$fitStatistics$overall, 4))
@@ -101,31 +143,9 @@ print.summary.betaMPT <- function(x,  ...){
       print(round(x$transformedParameters, 4))
     }
 
-  }
-}
-
-#' @export
-print.summary.traitMPT <- function(x,  ...){
-  if(is.null(x$meanParameters)){
-    warning("Clean MPT summary only available when fitting with JAGS.")
-    print(x)
-  }else{
-    cat("Mean parameters on group level:\n")
-    print(round(x$meanParameters$mean, 4))
-    cat("\nMean of latent-trait values across individuals:\n")
-    print(round(x$meanParameters$mu, 4))
-    cat("\nStandard deviation of latent-trait values across individuals:\n")
-    print(round(x$meanParameters$sigma, 4))
-    cat("\nCorrelations of individual latent-trait values:\n")
-    print(round(x$meanParameters$rho, 4))
-
-    cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
-    print(round(x$fitStatistics$overall, 4))
-    cat("\nPoster predictive p-values for individual data sets:\n")
-    print(round(x$fitStatistics$p.T1individual, 4))
-    if(!is.null(x$transformedParameters)){
-      cat("\nTransformed parameters:\n")
-      print(round(x$transformedParameters, 4))
+    if(!is.null(x$groupParameters$slope)){
+      cat("\nSlope parameters for predictor variables:\n")
+      print(round(x$groupParameters$slope, 4))
     }
 
   }
@@ -159,8 +179,8 @@ print.betaMPT <- function(x,  ...){
   if(!x$sampler %in% c("jags", "JAGS")){
     warning("\nClean MPT summary only available when fitting with JAGS.")
   }else{
-    print(round(cbind("Group Mean" = x$summary$meanParameters$mean[,1],
-                      "Group Variance" = x$summary$meanParameters$variance[,1]),4))
+    print(round(cbind("Group Mean" = x$summary$groupParameters$mean[,1],
+                      "Group SD" = x$summary$groupParameters$SD[,1]),4))
   }
   cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
 }
@@ -173,9 +193,9 @@ print.traitMPT <- function(x,  ...){
   if(!x$sampler %in% c("jags", "JAGS")){
     warning("\nClean MPT summary only available when fitting with JAGS.")
   }else{
-    print(round(cbind("Mean(MPT Parameters)" = x$summary$meanParameters$mean[,1],
-                      "Mu(latent-traits)" = x$summary$meanParameters$mu[,1],
-                      "SD(latent-traits)" = x$summary$meanParameters$sigma[,1]),4))
+    print(round(cbind("Mean(MPT Parameters)" = x$summary$groupParameters$mean[,1],
+                      "Mu(latent-traits)" = x$summary$groupParameters$mu[,1],
+                      "SD(latent-traits)" = x$summary$groupParameters$sigma[,1]),4))
   }
   cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
 }

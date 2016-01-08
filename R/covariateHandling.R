@@ -46,8 +46,10 @@ covHandling <- function(covData, covStructure=NULL, N, thetaNames){
 
     # replace by constrained parameters and remove redundant rows
     parSel <- match(covTable$Parameter,  thetaNames$Parameter)
+    if(any(is.na(parSel)))
+      stop("Check parameter names in covStructure. Problematic right now:\n  ", covTable$Parameter[is.na(parSel)])
     covTable$theta <- thetaNames$theta[parSel]
-    covTable$Parameter <- thetaNames$Parameter[covTable$theta]
+    covTable$Parameter <- thetaNames$Parameter[parSel]
     covTable$covIdx <- (1:ncol(covData))[match(covTable$Covariate,  covNames)]
     covTable <- covTable[!duplicated(paste(covTable$theta, covTable$covIdx)),]
   }else{
@@ -101,4 +103,70 @@ covStringBeta <- function(covTable){
   ###################  ###################   ###################
 
   return(list(modelString = modelString, covPars = covPars))
+}
+
+######################## generate appropriate JAGS model string for latent-trait MPT
+# covTable: result from preprocessing using covHandling()
+# S: number of free parameters
+covStringTrait <- function(covTable, S){
+  modelString <- "\n## Probit Transformation and Covariate Handling ##\n"
+  covPars <- c()
+
+
+  ##### no predictors/ covariates: simple probit transformation as before
+  if(is.null(covTable)){
+    modelString <- "
+for(i in 1:subjs) {
+  for(s in 1:S){
+    theta[s,i] <- phi(mu[s] + xi[s]*delta.part.raw[s,i])
+  }
+}
+"
+
+  ##### predictors included!
+  }else{
+    # which parameters include covariates?
+    parWithCov <- unique(covTable$theta)
+    modelString <- "\nfor(i in 1:subjs) {"
+    for(s in 1:S){
+
+      #### parameter WITH covariate
+      if(s %in% parWithCov){
+
+        selectLines <- covTable$theta == s
+        # beginning of line as usual:
+        modelString <- paste0(modelString,
+                              "\ntheta[",s,",i] <- phi(mu[",s,"] + xi[",s,"]*delta.part.raw[",s,",i]")
+        #
+        for(cc in 1:sum(selectLines)){
+          covIdx <-  covTable$covIdx[selectLines][cc]
+          covParTmp <- paste0("slope_",
+                                       covTable$Parameter[selectLines][1],"_",   # parameter label
+                                       covTable$Covariate[selectLines][cc])      # covaraite label
+          covPars <- c(covPars, covParTmp)
+          modelString <- paste0(modelString, " + ",covParTmp,"*covData[i,",covIdx,"]")
+
+        }
+        modelString <- paste0(modelString, ")")
+
+      }else{
+        #### parameter WITHOUT covariate: as usual (but with explicit number as index)
+        modelString <- paste0(modelString,
+                              "\ntheta[",s,",i] <- phi(mu[",s,"] + xi[",s,"]*delta.part.raw[",s,",i])")
+      }
+    }
+    modelString <- paste0(modelString, "\n}\n")
+
+    # hyperpriors for slopes
+    for(pp in 1:length(covPars)){
+      modelString <- paste0(modelString, "\n", covPars[pp], " ~ dnorm(0,1)")
+    }
+  }
+
+
+# lines in JAGS:
+# additionally monitored variable: covPars <- paste0("cor_", sapply(covList, function(ll, ll$Par) ))
+###################  ###################   ###################
+
+return(list(modelString = modelString, covPars = covPars))
 }

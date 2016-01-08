@@ -38,8 +38,11 @@ genBetaMPT <- function(N, numItems, eqnfile, mean=NULL, sd=NULL, alpha=NULL, bet
     mean <- checkNaming(S, thetaNames, mean, "mean")
     sd <- checkNaming(S, thetaNames, sd, "sd")
 
-    alpha <- -(mean*(mean^2-mean+sd^2))/sd^2
-    beta <- ((mean-1)*(mean^2-mean+sd^2))/sd^2
+    alpha <- ((1 - mean) / sd^2 - 1 / mean) * mean ^ 2
+    beta <- alpha * (1 / mean - 1)
+
+#     alpha <- -(mean*(mean^2-mean+sd^2))/sd^2
+#     beta <- ((mean-1)*(mean^2-mean+sd^2))/sd^2
     if(any(alpha<=0) | any(beta<=0))
       stop("Check numerical values for mean and sd, result in negative alpha/beta parameters of beta-hyperprior distribution.")
   }else if(!is.null(alpha) & !is.null(beta)){
@@ -139,7 +142,7 @@ genTraitMPT <- function(N, numItems, eqnfile, mean=NULL, sigma=NULL, rho=NULL){
   # generate multivariate normal using cholesky decomposition
   covMatrix <- diag(sigma) %*% rho %*% diag(sigma)
   cholesky <- chol(covMatrix)
-  individParLatent <- mean + iidNormal %*% cholesky
+  individParLatent <- matrix(qnorm(mean), N, S, byrow = TRUE) + iidNormal %*% cholesky
   colnames(individParLatent) <- thetaNames
   individPar <- pnorm(individParLatent)
 

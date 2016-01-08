@@ -1,10 +1,11 @@
 ---
 title: "TreeBUGS: Hierarchical MPT Modeling"
-author: "Daniel W. Heck, Denis Arnold, Nina Arnold"
+author: "Daniel W. Heck, Nina Arnold, & Denis Arnold"
 date: "`r Sys.Date()`"
 number_section: true
 output:
       rmarkdown::html_vignette:
+      toc: true
 vignette: >
   %\VignetteIndexEntry{TreeBUGS}
   %\VignetteEngine{knitr::rmarkdown}
@@ -26,12 +27,12 @@ In the following, these steps are explained in more detail. Note that TreeBUGS r
 
 
 
-### MPT model file in EQN syntax
+### 1. Step: MPT model file in EQN syntax
 
 The model needs to be passed in the standard .eqn file format (e.g., as in multiTree; Moshagen, 2010). As an example, consider the most simple two-high-threshold model (2HTM), each line defines a single processing path containing tree label, category label, and model equations:
 
 ```
-# Title: 2HTM
+# Title (ignored): 2HTM
 Target    Hit    Do
 Target    Hit    (1-Do)*g
 Target    Miss   (1-Do)*(1-g)
@@ -40,7 +41,12 @@ Lure      CR     (1-Dn)*(1-g)
 Lure      CR     (1-Dn)
 ``` 
 
-Note that model equations require the multiplication sign `*` and parameters should not be summarized, e.g., by `a^2*(1-a)`. As an input for TreeBUGS, the model file (e.g., `"2htm.txt"`) needs to be saved in the current working directory. Otherwise, the path to the file must be fully specified (e.g., `C:/models/2htm.txt`). To check how TreeBUGS interprets a given .eqn-file, use `readEQN("pathToFile.eqn", paramOrder=TRUE)` 
+Note that model equations require the multiplication sign `*` and parameters should not be summarized, e.g., by `a^2*(1-a)`. As an input for TreeBUGS, the model file (e.g., `"2htm.txt"`) needs to be saved in the current working directory. Otherwise, the relative or absolute path to the file must be specified (e.g., `/models/2htm.txt`). To check how TreeBUGS interprets a given .eqn-file, use:
+```{r, eval=F}
+readEQN(file = "pathToFile.eqn",       # relative or absolute path 
+        restrictions = list("Dn=Do"),  # equality constraints
+        paramOrder = TRUE)             # show parameter order
+```
 
 Equality restrictions on the MPT parameters can either be provided in a list:
 ```{r, eval=FALSE}
@@ -54,12 +60,12 @@ g=0.5
 
 
 
-### Data Set with Individual Frequencies
+### 2. Step: Data Set with Individual Frequencies
 
 As default, the data are provided in a comma-separated text file (.csv) in the following format:
 
 ```
-Hit, Miss, FA, CR
+Hit,   Miss,     FA,    CR
 20,      10,      5,    25
 13,       7,      9,    21 
 15,       5,      6,    14
@@ -67,79 +73,111 @@ Hit, Miss, FA, CR
 
 ```
 
-Note that the first line contains the category labels (must match the category labels from the .eqn-file) and all other rows contain individual frequencies. Similarly as for the .eqn file, the path to the data file can either be specified as `data_ind.csv` if it is in the current working directory, or as an absolute path (e.g., `"C:/models/data_ind.csv"`). 
+Note that the first line contains the category labels, which must match the category labels from the .eqn-file. The remaining rows contain individual frequencies. Similarly as for the .eqn file, the path to the data file can either be specified as  `data_ind.csv` if it is in the current working directory, or as an relative or absolute path (e.g., `"C:/models/data_ind.csv"`). 
 
 Alternatively, a data.frame or matrix with appropriate column names (i.e., category labels) can be provided.
 
 
 
-### Fit Hierarchical MPT Model
+### 3. Step: Fit Hierarchical MPT Model
 
 An hierarchical **Beta-MPT model** is fitted with the following code:
 
 ```{r, eval=FALSE}
-beta.fit <- betaMPT(eqnfile="2htm.txt",              # .eqn file
-                    data="data_ind.csv",             # individual data
-                    restrictions=c("do=dn"),         # parameter restrictions (or path to file)
-                    modelfilename = "jags_model_file.txt"   # export JAGS model file
+# load the package:
+require("TreeBUGS")
+
+# fit the model:
+fitHierarchicalMPT <- betaMPT(eqnfile="2htm.txt",              # .eqn file
+                              data="data_ind.csv",             # individual data
+                              restrictions=c("do=dn"),         # parameter restrictions (or path to file)
+                              
+                              ### optional MCMC input:                 
+                              n.iter = 50000,                  # number of iterations
+                              n.burnin = 5000,                 # number of burnin samples that are removed
+                              n.thin = 5,                      # thinning rate of removing samples
+                              n.chains = 3                     # number of MCMC chains (run in parallel)
 )
 
 ```
 
-Similarly, a latent-trait model is fitted by replacing `betaMPT` by `traitMPT`.
+Similarly, a latent-trait model is fitted simply by replacing `betaMPT` by `traitMPT`.
 
 
-### Check convergence of MCMC chains
+### 4. Step: Check convergence of MCMC chains
 
 The functions `betaMPT` and `traitMPT` return a list including the original samples from the MCMC sampler for convergence checks. Basically, these samples can be accessed by `fittedModel$mcmc`:
 
 ```{r, eval=FALSE}
 # Traceplots (posterior values as a function of sample number)
-traceplot(fittedModel$mcmc,    # fitted model
-          mfrow = c(3,3)      # number of rows and columns
+traceplot(fitHierarchicalMPT$mcmc,    # fitted model
+          mfrow = c(3,3)              # number of rows and columns
           )
 ```
 
 Further convergence checks are available in the convergence diagniostic package \link{coda}. Before using these functions, the MCMC samples must be transformed to a `mcmc.list`:
 
 ```{r, eval=FALSE}
-# load coda library
-library(coda)
+# load coda library (convergence diagnostics)
+require("coda")
 
 # transform R2JAGS output to mcmc.list:
-codaModel <- as.mcmc.list(fittedModel$mcmc$BUGSoutput)
+codaModel <- as.mcmc.list(fitHierarchicalMPT$mcmc$BUGSoutput)
 
-# Auto-correlation plots:
+# For instance, auto-correlation plots:
 acfplot(codaModel)
-
-# 
 ```
 
-See \link{R2JAGS} for further convergence statistics and plots.
+See \link{R2JAGS} and \link{coda} for further convergence statistics and plots. Note that inferences from from the model are likely not to be valid if the Markov-Chain Monte-Carlo (MCMC) sampler did not reach convergence!
 
-### Summarize and Plot Model
+### 5. Step: Summarize and Plot Model
 
-To get an overview of the parameter estimates including convergence statistics, use:
+TreeBUGS produces an MPT-tailored summary of parameter estimates and convergence statistics:
 
+* Information about the parameter posterior distribution: Mean, SD, Median, 2.5% and 97.5% quantiles
+* Convergence: R²-Statistic (should be close to 1.00 for all parameters) and number of effective samples when accounting for auto-correlation (should be large)
+
+To obtain the summary after fitting the model, simly use:
 ```{r, eval=FALSE}
-summary(beta2HTM)
+summary(fitHierarchicalMPT)
 ```
 
 To plot parameter estimates, use:
 
 ```{r, eval=FALSE}
-plot(beta2HTM,     # fitted model
-     includeIndividual=TRUE   # whether to plot individual estimates
+plot(fitHierarchicalMPT,     # fitted model
+     includeIndividual=TRUE  # whether to plot individual estimates
      )
 ```
 
 ## Extended Modeling Possibilities
 
-### Including Covariates
+### A) Including Covariates
 
-TBA
+In the latent-trait MPT, predictor variables can be included to account for interindividual variance in MPT parameters. In contrast, in the Beta-MPT, only the correlation of covariates with MPT parameters is sampled (which does not change the estimated model). However, the arguments to include covariates are identical:
 
-### Include Transformed Parameters
+* `covData`: Either a data frame or the path to a csv data file separated by commas `,`
+    * Rows: The order of individuals must be identical to the order in the frequency data (`data`)
+    * Columns: Covariates must habe column names different from the parameters
+* `covStructure`: Either a list or path to a text file in which the assignment of MPT parameters to covariates is coded as follows:
+    * MPT parameter label(s)  ; label(s)   (separated by a semicolon)
+    * For instance: `list("Do Dn ; IQ",  "g ; age extraversion")` 
+    * Multiple combinations are included by separate entries in the list or by separate lines in the text file (redundant combinations are removed automatically)
+    
+Overall, the code could look like this:
+
+```{r, eval=F}
+fitMPT <- traitMPT(eqnfile = "2htm.txt", 
+                   data = "data_ind.csv",   
+                   restrictions = c("do=dn"),  
+                   covData = "data_covariates.csv", 
+                   covStructure = list("Do Dn ; IQ",  "g ; age extraversion")
+                   ...
+```
+
+After fitting the model, the results appear when typing `summary(fitMPT)`
+
+### B) Include Transformed Parameters
 
 To test the difference between two core MPT parameters, the functions `betaMPT` and `traitMPT` include the argument `transformedParameters` that allows to sample transformed parameters. For instance, the difference between two MPT parameters can be tested by 
 
@@ -148,52 +186,46 @@ transformedParameters = list("deltaG = G_1 - G_2",     # difference of parameter
                              "G1_larger = G_1 > G_2")  # indicator variable (testing order constraints)
 ```
 
-Note that transformed parameters require new, unique labels left of the equality sign `=` and that parameters on the right hand must match with the MPT parameters in the .eqn-file. Note that transformed parameters are computed and monitored on the group-level only.
+If the parameters are different, the 95% posterior interval of the parameter `deltaG` should exclude zero. 
 
-### Generate Simulated Data Sets
+Note the following about the correct specification of transformed parameters:
+
+* transformed parameters require new, unique labels left of the equality sign `=` 
+* parameters on the right hand must match with the MPT parameters in the .eqn-file
+* transformed parameters are computed and monitored on the group-level only
+
+### C) Generate Simulated Data Sets
 
 Simulated data sets are in general useful to check the robustness of the estimators and the sample size requirements. TreeBUGS includes functions to generate data sets of individual frequencies for both the Beta-MPT and the latent-trait MPT model. 
 
 ```{r, eval=FALSE}
-genDat <- genBetaMPT(N = 100,                             # number of participants     
-                     numItems = c(Target=250, Lure=250),  # number of responses per tree
-                     eqnfile = "2htm.eqn",                # path to MPT file
-                     mean = c(Do=.7, Dn=.7, g=.5),        # true group-level parameters
-                     sd =   c(Do=.1, Dn=.1, g=.05))       # SD of individual parameters
+# beta-MPT
+genBeta <- genBetaMPT(N = 100,                             # number of participants     
+                      numItems = c(Target=250, Lure=250),  # number of responses per tree
+                      eqnfile = "2htm.eqn",                # path to MPT file
+                      mean = c(Do=.7, Dn=.7, g=.5),        # true group-level parameters
+                      sd =   c(Do=.1, Dn=.1, g=.05))       # SD of individual parameters
+                   
+# latent-trait MPT
+genTrait <- genTraitMPT(N = 100,                             # number of participants     
+                        numItems = c(Target=250, Lure=250),  # number of responses per tree
+                        eqnfile = "2htm.eqn",                # path to MPT file
+                        mean = c(Do=.7, Dn=.7, g=.5),        # true group-level parameters
+                        sigma =   c(Do=.25, Dn=.25, g=.05),  # SD of latent (!) individual parameters
+                        rho = diag(3))                       # correlation matrix. here: no correlation
 ```
 
-<!---
-#################### EXAMPLES
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
+The resulting data sets contain both the generated frequncies (`genTrait$data`) and the data-generating group and individual parameters (`genTrait$parameters` )
 
 
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
-
---->
 
 ## References
  
 * Erdfelder, E., Auer, T.-S., Hilbig, B. E., Assfalg, A., Moshagen, M., & Nadarevic, L. (2009). Multinomial processing tree models: A review of the literature. Journal of Psychology, 217, 108–124. http://doi.org/10.1027/0044-3409.217.3.108
 
 * Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70–98. http://doi.org/10.1007/s11336-009-9141-0
+
+* Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205–235.
 
 * Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42–54. http://doi.org/10.3758/BRM.42.1.42
 

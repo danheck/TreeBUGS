@@ -33,7 +33,7 @@ callingSampler <- function(model,
                            n.thin=2,
                            n.chains=3,
                            sampler="JAGS",
-                           autojags=TRUE,
+                           autojags=FALSE,
                            # savetable = NULL,
                            ...){
 
@@ -62,16 +62,25 @@ callingSampler <- function(model,
   for(i in 1:length(treeNames)){
     assign(paste("items",treeNames[i],sep="."),
            rowSums(responses[(index+1):(index+NresponsesTree[i])]))
+
+    # check whether any N=0
+    if (any(rowSums(responses[(index+1):(index+NresponsesTree[i])]) == 0))
+      warning("One or more responses do not have responses for tree",
+              treeNames[i], ". As a solution, the critical participants might be excluded.")
+
     assign(paste("response",treeNames[i],sep="."),
            matrix(as.vector(t(responses[(index+1):(index+NresponsesTree[i])])),
                   ncol=NresponsesTree[i],nrow=subjs,byrow=TRUE))
     index=index+NresponsesTree[i]
+
   }
 
   # make data
   data <- c(paste("items",treeNames, sep="."),
             paste("response",treeNames, sep="."),
             "subjs", "S")
+  # data <- list(itemsa.A = ....)
+
   if(model == "traitMPT"){
     data <- c(data, "V", "df")
     df <- hyperpriors$df
@@ -81,16 +90,22 @@ callingSampler <- function(model,
     if(is.character(covData)){
       covData <- read.csv(covData, header=T, sep= ",",  strip.white = TRUE)
     }
+
+    if(any(apply(covData, 2, class) %in% c("factor", "character", "logical"))){
+      stop("Covariate values must be provided as numbers, no factors/characters allowed!")
+    }
+
+    if(model == "traitMPT"){
+      covDataCentered <- apply(covData, 2, scale, center=TRUE, scale = FALSE)
+      if(any(covDataCentered != covData)){
+        warning("Predictor variables in latent-trait MPT are automatically centererd to a MEAN OF ZERO!")
+        covData <- covDataCentered
+      }
+    }
+
     covSD <- apply(covData, 2, sd)
     data <- c(data, "covData", "covSD")
   }
-#   for(i in 1:length(treeNames)){
-#     data <- c(data,
-#               paste("items",treeNames[i],sep="."),
-#               paste("response",treeNames[i],sep="."))
-#   }
-  # data <- c(data, "subjs", "S")
-
 
   # call Sampler
 
@@ -102,7 +117,10 @@ callingSampler <- function(model,
                       transformedPar, covPars)
     # random initial values
     if(model == "betaMPT"){
-      inits <- function() list(theta=matrix(runif(subjs*S), S, subjs))
+      inits <- function() list(theta=matrix(runif(subjs*S), S, subjs)
+                               # alpha=rgamma(S, 2, .2),
+                               # beta=rgamma(S, 2, .2)
+                               )
     }else{
       inits <- NULL
     }

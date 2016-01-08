@@ -81,7 +81,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   SubPar <- tHoutput$SubPar
   mergedTree <- tHoutput$mergedTree
 
-  data <- data[,mergedTree$Category] #ordering data according to Tree
   thetaNames <- tHoutput[[1]][,1:2]
   S <- max(SubPar$theta)
   isIdentifiable(S, mergedTree)
@@ -131,6 +130,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                           mcmc = mcmc,
                           thetaNames = thetaNames,
                           sampler = sampler,
+                          covIncluded = !is.null(covData),
                           transformedParameters = transformedPar$transformedParameters)
 
   mptInfo <- list(thetaNames = thetaNames,
