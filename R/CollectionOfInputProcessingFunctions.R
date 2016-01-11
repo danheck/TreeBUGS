@@ -166,12 +166,13 @@ mergeBranches<-function(Tree){ # OLD ,DataNames){ # Unique branches for each Tre
 # #' @export
 getParameter<-function(TreeData){
 
-  Parameter=unique(unlist(strsplit(TreeData$Equation,
+  Parameter <- unique(unlist(strsplit(TreeData$Equation,
                                    split="\\*|\\(|\\)|\\-|\\+")))
-  r=c(which(nchar(Parameter)==0), grep("^[0-9]+$|^[0-9]+\\.[0-9]+", Parameter))
-  Parameter=Parameter[-r]
-  Parameter=c(sort(Parameter[grep("[A-Z]",Parameter)]),
-              sort(Parameter[-grep("[A-Z]",Parameter)]))
+  r <- c(which(nchar(Parameter)==0), grep("^[0-9]+$|^[0-9]+\\.[0-9]+", Parameter))
+  Parameter <- Parameter[-r]
+#   Parameter=c(sort(Parameter[grepl("[A-Z]",Parameter)]),
+#               sort(Parameter[!grepl("[A-Z]",Parameter)]))   # returns errors if model does not contain uppercase parameters
+
   return(sort(Parameter))
 
 }
