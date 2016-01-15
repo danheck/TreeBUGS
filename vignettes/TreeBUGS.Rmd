@@ -152,15 +152,15 @@ plot(fitHierarchicalMPT,     # fitted model
 
 ## Extended Modeling Possibilities
 
-### A) Including Covariates
+### A) Including Continuous Covariates
 
-In the latent-trait MPT, predictor variables can be included to account for interindividual variance in MPT parameters. In contrast, in the Beta-MPT, only the correlation of covariates with MPT parameters is sampled (which does not change the estimated model). However, the arguments to include covariates are identical:
+In the latent-trait MPT, predictor variables can be included to account for interindividual variance in MPT parameters. In contrast, in the Beta-MPT, only the correlation of covariates with MPT parameters is sampled (which does not influence the parameter estimates). However, the arguments to include covariates are identical:
 
 * `covData`: Either a data frame or the path to a csv data file separated by commas `,`
     * Rows: The order of individuals must be identical to the order in the frequency data (`data`)
     * Columns: Covariates must habe column names different from the parameters
 * `covStructure`: Either a list or path to a text file in which the assignment of MPT parameters to covariates is coded as follows:
-    * MPT parameter label(s)  ; label(s)   (separated by a semicolon)
+    * `one or more MPT parameter labels  ; one or more covariate labels `  (separated by a semicolon)
     * For instance: `list("Do Dn ; IQ",  "g ; age extraversion")` 
     * Multiple combinations are included by separate entries in the list or by separate lines in the text file (redundant combinations are removed automatically)
     
@@ -175,11 +175,39 @@ fitMPT <- traitMPT(eqnfile = "2htm.txt",
                    ...
 ```
 
-After fitting the model, the results appear when typing `summary(fitMPT)`
+After fitting the model, the results appear when typing `summary(fitMPT)`. 
 
-### B) Include Transformed Parameters
 
-To test the difference between two core MPT parameters, the functions `betaMPT` and `traitMPT` include the argument `transformedParameters` that allows to sample transformed parameters. For instance, the difference between two MPT parameters can be tested by 
+### B) Including Discrete Factors in a Latent-Trait MPT Model
+
+In the latent-trait model, it is possible to include discrete factors as predictor variables, similar as in the general linear model formulation of an ANOVA. Compared to continuous covariates only the following changes:
+
+* New argument `covType`: Covariates can be set as
+    * continuous (`"c"`)
+    * fixed effect (`"f"`)
+    * random effect (`"r"`)
+* `covData` can have columns with character or factor variables (numeric columns can be specified as factors using `covType`)
+* By default, character variables in `covData` are included as fixed effects
+* The order of `covType` has to match the column order of `covData`
+
+Note that the same parameter covariance structure is assumed in each group, which might produce more reliable estimates than specifying a separate MPT tree for each condition (and thus assuming a separate parameter covariance matrix in each group). An example might be: 
+
+```{r, eval=F}
+fitMPT <- traitMPT(eqnfile = "2htm.txt", 
+                   data = "data_ind.csv",   
+                   covData = "data_covariates.csv", 
+                   covStructure = list("Do Dn ; factor1 factor2",  "g ; age"),
+                   covType = c("c", "c", "f", "r")
+                   ...
+```
+
+
+Multiple factors can be included, but currently it is not possible to directly include interactions. For an introduction to Bayesian ANOVA, see Rouder et al., 2012.
+
+
+### C) Sampling Transformed Parameters
+
+The argument `transformedParameters`allows to sample any mathematical function of the actual MPT parameters. This is helpful to test differences between two core MPT parameters or obtain reparameterized versions of the parameters (e.g., for order constraints). For instance, the difference between two MPT parameters can be computed using
 
 ```{r, eval=FALSE}
 transformedParameters = list("deltaG = G_1 - G_2",     # difference of parameters
@@ -188,13 +216,15 @@ transformedParameters = list("deltaG = G_1 - G_2",     # difference of parameter
 
 If the parameters are different, the 95% posterior interval of the parameter `deltaG` should exclude zero. 
 
+Transformed parameters are also helpful if the model contains reparameterizations of order constraints. For instance, if $a<b$ is replaced by $a = s_a * b$ (the standard procedure in multiTree), the EQN file includes the parameters `b` and  `s_a`, but the interest is in `a`, which can be obtained by `transformedParameters = list("a = s_a * b")` . 
+
 Note the following about the correct specification of transformed parameters:
 
 * transformed parameters require new, unique labels left of the equality sign `=` 
 * parameters on the right hand must match with the MPT parameters in the .eqn-file
 * transformed parameters are computed and monitored on the group-level only
 
-### C) Generate Simulated Data Sets
+### D) Generate Simulated Data Sets
 
 Simulated data sets are in general useful to check the robustness of the estimators and the sample size requirements. TreeBUGS includes functions to generate data sets of individual frequencies for both the Beta-MPT and the latent-trait MPT model. 
 

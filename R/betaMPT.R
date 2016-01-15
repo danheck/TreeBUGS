@@ -36,10 +36,10 @@
 
 betaMPT <- function(eqnfile,  # statistical model stuff
                     data,
-                    restrictions = NULL,
-                    covData = NULL,
-                    covStructure = NULL,
-                    transformedParameters = NULL,
+                    restrictions,
+                    covData,
+                    covStructure,
+                    transformedParameters,
                     alpha = "dunif(.01,5000)",
                     beta = "dunif(.01,5000)",
 
@@ -50,13 +50,17 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     n.chains=3,
 
                     # File Handling stuff:
-                    modelfilename = NULL,
-                    parEstFile = NULL,
+                    modelfilename,
+                    parEstFile,
                     sampler = "JAGS",
                     autojags = FALSE,
                     ...){
+  if(missing(restrictions)) restrictions <- NULL
+  if(missing(covData)) covData <- NULL
+  if(missing(covStructure)) covStructure <- NULL
+  if(missing(transformedParameters)) transformedParameters <- NULL
 
-  if(is.null(modelfilename)){
+  if(missing(modelfilename) | is.null(modelfilename)){
     modelfilename <- tempfile(pattern = "MODELFILE",fileext = ".txt")
   }
 
@@ -93,11 +97,15 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   N <- nrow(data)
 
   # covariate: get neat table and appropriate JAGS string
-  covTable <- covHandling(covData, covStructure, N, thetaNames)
+  covTmp1 <- covHandling(covData, covStructure, N, thetaNames)
+  covData <- covTmp1$covData
+  covTable <- covTmp1$covTable
+  if( any(covTable$covType != "c"))
+    stop("To compute correlations in betaMPT, only continuous covariates are allowed.")
 
-  covTmp <- covStringBeta(covTable)
-  covString <- covTmp$modelString
-  covPars <- covTmp$covPars
+  covTmp2 <- covStringBeta(covTable)
+  covString <- covTmp2$modelString
+  covPars <- covTmp2$covPar
 
 
   makeModelFile(model = "betaMPT",
@@ -134,9 +142,13 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                           transformedParameters = transformedPar$transformedParameters)
 
   mptInfo <- list(thetaNames = thetaNames,
+                  MPT=mergedTree,
                   eqnfile = eqnfile,
                   data = data,
-                  restrictions = restrictions)
+                  restrictions = restrictions,
+                  covData=covData,
+                  covTable=covTable,
+                  transformedParameters=transformedPar$transformedParameters)
 
   # class structure for TreeBUGS
   fittedModel <- list(summary = summary,
@@ -146,7 +158,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                       call = match.call()  )
 
   # write results
-  if(!(missing(parEstFile) | is.null(parEstFile))){
+  if(!(missing(parEstFile) || is.null(parEstFile))){
     write.table(summary,  file = parEstFile, sep = "\t",
                 na = "NA", dec = ".",
                 row.names = T, col.names = T, quote = F)

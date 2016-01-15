@@ -26,6 +26,7 @@ callingSampler <- function(model,
                            transformedPar=NULL,
                            covPars=NULL,
                            covData=NULL,
+                           X_list=list(),   # list with design matrices for fixed effects
                            hyperpriors=NULL,
                            n.iter=100000,
                            n.burnin=NULL,
@@ -53,6 +54,7 @@ callingSampler <- function(model,
 
   treeNames=unique(mergedTree$Tree)
   NresponsesTree=vector("numeric",length=length(treeNames))
+  parameters <- c(parameters, paste("response",treeNames, "pred.mean", sep="."))
 
   for(i in 1:length(treeNames)){
     NresponsesTree[i]=length(which(mergedTree$Tree==treeNames[i]))
@@ -85,6 +87,12 @@ callingSampler <- function(model,
     data <- c(data, "V", "df")
     df <- hyperpriors$df
     V <- hyperpriors$V
+
+    if(length(X_list) != 0){
+      for(pp in 1:length(X_list))
+          assign(names(X_list)[pp], X_list[[pp]])
+      data <- c(data, names(X_list))
+    }
   }
   if(!is.null(covData)){
     if(is.character(covData)){
@@ -93,14 +101,6 @@ callingSampler <- function(model,
 
     if(any(apply(covData, 2, class) %in% c("factor", "character", "logical"))){
       stop("Covariate values must be provided as numbers, no factors/characters allowed!")
-    }
-
-    if(model == "traitMPT"){
-      covDataCentered <- apply(covData, 2, scale, center=TRUE, scale = FALSE)
-      if(any(covDataCentered != covData)){
-        warning("Predictor variables in latent-trait MPT are automatically centererd to a MEAN OF ZERO!")
-        covData <- covDataCentered
-      }
     }
 
     covSD <- apply(covData, 2, sd)

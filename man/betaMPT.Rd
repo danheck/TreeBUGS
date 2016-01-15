@@ -4,11 +4,11 @@
 \alias{betaMPT}
 \title{Fit a Hierarchical Beta-MPT Model}
 \usage{
-betaMPT(eqnfile, data, restrictions = NULL, covData = NULL,
-  covStructure = NULL, transformedParameters = NULL,
-  alpha = "dunif(.01,5000)", beta = "dunif(.01,5000)", n.iter = 50000,
-  n.burnin = 5000, n.thin = 5, n.chains = 3, modelfilename = NULL,
-  parEstFile = NULL, sampler = "JAGS", autojags = FALSE, ...)
+betaMPT(eqnfile, data, restrictions, covData, covStructure,
+  transformedParameters, alpha = "dunif(.01,5000)",
+  beta = "dunif(.01,5000)", n.iter = 50000, n.burnin = 5000, n.thin = 5,
+  n.chains = 3, modelfilename, parEstFile, sampler = "JAGS",
+  autojags = FALSE, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}

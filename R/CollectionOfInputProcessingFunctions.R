@@ -211,6 +211,7 @@ readSubjectData<-function(data,Category){
 # #' @export
 thetaHandling <-function(mergedTree, restrictions){
 
+  mergedTree$Eqn <- mergedTree$Equation
   Parameter=getParameter(mergedTree)
 
   SubPar <- data.frame(Parameter = Parameter,

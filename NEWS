@@ -1,3 +1,14 @@
+TreeBUGS 0.3.0 (January 2016)
+===========
+
+* Discrete factors as covariates in traitMPT with fixed and random effects (see argument: covType)
+* Improved covariate handling: irrelevant columns are neglected
+* Goodness of fit plots for mean frequencies (plotFit)
+* Removed default values for arguments that were NULL previously
+* Updated vignette
+* Various Bugfixes
+
+
 TreeBUGS 0.2.3 (January 2016)
 ===========
 
