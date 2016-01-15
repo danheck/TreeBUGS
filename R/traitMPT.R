@@ -3,6 +3,7 @@
 #' Fits a latent-trait MPT model (Klauer, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
 #'
 #' @inheritParams betaMPT
+#' @param covType a character vector specifying the type of covariates in each column of \code{covData}: \code{"c"} = continuous covariate (which is the default for continuous variables); \code{"f"} = fixed effect (default for character/factor variables); \code{"r"} = random effect.
 #' @param mu hyperprior for group means of probit-transformed parameters. Default is a standard normal distribution.
 #' @param xi hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,100]
 #' @param V  S x S matrix used as a hyperprior for the inverse-Wishart hyperprior parameters with as many rows and columns as there are core MPT parameters. Default is a diagonal matrix.
@@ -18,22 +19,24 @@
 #' @author Daniel Heck, Denis Arnold, Nina R. Arnold
 #' @references
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
+#'
 #' Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205-235.
 
 #' @export
 
 traitMPT <- function(eqnfile,  # statistical model stuff
                     data,
-                    restrictions = NULL,
-                    covData = NULL,
-                    covStructure = NULL,
-                    transformedParameters=NULL,
+                    restrictions,
+                    covData,
+                    covStructure,
+                    covType,  # c("c," f", "r")
+                    transformedParameters,
 
                     # hyperpriors:
                     mu = "dnorm(0,1)",
                     xi = "dunif(0,100)",
-                    V=NULL,
-                    df=NULL,
+                    V,
+                    df,
 
                     # MCMC stuff:
                     n.iter=50000,
@@ -42,13 +45,18 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     n.chains=3,
 
                     # File Handling stuff:
-                    modelfilename=NULL,
-                    parEstFile = NULL,
+                    modelfilename,
+                    parEstFile,
                     sampler="JAGS",
                     autojags=FALSE,
                     ...){
+  if(missing(restrictions)) restrictions <- NULL
+  if(missing(covData)) covData <- NULL
+  if(missing(covStructure)) covStructure <- NULL
+  if(missing(covType)) covType <- NULL
+  if(missing(transformedParameters)) transformedParameters <- NULL
 
-  if(is.null(modelfilename)){
+  if(missing(modelfilename) | is.null(modelfilename)){
     modelfilename=tempfile(pattern="MODELFILE",fileext=".txt")
   }
 
@@ -82,12 +90,32 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                                    thetaNames = thetaNames,
                                    transformedParameters = transformedParameters)
   N <- nrow(data)
-  covTable <- covHandling(covData, covStructure, N, thetaNames)
 
-  # switch transformation part depending on covariates: theta[i] <- phi(... + cov?)
-  covTmp <- covStringTrait(covTable, S=S)
-  covString <- covTmp$modelString
-  covPars <- covTmp$covPars
+
+  # assign covariates to parameters and handle factor levels
+  covTmp1 <- covHandling(covData, covStructure, N, thetaNames, covType=covType)
+  covData <- covTmp1$covData
+  covFactorLevels <- covTmp1$covFactorLevels
+  covTable <- covTmp1$covTable
+  covType <- covTmp1$covType
+
+  if(!is.null(covData)){
+    for(i in 1:ncol(covData)){
+      if(covType[i] == "c" &  colnames(covData)[i] %in% covTable$Covariate){
+        scaled <- scale(covData[,i], scale = FALSE)
+        if(any(scaled != covData[,i])){
+          warning("Predictor covariate ", colnames(covData)[i],
+                  "is automatically centererd to a MEAN OF ZERO \n  (recommended for latent-trait MPT)!")
+          covData[,i] <- scaled
+        }
+      }
+    }
+  }
+
+  # get model string: phi(....)
+  covTmp2 <- covStringTrait(covTable, S=S, covFactorLevels=covFactorLevels)
+  covString <- covTmp2$modelString
+  covPars <- covTmp2$covPars
 
   # hyperpriors
   if(missing(V) || is.null(V))
@@ -112,6 +140,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          transformedPar = transformedPar$transformedParameters,
                          covPars=covPars,
                          covData=covData,
+                         X_list=covTmp2$X_list,
                          hyperpriors = list(V=V, df=df),
                          n.iter = n.iter,
                          n.burnin = n.burnin,
@@ -128,12 +157,18 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                           thetaNames = thetaNames,
                           sampler = sampler,
                           covIncluded = !is.null(covData),
+                          covFactorLevels=covFactorLevels,
                           transformedParameters = transformedPar$transformedParameters)
 
   mptInfo <- list(thetaNames = thetaNames,
+                  MPT=mergedTree,
                   eqnfile=eqnfile,
                   data=data,
-                  restrictions=restrictions)
+                  restrictions=restrictions,
+                  covData=covData,
+                  covTable=covTable,
+                  covFactorLevels=covFactorLevels,
+                  transformedParameters=transformedPar$transformedParameters)
 
   # class structure for TreeBUGS
   fittedModel <- list(summary=summary,
@@ -143,7 +178,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                       call=match.call()  )
 
   # write results
-  if(!(missing(parEstFile) | is.null(parEstFile))){
+  if(!missing(parEstFile) &&  !is.null(parEstFile)){
     write.table(summary,  file=parEstFile, sep ="\t",
                 na="NA",dec=".",row.names=T,col.names=T,quote=F)
   }

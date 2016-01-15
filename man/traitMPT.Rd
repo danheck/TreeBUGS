@@ -4,11 +4,10 @@
 \alias{traitMPT}
 \title{Fit a Hierarchical latent-trait MPT Model}
 \usage{
-traitMPT(eqnfile, data, restrictions = NULL, covData = NULL,
-  covStructure = NULL, transformedParameters = NULL, mu = "dnorm(0,1)",
-  xi = "dunif(0,100)", V = NULL, df = NULL, n.iter = 50000,
-  n.burnin = 5000, n.thin = 5, n.chains = 3, modelfilename = NULL,
-  parEstFile = NULL, sampler = "JAGS", autojags = FALSE, ...)
+traitMPT(eqnfile, data, restrictions, covData, covStructure, covType,
+  transformedParameters, mu = "dnorm(0,1)", xi = "dunif(0,100)", V, df,
+  n.iter = 50000, n.burnin = 5000, n.thin = 5, n.chains = 3,
+  modelfilename, parEstFile, sampler = "JAGS", autojags = FALSE, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -20,6 +19,8 @@ traitMPT(eqnfile, data, restrictions = NULL, covData = NULL,
 \item{covData}{The path to the csv data file for the individual values on the covariates (rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)}
 
 \item{covStructure}{Optional: Either the (full path to the) file that specifies the assigment of covariates to MPT parameters (that is, each row assigns one covariate to one or more parameters separated by a semicolon, e.g., \code{age ; Do Dn}). Can also be provided as a list, e.g., \code{list("age ; Do Dn", "extraversion ; g"}). Default: All combinations included (could be unstable).}
+
+\item{covType}{a character vector specifying the type of covariates in each column of \code{covData}: \code{"c"} = continuous covariate (which is the default for continuous variables); \code{"f"} = fixed effect (default for character/factor variables); \code{"r"} = random effect.}
 
 \item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
 

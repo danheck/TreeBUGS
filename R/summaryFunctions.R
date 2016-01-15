@@ -1,6 +1,8 @@
 
 # internal function to process R2JAGS output
-summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", covIncluded=FALSE, transformedParameters=NULL){
+summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS",
+                         covIncluded=FALSE, covFactorLevels=NULL,
+                         transformedParameters=NULL){
 
   # number of parameters
   S <- max(thetaNames[,"theta"])
@@ -28,9 +30,9 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", covIncluded=FA
 
       if(covIncluded){
         selCov <- grepl("cor_", rownames(mcmc$BUGSoutput$summary))
-        corr <- mcmc$BUGSoutput$summary[selCov, colsel, drop=FALSE]
-      }else{r <- NULL}
-      groupParameters <- list(mean=mu, SD=SD, alpha=alpha, beta=beta, corr=corr)
+        correlation <- mcmc$BUGSoutput$summary[selCov, colsel, drop=FALSE]
+      }else{correlation <- NULL}
+      groupParameters <- list(mean=mu, SD=SD, alpha=alpha, beta=beta, correlation=correlation)
 
     }else{
       mu <- mcmc$BUGSoutput$summary[paste0("mu",idx),colsel, drop=FALSE]
@@ -54,12 +56,30 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS", covIncluded=FA
       rownames(sigma) <-paste0("latent_sigma_", uniqueNames)
       rownames(rho) <- rhoNames
 
-      if(covIncluded){
-        selCov <- grepl("slope_", rownames(mcmc$BUGSoutput$summary))
+      selCov <- grepl("slope_", rownames(mcmc$BUGSoutput$summary))
+      selFac <- grepl("factor_", rownames(mcmc$BUGSoutput$summary))
+      if(any(selCov)){
         slope <- mcmc$BUGSoutput$summary[selCov, colsel, drop=FALSE]
       }else{slope <- NULL}
+      if(any(selFac)){
+        selFacSD <- grepl("SD_factor_", rownames(mcmc$BUGSoutput$summary))
+        factor <- mcmc$BUGSoutput$summary[selFac & !selFacSD, colsel, drop=FALSE]
 
-      groupParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho, slope = slope)
+        # rename factor levels
+        tmpNames <- sapply(rownames(factor), function(xx) strsplit(xx, split="_")[[1]][3])
+        for(ff in 1:length(covFactorLevels)){
+          if( !is.null(covFactorLevels[[ff]])){
+             selrow <- grepl(names(covFactorLevels)[ff], tmpNames)
+             rownames(factor)[selrow] <- paste0(rownames(factor)[selrow],"_", covFactorLevels[[ff]])
+          }
+        }
+
+
+        factorSD <- mcmc$BUGSoutput$summary[ selFacSD, colsel, drop=FALSE]
+      }else{factor <- NULL ; factorSD <- NULL}
+
+      groupParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho,
+                              slope = slope, factor = factor, factorSD = factorSD)
     }
 
     individParameters <- array(c(mcmc$BUGSoutput$mean$theta,
@@ -111,9 +131,9 @@ print.summary.betaMPT <- function(x,  ...){
       cat("\nTransformed parameters:\n")
       print(round(x$transformedParameters, 4))
     }
-    if(!is.null(x$groupParameters$corr)){
+    if(!is.null(x$groupParameters$correlation)){
       cat("\nSampled correlations of MPT parameters with covariates:\n")
-      print(round(x$groupParameters$corr, 4))
+      print(round(x$groupParameters$correlation, 4))
     }
 
   }
@@ -146,6 +166,13 @@ print.summary.traitMPT <- function(x,  ...){
     if(!is.null(x$groupParameters$slope)){
       cat("\nSlope parameters for predictor variables:\n")
       print(round(x$groupParameters$slope, 4))
+    }
+
+    if(!is.null(x$groupParameters$factor)){
+      cat("\nEffects of factors on latent scale (additive shift from overall mean):\n")
+      print(round(x$groupParameters$factor, 4))
+      cat("\nFactor SD on latent scale:\n")
+      print(round(x$groupParameters$factorSD, 4))
     }
 
   }

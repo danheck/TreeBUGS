@@ -23,10 +23,6 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   count=1
   # number of categories per tree:
   ncatPerTree <- as.vector(by(mergedTree$Category, mergedTree$Tree, length))
-#   ncatPerTree <- rep(NA, NOT)
-#   for(i in 1:NOT) {
-#     ncatPerTree[i] <- length(grep(treeNames[i],mergedTree$Tree))
-#   }
 
   if(sampler%in%c("jags","JAGS")){
 
@@ -128,23 +124,8 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   for(i in 1:NOT){
     cat("+ sum( (response.",treeNames[i],".pred[n,] - n.expected.",treeNames[i],"[n,])^2/n.expected.",treeNames[i],"[n,])", sep="", file=filename,append=T)
   }
-  # 	T1.obs <- sum( (freq.mean-n.mean)^2/n.mean)
-  # 	T1.pred <- sum( (pred.mean-n.mean)^2/n.mean)
+
   cat("\np.T1ind[n] <- T1ind.pred[n] > T1ind.obs[n]\n",  file=filename,append=T)
-
-
-  ### individual analysis:
-#   T1ind.obs[n] <- 0+
-#     sum( (response.A[n,] - n.expected.A[n,])^2/n.expected.A[n,])+
-#     sum( (response.B[n,] - n.expected.B[n,])^2/n.expected.B[n,])+
-#     sum( (response.N[n,] - n.expected.N[n,])^2/n.expected.N[n,])
-#
-#   T1ind.pred[n] <- 0+
-#     sum( (response.A.pred[n,] - n.expected.A[n,])^2/n.expected.A[n,])+
-#     sum( (response.B.pred[n,] - n.expected.B[n,])^2/n.expected.B[n,])+
-#     sum( (response.N.pred[n,] - n.expected.N[n,])^2/n.expected.N[n,])
-#
-#   p.T1ind[n] <- T1ind.pred[n] > T1ind.obs[n]
 
   cat("}\n",file=filename,append=T)
 
@@ -172,9 +153,7 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   for(i in 1:NOT){
     cat("+ sum( (response.",treeNames[i],".pred.mean - n.expected.",treeNames[i],".mean)^2/n.expected.",treeNames[i],".mean)", sep="", file=filename,append=T)
   }
-# 	T1.obs <- sum( (freq.mean-n.mean)^2/n.mean)
-# 	T1.pred <- sum( (pred.mean-n.mean)^2/n.mean)
-	  cat("\np.T1 <- T1.pred > T1.obs\n",  file=filename,append=T)
+  cat("\np.T1 <- T1.pred > T1.obs\n",  file=filename,append=T)
 
 }
 	### Transformed parameters:
@@ -284,7 +263,7 @@ for(i in 1:subjs) {
 }
 
 T.prec.part[1:S,1:S] ~ dwish(V, df)
-Sigma.Tau.raw[1:S,1:S] <- inverse(T.prec.part[,])
+Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
 
 
 for(s in 1:S){
@@ -293,37 +272,14 @@ for(s in 1:S){
   mean[s] <- phi(mu[s])
   xi[s] ~ ", xi, "
   for(q in 1:S){
-    # Off-diagonal elements of S
-    rho[s,q] <- Sigma.Tau.raw[s,q]/sqrt(Sigma.Tau.raw[s,s]*Sigma.Tau.raw[q,q])
+    # Off-diagonal elements of S (correlations not affected by xi)
+    rho[s,q] <- Sigma.raw[s,q]/sqrt(Sigma.raw[s,s]*Sigma.raw[q,q])
   }
-  # Diagonal elements of S
-  sigma[s] <- xi[s]*sqrt(Sigma.Tau.raw[s,s])
+  # Diagonal elements of S (rescale sigma)
+  sigma[s] <- xi[s]*sqrt(Sigma.raw[s,s])
 }
 ")
 
-  ###################################################### Hierarchical model ####################
-#   for(p in 1:P){
-#     theta.probit[i,p] <- mu[p] + xi[p]*delta.part.raw[i,p]
-#   }
-  # delta.part.raw[i,1:P] ~ dmnorm(mu.delta.raw[1:P],T.prec.part[1:P,1:P])
-
-
-# T.prec.part[1:P,1:P] ~ dwish(V, df)
-# Sigma.Tau.raw[1:P,1:P] <- inverse(T.prec.part[,])
-#
-# for(p in 1:P){
-#   mu.delta.raw[p] <- 0
-#   mu[p] ~ dnorm(0,1)
-#   xi[p] ~ dunif (0, 100)
-#
-#
-#   for(q in 1:P){
-#     # Off-diagonal elements of S
-#     rho[p,q] <- Sigma.Tau.raw[p,q]/sqrt(Sigma.Tau.raw[p,p]*Sigma.Tau.raw[q,q])
-#   }
-#   # Diagonal elements of S
-#   sigma[p] <- xi[p]*sqrt(Sigma.Tau.raw[p,p])
-# }
 
   return(modelString)
 }
