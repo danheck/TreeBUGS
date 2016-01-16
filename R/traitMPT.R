@@ -56,7 +56,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   if(missing(covType)) covType <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
 
-  if(missing(modelfilename) | is.null(modelfilename)){
+  if(missing(modelfilename) || is.null(modelfilename)){
     modelfilename=tempfile(pattern="MODELFILE",fileext=".txt")
   }
 

@@ -60,7 +60,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   if(missing(covStructure)) covStructure <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
 
-  if(missing(modelfilename) | is.null(modelfilename)){
+  if(missing(modelfilename) || is.null(modelfilename)){
     modelfilename <- tempfile(pattern = "MODELFILE",fileext = ".txt")
   }
 
