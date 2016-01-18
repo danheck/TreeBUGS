@@ -12,6 +12,6 @@ plotFit(fittedModel, ...)
 \item{...}{arguments passed to \code{\link{boxplot}}}
 }
 \description{
-Plots observed mean frequencies against sampled mean frequencies
+Plots observed mean frequencies against sampled mean frequencies.
 }
 

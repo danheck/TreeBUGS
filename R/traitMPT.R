@@ -132,6 +132,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                 sampler=sampler,
                 parString=transformedPar$modelstring)
 
+  time0 <- Sys.time()
+  cat("MCMC sampling started at ", format(time0), "\n")
   mcmc <- callingSampler(model = "traitMPT",
                          mergedTree = mergedTree,
                          data = data,
@@ -149,7 +151,9 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          sampler = sampler,
                          autojags = autojags,
                          ...)
-
+  time1 <- Sys.time()
+  cat("MCMC sampling finished at", format(time1), "\n  ")
+  print(time1-time0)
 
   # Beta MPT: rename parameters and get specific summaries
   summary <- summarizeMPT(model = "traitMPT",
@@ -175,7 +179,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                       mptInfo=mptInfo,
                       mcmc=mcmc,
                       sampler=sampler,
-                      call=match.call()  )
+                      call=match.call(),
+                      time=time1-time0)
 
   # write results
   if(!missing(parEstFile) &&  !is.null(parEstFile)){
