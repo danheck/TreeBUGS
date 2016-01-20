@@ -7,7 +7,7 @@
 plotFit(fittedModel, ...)
 }
 \arguments{
-\item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}})}
+\item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
 \item{...}{arguments passed to \code{\link{boxplot}}}
 }

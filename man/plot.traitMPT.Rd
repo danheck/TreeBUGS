@@ -19,4 +19,7 @@ Plots for latent-trait MPT models (see \code{\link{traitMPT}}).
 \author{
 Daniel Heck
 }
+\seealso{
+\code{\link{plotDistribution}}
+}
 

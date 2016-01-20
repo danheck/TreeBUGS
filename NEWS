@@ -1,3 +1,9 @@
+TreeBUGS 0.3.1 (January 2016)
+===========
+
+* New function plotDistribution() to plot histograms of individual mean estimates
+
+
 TreeBUGS 0.3.0 (January 2016)
 ===========
 

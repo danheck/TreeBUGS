@@ -3,7 +3,7 @@
 #'
 #' Plots observed mean frequencies against sampled mean frequencies.
 #'
-#' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}})
+#' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})
 #' @param ... arguments passed to \code{\link{boxplot}}
 #' @export
 plotFit <- function(fittedModel,...){

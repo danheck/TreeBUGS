@@ -19,4 +19,7 @@ Plot Beta-MPT Parameter Estimates
 \author{
 Daniel Heck
 }
+\seealso{
+\code{\link{plotDistribution}}
+}
 

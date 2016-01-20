@@ -11,9 +11,9 @@
 #' @import R2WinBUGS
 #' @import R2jags
 #' @importFrom utils read.csv write.table
-#' @importFrom graphics axis plot points  segments
+#' @importFrom graphics axis plot points  segments abline boxplot curve hist lines par
 #' @importFrom grDevices rainbow
-#' @importFrom stats pnorm rnorm runif sd qnorm
+#' @importFrom stats pnorm rnorm runif sd qnorm dnorm dbeta
 #' @references
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 #'

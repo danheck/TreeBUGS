@@ -6,6 +6,7 @@
 #' @param includeIndividual whether to plot individual estimates
 #' @param ... further arguments passed to the standard \code{\link{plot}} function
 #' @author Daniel Heck
+#' @seealso \code{\link{plotDistribution}}
 #' @export
 plot.betaMPT <- function(x, includeIndividual=TRUE, ...){
 
@@ -39,6 +40,7 @@ plot.betaMPT <- function(x, includeIndividual=TRUE, ...){
 #'
 #' @inheritParams  plot.betaMPT
 #' @author Daniel Heck
+#' @seealso \code{\link{plotDistribution}}
 #' @export
 plot.traitMPT <- function(x, includeIndividual=TRUE, ...){
   plot.betaMPT(x,...)
