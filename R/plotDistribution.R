@@ -6,6 +6,7 @@
 #' @inheritParams plotFit
 #' @param scale only for latent-trait MPT: should estimates be plotted on the \code{"latent"} or the \code{"probability"} scale (i.e., as MPT parameters). Can be abbreviated by \code{"l"}  and \code{"p"}.
 #' @param ... further arguments passed to \code{\link{hist}} (e.g., \code{breaks=50} to get a more fine-grained histogram or \code{xlim=0:1} to use the same x-scale for all histograms)
+#' @details Note that differences due to discrete factor levels are currently not considered in the group-level predictions (red line). Under such a model, individual estimates are not necessarily normally distributed as indicated in the plot.
 #' @seealso \code{\link{plot.traitMPT}}
 #' @export
 plotDistribution <- function(fittedModel, scale="probability", ...){
@@ -28,12 +29,12 @@ plotDistribution <- function(fittedModel, scale="probability", ...){
 
       if(scale == "latent"){
         hist(qnorm(indEsts), freq=F, main=parnames[idx], xlab="Latent scale", ...)
-        xx <- seq(0, 1, .005)
+        xx <- seq(-10, 10, length.out = 3000)
         lines(xx, dnorm(xx, qnorm(means[idx]), sigma[idx]), col=2)
       }else{
         hist(indEsts, freq=F, main=parnames[idx], xlab="Probability scale", ...)
         # values on latent scale:
-        xx <- seq(-5, 5, .005)
+        xx <- seq(0, 1, length.out = 1000)
         # values on probability scale:
         xx.p <- pnorm(xx)
         # discrete approximation to density on latent scale:
@@ -46,7 +47,7 @@ plotDistribution <- function(fittedModel, scale="probability", ...){
       beta <- fittedModel$summary$groupParameters$beta[,1]
 
       hist(indEsts, freq=F, main=parnames[idx], xlab="Probability scale", ...)
-      xx <- seq(0, 1, .005)
+      xx <- seq(0, 1, length.out = 1000)
       lines(xx, dbeta(xx, alpha[idx], beta[idx]), col=2)
 
     }
