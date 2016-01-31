@@ -16,6 +16,9 @@ plotDistribution(fittedModel, scale = "probability", ...)
 \description{
 Plots histograms of the mean posterior estimates for participants including the estimated shape on the group level (e.g., the beta distribution in case of the beta-MPT)
 }
+\details{
+Note that differences due to discrete factor levels are currently not considered in the group-level predictions (red line). Under such a model, individual estimates are not necessarily normally distributed as indicated in the plot.
+}
 \seealso{
 \code{\link{plot.traitMPT}}
 }

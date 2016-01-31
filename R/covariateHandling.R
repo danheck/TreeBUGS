@@ -21,7 +21,7 @@ covHandling <- function(covData, covStructure=NULL, N, thetaNames, covType=NULL)
 
     # list / path to file
     if(is.character(covData)){
-      covData <- read.csv(covData, header=T, sep= ",", strip.white = T)
+      covData <- read.csv(covData, header=T, sep= ";", strip.white = T)
     }
     if(is.character(covStructure)){
       covStructure <- as.list(read.csv(covStructure, header=F,stringsAsFactors=F, sep="}")$V1)

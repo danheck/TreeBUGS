@@ -59,12 +59,14 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   if(missing(modelfilename) || is.null(modelfilename)){
     modelfilename=tempfile(pattern="MODELFILE",fileext=".txt")
   }
+  if(n.iter <= n.burnin)
+    stop("n.iter must be larger than n.burnin")
 
   ### read data
   if(is.matrix(data) | is.data.frame(data)){
     data <- as.data.frame(data)
   }else{
-    data = read.csv(data, header=TRUE)
+    data = read.csv(data, header=TRUE, sep=";")
   }
   if(any(is.na(data))){
     warning("Check for missings in the data.")
@@ -181,13 +183,11 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                       sampler=sampler,
                       call=match.call(),
                       time=time1-time0)
-
-  # write results
-  if(!missing(parEstFile) &&  !is.null(parEstFile)){
-    write.table(summary,  file=parEstFile, sep ="\t",
-                na="NA",dec=".",row.names=T,col.names=T,quote=F)
-  }
-
   class(fittedModel) <- "traitMPT"
+
+  # write results to file
+  writeSummary(fittedModel, parEstFile)
+
+
   return(fittedModel)
 }

@@ -26,15 +26,13 @@ plotDistribution <- function(fittedModel, scale="probability", ...){
     indEsts <- fittedModel$summary$individParameters[idx,,1]
     if(class(fittedModel) == "traitMPT"){
       sigma <- fittedModel$mcmc$BUGSoutput$mean$sigma
-
+      # values on latent scale:
+      xx <- seq(-10, 10, length.out = 3000)
       if(scale == "latent"){
         hist(qnorm(indEsts), freq=F, main=parnames[idx], xlab="Latent scale", ...)
-        xx <- seq(-10, 10, length.out = 3000)
         lines(xx, dnorm(xx, qnorm(means[idx]), sigma[idx]), col=2)
       }else{
         hist(indEsts, freq=F, main=parnames[idx], xlab="Probability scale", ...)
-        # values on latent scale:
-        xx <- seq(0, 1, length.out = 1000)
         # values on probability scale:
         xx.p <- pnorm(xx)
         # discrete approximation to density on latent scale:

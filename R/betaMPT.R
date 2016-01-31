@@ -3,9 +3,9 @@
 #' Fits a Beta-MPT model (Smith & Batchelder, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
 #'
 #' @param eqnfile The (full path to the) file that specifies the MPT model (standard .eqn syntax)
-#' @param data The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)
+#' @param data The (full path to the) csv file with the data (semicolon separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)
 #' @param restrictions  Optional: Either the (full path to the) file that specifies which parameters should be constants and which should be equal; alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
-#' @param covData The path to the csv data file for the individual values on the covariates (rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)
+#' @param covData The path to the csv data file for the individual values on the covariates (semicolon-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)
 #' @param covStructure  Optional: Either the (full path to the) file that specifies the assigment of covariates to MPT parameters (that is, each row assigns one covariate to one or more parameters separated by a semicolon, e.g., \code{age ; Do Dn}). Can also be provided as a list, e.g., \code{list("age ; Do Dn", "extraversion ; g"}). Default: All combinations included (could be unstable).
 #' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
 #' @param modelfilename Name that the modelfile that is made by the function to work with WinBUGS should get.
@@ -63,12 +63,14 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   if(missing(modelfilename) || is.null(modelfilename)){
     modelfilename <- tempfile(pattern = "MODELFILE",fileext = ".txt")
   }
+  if(n.iter <= n.burnin)
+    stop("n.iter must be larger than n.burnin")
 
   ### read data
   if(is.matrix(data) | is.data.frame(data)){
     data <- as.data.frame(data)
   }else{
-    data <- read.csv(data, header = TRUE)
+    data <- read.csv(data, header = TRUE, sep=";")
   }
   if(any(is.na(data))){
     warning("Check for missings in the data.")
@@ -164,14 +166,12 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                       call = match.call(),
                       time = time1-time0)
 
-  # write results
-  if(!(missing(parEstFile) || is.null(parEstFile))){
-    write.table(summary,  file = parEstFile, sep = "\t",
-                na = "NA", dec = ".",
-                row.names = T, col.names = T, quote = F)
-  }
-
   class(fittedModel) <- "betaMPT"
+
+  # write results to file
+  writeSummary(fittedModel, parEstFile)
+
+
   return(fittedModel)
 }
 

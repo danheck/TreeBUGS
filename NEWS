@@ -1,3 +1,10 @@
+TreeBUGS 0.3.2 (January 2016)
+===========
+
+* csv-format for "data" and "covData": semicolon (;) instead of comma (,) to separate cells
+* Printing of summary output to "parEstFile" improved
+
+
 TreeBUGS 0.3.1 (January 2016)
 ===========
 
