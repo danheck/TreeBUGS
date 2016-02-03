@@ -123,6 +123,7 @@ covStringBeta <- function(covTable){
   thetaSD[i] <- sd(theta[i,])
 }
 ")
+    cnt <- 0
     for(pp in 1:length(pars)){
       sel <- covTable$Parameter == pars[pp]
       thetaIdx <- covTable$theta[sel][1]
@@ -140,7 +141,7 @@ covStringBeta <- function(covTable){
                               "])) )/covSD[",covIdx,
                               "] / thetaSD[",thetaIdx,"]\n")
 # nice, not supported: cor(theta[",thetaIdx, ",], covData[,",covIdx, "])
-        covTable$covPar[pp] <-  paste0("cor_", pars[pp],"_",covs[cc])
+        covTable$covPar[cnt<-cnt+1] <-  paste0("cor_", pars[pp],"_",covs[cc])
       }
     }
   }

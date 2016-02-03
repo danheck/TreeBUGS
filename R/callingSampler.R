@@ -100,13 +100,13 @@ callingSampler <- function(model,
     }
   }
   if(!is.null(covData)){
-    if(is.character(covData)){
-      covData <- read.csv(covData, header=T, sep= ",",  strip.white = TRUE)
-    }
-
-    if(any(apply(covData, 2, class) %in% c("factor", "character", "logical"))){
-      stop("Covariate values must be provided as numbers, no factors/characters allowed!")
-    }
+#     if(is.character(covData)){
+#       covData <- read.csv(covData, header=T, sep= ";",  strip.white = TRUE)
+#     }
+#
+#     if(any(apply(covData, 2, class) %in% c("factor", "character", "logical"))){
+#       stop("Covariate values must be provided as numbers, no factors/characters allowed!")
+#     }
 
     covSD <- apply(covData, 2, sd)
     data <- c(data, "covData", "covSD")
