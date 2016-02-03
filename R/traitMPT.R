@@ -53,6 +53,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   if(missing(restrictions)) restrictions <- NULL
   if(missing(covData)) covData <- NULL
   if(missing(covStructure)) covStructure <- NULL
+  if(missing(covType)) covType <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
 
   checkParEstFile(parEstFile)
