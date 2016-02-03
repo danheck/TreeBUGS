@@ -30,7 +30,7 @@ callingSampler <- function(model,
                            hyperpriors=NULL,
                            n.iter=100000,
                            n.burnin=NULL,
-                           n.update= 10,
+                           n.update= 3,
                            n.thin=2,
                            n.chains=3,
                            sampler="JAGS",
@@ -60,28 +60,33 @@ callingSampler <- function(model,
     NresponsesTree[i]=length(which(mergedTree$Tree==treeNames[i]))
   }
 
+  # make character vector with data object names
+  data <- c("subjs", "S")
   index=0
   for(i in 1:length(treeNames)){
-    assign(paste("items",treeNames[i],sep="."),
-           rowSums(responses[(index+1):(index+NresponsesTree[i])]))
+    ### variable names in JAGS
+    name.mean <-     paste("response",treeNames[i],"mean",sep=".")
+    name.response <- paste("response",treeNames[i],sep=".")
+    name.items <- paste("items",treeNames[i],sep=".")
+
+    assign(name.items, rowSums(responses[(index+1):(index+NresponsesTree[i])]))
 
     # check whether any N=0
     if (any(rowSums(responses[(index+1):(index+NresponsesTree[i])]) == 0))
       warning("One or more responses do not have responses for tree",
               treeNames[i], ". As a solution, the critical participants might be excluded.")
 
-    assign(paste("response",treeNames[i],sep="."),
-           matrix(as.vector(t(responses[(index+1):(index+NresponsesTree[i])])),
-                  ncol=NresponsesTree[i],nrow=subjs,byrow=TRUE))
+    assign(name.response,  matrix(as.vector(t(responses[(index+1):(index+NresponsesTree[i])])),
+                                  ncol=NresponsesTree[i],nrow=subjs,byrow=TRUE))
+
+    # mean frequencies for T1 statistic
+    assign(name.mean, colMeans(get(name.response)))
+
     index=index+NresponsesTree[i]
 
+    data <- c(data, name.mean, name.response, name.items)
   }
 
-  # make data
-  data <- c(paste("items",treeNames, sep="."),
-            paste("response",treeNames, sep="."),
-            "subjs", "S")
-  # data <- list(itemsa.A = ....)
 
   if(model == "traitMPT"){
     data <- c(data, "V", "df")
@@ -135,7 +140,11 @@ callingSampler <- function(model,
                             envir=environment(),
                             ...)
     if(autojags){
-      recompile(samples)
+      cat("#####################################\n
+#### Autojags started. Might require some time
+#### (use n.update to adjust maximum number of updates). See ?autojags\n
+#####################################\n")
+      recompile(samples, n.iter=n.iter)
       samples.upd <- autojags(samples, n.update = n.update)
       samples=samples.upd
     }

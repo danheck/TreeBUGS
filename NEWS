@@ -1,3 +1,11 @@
+TreeBUGS 0.3.3 (February 2016)
+===========
+
+* autojags fixed
+* BCI and R^hat included in individual statistics
+* Better checks for input arguments for betaMPT, traitMPT
+
+
 TreeBUGS 0.3.2 (January 2016)
 ===========
 

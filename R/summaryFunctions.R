@@ -81,12 +81,13 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS",
       groupParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho,
                               slope = slope, factor = factor, factorSD = factorSD)
     }
-
-    individParameters <- array(c(mcmc$BUGSoutput$mean$theta,
-                                 mcmc$BUGSoutput$median$theta,
-                                 mcmc$BUGSoutput$sd$theta), c(S,N,3))
+    theta.names <- apply(as.matrix(data.frame(lapply(expand.grid("theta[",1:S, ",",1:N,"]"), as.character))),
+                         1, paste0, collapse="")
+    individParameters <- array(data = mcmc$BUGSoutput$summary[theta.names,colsel],
+                               dim = c(S,N,length(colsel)))
     dimnames(individParameters) <- list(Parameter=uniqueNames,
-                                        ID=1:N, Statistic=c("Mean","Median","SD"))
+                                        ID=1:N,
+                                        Statistic=colnames(mcmc$BUGSoutput$summary)[colsel])
 
     # goodness of fit and deviance
     if(is.null(transformedParameters)){

@@ -53,30 +53,18 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   if(missing(restrictions)) restrictions <- NULL
   if(missing(covData)) covData <- NULL
   if(missing(covStructure)) covStructure <- NULL
-  if(missing(covType)) covType <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
 
-  if(missing(modelfilename) || is.null(modelfilename)){
-    modelfilename=tempfile(pattern="MODELFILE",fileext=".txt")
-  }
+  checkParEstFile(parEstFile)
+  modelfilename <- checkModelfilename(modelfilename)
+  data <- readData(data)
+
   if(n.iter <= n.burnin)
     stop("n.iter must be larger than n.burnin")
 
-  ### read data
-  if(is.matrix(data) | is.data.frame(data)){
-    data <- as.data.frame(data)
-  }else{
-    data = read.csv(data, header=TRUE, sep=";")
-  }
-  if(any(is.na(data))){
-    warning("Check for missings in the data.")
-  }
-
+  # MPT structure
   Tree <- readEQN(eqnfile)
-  # reorder data:
-  # data <- data[,sort(unique(Tree$Answers))] OLD Daniel fix
-
-  mergedTree <- mergeBranches(Tree) # OLD mergeBranches ,names(data))
+  mergedTree <- mergeBranches(Tree)
   data <- readSubjectData(data, unique(mergedTree$Category))
 
   tHoutput <- thetaHandling(mergedTree,restrictions)

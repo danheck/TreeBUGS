@@ -24,29 +24,29 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   # number of categories per tree:
   ncatPerTree <- as.vector(by(mergedTree$Category, mergedTree$Tree, length))
 
-  if(sampler%in%c("jags","JAGS")){
-
-    ################################### DATA #######################
-    cat("data\n",file=filename)
-    cat("{\n",file=filename,append=T)
-    # cat("for(s in 1:",S,"){\n",sep="",file=filename,append=T)
-    # cat("zero[s] <- 0\n",file=filename,append=T)
-    # cat("}\n ",file=filename,append=T)
-
-
-    ####### for posterior predictive cehck: mean frequencies
-    for(i in 1:NOT){
-      cat("for(k in 1:",ncatPerTree[i],") {\n",sep="",file=filename,append=T)
-        cat("response.",treeNames[i],".mean[k] <- mean(response.",treeNames[i],"[,k])\n",sep="",file=filename,append=T)
-      cat("}\n", file=filename,append=T)
-    }
-    cat("}\n ",file=filename,append=T)
-
-    ###################################### MODEL ###################
-    cat("model\n",file=filename,append=T)
-  }else{
+  #if(sampler%in%c("jags","JAGS")){
+#
+  #  ################################### DATA #######################
+  #  cat("data\n",file=filename)
+  #  cat("{\n",file=filename,append=T)
+  #  # cat("for(s in 1:",S,"){\n",sep="",file=filename,append=T)
+  #  # cat("zero[s] <- 0\n",file=filename,append=T)
+  #  # cat("}\n ",file=filename,append=T)
+#
+#
+  #  ####### for posterior predictive cehck: mean frequencies
+  #  for(i in 1:NOT){
+  #    cat("for(k in 1:",ncatPerTree[i],") {\n",sep="",file=filename,append=T)
+  #      cat("response.",treeNames[i],".mean[k] <- mean(response.",treeNames[i],"[,k])\n",sep="",file=filename,append=T)
+  #    cat("}\n", file=filename,append=T)
+  #  }
+  #  cat("}\n ",file=filename,append=T)
+#
+  #  ###################################### MODEL ###################
+  #  cat("model\n",file=filename,append=T)
+  #}else{
     cat("model\n",file=filename)
-  }
+  #}
 
 	cat("{\n",file=filename,append=T)
 	cat("for (n in 1: subjs){\n",file=filename,append=T)

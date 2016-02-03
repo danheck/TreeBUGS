@@ -18,7 +18,7 @@
 #' @param n.thin Thinning rate.
 #' @param n.chains number of MCMC chains
 #' @param sampler Which sampler should be used? Default is "JAGS". Further options are "OpenBUGS" and "WinBugs" (without MPT specific summary and plotting functions)
-#' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.
+#' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}).  Use \code{n.update=3} as an additional argument to control how often JAGS is rerun. Can take a lot of time for large models.
 #' @param ... Arguments to be passed to the sampling function (default: \code{\link{jags.parallel}}.
 #'
 #' @details Note that, in the Beta-MPT model, correlations of individual MPT parameters with covariates are sampled. Hence, the covariates do not affect the estimation of the actual Beta-MPT parameters. Therefore, the correlation of covariates with the individual MPT parameters can equivalently be performed after fitting the model using the sampled posterior parameter values stored in \code{betaMPT$mcmc}
@@ -60,27 +60,16 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   if(missing(covStructure)) covStructure <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
 
-  if(missing(modelfilename) || is.null(modelfilename)){
-    modelfilename <- tempfile(pattern = "MODELFILE",fileext = ".txt")
-  }
+  checkParEstFile(parEstFile)
+  modelfilename <- checkModelfilename(modelfilename)
+  data <- readData(data)
+
   if(n.iter <= n.burnin)
     stop("n.iter must be larger than n.burnin")
 
-  ### read data
-  if(is.matrix(data) | is.data.frame(data)){
-    data <- as.data.frame(data)
-  }else{
-    data <- read.csv(data, header = TRUE, sep=";")
-  }
-  if(any(is.na(data))){
-    warning("Check for missings in the data.")
-  }
 
   Tree <- readEQN(eqnfile)
-  # reorder data:
-  # data <- data[,sort(unique(Tree$Answers))] OLD Daniel fix
-
-  mergedTree <- mergeBranches(Tree) # OLD mergeBranches ,names(data))
+  mergedTree <- mergeBranches(Tree)
   data <- readSubjectData(data,unique(mergedTree$Category))
 
   tHoutput <- thetaHandling(mergedTree,restrictions)
