@@ -115,6 +115,9 @@ summarizeMPT <- function(model, mcmc, thetaNames, sampler="JAGS",
 
 #' @export
 print.summary.betaMPT <- function(x,  ...){
+  cat("Call: \n")
+  print(x$call)
+  cat("\n")
   if(is.null(x$groupParameters)){
     warning("Clean MPT summary only available when fitting with JAGS.")
     print(x)
@@ -142,6 +145,9 @@ print.summary.betaMPT <- function(x,  ...){
 
 #' @export
 print.summary.traitMPT <- function(x,  ...){
+  cat("Call: \n")
+  print(x$call)
+  cat("\n")
   if(is.null(x$groupParameters)){
     warning("Clean MPT summary only available when fitting with JAGS.")
     print(x)
@@ -185,6 +191,7 @@ summary.betaMPT <- function(object,  ...){
     warning("Clean MPT summary only available when fitting with JAGS.")
   }
   summ <- object$summary
+  summ$call <- object$call
   class(summ) <- "summary.betaMPT"
   return(summ)
 }
@@ -195,6 +202,7 @@ summary.traitMPT <- function(object,  ...){
     warning("Clean MPT summary only available when fitting with JAGS.")
   }
   summ <- object$summary
+  summ$call <- object$call
   class(summ) <- "summary.traitMPT"
   return(summ)
 }
