@@ -1,4 +1,4 @@
-# #' Calling the Sampler (JAGS or OpenBUGS or WinBUGS)
+# #' Calling the Sampler (JAGS)
 # #'
 # #' @param model either "betaMPT", "traitMPT"
 # #' @param mergedTree Ouptut of mergeBranches()
@@ -12,7 +12,6 @@
 # #' @param n.update Update paramater for JAGS
 # #' @param n.thin Thinning rate.
 # #' @param n.chains number of MCMC chains
-# #' @param sampler The Sampler to be used. Options are JAGS, OpenBUGS or WinBUGS. Note that you need to install the sampler on # your computer.
 # #' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large # models.
 # #' not necessary:  @param savetable name of the file to which the results should be saved on the hard drive.
 # #' @param ... Arguments to be passed to other methods.
@@ -33,7 +32,6 @@ callingSampler <- function(model,
                            n.update= 3,
                            n.thin=2,
                            n.chains=3,
-                           sampler="JAGS",
                            autojags=FALSE,
                            # savetable = NULL,
                            ...){
@@ -114,9 +112,7 @@ callingSampler <- function(model,
 
   # call Sampler
 
-  if(sampler%in%c("jags","JAGS")){
-    # W=diag(S)
-    # data <- c(data, "W")
+  # if(sampler %in% c("jags","JAGS")){
     parametervector=c(unlist(parameters),
                       "T1.obs","T1.pred","p.T1","p.T1ind",
                       transformedPar, covPars)
@@ -149,28 +145,10 @@ callingSampler <- function(model,
       samples=samples.upd
     }
 
-  }else{
-    if(sampler%in%c("openbugs","OpenBUGS","winbugs","WinBUGS")){
+#   }else{
+#       print(paste("Unknown sampler:",sampler))
+#     }
 
-      samples = bugs(data,
-                     inits=NULL,
-                     parameters,
-                     model.file = modelfile,
-                     n.chains=n.chains,
-                     n.iter=n.iter,
-                     n.burnin=n.burnin,
-                     n.thin=n.thin,
-                     DIC=T,
-                     codaPkg=F,
-                     debug=F,
-                     program = sampler,
-                     ...)
-      # get coda samples (better to process afterwards)
-      # tmp <- capture.output({samples <- read.bugs(out)})
-    }else{
-      print(paste("Unknown sampler:",sampler))
-    }
-  }
 
   return(samples)
 }

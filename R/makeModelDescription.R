@@ -5,7 +5,6 @@
 # #' @param mergedTree Output of mergeBranches()
 # #' @param S The number of thetas
 # #' @param hyperprior named list, either with entries "alpha" and "beta" for the "betaMPT", or with "mu" and "xi" for the latent-trait MPT
-# #' @param sampler Which sampler should be used? Default is "JAGS", further options are "OpenBUGS" and "WinBugs"
 # #' @param parString  additional lines added to sample transformed parameters (e.g., parameter differences for testing)
 # #' @author Daniel Heck, Nina R. Arnold, Denis Arnold
 # #' @export
@@ -15,7 +14,6 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
                          S,
                          hyperprior, # list (either with alpha+beta or with mu+xi)
                          covString=NULL,
-                         sampler="JAGS",
                          parString=""){
 
   treeNames <- as.character(sort(unique(mergedTree$Tree)))
@@ -24,8 +22,7 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   # number of categories per tree:
   ncatPerTree <- as.vector(by(mergedTree$Category, mergedTree$Tree, length))
 
-  #if(sampler%in%c("jags","JAGS")){
-#
+
   #  ################################### DATA #######################
   #  cat("data\n",file=filename)
   #  cat("{\n",file=filename,append=T)
@@ -72,13 +69,11 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 	hyperprior <- switch(model,
 	                     "betaMPT" = makeBetaHyperprior(S =S ,
 	                                                    alpha = hyperprior$alpha,
-	                                                    beta = hyperprior$beta,
-	                                                    sampler = sampler),
+	                                                    beta = hyperprior$beta),
 	                     "traitMPT" = makeTraitHyperprior(S = S,
 	                                                      covString = covString,
 	                                                     mu = hyperprior$mu,
-	                                                     xi = hyperprior$xi,
-	                                                     sampler = sampler)
+	                                                     xi = hyperprior$xi)
 	)
 
 	cat(hyperprior, file=filename, append=T)
@@ -92,7 +87,6 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 
 
 	############################## Posterior predictive checks:
-	if(sampler%in%c("jags","JAGS")){
 
 	cat("\n############# T1: posterior predictive check of mean frequencies\n", file=filename,append=T)
 
@@ -155,7 +149,7 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   }
   cat("\np.T1 <- T1.pred > T1.obs\n",  file=filename,append=T)
 
-}
+
 	### Transformed parameters:
   cat(parString, file=filename, append = TRUE)
 
@@ -220,8 +214,7 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 ################### Beta-MPT specific hyperprior part
 makeBetaHyperprior <-function(S,
                               alpha = "dunif(1,5000)",
-                              beta = "dunif(1,5000)",
-                              sampler = "JAGS"){
+                              beta = "dunif(1,5000)"){
   modelString <- paste0("
 
 for(s in 1:S){
@@ -232,8 +225,8 @@ for(s in 1:S){
 
 for(s in 1:S){",
 
-ifelse(sampler%in%c("openbugs","OpenBUGS","winbugs","WinBUGS"),
-       "\nzero[s] <- 0", "\n"),
+# ifelse(sampler%in%c("openbugs","OpenBUGS","winbugs","WinBUGS"),
+#        "\nzero[s] <- 0", "\n"),
 "
   zero[s] ~dpois(phi[s])
   phi[s] <- -log(1/pow(alph[s]+bet[s],5/2))
@@ -253,8 +246,7 @@ ifelse(sampler%in%c("openbugs","OpenBUGS","winbugs","WinBUGS"),
 makeTraitHyperprior <-function(S,
                                covString,
                                mu = "dnorm(0,1)",
-                               xi = "dunif(0,100)",
-                               sampler = "JAGS"){
+                               xi = "dunif(0,100)"){
   modelString <- paste0(covString, "
 
 # hyperpriors

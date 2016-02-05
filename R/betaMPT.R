@@ -8,7 +8,7 @@
 #' @param covData The path to the csv data file for the individual values on the covariates (semicolon-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)
 #' @param covStructure  Optional: Either the (full path to the) file that specifies the assigment of covariates to MPT parameters (that is, each row assigns one covariate to one or more parameters separated by a semicolon, e.g., \code{age ; Do Dn}). Can also be provided as a list, e.g., \code{list("age ; Do Dn", "extraversion ; g"}). Default: All combinations included (could be unstable).
 #' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
-#' @param modelfilename Name that the modelfile that is made by the function to work with WinBUGS should get.
+#' @param modelfilename Name that the modelfile that is made by the function to work with JAGS should get.
 #'        Default is to write this information to the tempdir as required by CRAN standards.
 #' @param alpha Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).
 #' @param beta Second hyperprior, see \code{alpha}
@@ -17,7 +17,6 @@
 #' @param n.burnin Burnin period.
 #' @param n.thin Thinning rate.
 #' @param n.chains number of MCMC chains
-#' @param sampler Which sampler should be used? Default is "JAGS". Further options are "OpenBUGS" and "WinBugs" (without MPT specific summary and plotting functions)
 #' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}).  Use \code{n.update=3} as an additional argument to control how often JAGS is rerun. Can take a lot of time for large models.
 #' @param ... Arguments to be passed to the sampling function (default: \code{\link{jags.parallel}}.
 #'
@@ -28,7 +27,6 @@
 #'  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
 #'  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
 #'  \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{mcmc.list} for analysis with the \code{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
-#'  \item \code{sampler}: the type of sampler used (standard: \code{"JAGS"})
 #' }
 #' @author Nina R. Arnold, Denis Arnold, Daniel Heck
 #' @references Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.
@@ -52,7 +50,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     # File Handling stuff:
                     modelfilename,
                     parEstFile,
-                    sampler = "JAGS",
                     autojags = FALSE,
                     ...){
   if(missing(restrictions)) restrictions <- NULL
@@ -105,7 +102,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                 S = max(SubPar$theta),
                 hyperprior = list(alpha=alpha, beta = beta),
                 covString = covString,
-                sampler = sampler,
                 parString = transformedPar$modelstring)
 
   time0 <- Sys.time()
@@ -123,7 +119,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                          n.burnin = n.burnin,
                          n.thin = n.thin,
                          n.chains = n.chains,
-                         sampler = sampler,
                          autojags = autojags,
                          ...)
   time1 <- Sys.time()
@@ -134,7 +129,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   summary <- summarizeMPT(model = "betaMPT",
                           mcmc = mcmc,
                           thetaNames = thetaNames,
-                          sampler = sampler,
                           covIncluded = !is.null(covData),
                           transformedParameters = transformedPar$transformedParameters)
 
@@ -151,7 +145,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   fittedModel <- list(summary = summary,
                       mptInfo = mptInfo,
                       mcmc = mcmc,
-                      sampler = sampler,
                       call = match.call(),
                       time = time1-time0)
 

@@ -7,8 +7,8 @@ writeSummary <- function(fittedModel, parEstFile=NULL){
     try({
       print(summary(fittedModel))
 
-      cat("\n\n#################################\n#### Group Parameter Estimates\n")
-      print(fittedModel$summary$groupParameters)
+#       cat("\n\n#################################\n#### Group Parameter Estimates\n")
+#       print(fittedModel$summary$groupParameters)
 
       cat("\n\n#################################\n#### Individual Parameter Estimates\n")
       printIndividualPar(fittedModel$summary$individParameters)

@@ -14,7 +14,6 @@
 #'  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
 #'  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
 #'  \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{mcmc.list} for analysis with the \code{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
-#'  \item \code{sampler}: the type of sampler used (standard: \code{"JAGS"})
 #' }
 #' @author Daniel Heck, Denis Arnold, Nina R. Arnold
 #' @references
@@ -47,7 +46,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     # File Handling stuff:
                     modelfilename,
                     parEstFile,
-                    sampler="JAGS",
                     autojags=FALSE,
                     ...){
   if(missing(restrictions)) restrictions <- NULL
@@ -120,7 +118,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                 S = S,
                 hyperprior = list(mu = mu, xi = xi),
                 covString = covString,
-                sampler=sampler,
                 parString=transformedPar$modelstring)
 
   time0 <- Sys.time()
@@ -139,7 +136,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          n.burnin = n.burnin,
                          n.thin = n.thin,
                          n.chains = n.chains,
-                         sampler = sampler,
                          autojags = autojags,
                          ...)
   time1 <- Sys.time()
@@ -150,7 +146,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   summary <- summarizeMPT(model = "traitMPT",
                           mcmc = mcmc,
                           thetaNames = thetaNames,
-                          sampler = sampler,
                           covIncluded = !is.null(covData),
                           covFactorLevels=covFactorLevels,
                           transformedParameters = transformedPar$transformedParameters)
@@ -169,7 +164,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   fittedModel <- list(summary=summary,
                       mptInfo=mptInfo,
                       mcmc=mcmc,
-                      sampler=sampler,
                       call=match.call(),
                       time=time1-time0)
   class(fittedModel) <- "traitMPT"

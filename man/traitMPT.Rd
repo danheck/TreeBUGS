@@ -7,7 +7,7 @@
 traitMPT(eqnfile, data, restrictions, covData, covStructure, covType,
   transformedParameters, mu = "dnorm(0,1)", xi = "dunif(0,100)", V, df,
   n.iter = 50000, n.burnin = 5000, n.thin = 5, n.chains = 3,
-  modelfilename, parEstFile, sampler = "JAGS", autojags = FALSE, ...)
+  modelfilename, parEstFile, autojags = FALSE, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -40,14 +40,12 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, covType,
 
 \item{n.chains}{number of MCMC chains}
 
-\item{modelfilename}{Name that the modelfile that is made by the function to work with WinBUGS should get.
+\item{modelfilename}{Name that the modelfile that is made by the function to work with JAGS should get.
 Default is to write this information to the tempdir as required by CRAN standards.}
 
 \item{parEstFile}{Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")}
 
-\item{sampler}{Which sampler should be used? Default is "JAGS". Further options are "OpenBUGS" and "WinBugs" (without MPT specific summary and plotting functions)}
-
-\item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}). Can take a lot of time for large models.}
+\item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}).  Use \code{n.update=3} as an additional argument to control how often JAGS is rerun. Can take a lot of time for large models.}
 
 \item{...}{Arguments to be passed to the sampling function (default: \code{\link{jags.parallel}}.}
 }
@@ -57,7 +55,6 @@ a list of the class \code{traitMPT} with the objects:
  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
  \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{mcmc.list} for analysis with the \code{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
- \item \code{sampler}: the type of sampler used (standard: \code{"JAGS"})
 }
 }
 \description{
