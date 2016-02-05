@@ -2,7 +2,7 @@ Package: TreeBUGS
 Type: Package
 Title: Hierarchical MPT Modeling using BUGS
 Version: 0.3.4
-Date: 2016-01-20
+Date: 2016-02-05
 Authors@R: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut")),
              person("Nina", "Arnold", email="arnold@uni-mannheim.de", role = c("aut")),
              person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut","cre")))
@@ -10,7 +10,6 @@ Maintainer: Denis Arnold <denis.arnold@uni-tuebingen.de>
 Description: Fits hierarchical multinomial processing tree (MPT) models that either assume latent multivariate normal (Klauer, 2010) or indpendent beta distributions (Smith & Batchelder, 2010) for the person parameters. To fit a model, only an .eqn-file as for standard MPT models is required. Moreover, data can either be provided in a comma-separated file (.csv) or directly in R. TreeBUGS then automatically creates a model file and calls JAGS. Fitted models can be analyzed using summary and plotting functions tailored to MPT models.
 LazyData: TRUE
 Depends:
-    R2WinBUGS (>= 2.1),
     R2jags,
     stats,
     graphics,
