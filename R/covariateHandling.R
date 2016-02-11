@@ -245,7 +245,7 @@ for(i in 1:subjs) {
 
         # add design matrix to list of design matrices:
         X_list <- c(X_list,
-                    list(X = eigen(Z, symmetric=T)$vectors[,1:(numLevel-1)]))
+                    list(X = as.matrix(eigen(Z, symmetric=T)$vectors[,1:(numLevel-1)])))
         names(X_list)[length(X_list)] <- paste0("X_", covPars[pp])
 
         # model string: only (numLevel-1) priors
