@@ -18,7 +18,7 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
 
 \item{covData}{The path to the csv data file for the individual values on the covariates (semicolon-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)}
 
-\item{covStructure}{Optional: Either the (full path to the) file that specifies the assigment of covariates to MPT parameters (that is, each row assigns one covariate to one or more parameters separated by a semicolon, e.g., \code{age ; Do Dn}). Can also be provided as a list, e.g., \code{list("age ; Do Dn", "extraversion ; g"}). Default: All combinations included (could be unstable).}
+\item{covStructure}{Optional: Either the (full path to the) file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Default: All combinations included (not recommended, could be unstable).}
 
 \item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
 

@@ -38,7 +38,8 @@ covHandling <- function(covData, covStructure=NULL, N, thetaNames, covType=NULL)
 
     if(is.null(covStructure)){
       # default: all covariates for all parameters included
-      covStructure <- lapply(unique(thetaNames$Parameter), function(tt) paste(tt, ";", paste(covNames, collapse=" ")))
+      covStructure <- lapply(unique(thetaNames$Parameter),
+                             function(tt) paste(tt, ";", paste(covNames, collapse=" ")))
     }
 
     # default: continuous / random covariates
