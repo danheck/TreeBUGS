@@ -33,7 +33,7 @@ plot.betaMPT <- function(x, includeIndividual=TRUE, ...){
 
 }
 
-#' Plots for latent-trait MPT models (see \code{\link{traitMPT}}).
+#' Plots for latent-trait MPT models
 #'
 #' @inheritParams  plot.betaMPT
 #' @author Daniel Heck

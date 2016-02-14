@@ -161,11 +161,11 @@ print.summary.traitMPT <- function(x,  ...){
   }else{
     cat("Mean parameters on group level:\n")
     print(round(x$groupParameters$mean, 4))
-    cat("\nMean of latent-trait values across individuals:\n")
+    cat("\nMean of latent-trait values (probit-scale) across individuals:\n")
     print(round(x$groupParameters$mu, 4))
-    cat("\nStandard deviation of latent-trait values across individuals:\n")
+    cat("\nStandard deviation of latent-trait values (probit scale) across individuals:\n")
     print(round(x$groupParameters$sigma, 4))
-    cat("\nCorrelations of individual latent-trait values:\n")
+    cat("\nCorrelations of latent-trait values on probit scale:\n")
     print(round(x$groupParameters$rho, 4))
 
     cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")

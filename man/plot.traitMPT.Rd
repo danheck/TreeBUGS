@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotParameters.R
 \name{plot.traitMPT}
 \alias{plot.traitMPT}
-\title{Plots for latent-trait MPT models (see \code{\link{traitMPT}}).}
+\title{Plots for latent-trait MPT models}
 \usage{
 \method{plot}{traitMPT}(x, includeIndividual = TRUE, ...)
 }
@@ -14,7 +14,7 @@
 \item{...}{further arguments passed to the standard \code{\link{plot}} function}
 }
 \description{
-Plots for latent-trait MPT models (see \code{\link{traitMPT}}).
+Plots for latent-trait MPT models
 }
 \author{
 Daniel Heck

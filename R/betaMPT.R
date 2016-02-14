@@ -13,12 +13,12 @@
 #' @param alpha Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).
 #' @param beta Second hyperprior, see \code{alpha}
 #' @param parEstFile Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")
-#' @param n.iter Number of iterations (including burnin samples).
-#' @param n.burnin Burnin period.
+#' @param n.iter Number of iterations per chain (including burnin samples). See \code{\link{jags.parallel}} for details.
+#' @param n.burnin Burnin period, samples will not be stored.
 #' @param n.thin Thinning rate.
 #' @param n.chains number of MCMC chains
 #' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}).  Use \code{n.update=3} as an additional argument to control how often JAGS is rerun. Can take a lot of time for large models.
-#' @param ... Arguments to be passed to the sampling function (default: \code{\link{jags.parallel}}.
+#' @param ... Arguments to be passed to the JAGS sampling function (default: \code{\link{jags.parallel}}.
 #'
 #' @details Note that, in the Beta-MPT model, correlations of individual MPT parameters with covariates are sampled. Hence, the covariates do not affect the estimation of the actual Beta-MPT parameters. Therefore, the correlation of covariates with the individual MPT parameters can equivalently be performed after fitting the model using the sampled posterior parameter values stored in \code{betaMPT$mcmc}
 #'

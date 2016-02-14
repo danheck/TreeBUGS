@@ -3,12 +3,13 @@
 #' Fits a latent-trait MPT model (Klauer, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
 #'
 #' @inheritParams betaMPT
-#' @param covType a character vector specifying the type of covariates in each column of \code{covData}: \code{"c"} = continuous covariate (which is the default for continuous variables); \code{"f"} = fixed effect (default for character/factor variables); \code{"r"} = random effect.
-#' @param mu hyperprior for group means of probit-transformed parameters. Default is a standard normal distribution.
+#' @param covType a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.
+#' @param mu hyperprior for group means of probit-transformed parameters. Default is a standard normal distribution that implied a uniform distribution on the MPT probability parameters
 #' @param xi hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,100]
 #' @param V  S x S matrix used as a hyperprior for the inverse-Wishart hyperprior parameters with as many rows and columns as there are core MPT parameters. Default is a diagonal matrix.
 #' @param df degrees of freedom for the inverse-Wishart hyperprior for the individual parameters. Minimum is S+1, where S gives the number of core MPT parameters.
 #'
+#' @param IVprec hyperprior on the precision (i.e., the inverse of the variance) of the slope parameter for continuous independent variables. Default implies a Cauchy prior (Rouder et. al, 2012). To use a more-informative standard-normal prior, use \code{IVprec = 'dcat(1)'}.
 #' @return a list of the class \code{traitMPT} with the objects:
 #' \itemize{
 #'  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
@@ -20,6 +21,9 @@
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 #'
 #' Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205-235.
+#'
+#' Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56, 356-374.
+
 
 #' @export
 
@@ -36,6 +40,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     xi = "dunif(0,100)",
                     V,
                     df,
+                    IVprec = "dchisq(1)",  # change to "dcat(1)" to set beta ~ dnorm(0,1)
 
                     # MCMC stuff:
                     n.iter=50000,
@@ -93,8 +98,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
       if(covType[i] == "c" &  colnames(covData)[i] %in% covTable$Covariate){
         scaled <- scale(covData[,i], scale = FALSE)
         if(any(scaled != covData[,i])){
-          warning("Predictor covariate ", colnames(covData)[i],
-                  "is automatically centererd to a MEAN OF ZERO \n  (recommended for latent-trait MPT)!")
+#           warning("Predictor covariate ", colnames(covData)[i],
+#                   " is automatically centererd to a MEAN OF ZERO \n  (recommended for latent-trait MPT)!")
           covData[,i] <- scaled
         }
       }
@@ -102,7 +107,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   }
 
   # get model string: phi(....)
-  covTmp2 <- covStringTrait(covTable, S=S, covFactorLevels=covFactorLevels)
+  covTmp2 <- covStringTrait(covTable, S=S,
+                            covFactorLevels=covFactorLevels, IVprec=IVprec)
   covString <- covTmp2$modelString
   covPars <- covTmp2$covPars
 

@@ -26,9 +26,9 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
 
 \item{beta}{Second hyperprior, see \code{alpha}}
 
-\item{n.iter}{Number of iterations (including burnin samples).}
+\item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link{jags.parallel}} for details.}
 
-\item{n.burnin}{Burnin period.}
+\item{n.burnin}{Burnin period, samples will not be stored.}
 
 \item{n.thin}{Thinning rate.}
 
@@ -41,7 +41,7 @@ Default is to write this information to the tempdir as required by CRAN standard
 
 \item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}).  Use \code{n.update=3} as an additional argument to control how often JAGS is rerun. Can take a lot of time for large models.}
 
-\item{...}{Arguments to be passed to the sampling function (default: \code{\link{jags.parallel}}.}
+\item{...}{Arguments to be passed to the JAGS sampling function (default: \code{\link{jags.parallel}}.}
 }
 \value{
 a list of the class \code{betaMPT} with the objects:

@@ -6,8 +6,8 @@
 \usage{
 traitMPT(eqnfile, data, restrictions, covData, covStructure, covType,
   transformedParameters, mu = "dnorm(0,1)", xi = "dunif(0,100)", V, df,
-  n.iter = 50000, n.burnin = 5000, n.thin = 5, n.chains = 3,
-  modelfilename, parEstFile, autojags = FALSE, ...)
+  IVprec = "dchisq(1)", n.iter = 50000, n.burnin = 5000, n.thin = 5,
+  n.chains = 3, modelfilename, parEstFile, autojags = FALSE, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -20,11 +20,11 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, covType,
 
 \item{covStructure}{Optional: Either the (full path to the) file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Default: All combinations included (not recommended, could be unstable).}
 
-\item{covType}{a character vector specifying the type of covariates in each column of \code{covData}: \code{"c"} = continuous covariate (which is the default for continuous variables); \code{"f"} = fixed effect (default for character/factor variables); \code{"r"} = random effect.}
+\item{covType}{a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.}
 
 \item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
 
-\item{mu}{hyperprior for group means of probit-transformed parameters. Default is a standard normal distribution.}
+\item{mu}{hyperprior for group means of probit-transformed parameters. Default is a standard normal distribution that implied a uniform distribution on the MPT probability parameters}
 
 \item{xi}{hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,100]}
 
@@ -32,9 +32,11 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, covType,
 
 \item{df}{degrees of freedom for the inverse-Wishart hyperprior for the individual parameters. Minimum is S+1, where S gives the number of core MPT parameters.}
 
-\item{n.iter}{Number of iterations (including burnin samples).}
+\item{IVprec}{hyperprior on the precision (i.e., the inverse of the variance) of the slope parameter for continuous independent variables. Default implies a Cauchy prior (Rouder et. al, 2012). To use a more-informative standard-normal prior, use \code{IVprec = 'dcat(1)'}.}
 
-\item{n.burnin}{Burnin period.}
+\item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link{jags.parallel}} for details.}
+
+\item{n.burnin}{Burnin period, samples will not be stored.}
 
 \item{n.thin}{Thinning rate.}
 
@@ -47,7 +49,7 @@ Default is to write this information to the tempdir as required by CRAN standard
 
 \item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}).  Use \code{n.update=3} as an additional argument to control how often JAGS is rerun. Can take a lot of time for large models.}
 
-\item{...}{Arguments to be passed to the sampling function (default: \code{\link{jags.parallel}}.}
+\item{...}{Arguments to be passed to the JAGS sampling function (default: \code{\link{jags.parallel}}.}
 }
 \value{
 a list of the class \code{traitMPT} with the objects:
@@ -67,5 +69,7 @@ Daniel Heck, Denis Arnold, Nina R. Arnold
 Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 
 Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205-235.
+
+Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56, 356-374.
 }
 

@@ -162,7 +162,7 @@ covStringBeta <- function(covTable){
 # S: number of free parameters
 # covFactorLevels: list with factor levels for discrete covariates
 
-covStringTrait <- function(covTable, S, covFactorLevels=NULL){
+covStringTrait <- function(covTable, S, covFactorLevels=NULL, IVprec="dchisq(1)"){
   modelString <- "\n## Probit Transformation and Covariate Handling ##\n"
 
   ##### no predictors/ covariates: simple probit transformation as before
@@ -227,7 +227,9 @@ for(i in 1:subjs) {
       if(covTable$covType[pp] == "c"){
 
         # hyperpriors for slopes
-        modelString <- paste0(modelString, "\n", covPars[pp], " ~ dnorm(0,1)")
+        modelString <- paste0(modelString, "\n",
+                              covPars[pp], " ~ dnorm(0,tau_",covPars[pp],")","\n",
+                              "tau_",covPars[pp]," ~ ",IVprec, "\n")
 
       }else if(covTable$covType[pp] == "r"){
         numLevel <- length(covFactorLevels[[covTable$covIdx[pp]]])
