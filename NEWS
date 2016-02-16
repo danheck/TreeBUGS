@@ -4,6 +4,7 @@ TreeBUGS 0.3.5 (February 2016)
 * Less informative Cauchy prior as default for continuous predictors in traitMPT
 * Additional argument IVprec in traitMPT to specify hyperprior for precision of continuous slope paramters
 * Data-generating function genMPT using general matrices of individual parameters
+* Parameter labels for output in fittedModel$mcmc$BUGSoutput
 
 
 TreeBUGS 0.3.4 (February 2016)

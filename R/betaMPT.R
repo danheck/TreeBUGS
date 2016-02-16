@@ -74,6 +74,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   mergedTree <- tHoutput$mergedTree
 
   thetaNames <- tHoutput[[1]][,1:2]
+  thetaUnique <- thetaNames$Parameter[as.numeric(rownames(unique(thetaNames[2])))]
   S <- max(SubPar$theta)
   isIdentifiable(S, mergedTree)
 
@@ -142,6 +143,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                   transformedParameters=transformedPar$transformedParameters)
 
   # class structure for TreeBUGS
+  mcmc$BUGSoutput <- renameBUGSoutput(mcmc$BUGSoutput, thetaUnique, "betaMPT")
   fittedModel <- list(summary = summary,
                       mptInfo = mptInfo,
                       mcmc = mcmc,
