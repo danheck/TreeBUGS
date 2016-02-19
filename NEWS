@@ -1,6 +1,7 @@
 TreeBUGS 0.3.5 (February 2016)
 ===========
 
+* Back to comma-separated data format for 'data.csv' and 'covData.csv'
 * Less informative Cauchy prior as default for continuous predictors in traitMPT
 * Additional argument IVprec in traitMPT to specify hyperprior for precision of continuous slope paramters
 * Data-generating function genMPT using general matrices of individual parameters

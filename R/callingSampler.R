@@ -99,7 +99,7 @@ callingSampler <- function(model,
   }
   if(!is.null(covData)){
 #     if(is.character(covData)){
-#       covData <- read.csv(covData, header=T, sep= ";",  strip.white = TRUE)
+#       covData <- read.csv(covData, header=T, sep= ",",  strip.white = TRUE)
 #     }
 #
 #     if(any(apply(covData, 2, class) %in% c("factor", "character", "logical"))){

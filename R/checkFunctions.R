@@ -30,7 +30,7 @@ readData  <- function(data){
   if(is.matrix(data) | is.data.frame(data)){
     data <- as.data.frame(data)
   }else{
-    data = read.csv(data, header=TRUE, sep=";")
+    data = read.csv(data, header=TRUE, sep=",")
   }
   if(any(is.na(data))){
     warning("Check missings in the data file

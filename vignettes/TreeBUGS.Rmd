@@ -18,7 +18,7 @@ vignette: >
 In the most simple user scenario, the following steps are required:
 
 1. Define path to existing MPT model file in .eqn format (cf. multiTree; Moshagen, 2010)
-2. Define path to data set with individual frequencies (.csv file: semicolon separated, rows=persons, columns=labeled categories)
+2. Define path to data set with individual frequencies (.csv file: comma separated, rows=persons, columns=labeled categories)
 3. Call one of the fitting functions `betaMPT` or `traitMPT` (exact code below)
 4. Check convergence of MCMC chains
 5. Summarize and plot results
@@ -62,13 +62,13 @@ g=0.5
 
 ### 2. Step: Data Set with Individual Frequencies
 
-As default, the data are provided in a semicolon-separated text file (.csv) in the following format:
+As default, the data are provided in a comma-separated text file (.csv) in the following format:
 
 ```
-Hit;   Miss;     FA;    CR
-20;      10;      5;    25
-13;       7;      9;    21 
-15;       5;      6;    14
+Hit,   Miss,     FA,    CR
+20,      10,      5,    25
+13,       7,      9,    21 
+15,       5,      6,    14
 .....
 
 ```
@@ -156,7 +156,7 @@ plot(fitHierarchicalMPT,     # fitted model
 
 In the latent-trait MPT, predictor variables can be included to account for interindividual variance in MPT parameters. In contrast, in the Beta-MPT, only the correlation of covariates with MPT parameters is sampled (which does not influence the parameter estimates). However, the arguments to include covariates are identical:
 
-* `covData`: Either a data frame or the path to a csv data file separated by semicolons `;`
+* `covData`: Either a data frame or the path to a csv data file separated by commas `,`
     * Rows: The order of individuals must be identical to the order in the frequency data (`data`)
     * Columns: Covariates must habe column names different from the parameters
 * `covStructure`: Either a list or path to a text file in which the assignment of MPT parameters to covariates is coded as follows:

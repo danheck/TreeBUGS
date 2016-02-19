@@ -3,9 +3,9 @@
 #' Fits a Beta-MPT model (Smith & Batchelder, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
 #'
 #' @param eqnfile The (full path to the) file that specifies the MPT model (standard .eqn syntax)
-#' @param data The (full path to the) csv file with the data (semicolon separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)
+#' @param data The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)
 #' @param restrictions  Optional: Either the (full path to the) file that specifies which parameters should be constants and which should be equal; alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
-#' @param covData The path to the csv data file for the individual values on the covariates (semicolon-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)
+#' @param covData The path to the csv data file for the individual values on the covariates (comma-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)
 #' @param covStructure  Optional: Either the (full path to the) file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Default: All combinations included (not recommended, could be unstable).
 #' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
 #' @param modelfilename Name that the modelfile that is made by the function to work with JAGS should get.
