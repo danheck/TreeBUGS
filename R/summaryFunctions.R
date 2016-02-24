@@ -4,7 +4,7 @@ summarizeMPT <- function(model,
                          mcmc,
                          thetaNames,
                          covIncluded=FALSE,
-                         covFactorLevels=NULL,
+                         predFactorLevels=NULL,
                          transformedParameters=NULL){
 
   # number of parameters
@@ -70,19 +70,27 @@ summarizeMPT <- function(model,
 
       # rename factor levels
       tmpNames <- sapply(rownames(factor), function(xx) strsplit(xx, split="_")[[1]][3])
-      for(ff in 1:length(covFactorLevels)){
-        if( !is.null(covFactorLevels[[ff]])){
-          selrow <- grepl(names(covFactorLevels)[ff], tmpNames)
-          rownames(factor)[selrow] <- paste0(rownames(factor)[selrow],"_", covFactorLevels[[ff]])
+      for(ff in 1:length(predFactorLevels)){
+        if( !is.null(predFactorLevels[[ff]])){
+          selrow <- grepl(names(predFactorLevels)[ff], tmpNames)
+          rownames(factor)[selrow] <- paste0(rownames(factor)[selrow],"_", predFactorLevels[[ff]])
         }
       }
 
 
       factorSD <- mcmc$BUGSoutput$summary[ selFacSD, colsel, drop=FALSE]
-    }else{factor <- NULL ; factorSD <- NULL}
-
+    }else{
+      factor <- NULL ; factorSD <- NULL
+    }
+    if(covIncluded){
+      selCov <- grepl("cor_", rownames(mcmc$BUGSoutput$summary))
+      correlation <- mcmc$BUGSoutput$summary[selCov, colsel, drop=FALSE]
+    }else{correlation <- NULL}
+    rho.matrix <- mcmc$BUGSoutput$mean$rho
+    dimnames(rho.matrix) <- list(uniqueNames,uniqueNames)
     groupParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho,
-                            slope = slope, factor = factor, factorSD = factorSD)
+                            rho.matrix=rho.matrix,
+                            slope = slope, factor = factor, factorSD = factorSD, correlation=correlation)
   }
   theta.names <- apply(as.matrix(data.frame(lapply(expand.grid("theta[",1:S, ",",1:N,"]"), as.character))),
                        1, paste0, collapse="")
@@ -126,25 +134,25 @@ print.summary.betaMPT <- function(x,  ...){
     print(x)
   }else{
     cat("Mean parameters on group level:\n")
-    print(round(x$groupParameters$mean, 4))
+    print(round(x$groupParameters$mean, x$round))
     cat("\nStandard deviation of parameters across individuals:\n")
-    print(round(x$groupParameters$SD, 4))
+    print(round(x$groupParameters$SD, x$round))
     cat("\nAlpha parameters of beta distributions:\n")
-    print(round(x$groupParameters$alpha, 4))
+    print(round(x$groupParameters$alpha, x$round))
     cat("\nBeta parameters of beta distributions:\n\n")
-    print(round(x$groupParameters$beta, 4))
+    print(round(x$groupParameters$beta, x$round))
 
     cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
-    print(round(x$fitStatistics$overall, 4))
+    print(round(x$fitStatistics$overall, x$round))
     cat("\nPoster predictive p-values for individual data sets:\n")
-    print(round(x$fitStatistics$p.T1individual, 4))
+    print(round(x$fitStatistics$p.T1individual, x$round))
     if(!is.null(x$transformedParameters)){
       cat("\nTransformed parameters:\n")
-      print(round(x$transformedParameters, 4))
+      print(round(x$transformedParameters, x$round))
     }
     if(!is.null(x$groupParameters$correlation)){
       cat("\nSampled correlations of MPT parameters with covariates:\n")
-      print(round(x$groupParameters$correlation, 4))
+      print(round(x$groupParameters$correlation, x$round))
     }
 
   }
@@ -160,56 +168,64 @@ print.summary.traitMPT <- function(x,  ...){
     print(x)
   }else{
     cat("Mean parameters on group level:\n")
-    print(round(x$groupParameters$mean, 4))
+    print(round(x$groupParameters$mean, x$round))
     cat("\nMean of latent-trait values (probit-scale) across individuals:\n")
-    print(round(x$groupParameters$mu, 4))
+    print(round(x$groupParameters$mu, x$round))
     cat("\nStandard deviation of latent-trait values (probit scale) across individuals:\n")
-    print(round(x$groupParameters$sigma, 4))
+    print(round(x$groupParameters$sigma, x$round))
     cat("\nCorrelations of latent-trait values on probit scale:\n")
-    print(round(x$groupParameters$rho, 4))
+    print(round(x$groupParameters$rho, x$round))
+    cat("\nCorrelations (posterior mean estimates) in matrix form:\n")
+    print(round(x$groupParameters$rho.matrix, x$round))
 
     cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
-    print(round(x$fitStatistics$overall, 4))
+    print(round(x$fitStatistics$overall, x$round))
     cat("\nPoster predictive p-values for individual data sets:\n")
-    print(round(x$fitStatistics$p.T1individual, 4))
+    print(round(x$fitStatistics$p.T1individual, x$round))
     if(!is.null(x$transformedParameters)){
       cat("\nTransformed parameters:\n")
-      print(round(x$transformedParameters, 4))
+      print(round(x$transformedParameters, x$round))
     }
 
     if(!is.null(x$groupParameters$slope)){
       cat("\nSlope parameters for predictor variables:\n")
-      print(round(x$groupParameters$slope, 4))
+      print(round(x$groupParameters$slope, x$round))
     }
 
     if(!is.null(x$groupParameters$factor)){
       cat("\nEffects of factors on latent scale (additive shift from overall mean):\n")
-      print(round(x$groupParameters$factor, 4))
+      print(round(x$groupParameters$factor, x$round))
       cat("\nFactor SD on latent scale:\n")
-      print(round(x$groupParameters$factorSD, 4))
+      print(round(x$groupParameters$factorSD, x$round))
     }
 
+    if(!is.null(x$groupParameters$correlation)){
+      cat("\nSampled correlations of covariates with MPT parameters:\n")
+      print(round(x$groupParameters$correlation, x$round))
+    }
   }
 }
 
 #' @export
-summary.betaMPT <- function(object,  ...){
+summary.betaMPT <- function(object, round=4, ...){
 #   if(!object$sampler %in% c("jags", "JAGS")){
 #     warning("Clean MPT summary only available when fitting with JAGS.")
 #   }
   summ <- object$summary
   summ$call <- object$call
+  summ$round <- round
   class(summ) <- "summary.betaMPT"
   return(summ)
 }
 
 #' @export
-summary.traitMPT <- function(object,  ...){
+summary.traitMPT <- function(object, round=4, ...){
 #   if(!object$sampler %in% c("jags", "JAGS")){
 #     warning("Clean MPT summary only available when fitting with JAGS.")
 #   }
   summ <- object$summary
   summ$call <- object$call
+  summ$round <- round
   class(summ) <- "summary.traitMPT"
   return(summ)
 }

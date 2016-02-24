@@ -6,10 +6,11 @@
 #' @param data The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)
 #' @param restrictions  Optional: Either the (full path to the) file that specifies which parameters should be constants and which should be equal; alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
 #' @param covData The path to the csv data file for the individual values on the covariates (comma-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)
-#' @param covStructure  Optional: Either the (full path to the) file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Default: All combinations included (not recommended, could be unstable).
+#' @param covStructure  Optional: Which correlations to compute? Either the (full path to the) file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Default: All continuous variables in covData included.
 #' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
 #' @param modelfilename Name that the modelfile that is made by the function to work with JAGS should get.
 #'        Default is to write this information to the tempdir as required by CRAN standards.
+#' @param corProbit whether to use probit-transformed MPT parameters to compute correlations. Default for beta-MPT: MPT parameters are used on the probability scale [0,1]
 #' @param alpha Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).
 #' @param beta Second hyperprior, see \code{alpha}
 #' @param parEstFile Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")
@@ -38,6 +39,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     covData,
                     covStructure,
                     transformedParameters,
+                    corProbit=FALSE,
                     alpha = "dunif(.01,5000)",
                     beta = "dunif(.01,5000)",
 
@@ -85,15 +87,20 @@ betaMPT <- function(eqnfile,  # statistical model stuff
 
   N <- nrow(data)
 
-  # covariate: get neat table and appropriate JAGS string
-  covTmp1 <- covHandling(covData, covStructure, N, thetaNames)
+  # covariate: reading + checking
+  covData <- covDataRead(covData, N)
+  predType <- predTypeDefault(covData, predType=NULL)
+  # get neat table and appropriate JAGS string
+  covTmp1 <- covHandling(covData, covStructure, N, thetaNames, predType=predType, defaultExclude=NULL)
+                         # onlyContinuous=TRUE)
   covData <- covTmp1$covData
   covTable <- covTmp1$covTable
-  if( any(covTable$covType != "c"))
+  if( any(covTable$predType != "c"))
     stop("To compute correlations in betaMPT, only continuous covariates are allowed.")
 
-  covTmp2 <- covStringBeta(covTable)
-  covString <- covTmp2$modelString
+  # only allow correlations
+  covTmp2 <- covStringCorrelation(covTable, corProbit=corProbit)
+  corString <- covTmp2$modelString
   covPars <- covTmp2$covPar
 
 
@@ -102,7 +109,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                 mergedTree = mergedTree ,
                 S = max(SubPar$theta),
                 hyperprior = list(alpha=alpha, beta = beta),
-                covString = covString,
+                corString = corString,
                 parString = transformedPar$modelstring)
 
   time0 <- Sys.time()
@@ -140,6 +147,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                   restrictions = restrictions,
                   covData=covData,
                   covTable=covTable,
+                  corProbit=corProbit,
                   transformedParameters=transformedPar$transformedParameters)
 
   # class structure for TreeBUGS

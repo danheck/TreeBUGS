@@ -1,3 +1,16 @@
+TreeBUGS 0.4.0 (February 2016)
+===========
+
+* Possible to sample correlations AND predictors in traitMPT (using covStructure vs. predStructure)
+* Defaults for traitMPT: No predictors ; correlations for all covariates that are not included in predStructure
+* Changed argument name "covType" to "predType" (since it is only relevant for predStructure in traitMPT)
+* New argument corProbit to specify whether to compute correlations for probability- or probit-scaled MPT parameters
+* Allow to round to specific number of digits, e.g.: summary(fittedModel, round=6)
+* New function getParam() to conveniently extract posterior estimates (e.g., posterior mean, median, sd)
+* New function getGroupMeans() to get group estimates in traitMPT with discrete predictors (for single factors or combinations)
+* Updated vignette
+
+
 TreeBUGS 0.3.5 (February 2016)
 ===========
 

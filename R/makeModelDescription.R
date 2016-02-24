@@ -6,14 +6,15 @@
 # #' @param S The number of thetas
 # #' @param hyperprior named list, either with entries "alpha" and "beta" for the "betaMPT", or with "mu" and "xi" for the latent-trait MPT
 # #' @param parString  additional lines added to sample transformed parameters (e.g., parameter differences for testing)
-# #' @author Daniel Heck, Nina R. Arnold, Denis Arnold
+# #' @author Daniel Heck
 # #' @export
 makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
                          filename,
                          mergedTree,
                          S,
-                         hyperprior, # list (either with alpha+beta or with mu+xi)
-                         covString=NULL,
+                         hyperprior,       # list (either with alpha+beta or with mu+xi)
+                         corString=NULL,   # model string to compute correlations
+                         predString=NULL,  # model string to include predictors (in traitMPT)
                          parString=""){
 
   treeNames <- as.character(sort(unique(mergedTree$Tree)))
@@ -23,22 +24,6 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   ncatPerTree <- as.vector(by(mergedTree$Category, mergedTree$Tree, length))
 
 
-  #  ################################### DATA #######################
-  #  cat("data\n",file=filename)
-  #  cat("{\n",file=filename,append=T)
-  #  # cat("for(s in 1:",S,"){\n",sep="",file=filename,append=T)
-  #  # cat("zero[s] <- 0\n",file=filename,append=T)
-  #  # cat("}\n ",file=filename,append=T)
-#
-#
-  #  ####### for posterior predictive cehck: mean frequencies
-  #  for(i in 1:NOT){
-  #    cat("for(k in 1:",ncatPerTree[i],") {\n",sep="",file=filename,append=T)
-  #      cat("response.",treeNames[i],".mean[k] <- mean(response.",treeNames[i],"[,k])\n",sep="",file=filename,append=T)
-  #    cat("}\n", file=filename,append=T)
-  #  }
-  #  cat("}\n ",file=filename,append=T)
-#
   #  ###################################### MODEL ###################
   #  cat("model\n",file=filename,append=T)
   #}else{
@@ -71,7 +56,7 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 	                                                    alpha = hyperprior$alpha,
 	                                                    beta = hyperprior$beta),
 	                     "traitMPT" = makeTraitHyperprior(S = S,
-	                                                      covString = covString,
+	                                                      predString = predString,
 	                                                     mu = hyperprior$mu,
 	                                                     xi = hyperprior$xi)
 	)
@@ -81,9 +66,11 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 	######################################### END OF MODEL SPECIFIC HYPERPRIOR PART ##########################
 
 
-	if(model == "betaMPT" & !is.null(covString)){
-	  cat(covString, file=filename, append=T)
+	# if(model == "betaMPT" & !is.null(covString)){
+	 if( !is.null(corString)){
+	   cat(corString, file=filename, append=T)
 	}
+
 
 
 	############################## Posterior predictive checks:
@@ -244,10 +231,10 @@ for(s in 1:S){",
 
 ################### Beta-MPT specific hyperprior part
 makeTraitHyperprior <-function(S,
-                               covString,
+                               predString,
                                mu = "dnorm(0,1)",
                                xi = "dunif(0,100)"){
-  modelString <- paste0(covString, "
+  modelString <- paste0(predString, "
 
 # hyperpriors
 for(i in 1:subjs) {

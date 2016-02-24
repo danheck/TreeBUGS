@@ -150,19 +150,31 @@ plot(fitHierarchicalMPT,     # fitted model
      )
 ```
 
+Parameter estimates (posterior mean, median, SD) can be extracted by using:
+
+```{r, eval=FALSE}
+getParam(fitHierarchicalMPT, parameter="theta", posterior="mean")
+```
+
+
 ## Extended Modeling Possibilities
 
 ### A) Including Continuous Covariates
 
-In the latent-trait MPT, predictor variables can be included to account for interindividual variance in MPT parameters. In contrast, in the Beta-MPT, only the correlation of covariates with MPT parameters is sampled (which does not influence the parameter estimates). However, the arguments to include covariates are identical:
+It is possible to sample and estimate correlations of continuous covariates (e.g., age) with the individual MPT parameters. Note that this does not influence the model estimates (the estimated MPT parameters are only used repeatedly to compute a correlation). In contrast, in the latent-trait MPT model, variables can also be included as predictors to account for interindividual variance in MPT parameters, which influences the parameter estimates:
+$$\theta_{is} = \Phi(\mu_s + \delta_i + \gamma_i X_i)$$
 
-* `covData`: Either a data frame or the path to a csv data file separated by commas `,`
+The following arguments are used to specify the desired covariance structure:
+
+* `covData`: Either a data frame or the path to a csv data file separated by commas `,` hat contains the covariates
     * Rows: The order of individuals must be identical to the order in the frequency data (`data`)
     * Columns: Covariates must habe column names different from the parameters
-* `covStructure`: Either a list or path to a text file in which the assignment of MPT parameters to covariates is coded as follows:
+* `covStructure`: Which correlations should be sampled? Either a list or path to a text file in which the assignment of MPT parameters to covariates is coded as follows:
     * `one or more MPT parameter labels  ; one or more covariate labels `  (separated by a semicolon)
     * For instance: `list("Do Dn ; IQ",  "g ; age extraversion")` 
     * Multiple combinations are included by separate entries in the list or by separate lines in the text file (redundant combinations are removed automatically)
+* `corProbit`: whether to correlate MPT parameters on the probability scale (default for beta MPT) or on the latent probit scale (default for latent-trait MPT)
+* `predStructure`: Which MPT parameters to predict by which variables? (only for latent-trait model; similar syntax as `covStructure`)
     
 Overall, the code could look like this:
 
@@ -171,24 +183,25 @@ fitMPT <- traitMPT(eqnfile = "2htm.txt",
                    data = "data_ind.csv",   
                    restrictions = c("do=dn"),  
                    covData = "data_covariates.csv", 
-                   covStructure = list("Do Dn ; IQ",  "g ; age extraversion")
+                   covStructure = list("Do Dn ; weight",  "g ; age height"),  # correlations
+                   predStructure = list("Do Dn ; IQ"),   # IQ as predictor variable
                    ...
 ```
 
-After fitting the model, the results appear when typing `summary(fitMPT)`. 
+After fitting the model, the results appear when typing `summary(fitMPT)`.
 
 
 ### B) Including Discrete Factors in a Latent-Trait MPT Model
 
 In the latent-trait model, it is possible to include discrete factors as predictor variables, similar as in the general linear model formulation of an ANOVA. Compared to continuous covariates only the following changes:
 
-* New argument `covType`: Covariates can be set as
+* New argument `predType`: Predictor variables can be set as
     * continuous (`"c"`)
     * fixed effect (`"f"`)
     * random effect (`"r"`)
-* `covData` can have columns with character or factor variables (numeric columns can be specified as factors using `covType`)
+* `covData` can have columns with character or factor variables (numeric columns can be specified as factors using `predType`)
 * By default, character variables in `covData` are included as fixed effects
-* The order of `covType` has to match the column order of `covData`
+* The order of `predType` has to match the column order of `covData`
 
 Note that the same parameter covariance structure is assumed in each group, which might produce more reliable estimates than specifying a separate MPT tree for each condition (and thus assuming a separate parameter covariance matrix in each group). An example might be: 
 
@@ -196,13 +209,19 @@ Note that the same parameter covariance structure is assumed in each group, whic
 fitMPT <- traitMPT(eqnfile = "2htm.txt", 
                    data = "data_ind.csv",   
                    covData = "data_covariates.csv", 
-                   covStructure = list("Do Dn ; factor1 factor2",  "g ; age"),
-                   covType = c("c", "c", "f", "r")
+                   predStructure = list("Do ; factor1", "Dn ; factor2"),  #predictor
+                   predType = c("c", "c", "f", "r")
                    ...
 ```
 
+Group estimates can be obtained by 
 
-Multiple factors can be included, but currently it is not possible to directly include interactions. For an introduction to Bayesian ANOVA, see Rouder et al., 2012.
+```{r, eval=F}
+getGroupMeans(traitMPT)
+```
+
+
+Multiple factors can be included, but currently it is not possible to include interactions. For an introduction to Bayesian ANOVA, see Rouder et al., 2012.
 
 
 ### C) Sampling Transformed Parameters

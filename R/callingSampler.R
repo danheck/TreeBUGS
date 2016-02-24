@@ -98,14 +98,6 @@ callingSampler <- function(model,
     }
   }
   if(!is.null(covData)){
-#     if(is.character(covData)){
-#       covData <- read.csv(covData, header=T, sep= ",",  strip.white = TRUE)
-#     }
-#
-#     if(any(apply(covData, 2, class) %in% c("factor", "character", "logical"))){
-#       stop("Covariate values must be provided as numbers, no factors/characters allowed!")
-#     }
-
     covSD <- apply(covData, 2, sd)
     data <- c(data, "covData", "covSD")
   }
@@ -119,11 +111,10 @@ callingSampler <- function(model,
     # random initial values
     if(model == "betaMPT"){
       inits <- function() list(theta=matrix(runif(subjs*S), S, subjs)
-                               # alpha=rgamma(S, 2, .2),
-                               # beta=rgamma(S, 2, .2)
                                )
     }else{
-      inits <- NULL
+      inits <- function() list(delta.part.raw = matrix(rnorm(subjs*S, 0,1), S, subjs)
+                               )
     }
     samples <- jags.parallel(data,
                             inits=inits,

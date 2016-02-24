@@ -3,29 +3,29 @@
 
 # recodes factor labels into integer index
 # returns a pure numeric data set covData and the old factor labels
-covRecodeFactor <- function(covData, covType){
+covRecodeFactor <- function(covData, predType){
 
   numCov <- ncol(covData)
-  covFactorLevels <- vector("list", numCov)
+  predFactorLevels <- vector("list", numCov)
 
   for(i in 1:numCov){
 
-    if(covType[i] != "c"){
+    if(predType[i] != "c"){
 
       # store factor level labels:
-      covFactorLevels[[i]] <- sort(unique(levels(as.factor(covData[,i]))))
-      nLevel <- length(covFactorLevels[[i]])
+      predFactorLevels[[i]] <- sort(unique(levels(as.factor(covData[,i]))))
+      nLevel <- length(predFactorLevels[[i]])
 
       if(nLevel <= 1){
         stop("Factor", colnames(covData)[i], "has only one factor level!")
       }
 
       # replace factor levels by an integer index:
-      covData[,i] <- match( as.factor(covData[,i]), covFactorLevels[[i]] )
+      covData[,i] <- match( as.factor(covData[,i]), predFactorLevels[[i]] )
     }
   }
 
 
-  list(covData = covData, covFactorLevels = covFactorLevels)
+  list(covData = covData, predFactorLevels = predFactorLevels)
 }
 

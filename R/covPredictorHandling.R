@@ -1,0 +1,125 @@
+
+
+######################## generate appropriate JAGS model string for latent-trait MPT
+# covTable: result from preprocessing using covHandling()
+# S: number of free parameters
+# predFactorLevels: list with factor levels for discrete covariates
+
+covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dchisq(1)"){
+  modelString <- "\n## Probit Transformation and Covariate Handling ##\n"
+
+  ##### no predictors/ covariates: simple probit transformation as before
+  if(is.null(covTable)){
+    covPars <- c() ; X_list <- list()
+    modelString <- "
+    for(i in 1:subjs) {
+    for(s in 1:S){
+    theta[s,i] <- phi(mu[s] + xi[s]*delta.part.raw[s,i])
+    }
+    }
+    "
+
+    ############################### PREDICTORS IN PHI() TRANSFORMATION ########################
+  }else{
+    # which parameters include covariates?
+    parWithCov <- unique(covTable$theta)
+    modelString <- "\nfor(i in 1:subjs) {"
+    for(s in 1:S){
+
+      #### parameter WITH covariate
+      if(s %in% parWithCov){
+
+        selectLines <- covTable$theta == s
+        # beginning of line as usual:
+        modelString <- paste0(modelString,
+                              "\ntheta[",s,",i] <- phi(mu[",s,"] + xi[",s,"]*delta.part.raw[",s,",i]")
+
+        # loop across covariates
+        for(cc in 1:sum(selectLines)){
+          covIdx <-  covTable$covIdx[selectLines][cc]
+
+          if(covTable$predType[selectLines][cc] == "c"){
+            ####### continuous covariate
+            # add to model string:
+            modelString <- paste0(modelString, " + ",covTable$covPar[selectLines][cc],
+                                  "*covData[i,",covIdx,"]")
+
+          }else{
+            ####### discrete covariate
+            modelString <- paste0(modelString, " + ",covTable$covPar[selectLines][cc],
+                                  "[covData[i,",covIdx,"]]")
+          }
+
+        }
+        modelString <- paste0(modelString, ")")
+
+      }else{
+        #### parameter WITHOUT covariate: as usual (but with explicit number in JAGS as index)
+        modelString <- paste0(modelString,
+                              "\ntheta[",s,",i] <- phi(mu[",s,"] + xi[",s,"]*delta.part.raw[",s,",i])")
+      }
+    }
+    modelString <- paste0(modelString, "\n}\n")
+
+
+    ############################### HYPERPRIORS     ###############################
+
+    covPars <- covTable$covPar
+    X_list <- list()  # list with design matrices for fixed effects)
+    for(pp in 1:nrow(covTable)){
+      if(covTable$predType[pp] == "c"){
+
+        # hyperpriors for slopes
+        modelString <- paste0(modelString, "\n",
+                              covPars[pp], " ~ dnorm(0,tau_",covPars[pp],")","\n",
+                              "tau_",covPars[pp]," ~ ",IVprec, "\n")
+
+      }else if(covTable$predType[pp] == "r"){
+        numLevel <- length(predFactorLevels[[covTable$covIdx[pp]]])
+        # random effects:  (cf. Rouder et al (2012))
+        modelString <- paste0(modelString,
+                              "\nfor(level in 1:", numLevel,"){\n  ",
+                              covPars[pp], "[level] ~ dnorm(0, tau_",covPars[pp],") \n}\n",
+                              "tau_", covPars[pp], " ~ dchisq(1)\n",
+                              "SD_", covPars[pp], " <- sqrt(inverse(tau_",covPars[pp] ,"))")
+
+        covPars <- c(covPars, paste0("SD_", covPars[pp]))
+      }else{
+        # fixed effects: (Rouder et al, 2012)
+        numLevel <- length(predFactorLevels[[covTable$covIdx[pp]]])
+        Z <- diag(numLevel) - 1/numLevel
+
+        # add design matrix to list of design matrices:
+        X_list <- c(X_list,
+                    list(X = as.matrix(eigen(Z, symmetric=T)$vectors[,1:(numLevel-1)])))
+        names(X_list)[length(X_list)] <- paste0("X_", covPars[pp])
+
+        # model string: only (numLevel-1) priors
+        modelString <- paste0(modelString,
+
+                              # univariate normal priros on numLevel-1 of stransformed parameters
+                              "\nfor(level in 1:", numLevel-1, "){\n  ",
+                              "s",covPars[pp],"[level] ~ dnorm(0, tau_",covPars[pp],") \n}",
+
+                              # contrast coding of fixed effects:
+                              "\nfor(level in 1:", numLevel, "){\n  ",
+                              covPars[pp],"[level] <- inprod(",
+                              "s",covPars[pp],", X_",covPars[pp],"[level,])\n} \n",
+
+                              # hyperpriors:
+                              "tau_", covPars[pp], " ~ dchisq(1)\n",
+                              "SD_", covPars[pp], " <- sqrt(inverse(tau_", covPars[pp],"))")
+        # before calling sampler:        assign(paste0("X_",names(X_list)[pp]), X_list[[pp]])
+
+        covPars <- c(covPars, paste0("SD_", covPars[pp]))
+      }
+    }
+  }
+
+
+  # lines in JAGS:
+  # additionally monitored variable: covPars <- paste0("cor_", sapply(covList, function(ll, ll$Par) ))
+  ###################  ###################   ###################
+
+  return(list(modelString = modelString, covPars =  covPars, X_list=X_list))
+  }

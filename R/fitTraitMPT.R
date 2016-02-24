@@ -3,7 +3,9 @@
 #' Fits a latent-trait MPT model (Klauer, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
 #'
 #' @inheritParams betaMPT
-#' @param covType a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.
+#' @param predStructure  Similar to \code{covStructure}, but defines the mapping which variables in \code{covData} are predictors for which MPT parameters (whereas \code{covStructure} determines only sampled correlations). Default: No predictors.
+#' @param predType a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.
+#' @param corProbit whether to use probit-transformed MPT parameters to compute correlations (the default for trait-MPT)
 #' @param mu hyperprior for group means of probit-transformed parameters. Default is a standard normal distribution that implied a uniform distribution on the MPT probability parameters
 #' @param xi hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,100]
 #' @param V  S x S matrix used as a hyperprior for the inverse-Wishart hyperprior parameters with as many rows and columns as there are core MPT parameters. Default is a diagonal matrix.
@@ -31,9 +33,11 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     data,
                     restrictions,
                     covData,
-                    covStructure,
-                    covType,  # c("c," f", "r")
+                    covStructure,   # correlation
+                    predStructure,  # predictor structure
+                    predType,    # c("c," f", "r")
                     transformedParameters,
+                    corProbit=TRUE,
 
                     # hyperpriors:
                     mu = "dnorm(0,1)",
@@ -56,7 +60,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   if(missing(restrictions)) restrictions <- NULL
   if(missing(covData)) covData <- NULL
   if(missing(covStructure)) covStructure <- NULL
-  if(missing(covType)) covType <- NULL
+  if(missing(predStructure)) predStructure <- NULL
+  if(missing(predType)) predType <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
 
   checkParEstFile(parEstFile)
@@ -87,31 +92,37 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   N <- nrow(data)
 
 
-  # assign covariates to parameters and handle factor levels
-  covTmp1 <- covHandling(covData, covStructure, N, thetaNames, covType=covType)
-  covData <- covTmp1$covData
-  covFactorLevels <- covTmp1$covFactorLevels
-  covTable <- covTmp1$covTable
-  covType <- covTmp1$covType
+  # covariate: reading + checking
+  covData <- covDataRead(covData, N)
+  predType <- predTypeDefault(covData, predType=predType)
+  covData <- covDataCenter(covData, predType=predType)
 
-  if(!is.null(covData)){
-    for(i in 1:ncol(covData)){
-      if(covType[i] == "c" &  colnames(covData)[i] %in% covTable$Covariate){
-        scaled <- scale(covData[,i], scale = FALSE)
-        if(any(scaled != covData[,i])){
-#           warning("Predictor covariate ", colnames(covData)[i],
-#                   " is automatically centererd to a MEAN OF ZERO \n  (recommended for latent-trait MPT)!")
-          covData[,i] <- scaled
-        }
-      }
-    }
-  }
 
+  # PREDICTORS: assign covariates to parameters and handle factor levels
+  predTmp1 <- covHandling(covData, predStructure, N, thetaNames, predType=predType,
+                          defaultExclude="ALL_COVARIATES")
+  predFactorLevels <- predTmp1$predFactorLevels
+  predTable <- predTmp1$covTable
+  covData <- predTmp1$covData
   # get model string: phi(....)
-  covTmp2 <- covStringTrait(covTable, S=S,
-                            covFactorLevels=covFactorLevels, IVprec=IVprec)
-  covString <- covTmp2$modelString
-  covPars <- covTmp2$covPars
+  predTmp2 <- covStringPredictor(predTable, S=S,
+                                 predFactorLevels=predFactorLevels, IVprec=IVprec)
+  predString <- predTmp2$modelString
+  predPars <- predTmp2$covPars
+
+  # CORRELATIONS
+  covTmp1 <- covHandling(covData, covStructure, N, thetaNames, predType=predType,
+                         defaultExclude=unique(predTable$Covariate))
+  covTable <- covTmp1$covTable
+  covTmp2 <- covStringCorrelation(covTable, corProbit=corProbit)
+  corString <- covTmp2$modelString
+  corPars <- covTmp2$covPar
+  covData <- covData[,sapply(covData, class) %in% c("numeric", "integer")]
+
+  if( any(covTable$Covariate %in% predTable$Covariate))
+    warning("Some variables in covData appear both as predictors and as covariates:\n    ",
+            paste(covTable$Covariate[covTable$Covariate %in% predTable$Covariate], collapse=", "))
+
 
   # hyperpriors
   if(missing(V) || is.null(V))
@@ -124,7 +135,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                 mergedTree = mergedTree ,
                 S = S,
                 hyperprior = list(mu = mu, xi = xi),
-                covString = covString,
+                predString = predString,
+                corString = corString,
                 parString=transformedPar$modelstring)
 
   time0 <- Sys.time()
@@ -135,9 +147,9 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          modelfile = modelfilename,
                          S = max(SubPar$theta),
                          transformedPar = transformedPar$transformedParameters,
-                         covPars=covPars,
+                         covPars=c(corPars, predPars),
                          covData=covData,
-                         X_list=covTmp2$X_list,
+                         X_list=predTmp2$X_list,
                          hyperpriors = list(V=V, df=df),
                          n.iter = n.iter,
                          n.burnin = n.burnin,
@@ -154,7 +166,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                           mcmc = mcmc,
                           thetaNames = thetaNames,
                           covIncluded = !is.null(covData),
-                          covFactorLevels=covFactorLevels,
+                          predFactorLevels=predFactorLevels,
                           transformedParameters = transformedPar$transformedParameters)
 
   mptInfo <- list(thetaNames = thetaNames,
@@ -164,7 +176,9 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                   restrictions=restrictions,
                   covData=covData,
                   covTable=covTable,
-                  covFactorLevels=covFactorLevels,
+                  corProbit=corProbit,
+                  predTable=predTable,
+                  predFactorLevels=predFactorLevels,
                   transformedParameters=transformedPar$transformedParameters)
 
   # class structure for TreeBUGS
