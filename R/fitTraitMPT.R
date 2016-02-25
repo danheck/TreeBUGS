@@ -117,7 +117,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   covTmp2 <- covStringCorrelation(covTable, corProbit=corProbit)
   corString <- covTmp2$modelString
   corPars <- covTmp2$covPar
-  covData <- covData[,sapply(covData, class) %in% c("numeric", "integer")]
+  covData <- covData[,sapply(covData, class) %in% c("numeric", "integer"), drop=FALSE]
 
   if( any(covTable$Covariate %in% predTable$Covariate))
     warning("Some variables in covData appear both as predictors and as covariates:\n    ",
