@@ -26,7 +26,11 @@ plot.traitMPT <- function(x, parameter="mean", type="trace", ...){
     stop("Parameter not found in MCMC object.")
   }
   parLabel  <- names(x$mcmc$BUGSoutput$mean[[parameter]])
-  allnam[idx] <- paste0(parameter, "_", parLabel)
+  if (parameter %in% "rho" | is.null(parLabel)){
+    parLabel <- allnam[idx]
+  }else{
+    allnam[idx] <- paste0(parameter, "_", parLabel)
+  }
   coda::varnames(MPT.mcmc) <- allnam
   # `varnames()<-`(MPT.mcmc, allnam)
 
