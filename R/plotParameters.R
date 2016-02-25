@@ -1,14 +1,17 @@
 
 ############## PLOTTING FUNCTIONS FOR betaMPT
-#' Plot Beta-MPT Parameter Estimates
+
+#' Plot Parameter Estimates
 #'
-#' @param x a fitted Beta-MPT model (see \code{\link{betaMPT}})
+#' Plot parameter estimates for hierarchical MPT models
+#'
+#' @param x a fitted Beta or latent-trait MPT model
 #' @param includeIndividual whether to plot individual estimates
 #' @param ... further arguments passed to the standard \code{\link{plot}} function
 #' @author Daniel Heck
-#' @seealso \code{\link{plotDistribution}}
+#' @seealso \code{\link{betaMPT}}, \code{\link{traitMPT}}, \code{\link{plotDistribution}}
 #' @export
-plot.betaMPT <- function(x, includeIndividual=TRUE, ...){
+plotParam <- function(x, includeIndividual=TRUE, ...){
 
   dims <- dim(x$summary$individParameters)
   N <- dims[2]
@@ -32,22 +35,3 @@ plot.betaMPT <- function(x, includeIndividual=TRUE, ...){
 
 
 }
-
-#' Plots for latent-trait MPT models
-#'
-#' @inheritParams  plot.betaMPT
-#' @author Daniel Heck
-#' @seealso \code{\link{plotDistribution}}
-#' @export
-plot.traitMPT <- function(x, includeIndividual=TRUE, ...){
-  plot.betaMPT(x,...)
-}
-
-
-# convergence diagnostic: pass to R2JAGS?
-
-# #' @export
-# traceplot.betaMPT <- function(x,...){traceplot(x$mcmc,...)}
-#
-# #' @export
-# autocorr.plot.betaMPT <- function(x,...){autocorr.plot(x$mcmc,...)}

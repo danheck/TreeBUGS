@@ -1,3 +1,11 @@
+TreeBUGS 0.4.1 (February 2016)
+===========
+
+* new argument "T1group" to compute T1 statistic separately for a grouping factor (e.g., experimental condition; can be one of the predictors in traitMPT)
+* changed name of parameter estimate plotting function to "plotParam()"
+* new generic plotting function plot() for betaMPT and traitMPT (a convenient wrapper for the convergence plots in coda)
+
+
 TreeBUGS 0.4.0 (February 2016)
 ===========
 

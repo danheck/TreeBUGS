@@ -5,50 +5,51 @@ summarizeMPT <- function(model,
                          thetaNames,
                          covIncluded=FALSE,
                          predFactorLevels=NULL,
-                         transformedParameters=NULL){
+                         transformedParameters=NULL,
+                         NgroupT1=NULL){
 
+  summ <- mcmc$BUGSoutput$summary
   # number of parameters
   S <- max(thetaNames[,"theta"])
 
   idx <- ""
   if(S>1) idx <- paste0("[",1:S,"]")
 
-  # if(sampler %in% c("JAGS","jags")){
   N <- dim(mcmc$BUGSoutput$mean$theta)[2]
   # which statistics to select:
   colsel <- c(1:3,5,7:9)
   uniqueNames <- thetaNames[!duplicated(thetaNames[,"theta"]),"Parameter"]
 
+  if(covIncluded){
+    selCov <- grepl("cor_", rownames(summ))
+    correlation <- summ[selCov, colsel, drop=FALSE]
+  }else{correlation <- NULL}
+
+  ############################## BETA MPT SUMMARY
   if(model == "betaMPT"){
     # mean and individual parameter estimates
-    mu <- mcmc$BUGSoutput$summary[paste0("mean", idx),colsel, drop=FALSE]
-    SD <- mcmc$BUGSoutput$summary[paste0("sd",idx),colsel, drop=FALSE]
-    alpha <- mcmc$BUGSoutput$summary[paste0("alph",idx),colsel, drop=FALSE]
-    beta <- mcmc$BUGSoutput$summary[paste0("bet",idx),colsel, drop=FALSE]
+    mu <- summ[paste0("mean", idx),colsel, drop=FALSE]
+    SD <- summ[paste0("sd",idx),colsel, drop=FALSE]
+    alpha <- summ[paste0("alph",idx),colsel, drop=FALSE]
+    beta <- summ[paste0("bet",idx),colsel, drop=FALSE]
 
     rownames(mu) <-paste0("mean_", uniqueNames)
     rownames(SD) <-paste0("sd_", uniqueNames)
     rownames(alpha) <-paste0("alpha_", uniqueNames)
     rownames(beta) <-paste0("beta_", uniqueNames)
 
-    if(covIncluded){
-      selCov <- grepl("cor_", rownames(mcmc$BUGSoutput$summary))
-      correlation <- mcmc$BUGSoutput$summary[selCov, colsel, drop=FALSE]
-    }else{correlation <- NULL}
     groupParameters <- list(mean=mu, SD=SD, alpha=alpha, beta=beta, correlation=correlation)
 
   }else{
-    mu <- mcmc$BUGSoutput$summary[paste0("mu",idx),colsel, drop=FALSE]
-    mean <- mcmc$BUGSoutput$summary[paste0("mean",idx),colsel, drop=FALSE]
-    sigma <- mcmc$BUGSoutput$summary[paste0("sigma",idx),colsel, drop=FALSE]
+
+    ############################## LATENT-TRAIT SUMMARY
+    mu <- summ[paste0("mu",idx),colsel, drop=FALSE]
+    mean <- summ[paste0("mean",idx),colsel, drop=FALSE]
+    sigma <- summ[paste0("sigma",idx),colsel, drop=FALSE]
     rho <- rhoNames <- c()
     cnt <- 1
-    # if(S>1){
-    #         rho <- mcmc$BUGSoutput$summary[paste0("rho[1,",2:S,"]"),colsel, drop=FALSE]
-    #         rownames(rho) <- paste0("rho[1,",1:S,"]_",uniqueNames[1],"_",uniqueNames[2:S])
-    # cnt <- 2
     while(cnt<S){
-      rho <- rbind(rho, mcmc$BUGSoutput$summary[paste0("rho[",cnt,",",(cnt+1):S,"]"),colsel, drop=FALSE])
+      rho <- rbind(rho, summ[paste0("rho[",cnt,",",(cnt+1):S,"]"),colsel, drop=FALSE])
       rhoNames <- c(rhoNames,
                     paste0("rho[",uniqueNames[cnt],",",uniqueNames[(cnt+1):S],"]"))
       cnt <- cnt+1
@@ -59,14 +60,14 @@ summarizeMPT <- function(model,
     rownames(sigma) <-paste0("latent_sigma_", uniqueNames)
     rownames(rho) <- rhoNames
 
-    selCov <- grepl("slope_", rownames(mcmc$BUGSoutput$summary))
-    selFac <- grepl("factor_", rownames(mcmc$BUGSoutput$summary))
+    selCov <- grepl("slope_", rownames(summ))
+    selFac <- grepl("factor_", rownames(summ))
     if(any(selCov)){
-      slope <- mcmc$BUGSoutput$summary[selCov, colsel, drop=FALSE]
+      slope <- summ[selCov, colsel, drop=FALSE]
     }else{slope <- NULL}
     if(any(selFac)){
-      selFacSD <- grepl("SD_factor_", rownames(mcmc$BUGSoutput$summary))
-      factor <- mcmc$BUGSoutput$summary[selFac & !selFacSD, colsel, drop=FALSE]
+      selFacSD <- grepl("SD_factor_", rownames(summ))
+      factor <- summ[selFac & !selFacSD, colsel, drop=FALSE]
 
       # rename factor levels
       tmpNames <- sapply(rownames(factor), function(xx) strsplit(xx, split="_")[[1]][3])
@@ -78,14 +79,10 @@ summarizeMPT <- function(model,
       }
 
 
-      factorSD <- mcmc$BUGSoutput$summary[ selFacSD, colsel, drop=FALSE]
+      factorSD <- summ[ selFacSD, colsel, drop=FALSE]
     }else{
       factor <- NULL ; factorSD <- NULL
     }
-    if(covIncluded){
-      selCov <- grepl("cor_", rownames(mcmc$BUGSoutput$summary))
-      correlation <- mcmc$BUGSoutput$summary[selCov, colsel, drop=FALSE]
-    }else{correlation <- NULL}
     rho.matrix <- mcmc$BUGSoutput$mean$rho
     dimnames(rho.matrix) <- list(uniqueNames,uniqueNames)
     groupParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho,
@@ -94,17 +91,17 @@ summarizeMPT <- function(model,
   }
   theta.names <- apply(as.matrix(data.frame(lapply(expand.grid("theta[",1:S, ",",1:N,"]"), as.character))),
                        1, paste0, collapse="")
-  individParameters <- array(data = mcmc$BUGSoutput$summary[theta.names,colsel],
+  individParameters <- array(data = summ[theta.names,colsel],
                              dim = c(S,N,length(colsel)))
   dimnames(individParameters) <- list(Parameter=uniqueNames,
                                       ID=1:N,
-                                      Statistic=colnames(mcmc$BUGSoutput$summary)[colsel])
+                                      Statistic=colnames(summ)[colsel])
 
-  # goodness of fit and deviance
+  ############################## goodness of fit and deviance
   if(is.null(transformedParameters)){
     transPar <- NULL}
   else{
-    transPar <- mcmc$BUGSoutput$summary[transformedParameters,colsel, drop=FALSE]
+    transPar <- summ[transformedParameters,colsel, drop=FALSE]
   }
 
   summary <- list(groupParameters=groupParameters,
@@ -114,12 +111,13 @@ summarizeMPT <- function(model,
                                 "T1.observed"=mcmc$BUGSoutput$mean$T1.obs,
                                 "T1.predicted"=mcmc$BUGSoutput$mean$T1.pred,
                                 "p.T1"=mcmc$BUGSoutput$mean$p.T1),
-                    "p.T1individual"=mcmc$BUGSoutput$mean$p.T1ind),
+                    "p.T1.individual"=mcmc$BUGSoutput$mean$p.T1ind),
                   transformedParameters=transPar)
-  # }else{
-  #     warning("Clean MPT summary statistics only available when using JAGS.")
-  #     summary <- mcmc$BUGSoutput$summary
-  #   }
+  if(!is.null(mcmc$BUGSoutput$mean$p.T1.group)){
+    summary$fitStatistics$p.T1.group <- rbind(N_per_group=NgroupT1,
+                                              p.T1.group=mcmc$BUGSoutput$mean$p.T1.group)
+    # colnames(summary$p.T1.individual) <- names(NgroupT1)
+  }
   return(summary)
 }
 
@@ -142,10 +140,16 @@ print.summary.betaMPT <- function(x,  ...){
     cat("\nBeta parameters of beta distributions:\n\n")
     print(round(x$groupParameters$beta, x$round))
 
-    cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
+    cat("\n##############\n",
+        "Overall model fit statistics (T1: Posterior predictive check):\n")
     print(round(x$fitStatistics$overall, x$round))
-    cat("\nPoster predictive p-values for individual data sets:\n")
-    print(round(x$fitStatistics$p.T1individual, x$round))
+    cat("\nPoster predictive p-values for participants:\n")
+    print(round(x$fitStatistics$p.T1.individual, x$round))
+    if(!is.null(x$fitStatistics$p.T1.group)){
+      cat("\nPoster predictive p-values per group:\n")
+      print(round(x$fitStatistics$p.T1.group, x$round))
+    }
+
     if(!is.null(x$transformedParameters)){
       cat("\nTransformed parameters:\n")
       print(round(x$transformedParameters, x$round))
@@ -178,10 +182,15 @@ print.summary.traitMPT <- function(x,  ...){
     cat("\nCorrelations (posterior mean estimates) in matrix form:\n")
     print(round(x$groupParameters$rho.matrix, x$round))
 
-    cat("\nOverall model fit statistics (T1: Posterior predictive check):\n")
+    cat("\n##############\n",
+        "Overall model fit statistics (T1: Posterior predictive check):\n")
     print(round(x$fitStatistics$overall, x$round))
-    cat("\nPoster predictive p-values for individual data sets:\n")
-    print(round(x$fitStatistics$p.T1individual, x$round))
+    cat("\nPoster predictive p-values for participants:\n")
+    print(round(x$fitStatistics$p.T1.individual, x$round))
+    if(!is.null(x$fitStatistics$p.T1.group)){
+      cat("\nPoster predictive p-values per group:\n")
+      print(round(x$fitStatistics$p.T1.group, x$round))
+    }
     if(!is.null(x$transformedParameters)){
       cat("\nTransformed parameters:\n")
       print(round(x$transformedParameters, x$round))
@@ -207,7 +216,7 @@ print.summary.traitMPT <- function(x,  ...){
 }
 
 #' @export
-summary.betaMPT <- function(object, round=4, ...){
+summary.betaMPT <- function(object, round=3, ...){
 #   if(!object$sampler %in% c("jags", "JAGS")){
 #     warning("Clean MPT summary only available when fitting with JAGS.")
 #   }
@@ -219,7 +228,7 @@ summary.betaMPT <- function(object, round=4, ...){
 }
 
 #' @export
-summary.traitMPT <- function(object, round=4, ...){
+summary.traitMPT <- function(object, round=3, ...){
 #   if(!object$sampler %in% c("jags", "JAGS")){
 #     warning("Clean MPT summary only available when fitting with JAGS.")
 #   }

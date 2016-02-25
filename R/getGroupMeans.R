@@ -4,6 +4,7 @@
 #' For hierarchical latent-trait MPT models with discrete predictor variables.
 #' @param traitMPT a fitted \code{\link{traitMPT}} model
 #' @param factor whether to get group estimates for all combinations of factor levels (default) or only for specific factors (requires the names of the covariates in covData)
+# @param computeT1 whether to compute posterior predictive checks per group by using the T1 statistic (similar to chi square)
 #' @param probit whether to use probit scale or probability scale
 #' @seealso \code{\link{traitMPT}}
 #' @author Daniel Heck

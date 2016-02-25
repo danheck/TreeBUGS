@@ -142,12 +142,16 @@ To obtain the summary after fitting the model, simly use:
 summary(fitHierarchicalMPT)
 ```
 
-To plot parameter estimates, use:
+The following functions allow to plot parameter estimates, distributions, goodness of fit, and raw frequencies:
 
 ```{r, eval=FALSE}
-plot(fitHierarchicalMPT,     # fitted model
-     includeIndividual=TRUE  # whether to plot individual estimates
-     )
+plotParam(fitHierarchicalMPT,     # fitted model
+          includeIndividual=TRUE  # whether to plot individual estimates
+)
+plotDistribution(fittedModel, ...)   # plot estimated hierarchical parameter distribution
+plotFit(fittedModel,...)             # plot observed and predicted mean frequencies
+plotFreq(fittedModel,...)            # plot individual and mean raw frequencies per tree
+
 ```
 
 Parameter estimates (posterior mean, median, SD) can be extracted by using:

@@ -26,6 +26,7 @@ callingSampler <- function(model,
                            covPars=NULL,
                            covData=NULL,
                            X_list=list(),   # list with design matrices for fixed effects
+                           groupT1=NULL,    # list with groupMatT1 und NgroupT1  for splitted T1 statistic
                            hyperpriors=NULL,
                            n.iter=100000,
                            n.burnin=NULL,
@@ -71,7 +72,7 @@ callingSampler <- function(model,
 
     # check whether any N=0
     if (any(rowSums(responses[(index+1):(index+NresponsesTree[i])]) == 0))
-      warning("One or more responses do not have responses for tree",
+      warning("One or more participants do not have responses for tree",
               treeNames[i], ". As a solution, the critical participants might be excluded.")
 
     assign(name.response,  matrix(as.vector(t(responses[(index+1):(index+NresponsesTree[i])])),
@@ -83,6 +84,21 @@ callingSampler <- function(model,
     index=index+NresponsesTree[i]
 
     data <- c(data, name.mean, name.response, name.items)
+
+    # add G x numCat matrix with mean frequencies (one line per group)
+    if(!is.null(groupT1)){
+      name.group.mean <- paste0("group.resp.",treeNames[i],".mean")
+
+      mean.per.group <- c()
+      for(g in 1:nrow(groupT1$groupMatT1)){
+        idx <- groupT1$groupMatT1[1:groupT1$NgroupT1[g]]
+        mean.per.group <- rbind(mean.per.group,
+                                colMeans(get(name.response)[idx,,drop=FALSE]))
+
+      }
+      assign(name.group.mean, mean.per.group)
+      data <- c(data, name.group.mean)
+    }
   }
 
 
@@ -98,7 +114,7 @@ callingSampler <- function(model,
     }
   }
   if(!is.null(covData)){
-    covSD <- apply(covData, 2, sd)
+    covSD <- apply(covData, 2, sd, na.rm=TRUE)
     data <- c(data, "covData", "covSD")
   }
 
@@ -108,14 +124,23 @@ callingSampler <- function(model,
     parametervector=c(unlist(parameters),
                       "T1.obs","T1.pred","p.T1","p.T1ind",
                       transformedPar, covPars)
+
+    if(!is.null(groupT1)){
+      groupMatT1 <- groupT1$groupMatT1
+      NgroupT1 <- groupT1$NgroupT1
+      data <- c(data, "groupMatT1", "NgroupT1")
+      parametervector <- c(parametervector, "T1.group.obs", "T1.group.pred", "p.T1.group",
+                           paste0("group.n.exp.",treeNames, ".pred.mean"))
+    }
+
     # random initial values: required (otherwise T1 statistic results in errors: no variance!)
     if(model == "betaMPT"){
       inits <- function() list("theta"=matrix(runif(subjs*S), S, subjs)
                                )
     }else{
       inits <- function() list("delta.part.raw" = matrix(rnorm(subjs*S, 0,1), S, subjs),
-                               "xi"=runif(S,.9,1.1),
-                               "T.prec.part" = rWishart(1,df,V)[,,1]
+                               "xi"=runif(S,2/3,3/2), "mu" = rnorm(S, 0, .5),
+                               "T.prec.part" = rWishart(1,2*df,V)[,,1]
                                )
     }
     samples <- jags.parallel(data,

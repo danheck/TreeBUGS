@@ -37,6 +37,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     predStructure,  # predictor structure
                     predType,    # c("c," f", "r")
                     transformedParameters,
+                    T1group,
                     corProbit=TRUE,
 
                     # hyperpriors:
@@ -63,6 +64,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   if(missing(predStructure)) predStructure <- NULL
   if(missing(predType)) predType <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
+  if(missing(T1group)) T1group <- NULL
 
   checkParEstFile(parEstFile)
   modelfilename <- checkModelfilename(modelfilename)
@@ -117,6 +119,9 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   covTmp2 <- covStringCorrelation(covTable, corProbit=corProbit)
   corString <- covTmp2$modelString
   corPars <- covTmp2$covPar
+
+  # T1 per group split
+  groupT1 <- getGroupT1(covData, predType, T1group=T1group)
   covData <- covData[,sapply(covData, class) %in% c("numeric", "integer"), drop=FALSE]
 
   if( any(covTable$Covariate %in% predTable$Covariate))
@@ -137,7 +142,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                 hyperprior = list(mu = mu, xi = xi),
                 predString = predString,
                 corString = corString,
-                parString=transformedPar$modelstring)
+                parString=transformedPar$modelstring,
+                groupMatT1=groupT1$groupMatT1)
 
   time0 <- Sys.time()
   cat("MCMC sampling started at ", format(time0), "\n")
@@ -150,6 +156,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          covPars=c(corPars, predPars),
                          covData=covData,
                          X_list=predTmp2$X_list,
+                         groupT1=groupT1,
                          hyperpriors = list(V=V, df=df),
                          n.iter = n.iter,
                          n.burnin = n.burnin,
@@ -167,7 +174,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                           thetaNames = thetaNames,
                           covIncluded = !is.null(covData),
                           predFactorLevels=predFactorLevels,
-                          transformedParameters = transformedPar$transformedParameters)
+                          transformedParameters = transformedPar$transformedParameters,
+                          NgroupT1 = groupT1$NgroupT1)
 
   mptInfo <- list(thetaNames = thetaNames,
                   MPT=mergedTree,

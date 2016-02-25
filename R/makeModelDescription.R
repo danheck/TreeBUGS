@@ -15,7 +15,9 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
                          hyperprior,       # list (either with alpha+beta or with mu+xi)
                          corString=NULL,   # model string to compute correlations
                          predString=NULL,  # model string to include predictors (in traitMPT)
-                         parString=""){
+                         parString="",
+                         groupMatT1=NULL    # a G x 2 matrix that contains the grouping indices for T1 per group (column 1:2 = from:to)
+                         ){
 
   treeNames <- as.character(sort(unique(mergedTree$Tree)))
   NOT=length(treeNames)
@@ -93,8 +95,8 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 
   }
 
-  cat("\n\n### T1statistic for individual data:\n", file=filename,append=T)
-  cat("T1ind.obs[n] <- 0", file=filename,append=T )
+  cat("\n\n### T1statistic for individual data:\n",
+      "T1ind.obs[n] <- 0", file=filename,append=T )
   for(i in 1:NOT){
     cat("+ sum( (response.",treeNames[i],"[n,] - n.expected.",treeNames[i],"[n,])^2/n.expected.",treeNames[i],"[n,])",
         sep="", file=filename,append=T)
@@ -103,23 +105,58 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   # T1 for predicted means:
   cat("\nT1ind.pred[n] <- 0", file=filename,append=T )
   for(i in 1:NOT){
-    cat("+ sum( (response.",treeNames[i],".pred[n,] - n.expected.",treeNames[i],"[n,])^2/n.expected.",treeNames[i],"[n,])", sep="", file=filename,append=T)
+    cat("+ sum( (response.",treeNames[i],".pred[n,] - n.expected.",treeNames[i],
+        "[n,])^2/n.expected.",treeNames[i],"[n,])", sep="", file=filename,append=T)
   }
 
-  cat("\np.T1ind[n] <- T1ind.pred[n] > T1ind.obs[n]\n",  file=filename,append=T)
-
-  cat("}\n",file=filename,append=T)
+  cat("\np.T1ind[n] <- T1ind.pred[n] > T1ind.obs[n]\n",
+      "}\n",file=filename,append=T)
 
 
 
   cat("\n\n### T1 statistic for aggregated data:\n", file=filename,append=T)
   for(i in 1:NOT){
-    cat("for(k in 1:",ncatPerTree[i],") {\n",sep="",file=filename,append=T)
-    cat("n.expected.",treeNames[i],".mean[k] <- mean(n.expected.",treeNames[i],"[,k])\n",
+    cat("for(k in 1:",ncatPerTree[i],") {\n",
+        "n.expected.",treeNames[i],".mean[k] <- mean(n.expected.",treeNames[i],"[,k])\n",
+        "response.",treeNames[i],".pred.mean[k] <- mean(response.",treeNames[i],".pred[,k])\n",
         sep="",file=filename,append=T)
-    cat("response.",treeNames[i],".pred.mean[k] <- mean(response.",treeNames[i],".pred[,k])\n",
-        sep="",file=filename,append=T)
-    cat("}\n", file=filename,append=T)
+
+    # T1 per group
+#     for(s in 1:S){
+#       pred.group.mean[s,k] <- mean(pred[study.idx[s,1]:study.idx[s,2],k])
+#     }
+    if(!is.null(groupMatT1)){
+      cat("for(g in 1:",nrow(groupMatT1),") {\n",
+
+          "group.n.exp.",treeNames[i],".mean[g,k] <- mean(n.expected.",treeNames[i],  # expected per group
+          "[groupMatT1[g,1:NgroupT1[g]],k])\n",
+          "group.resp.",treeNames[i],".pred.mean[g,k] <- mean(response.",treeNames[i],  # sampled per group
+          ".pred[groupMatT1[g,1:NgroupT1[g]],k])\n",
+
+          "}\n", sep="",file=filename,append=T)
+    }
+    cat("}\n", file=filename,append=T )
+  }
+  if(!is.null(groupMatT1)){
+    # T1 for observed means:
+    cat("\n###### T1 (per group)\n",
+        "for(g in 1:",nrow(groupMatT1),") {\n",
+        "T1.group.obs[g] <- 0", file=filename,append=T )
+    for(i in 1:NOT){
+      cat("+ sum( (group.resp.",treeNames[i],".mean[g,] - group.n.exp.",treeNames[i],".mean[g,])^2/",
+          "group.n.exp.",treeNames[i],".mean[g,])",
+          sep="", file=filename,append=T)
+    }
+
+    # T1 for predicted means:
+    cat("\nT1.group.pred[g] <- 0", file=filename,append=T )
+    for(i in 1:NOT){
+      cat("+ sum( (group.resp.",treeNames[i],".pred.mean[g,] - group.n.exp.",treeNames[i],".mean[g,])^2/",
+          "group.n.exp.",treeNames[i],".mean[g,])",
+          sep="", file=filename,append=T)
+    }
+    cat("\n## T1 (per group) comparison:\n",
+        "p.T1.group[g] <- T1.group.pred[g] > T1.group.obs[g]\n}\n",  file=filename,append=T)
   }
 
   # T1 for observed means:

@@ -22,7 +22,7 @@ covHandling <- function(covData,
                         defaultExclude=NULL){
 
   # get a clean list
-  if(! (is.null(covData) |
+  if(! (is.null(covData) | is.list(covStructure) & length(covStructure) == 0 |
         is.null(covStructure) & "ALL_COVARIATES" %in% defaultExclude)){
 
     if(!("ALL_COVARIATES" %in% defaultExclude)){     # for correlation structure

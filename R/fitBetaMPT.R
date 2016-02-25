@@ -10,6 +10,7 @@
 #' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
 #' @param modelfilename Name that the modelfile that is made by the function to work with JAGS should get.
 #'        Default is to write this information to the tempdir as required by CRAN standards.
+#' @param T1group a name of the factor or character variable in covData that is used to compute the T1 statistic separately per group (e.g., per experimental condition)
 #' @param corProbit whether to use probit-transformed MPT parameters to compute correlations. Default for beta-MPT: MPT parameters are used on the probability scale [0,1]
 #' @param alpha Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).
 #' @param beta Second hyperprior, see \code{alpha}
@@ -39,6 +40,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     covData,
                     covStructure,
                     transformedParameters,
+                    T1group,
                     corProbit=FALSE,
                     alpha = "dunif(.01,5000)",
                     beta = "dunif(.01,5000)",
@@ -93,7 +95,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   # get neat table and appropriate JAGS string
   covTmp1 <- covHandling(covData, covStructure, N, thetaNames, predType=predType, defaultExclude=NULL)
                          # onlyContinuous=TRUE)
-  covData <- covTmp1$covData
   covTable <- covTmp1$covTable
   if( any(covTable$predType != "c"))
     stop("To compute correlations in betaMPT, only continuous covariates are allowed.")
@@ -102,6 +103,10 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   covTmp2 <- covStringCorrelation(covTable, corProbit=corProbit)
   corString <- covTmp2$modelString
   covPars <- covTmp2$covPar
+  # T1 per group split
+  groupT1 <- getGroupT1(covData, predType, T1group=T1group)
+  covData <- covData[,sapply(covData, class) %in% c("numeric", "integer"), drop=FALSE]
+
 
 
   makeModelFile(model = "betaMPT",
@@ -110,7 +115,8 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                 S = max(SubPar$theta),
                 hyperprior = list(alpha=alpha, beta = beta),
                 corString = corString,
-                parString = transformedPar$modelstring)
+                parString = transformedPar$modelstring,
+                groupMatT1=groupT1$groupMatT1)
 
   time0 <- Sys.time()
   cat("MCMC sampling started at ", format(time0), "\n")
@@ -122,6 +128,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                          transformedPar = transformedPar$transformedParameters,
                          covPars = covPars,
                          covData = covData,
+                         groupT1=groupT1,
                          # parameters,
                          n.iter = n.iter,
                          n.burnin = n.burnin,
@@ -138,7 +145,8 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                           mcmc = mcmc,
                           thetaNames = thetaNames,
                           covIncluded = !is.null(covData),
-                          transformedParameters = transformedPar$transformedParameters)
+                          transformedParameters = transformedPar$transformedParameters,
+                          NgroupT1 = groupT1$NgroupT1)
 
   mptInfo <- list(thetaNames = thetaNames,
                   MPT=mergedTree,

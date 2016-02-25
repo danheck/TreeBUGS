@@ -1,8 +1,8 @@
 Package: TreeBUGS
 Type: Package
 Title: Hierarchical MPT Modeling using BUGS
-Version: 0.4.0
-Date: 2016-02-24
+Version: 0.4.1
+Date: 2016-02-25
 Authors@R: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut")),
              person("Nina", "Arnold", email="arnold@uni-mannheim.de", role = c("aut")),
              person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut","cre")))
@@ -14,6 +14,7 @@ Depends:
     stats,
     graphics,
     utils,
-    grDevices
+    grDevices,
+    coda
 License: GPL (>=2)
 RoxygenNote: 5.0.1

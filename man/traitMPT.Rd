@@ -5,10 +5,10 @@
 \title{Fit a Hierarchical latent-trait MPT Model}
 \usage{
 traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
-  predType, transformedParameters, corProbit = TRUE, mu = "dnorm(0,1)",
-  xi = "dunif(0,100)", V, df, IVprec = "dchisq(1)", n.iter = 50000,
-  n.burnin = 5000, n.thin = 5, n.chains = 3, modelfilename, parEstFile,
-  autojags = FALSE, ...)
+  predType, transformedParameters, T1group, corProbit = TRUE,
+  mu = "dnorm(0,1)", xi = "dunif(0,100)", V, df, IVprec = "dchisq(1)",
+  n.iter = 50000, n.burnin = 5000, n.thin = 5, n.chains = 3,
+  modelfilename, parEstFile, autojags = FALSE, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -26,6 +26,8 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
 \item{predType}{a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.}
 
 \item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
+
+\item{T1group}{a name of the factor or character variable in covData that is used to compute the T1 statistic separately per group (e.g., per experimental condition)}
 
 \item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations (the default for trait-MPT)}
 
