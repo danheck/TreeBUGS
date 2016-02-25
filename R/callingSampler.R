@@ -108,12 +108,14 @@ callingSampler <- function(model,
     parametervector=c(unlist(parameters),
                       "T1.obs","T1.pred","p.T1","p.T1ind",
                       transformedPar, covPars)
-    # random initial values
+    # random initial values: required (otherwise T1 statistic results in errors: no variance!)
     if(model == "betaMPT"){
-      inits <- function() list(theta=matrix(runif(subjs*S), S, subjs)
+      inits <- function() list("theta"=matrix(runif(subjs*S), S, subjs)
                                )
     }else{
-      inits <- function() list(delta.part.raw = matrix(rnorm(subjs*S, 0,1), S, subjs)
+      inits <- function() list("delta.part.raw" = matrix(rnorm(subjs*S, 0,1), S, subjs),
+                               "xi"=runif(S,.9,1.1),
+                               "T.prec.part" = rWishart(1,df,V)[,,1]
                                )
     }
     samples <- jags.parallel(data,
