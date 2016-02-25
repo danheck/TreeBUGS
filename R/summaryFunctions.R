@@ -150,7 +150,7 @@ print.summary.betaMPT <- function(x,  ...){
       cat("\nTransformed parameters:\n")
       print(round(x$transformedParameters, x$round))
     }
-    if(!is.null(x$groupParameters$correlation)){
+    if(!is.null(x$groupParameters$correlation) & !nrow(x$groupParameters$correlation) == 0){
       cat("\nSampled correlations of MPT parameters with covariates:\n")
       print(round(x$groupParameters$correlation, x$round))
     }
@@ -199,7 +199,7 @@ print.summary.traitMPT <- function(x,  ...){
       print(round(x$groupParameters$factorSD, x$round))
     }
 
-    if(!is.null(x$groupParameters$correlation)){
+    if(!is.null(x$groupParameters$correlation) & !nrow(x$groupParameters$correlation) == 0){
       cat("\nSampled correlations of covariates with MPT parameters:\n")
       print(round(x$groupParameters$correlation, x$round))
     }
