@@ -48,15 +48,16 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     IVprec = "dchisq(1)",  # change to "dcat(1)" to set beta ~ dnorm(0,1)
 
                     # MCMC stuff:
-                    n.iter=50000,
-                    n.burnin=5000,
+                    n.iter=20000,
+                    n.adapt = 2000,
+                    n.burnin=2000,
                     n.thin=5,
                     n.chains=3,
 
                     # File Handling stuff:
                     modelfilename,
                     parEstFile,
-                    autojags=FALSE,
+                    autojags=NULL,
                     ...){
   if(missing(restrictions)) restrictions <- NULL
   if(missing(covData)) covData <- NULL
@@ -97,12 +98,13 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   # covariate: reading + checking
   covData <- covDataRead(covData, N)
   predType <- predTypeDefault(covData, predType=predType)
+  groupT1 <- getGroupT1(covData, predType, T1group=T1group)
   covData <- covDataCenter(covData, predType=predType)
 
 
   # PREDICTORS: assign covariates to parameters and handle factor levels
   predTmp1 <- covHandling(covData, predStructure, N, thetaNames, predType=predType,
-                          defaultExclude="ALL_COVARIATES")
+                          defaultExclude="ALL_COVARIATES", T1group=T1group)
   predFactorLevels <- predTmp1$predFactorLevels
   predTable <- predTmp1$covTable
   covData <- predTmp1$covData
@@ -121,7 +123,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   corPars <- covTmp2$covPar
 
   # T1 per group split
-  groupT1 <- getGroupT1(covData, predType, T1group=T1group)
   covData <- covData[,sapply(covData, class) %in% c("numeric", "integer"), drop=FALSE]
 
   if( any(covTable$Covariate %in% predTable$Covariate))
@@ -159,6 +160,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          groupT1=groupT1,
                          hyperpriors = list(V=V, df=df),
                          n.iter = n.iter,
+                         n.adapt = n.adapt,
                          n.burnin = n.burnin,
                          n.thin = n.thin,
                          n.chains = n.chains,

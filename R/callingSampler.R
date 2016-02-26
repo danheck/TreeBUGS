@@ -28,10 +28,11 @@ callingSampler <- function(model,
                            X_list=list(),   # list with design matrices for fixed effects
                            groupT1=NULL,    # list with groupMatT1 und NgroupT1  for splitted T1 statistic
                            hyperpriors=NULL,
-                           n.iter=100000,
-                           n.burnin=NULL,
-                           n.update= 3,
-                           n.thin=2,
+                           n.iter=20000,
+                           n.adapt=2000,
+                           n.burnin=2000,
+                           n.update= 2000,
+                           n.thin=5,
                            n.chains=3,
                            autojags=NULL,
                            # savetable = NULL,
@@ -113,7 +114,7 @@ callingSampler <- function(model,
       data <- c(data, names(X_list))
     }
   }
-  if(!is.null(covData)){
+  if(!is.null(covData) & !any(dim(covData) == 0)){
     covData <- as.matrix(covData)
     data <- c(data, "covData")
     if(any(grepl("cor_", covPars))){
@@ -170,6 +171,7 @@ callingSampler <- function(model,
                         n.chains=n.chains,
                         inits=inits.list,
                         burnin=n.burnin,
+                        adapt=n.adapt,
                         sample=ceiling((n.iter-n.burnin)/n.thin),
                         thin=n.thin,
                         modules=c("dic","glm"),

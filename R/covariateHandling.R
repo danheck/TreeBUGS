@@ -19,7 +19,8 @@ covHandling <- function(covData,
                         N,
                         thetaNames,
                         predType=NULL,
-                        defaultExclude=NULL){
+                        defaultExclude=NULL,
+                        T1group=NULL){
 
   # get a clean list
   if(! (is.null(covData) | is.list(covStructure) & length(covStructure) == 0 |

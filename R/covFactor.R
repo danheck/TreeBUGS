@@ -22,6 +22,7 @@ covRecodeFactor <- function(covData, predType){
 
       # replace factor levels by an integer index:
       covData[,i] <- match( as.factor(covData[,i]), predFactorLevels[[i]] )
+      covData[,i] <- as.numeric(covData[,i])
     }
   }
 

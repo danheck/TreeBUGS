@@ -16,7 +16,8 @@
 #' @param beta Second hyperprior, see \code{alpha}
 #' @param parEstFile Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")
 #' @param n.iter Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.
-#' @param n.burnin Burnin period, samples will not be stored.
+#' @param n.adapt number of adaption samples to adjust samplers in JAGS
+#' @param n.burnin Number of samples for burnin (samples will not be stored and removed from n.iter)
 #' @param n.thin Thinning rate.
 #' @param n.chains number of MCMC chains
 #' @param autojags if provided (as an empty list or with arguments passed to \link[runjags]{autoextend.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)
@@ -46,8 +47,9 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     beta = "dunif(.01,5000)",
 
                     # MCMC stuff:
-                    n.iter=50000,
-                    n.burnin=5000,
+                    n.iter=20000,
+                    n.adapt=2000,
+                    n.burnin=2000,
                     n.thin=5,
                     n.chains=3,
 
@@ -131,6 +133,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                          groupT1=groupT1,
                          # parameters,
                          n.iter = n.iter,
+                         n.adapt = n.adapt,
                          n.burnin = n.burnin,
                          n.thin = n.thin,
                          n.chains = n.chains,

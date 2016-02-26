@@ -6,9 +6,9 @@
 \usage{
 betaMPT(eqnfile, data, restrictions, covData, covStructure,
   transformedParameters, T1group, corProbit = FALSE,
-  alpha = "dunif(.01,5000)", beta = "dunif(.01,5000)", n.iter = 50000,
-  n.burnin = 5000, n.thin = 5, n.chains = 3, modelfilename, parEstFile,
-  autojags = NULL, ...)
+  alpha = "dunif(.01,5000)", beta = "dunif(.01,5000)", n.iter = 20000,
+  n.adapt = 2000, n.burnin = 2000, n.thin = 5, n.chains = 3,
+  modelfilename, parEstFile, autojags = NULL, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -33,7 +33,9 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
 
 \item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.}
 
-\item{n.burnin}{Burnin period, samples will not be stored.}
+\item{n.adapt}{number of adaption samples to adjust samplers in JAGS}
+
+\item{n.burnin}{Number of samples for burnin (samples will not be stored and removed from n.iter)}
 
 \item{n.thin}{Thinning rate.}
 
@@ -53,7 +55,7 @@ a list of the class \code{betaMPT} with the objects:
 \itemize{
  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
- \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link[runjags]{run.jags}} object. Note that the object \code{fittedModel$mcmc} is an \link[runjags]{runjags} object, whereas \code{fittedModel$mcmc$mcmc} is a mcmc.list as used by the coda package (\link[coda]{mcmc})
+ \item \code{mcmc}: the object returned from the MCMC sampler. Note that the object \code{fittedModel$mcmc} is an \link[runjags]{runjags} object, whereas \code{fittedModel$mcmc$mcmc} is a mcmc.list as used by the coda package (\link[coda]{mcmc})
 }
 }
 \description{

@@ -302,4 +302,5 @@ getRhoMatrix <- function (uniqueNames, rho) {
       }
     }
   }
+  rho.matrix
 }
