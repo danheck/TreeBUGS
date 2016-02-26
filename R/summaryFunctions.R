@@ -1,27 +1,48 @@
-
-# internal function to process R2JAGS output
-summarizeMPT <- function(model,
+#' Summarize JAGS Output for Hierarchical MPT Models
+#'
+#' Provide clean and readable summary statistics tailored to MPT models based on the JAGS output.
+#'
+# @param model either \code{"betaMPT"} or \code{"traitMPT"}
+#' @param mcmc the actual output of the sampler of a fitted MPT model (accesible via \code{fittedModel$mcmc})
+#' @param mptInfo the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})
+#' @details The MPT-specific summary is computed directly after fitting a model. However, this function might be used manually after removing MCMC samples (e.g., extending the burnin period).
+#' @examples
+#' # Remove MCMC samples and recompute MPT summary
+#' \dontrun{
+#' mcmc.subsample <- update(fit$mcmc)
+#' newMPTsummary <- summarizeMPT(oldMPT$mcmc, oldMPT$mptInfo)
+#' }
+#' @export
+summarizeMPT <- function(
+  # model,
                          mcmc,
-                         thetaNames,
-                         covIncluded=FALSE,
-                         predFactorLevels=NULL,
-                         transformedParameters=NULL,
-                         NgroupT1=NULL){
+                         mptInfo
+                         # thetaNames,
+#                          predFactorLevels=NULL,
+#                          transformedParameters=NULL,
+#                          NgroupT1=NULL
+                         ){
+  predFactorLevels <- mptInfo$predFactorLevels
+  transformedParameters <- mptInfo$transformedParameters
+  NgroupT1 <- mptInfo$T1group$NgroupT1
+  thetaNames <- mptInfo$thetaNames
+  model <- mptInfo$model
 
-  summ <- mcmc$BUGSoutput$summary
+  summ <- summary(mcmc) # mcmc$BUGSoutput$summary
   # number of parameters
   S <- max(thetaNames[,"theta"])
 
   idx <- ""
   if(S>1) idx <- paste0("[",1:S,"]")
 
-  N <- dim(mcmc$BUGSoutput$mean$theta)[2]
+  N <- nrow(mptInfo$data)
   # which statistics to select:
-  colsel <- c(1:3,5,7:9)
-  uniqueNames <- thetaNames[!duplicated(thetaNames[,"theta"]),"Parameter"]
+  # colsel <- c(1:3,5,7:9) # for R2JAGS
+  colsel <- c("Mean","SD","Lower95","Median","Upper95","SSeff","psrf") # for runjags
+  uniqueNames <- mptInfo$thetaUnique # thetaNames[!duplicated(thetaNames[,"theta"]),"Parameter"]
 
-  if(covIncluded){
-    selCov <- grepl("cor_", rownames(summ))
+  selCov <- grep("cor_", rownames(summ))
+  if(length(selCov) != 0){
     correlation <- summ[selCov, colsel, drop=FALSE]
   }else{correlation <- NULL}
 
@@ -83,8 +104,8 @@ summarizeMPT <- function(model,
     }else{
       factor <- NULL ; factorSD <- NULL
     }
-    rho.matrix <- mcmc$BUGSoutput$mean$rho
-    dimnames(rho.matrix) <- list(uniqueNames,uniqueNames)
+
+    rho.matrix <- getRhoMatrix(uniqueNames, rho)
     groupParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho,
                             rho.matrix=rho.matrix,
                             slope = slope, factor = factor, factorSD = factorSD, correlation=correlation)
@@ -95,29 +116,36 @@ summarizeMPT <- function(model,
                              dim = c(S,N,length(colsel)))
   dimnames(individParameters) <- list(Parameter=uniqueNames,
                                       ID=1:N,
-                                      Statistic=colnames(summ)[colsel])
+                                      Statistic=colsel)
 
   ############################## goodness of fit and deviance
   if(is.null(transformedParameters)){
-    transPar <- NULL}
-  else{
+    transPar <- NULL
+  }else{
     transPar <- summ[transformedParameters,colsel, drop=FALSE]
   }
-
+  dic <- extract(mcmc, "dic")
   summary <- list(groupParameters=groupParameters,
                   individParameters=individParameters,
                   fitStatistics=list(
-                    "overall"=c("DIC"=mcmc$BUGSoutput$DIC,
-                                "T1.observed"=mcmc$BUGSoutput$mean$T1.obs,
-                                "T1.predicted"=mcmc$BUGSoutput$mean$T1.pred,
-                                "p.T1"=mcmc$BUGSoutput$mean$p.T1),
-                    "p.T1.individual"=mcmc$BUGSoutput$mean$p.T1ind),
-                  transformedParameters=transPar)
-  if(!is.null(mcmc$BUGSoutput$mean$p.T1.group)){
+                    "overall"=c("DIC"=sum(dic$deviance) + mean( sum(dic$penalty)), #$BUGSoutput$DIC,
+                                "T1.observed"=summ["T1.obs","Mean"],
+                                "T1.predicted"=summ["T1.pred","Mean"],
+                                "p.T1"=summ["p.T1","Mean"]),
+                    "p.T1.individual"=summ[paste0("p.T1ind[",1:N,"]"),"Mean"], #mcmc$BUGSoutput$mean$p.T1ind),
+                  transformedParameters=transPar))
+  selT1group <- grep("p.T1.group", rownames(summ))
+  if(length(selT1group) != 0){
+  # if(!is.null(mcmc$BUGSoutput$mean$p.T1.group)){
     summary$fitStatistics$p.T1.group <- rbind(N_per_group=NgroupT1,
-                                              p.T1.group=mcmc$BUGSoutput$mean$p.T1.group)
+                                              p.T1.group=summ[selT1group,"Mean"])
     # colnames(summary$p.T1.individual) <- names(NgroupT1)
   }
+
+  summary$call <- "(summarizeMPT called manually)"
+  summary$round <- 3
+  class(summary) <- paste0("summary.", model)
+
   return(summary)
 }
 
@@ -154,7 +182,7 @@ print.summary.betaMPT <- function(x,  ...){
       cat("\nTransformed parameters:\n")
       print(round(x$transformedParameters, x$round))
     }
-    if(!is.null(x$groupParameters$correlation) & !nrow(x$groupParameters$correlation) == 0){
+    if(!is.null(x$groupParameters$correlation) && !nrow(x$groupParameters$correlation) == 0){
       cat("\nSampled correlations of MPT parameters with covariates:\n")
       print(round(x$groupParameters$correlation, x$round))
     }
@@ -208,7 +236,7 @@ print.summary.traitMPT <- function(x,  ...){
       print(round(x$groupParameters$factorSD, x$round))
     }
 
-    if(!is.null(x$groupParameters$correlation) & !nrow(x$groupParameters$correlation) == 0){
+    if(!is.null(x$groupParameters$correlation) && !nrow(x$groupParameters$correlation) == 0){
       cat("\nSampled correlations of covariates with MPT parameters:\n")
       print(round(x$groupParameters$correlation, x$round))
     }
@@ -217,25 +245,19 @@ print.summary.traitMPT <- function(x,  ...){
 
 #' @export
 summary.betaMPT <- function(object, round=3, ...){
-#   if(!object$sampler %in% c("jags", "JAGS")){
-#     warning("Clean MPT summary only available when fitting with JAGS.")
-#   }
   summ <- object$summary
   summ$call <- object$call
   summ$round <- round
-  class(summ) <- "summary.betaMPT"
+  # class(summ) <- "summary.betaMPT"
   return(summ)
 }
 
 #' @export
 summary.traitMPT <- function(object, round=3, ...){
-#   if(!object$sampler %in% c("jags", "JAGS")){
-#     warning("Clean MPT summary only available when fitting with JAGS.")
-#   }
   summ <- object$summary
   summ$call <- object$call
   summ$round <- round
-  class(summ) <- "summary.traitMPT"
+#   class(summ) <- "summary.traitMPT"
   return(summ)
 }
 
@@ -244,9 +266,6 @@ print.betaMPT <- function(x,  ...){
   cat("Call: \n")
   print(x$call)
   cat("\n")
-#   if(!x$sampler %in% c("jags", "JAGS")){
-#     warning("\nClean MPT summary only available when fitting with JAGS.")
-#   }else{
     print(round(cbind("Group Mean" = x$summary$groupParameters$mean[,1],
                       "Group SD" = x$summary$groupParameters$SD[,1]),4))
 
@@ -266,4 +285,21 @@ print.traitMPT <- function(x,  ...){
                       "SD(latent-traits)" = x$summary$groupParameters$sigma[,1]),4))
 
   cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
+}
+
+
+
+
+
+getRhoMatrix <- function (uniqueNames, rho) {
+  S <- length(uniqueNames)
+  rho.matrix <- matrix(1, S, S, dimnames=list(uniqueNames,uniqueNames))
+  if(S>1){
+    cnt <- 0
+    for(s1 in 1:(S-1)){
+      for(s2 in (s1+1):S){
+        rho.matrix[s1,s2] <- rho.matrix[s2,s1]  <- rho[cnt <- cnt+1]
+      }
+    }
+  }
 }

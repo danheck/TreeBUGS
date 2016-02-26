@@ -4,14 +4,14 @@
 \alias{getParam}
 \title{Get Parameter Posterior Estimates}
 \usage{
-getParam(fittedModel, parameter = "mean", posterior = "mean")
+getParam(fittedModel, parameter = "mean", posterior = "Mean")
 }
 \arguments{
 \item{fittedModel}{a fitted latent-trait MPT model (see \code{\link{traitMPT}}) or beta MPT model (see \code{\link{betaMPT}})}
 
 \item{parameter}{which parameter(s) should be returned? (see below for details)}
 
-\item{posterior}{whether to show the posterior \code{"mean"}, \code{"median"}, or \code{"sd"}}
+\item{posterior}{whether to show the posterior \code{"Mean"}, \code{"Median"}, or \code{"SD"}}
 }
 \description{
 Returns posterior statistics (e.g., mean, median) for the parameters of a hierarchical MPT model.
@@ -34,7 +34,7 @@ In the beta MPT, the following parameters are being estimated:
 \item \code{"theta"} (individual MPT parameters)
 }
 
-Note that this function is only a wrapper to conveniently access the information stored in \code{fittedModel$mcmc$BUGSoutput$mean}
+Note that this function is only a wrapper to conveniently access the information stored in \code{summary(fittedModel$mcmc)}
 }
 \author{
 Daniel Heck

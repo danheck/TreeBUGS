@@ -1,3 +1,10 @@
+TreeBUGS 0.4.2 (February 2016)
+===========
+
+* Using the package runjags instead of R2jags (better functionality, e.g., provides progress bar during parallel sampling; max.time for autojags)
+* Making the function summarizeMPT() visible to allow users to recompute nice MPT summaries after changing the mcmc object (e.g., after the exclusion of MCMC samples)
+
+
 TreeBUGS 0.4.1 (February 2016)
 ===========
 

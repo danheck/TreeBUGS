@@ -16,7 +16,7 @@
 #' \itemize{
 #'  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
 #'  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
-#'  \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{mcmc.list} for analysis with the \code{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
+#'  \item \code{mcmc}: the object returned from the MCMC sampler. Note that the object \code{fittedModel$mcmc} is an \link[runjags]{runjags} object, whereas \code{fittedModel$mcmc$mcmc} is a mcmc.list as used by the coda package (\link[coda]{mcmc})
 #' }
 #' @author Daniel Heck, Denis Arnold, Nina R. Arnold
 #' @references
@@ -169,15 +169,17 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   print(time1-time0)
 
   # Beta MPT: rename parameters and get specific summaries
-  summary <- summarizeMPT(model = "traitMPT",
-                          mcmc = mcmc,
-                          thetaNames = thetaNames,
-                          covIncluded = !is.null(covData),
-                          predFactorLevels=predFactorLevels,
-                          transformedParameters = transformedPar$transformedParameters,
-                          NgroupT1 = groupT1$NgroupT1)
+#   summary <- summarizeMPT(model = "traitMPT",
+#                           mcmc = mcmc,
+#                           thetaNames = thetaNames,
+#                          # covIncluded = !is.null(covData),
+#                           predFactorLevels=predFactorLevels,
+#                           transformedParameters = transformedPar$transformedParameters,
+#                           NgroupT1 = groupT1$NgroupT1)
 
-  mptInfo <- list(thetaNames = thetaNames,
+  mptInfo <- list(model="traitMPT",
+                  thetaNames = thetaNames,
+                  thetaUnique = thetaUnique,
                   MPT=mergedTree,
                   eqnfile=eqnfile,
                   data=data,
@@ -187,10 +189,14 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                   corProbit=corProbit,
                   predTable=predTable,
                   predFactorLevels=predFactorLevels,
-                  transformedParameters=transformedPar$transformedParameters)
+                  transformedParameters=transformedPar$transformedParameters,
+                  T1group=groupT1)
+
+  summary <- summarizeMPT(mptInfo = mptInfo,
+                          mcmc = mcmc)
 
   # class structure for TreeBUGS
-  mcmc$BUGSoutput <- renameBUGSoutput(mcmc$BUGSoutput, thetaUnique, "traitMPT")
+  # mcmc$BUGSoutput <- renameBUGSoutput(mcmc$BUGSoutput, thetaUnique, "traitMPT")
   fittedModel <- list(summary=summary,
                       mptInfo=mptInfo,
                       mcmc=mcmc,

@@ -1,4 +1,6 @@
 
+
+################ deprecated: only for use with R2jags
 # rename BUGSoutput object for further use
 renameBUGSoutput <- function(BUGSoutput,
                              thetaUnique,

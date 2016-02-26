@@ -14,8 +14,7 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
   if(is.null(traitMPT$mptInfo$predTable))
     stop("Model does not contain discrete predictors.")
 
-  thetaNames <- traitMPT$mptInfo$thetaNames
-  uniqueNames <- thetaNames[!duplicated(thetaNames[,"theta"]),"Parameter"]
+  uniqueNames <- traitMPT$mptInfo$thetaUnique
   facLevelNames <- traitMPT$mptInfo$predFactorLevels
   if( all(factor == "all")){
     includeFactors <- names(facLevelNames)
@@ -33,7 +32,8 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
   for(s in 1:S){
 
     # parameter s of S
-    muPosterior <- traitMPT$mcmc$BUGSoutput$sims.list[["mu"]][,s,drop=FALSE]
+    select <- grep("mu", varnames(traitMPT$mcmc$mcmc))
+    muPosterior <- do.call("rbind", traitMPT$mcmc$mcmc[,select]) #traitMPT$mcmc$BUGSoutput$sims.list[["mu"]][,s,drop=FALSE]
 
     # select only relevant predictors
     predTable <- traitMPT$mptInfo$predTable
@@ -51,7 +51,9 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
       facPosterior <- list()
       for(j in 1:length(factors)){
         parnam <- as.character(subset(predTable, predTable$Covariate == factors[j])[,"covPar"])
-        facPosterior[[j]] <- traitMPT$mcmc$BUGSoutput$sims.list[[parnam, drop=FALSE]]
+        if(length(facLevelNames[[factors[j]]]) >1)
+           parnam <- paste0(parnam, "[",1:length(facLevelNames[[factors[j]]]),"]")
+        facPosterior[[j]] <- do.call("rbind", traitMPT$mcmc$mcmc[,parnam])  #traitMPT$mcmc$BUGSoutput$sims.list[[parnam, drop=FALSE]]
         colnames(facPosterior[[j]]) <-  facLevelNames[[factors[j]]]
       }
 

@@ -18,6 +18,7 @@ plotParam <- function(x, includeIndividual=TRUE, ...){
   S <- dims[1]
   means <- x$summary$groupParameters$mean[,1]
 
+  par(mfrow=c(1,1))
   plot(1:S, means, ylim=0:1, xlim=c(.5, S+.5),pch=19, xaxt="n", #size=3,
        xlab = "MPT Parameters", ylab="Estimate",
        main="Mean estimates (including 95% credibility interval for group mean)", ...)

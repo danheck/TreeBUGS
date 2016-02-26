@@ -15,12 +15,12 @@
 #' @param alpha Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).
 #' @param beta Second hyperprior, see \code{alpha}
 #' @param parEstFile Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")
-#' @param n.iter Number of iterations per chain (including burnin samples). See \code{\link{jags.parallel}} for details.
+#' @param n.iter Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.
 #' @param n.burnin Burnin period, samples will not be stored.
 #' @param n.thin Thinning rate.
 #' @param n.chains number of MCMC chains
-#' @param autojags whether to run JAGS until the MCMC chains converge (see \link{autojags}).  Use \code{n.update=3} as an additional argument to control how often JAGS is rerun. Can take a lot of time for large models.
-#' @param ... Arguments to be passed to the JAGS sampling function (default: \code{\link{jags.parallel}}.
+#' @param autojags if provided (as an empty list or with arguments passed to \link[runjags]{autoextend.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)
+#' @param ... Arguments to be passed to the JAGS sampling function (i.e., to \code{\link[runjags]{run.jags}}.
 #'
 #' @details Note that, in the Beta-MPT model, correlations of individual MPT parameters with covariates are sampled. Hence, the covariates do not affect the estimation of the actual Beta-MPT parameters. Therefore, the correlation of covariates with the individual MPT parameters can equivalently be performed after fitting the model using the sampled posterior parameter values stored in \code{betaMPT$mcmc}
 #'
@@ -28,9 +28,9 @@
 #' \itemize{
 #'  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
 #'  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
-#'  \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{mcmc.list} for analysis with the \code{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
+#'  \item \code{mcmc}: the object returned from the MCMC sampler. Note that the object \code{fittedModel$mcmc} is an \link[runjags]{runjags} object, whereas \code{fittedModel$mcmc$mcmc} is a mcmc.list as used by the coda package (\link[coda]{mcmc})
 #' }
-#' @author Nina R. Arnold, Denis Arnold, Daniel Heck
+#' @author Daniel Heck, Nina R. Arnold, Denis Arnold,
 #' @references Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.
 #' @export
 
@@ -54,7 +54,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     # File Handling stuff:
                     modelfilename,
                     parEstFile,
-                    autojags = FALSE,
+                    autojags = NULL,
                     ...){
   if(missing(restrictions)) restrictions <- NULL
   if(missing(covData)) covData <- NULL
@@ -140,15 +140,9 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   cat("MCMC sampling finished at", format(time1), "\n  ")
   print(time1-time0)
 
-  # Beta MPT: rename parameters and get specific summaries
-  summary <- summarizeMPT(model = "betaMPT",
-                          mcmc = mcmc,
-                          thetaNames = thetaNames,
-                          covIncluded = !is.null(covData),
-                          transformedParameters = transformedPar$transformedParameters,
-                          NgroupT1 = groupT1$NgroupT1)
-
-  mptInfo <- list(thetaNames = thetaNames,
+  mptInfo <- list(model="betaMPT",
+                  thetaNames = thetaNames,
+                  thetaUnique = thetaUnique,
                   MPT=mergedTree,
                   eqnfile = eqnfile,
                   data = data,
@@ -156,10 +150,21 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                   covData=covData,
                   covTable=covTable,
                   corProbit=corProbit,
-                  transformedParameters=transformedPar$transformedParameters)
+                  transformedParameters=transformedPar$transformedParameters,
+                  T1group=groupT1)
+
+
+  # Beta MPT: rename parameters and get specific summaries
+#   summary <- summarizeMPT(model = "betaMPT",
+#                           mcmc = mcmc,
+#                           thetaNames = thetaNames,
+#                           transformedParameters = transformedPar$transformedParameters,
+#                           NgroupT1 = groupT1$NgroupT1)
+  summary <- summarizeMPT(mptInfo = mptInfo,
+                          mcmc = mcmc)
 
   # class structure for TreeBUGS
-  mcmc$BUGSoutput <- renameBUGSoutput(mcmc$BUGSoutput, thetaUnique, "betaMPT")
+  # mcmc$BUGSoutput <- renameBUGSoutput(mcmc$BUGSoutput, thetaUnique, "betaMPT")
   fittedModel <- list(summary = summary,
                       mptInfo = mptInfo,
                       mcmc = mcmc,

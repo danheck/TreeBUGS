@@ -8,7 +8,7 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
   transformedParameters, T1group, corProbit = FALSE,
   alpha = "dunif(.01,5000)", beta = "dunif(.01,5000)", n.iter = 50000,
   n.burnin = 5000, n.thin = 5, n.chains = 3, modelfilename, parEstFile,
-  autojags = FALSE, ...)
+  autojags = NULL, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -31,7 +31,7 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
 
 \item{beta}{Second hyperprior, see \code{alpha}}
 
-\item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link{jags.parallel}} for details.}
+\item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.}
 
 \item{n.burnin}{Burnin period, samples will not be stored.}
 
@@ -44,16 +44,16 @@ Default is to write this information to the tempdir as required by CRAN standard
 
 \item{parEstFile}{Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")}
 
-\item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}).  Use \code{n.update=3} as an additional argument to control how often JAGS is rerun. Can take a lot of time for large models.}
+\item{autojags}{if provided (as an empty list or with arguments passed to \link[runjags]{autoextend.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)}
 
-\item{...}{Arguments to be passed to the JAGS sampling function (default: \code{\link{jags.parallel}}.}
+\item{...}{Arguments to be passed to the JAGS sampling function (i.e., to \code{\link[runjags]{run.jags}}.}
 }
 \value{
 a list of the class \code{betaMPT} with the objects:
 \itemize{
  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
- \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{mcmc.list} for analysis with the \code{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
+ \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link[runjags]{run.jags}} object. Note that the object \code{fittedModel$mcmc} is an \link[runjags]{runjags} object, whereas \code{fittedModel$mcmc$mcmc} is a mcmc.list as used by the coda package (\link[coda]{mcmc})
 }
 }
 \description{
@@ -63,7 +63,7 @@ Fits a Beta-MPT model (Smith & Batchelder, 2010) based on a standard MPT model f
 Note that, in the Beta-MPT model, correlations of individual MPT parameters with covariates are sampled. Hence, the covariates do not affect the estimation of the actual Beta-MPT parameters. Therefore, the correlation of covariates with the individual MPT parameters can equivalently be performed after fitting the model using the sampled posterior parameter values stored in \code{betaMPT$mcmc}
 }
 \author{
-Nina R. Arnold, Denis Arnold, Daniel Heck
+Daniel Heck, Nina R. Arnold, Denis Arnold,
 }
 \references{
 Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.

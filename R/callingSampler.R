@@ -33,7 +33,7 @@ callingSampler <- function(model,
                            n.update= 3,
                            n.thin=2,
                            n.chains=3,
-                           autojags=FALSE,
+                           autojags=NULL,
                            # savetable = NULL,
                            ...){
 
@@ -114,13 +114,15 @@ callingSampler <- function(model,
     }
   }
   if(!is.null(covData)){
-    covSD <- apply(covData, 2, sd, na.rm=TRUE)
-    data <- c(data, "covData", "covSD")
+    covData <- as.matrix(covData)
+    data <- c(data, "covData")
+    if(any(grepl("cor_", covPars))){
+      covSD <- apply(covData, 2, sd, na.rm=TRUE)
+      data <- c(data, "covSD")
+    }
   }
 
   # call Sampler
-
-  # if(sampler %in% c("jags","JAGS")){
     parametervector=c(unlist(parameters),
                       "T1.obs","T1.pred","p.T1","p.T1ind",
                       transformedPar, covPars)
@@ -130,7 +132,7 @@ callingSampler <- function(model,
       NgroupT1 <- groupT1$NgroupT1
       data <- c(data, "groupMatT1", "NgroupT1")
       parametervector <- c(parametervector, "T1.group.obs", "T1.group.pred", "p.T1.group",
-                           paste0("group.n.exp.",treeNames, ".pred.mean"))
+                           paste0("group.resp.",treeNames, ".pred.mean"))
     }
 
     # random initial values: required (otherwise T1 statistic results in errors: no variance!)
@@ -143,29 +145,48 @@ callingSampler <- function(model,
                                "T.prec.part" = rWishart(1,2*df,V)[,,1]
                                )
     }
-    samples <- jags.parallel(data,
-                            inits=inits,
-                            parameters.to.save=parametervector,
-                            model.file = modelfile,
-                            n.iter=n.iter,
-                            n.burnin=n.burnin,
-                            n.chains=n.chains,
-                            DIC=T,
-                            envir=environment(),
-                            ...)
-    if(autojags){
+    inits.list <- replicate(n.chains, inits(), simplify=FALSE)
+    for(i in 1:length(inits.list))
+      inits.list[[i]]$.RNG.name <- c("base::Wichmann-Hill",
+                                     "base::Marsaglia-Multicarry",
+                                     "base::Super-Duper",
+                                     "base::Mersenne-Twister")[1+ (i-1)%% 4]
+    #     samples <- jags.parallel(data,
+#                             inits=inits,
+#                             parameters.to.save=parametervector,
+#                             model.file = modelfile,
+#                             n.iter=n.iter,
+#                             n.burnin=n.burnin,
+#                             n.chains=n.chains,
+#                             DIC=T,
+#                             envir=environment(),
+#                             ...)
+
+    data.list <-  lapply(data, get, envir=environment())
+    names(data.list) <- data
+    samples <- run.jags(model = modelfile,
+                        monitor=parametervector,
+                        data=data.list,
+                        n.chains=n.chains,
+                        inits=inits.list,
+                        burnin=n.burnin,
+                        sample=ceiling((n.iter-n.burnin)/n.thin),
+                        thin=n.thin,
+                        modules=c("dic","glm"),
+                        summarise=TRUE,
+                        method="parallel",
+                        ...)
+
+    if(!is.null(autojags)){
       cat("#####################################\n
 #### Autojags started. Might require some time
-#### (use n.update to adjust maximum number of updates). See ?autojags\n
+#### (use max.time to adjust maximum time for updating). See ?autoextend.jags\n
 #####################################\n")
-      recompile(samples, n.iter=n.iter)
-      samples.upd <- autojags(samples, n.update = n.update)
-      samples=samples.upd
+#       recompile(samples, n.iter=n.iter)
+#       samples <- autojags(samples, n.update = n.update)
+      samples <- do.call(autoextend.jags, c(list(runjags.object = samples ), autojags))
     }
 
-#   }else{
-#       print(paste("Unknown sampler:",sampler))
-#     }
 
 
   return(samples)

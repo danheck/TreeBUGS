@@ -41,7 +41,7 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
 
 \item{IVprec}{hyperprior on the precision (i.e., the inverse of the variance) of the slope parameter for continuous independent variables. Default implies a Cauchy prior (Rouder et. al, 2012). To use a more-informative standard-normal prior, use \code{IVprec = 'dcat(1)'}.}
 
-\item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link{jags.parallel}} for details.}
+\item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.}
 
 \item{n.burnin}{Burnin period, samples will not be stored.}
 
@@ -54,16 +54,16 @@ Default is to write this information to the tempdir as required by CRAN standard
 
 \item{parEstFile}{Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")}
 
-\item{autojags}{whether to run JAGS until the MCMC chains converge (see \link{autojags}).  Use \code{n.update=3} as an additional argument to control how often JAGS is rerun. Can take a lot of time for large models.}
+\item{autojags}{if provided (as an empty list or with arguments passed to \link[runjags]{autoextend.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)}
 
-\item{...}{Arguments to be passed to the JAGS sampling function (default: \code{\link{jags.parallel}}.}
+\item{...}{Arguments to be passed to the JAGS sampling function (i.e., to \code{\link[runjags]{run.jags}}.}
 }
 \value{
 a list of the class \code{traitMPT} with the objects:
 \itemize{
  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
- \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link{jags.parallel}} object. Note that the sample can be transformed into an \code{mcmc.list} for analysis with the \code{coda} package by \code{as.mcmc.list(fittedModel$mcmc$BUGSoutput)}
+ \item \code{mcmc}: the object returned from the MCMC sampler. Standard: An \code{\link[runjags]{run.jags}} object. Note that the object \code{fittedModel$mcmc} is an \link[runjags]{runjags} object, whereas \code{fittedModel$mcmc$mcmc} is a mcmc.list as used by the coda package (\link[coda]{mcmc})
 }
 }
 \description{

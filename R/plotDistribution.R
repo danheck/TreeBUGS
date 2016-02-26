@@ -25,7 +25,9 @@ plotDistribution <- function(fittedModel, scale="probability", ...){
   for(idx in 1:S ){
     indEsts <- fittedModel$summary$individParameters[idx,,1]
     if(class(fittedModel) == "traitMPT"){
-      sigma <- fittedModel$mcmc$BUGSoutput$mean$sigma
+      sigma <- fittedModel$summary$groupParameters$sigma[,"Mean"]
+      # sigma <- fittedModel$mcmc$BUGSoutput$mean$sigma
+
       # values on latent scale:
       xx <- seq(-10, 10, length.out = 3000)
       if(scale == "latent"){

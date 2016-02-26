@@ -5,18 +5,18 @@
 \alias{plot.traitMPT}
 \title{Plot Convergence for Hierarchical MPT Models}
 \usage{
-\method{plot}{betaMPT}(x, parameter = "mean", type = "trace", ...)
+\method{plot}{betaMPT}(x, parameter = "mean", type = "default", ...)
 
-\method{plot}{traitMPT}(x, parameter = "mean", type = "trace", ...)
+\method{plot}{traitMPT}(x, parameter = "mean", type = "default", ...)
 }
 \arguments{
 \item{x}{fitted hierarchical MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
 \item{parameter}{which parameter to plot (e.g., \code{"theta"}, \code{"rho"}, \code{"slope"}). Parameters are matched partially, in order to plot all entries of vector valued parameters (see \code{\link{getParam}} to get a list of parameters)}
 
-\item{type}{what type of convergence plot (\code{"trace"}, \code{"acf"}, \code{"gelman"}). See, e.g., \code{\link[coda]{traceplot}}}
+\item{type}{type of convergence plot. Can be one of \code{"default"} (trace+density), \code{"trace"}, \code{"autocorr"}, \code{"crosscorr"},\code{"density"},   \code{"gelman"}. See, e.g., \code{\link[coda]{plot.mcmc.list}}}
 
-\item{...}{further arguments passed to the \code{coda}-plotting function}
+\item{...}{further arguments passed to the plotting functions in coda}
 }
 \description{
 Plot Convergence for Hierarchical MPT Models

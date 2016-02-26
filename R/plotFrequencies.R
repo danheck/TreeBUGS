@@ -9,6 +9,7 @@
 #' @export
 plotFreq <- function(fittedModel, freq=TRUE, select="all"){
 
+  par(mfrow=c(1,1))
   dat <- fittedModel$mptInfo$data
   K <- ncol(dat)
   N <- nrow(dat)
