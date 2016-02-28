@@ -8,7 +8,8 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
   predType, transformedParameters, T1group, corProbit = TRUE,
   mu = "dnorm(0,1)", xi = "dunif(0,100)", V, df, IVprec = "dchisq(1)",
   n.iter = 20000, n.adapt = 2000, n.burnin = 2000, n.thin = 5,
-  n.chains = 3, modelfilename, parEstFile, autojags = NULL, ...)
+  n.chains = 3, dic = FALSE, modelfilename, parEstFile, autojags = NULL,
+  ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -50,6 +51,8 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
 \item{n.thin}{Thinning rate.}
 
 \item{n.chains}{number of MCMC chains}
+
+\item{dic}{whether to compute DIC using \code{\link[runjags]{extract}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
 
 \item{modelfilename}{Name that the modelfile that is made by the function to work with JAGS should get.
 Default is to write this information to the tempdir as required by CRAN standards.}

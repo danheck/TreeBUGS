@@ -152,7 +152,7 @@ callingSampler <- function(model,
                                      "base::Marsaglia-Multicarry",
                                      "base::Super-Duper",
                                      "base::Mersenne-Twister")[1+ (i-1)%% 4]
-    #     samples <- jags.parallel(data,
+#         samples2 <- jags.parallel(data,
 #                             inits=inits,
 #                             parameters.to.save=parametervector,
 #                             model.file = modelfile,
@@ -175,7 +175,7 @@ callingSampler <- function(model,
                         sample=ceiling((n.iter-n.burnin)/n.thin),
                         thin=n.thin,
                         modules=c("dic","glm"),
-                        summarise=TRUE,
+                        summarise=FALSE,
                         method="parallel",
                         ...)
 
@@ -186,10 +186,10 @@ callingSampler <- function(model,
 #####################################\n")
 #       recompile(samples, n.iter=n.iter)
 #       samples <- autojags(samples, n.update = n.update)
-      samples <- do.call(autoextend.jags, c(list(runjags.object = samples ), autojags))
+      samples <- do.call(autoextend.jags, c(list(runjags.object = samples,
+                                                 summarise=FALSE),
+                                            autojags))  # additional user arguments
     }
 
-
-
-  return(samples)
+  return(samples)   # own summary
 }

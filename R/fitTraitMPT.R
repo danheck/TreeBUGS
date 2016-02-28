@@ -53,6 +53,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     n.burnin=2000,
                     n.thin=5,
                     n.chains=3,
+                    dic =FALSE,
 
                     # File Handling stuff:
                     modelfilename,
@@ -148,7 +149,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
 
   time0 <- Sys.time()
   cat("MCMC sampling started at ", format(time0), "\n")
-  mcmc <- callingSampler(model = "traitMPT",
+  runjags <- callingSampler(model = "traitMPT",
                          mergedTree = mergedTree,
                          data = data,
                          modelfile = modelfilename,
@@ -194,14 +195,20 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                   transformedParameters=transformedPar$transformedParameters,
                   T1group=groupT1)
 
-  summary <- summarizeMPT(mptInfo = mptInfo,
-                          mcmc = mcmc)
+  # own summary (more stable than runjags)
+  mcmc.summ <- summarizeMCMC(runjags$mcmc)
+  summary <- summarizeMPT(mcmc = runjags$mcmc, mptInfo = mptInfo, summ=mcmc.summ)
+  if(dic){
+    summary$dic <-   extract(runjags, "dic", ...)
+  }else{summary$dic <- NULL}
+
 
   # class structure for TreeBUGS
   # mcmc$BUGSoutput <- renameBUGSoutput(mcmc$BUGSoutput, thetaUnique, "traitMPT")
   fittedModel <- list(summary=summary,
                       mptInfo=mptInfo,
-                      mcmc=mcmc,
+                      mcmc.summ = mcmc.summ,
+                      runjags = runjags,
                       call=match.call(),
                       time=time1-time0)
   class(fittedModel) <- "traitMPT"

@@ -12,9 +12,9 @@ plotFit <- function(fittedModel,...){
   tree <- fittedModel$mptInfo$MPT$Tree
   TreeNames <- unique(tree)
   nam <- paste("response", TreeNames, "pred.mean", sep=".")
-  select <- c(sapply(nam, grep, x=varnames(fittedModel$mcmc$mcmc)))
+  select <- c(sapply(nam, grep, x=varnames(fittedModel$runjags$mcmc)))
   # pred <- do.call("cbind", fittedModel$mcmc$BUGSoutput$sims.list[nam])
-  pred <- do.call("rbind", fittedModel$mcmc$mcmc[,select])
+  pred <- do.call("rbind", fittedModel$runjags$mcmc[,select])
   boxplot(pred, xaxt="n", main="Observed (red) and predicted (boxplot) mean frequencies", ...)
   axis(1, 1:ncol(dat), labels = colnames(dat))
 

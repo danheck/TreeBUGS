@@ -11,7 +11,7 @@ getParam(fittedModel, parameter = "mean", posterior = "Mean")
 
 \item{parameter}{which parameter(s) should be returned? (see below for details)}
 
-\item{posterior}{whether to show the posterior \code{"Mean"}, \code{"Median"}, or \code{"SD"}}
+\item{posterior}{whether to show the posterior \code{"Mean"}, \code{"50\%"} (median), or \code{"SD"}}
 }
 \description{
 Returns posterior statistics (e.g., mean, median) for the parameters of a hierarchical MPT model.
@@ -34,7 +34,7 @@ In the beta MPT, the following parameters are being estimated:
 \item \code{"theta"} (individual MPT parameters)
 }
 
-Note that this function is only a wrapper to conveniently access the information stored in \code{summary(fittedModel$mcmc)}
+Note that this function is only a wrapper to conveniently access the information stored in \code{fittedModel$mcmc.summ}
 }
 \author{
 Daniel Heck

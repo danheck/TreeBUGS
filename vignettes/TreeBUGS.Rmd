@@ -106,29 +106,23 @@ Similarly, a latent-trait model is fitted simply by replacing `betaMPT` by `trai
 
 ### 4. Step: Check convergence of MCMC chains
 
-The functions `betaMPT` and `traitMPT` return a list including the original samples from the MCMC sampler for convergence checks. Basically, these samples can be accessed by `fittedModel$mcmc`:
+The functions `betaMPT` and `traitMPT` return a list including the original samples from the MCMC sampler for convergence checks. The MCMC samples are stored in `fittedModel$runjags$mcmc` as an `mcmc.list` object (see the package \link{coda} for convergence diagniostics). TreeBUGS provides a handy wrapper to access the most important plotting functions:
 
 ```{r, eval=FALSE}
-# Traceplots (posterior values as a function of sample number)
-traceplot(fitHierarchicalMPT$mcmc,    # fitted model
-          mfrow = c(3,3)              # number of rows and columns
-          )
+# Default: Traceplot and density
+plot(fittedModel,    # fitted model
+     parameter ="mean"            # which parameter to plot
+)
+# further arguments are passed to ?plot.mcmc.list
+
+# Auto-correlation plots:
+plot(fittedModel,  parameter = "mean", type = "acf")
+
+# Gelman-Rubin plots:
+plot(fittedModel,  parameter = "mean", type = "gelman")
 ```
 
-Further convergence checks are available in the convergence diagniostic package \link{coda}. Before using these functions, the MCMC samples must be transformed to a `mcmc.list`:
-
-```{r, eval=FALSE}
-# load coda library (convergence diagnostics)
-require("coda")
-
-# transform R2JAGS output to mcmc.list:
-codaModel <- as.mcmc.list(fitHierarchicalMPT$mcmc$BUGSoutput)
-
-# For instance, auto-correlation plots:
-acfplot(codaModel)
-```
-
-See \link{R2JAGS} and \link{coda} for further convergence statistics and plots. Note that inferences from from the model are likely not to be valid if the Markov-Chain Monte-Carlo (MCMC) sampler did not reach convergence!
+See \link{coda} and \link{runjags} for further convergence statistics and plots. Note that inferences from from the model are likely not to be valid if the Markov-Chain Monte-Carlo (MCMC) sampler did not reach convergence!
 
 ### 5. Step: Summarize and Plot Model
 

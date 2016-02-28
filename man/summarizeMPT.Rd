@@ -4,12 +4,14 @@
 \alias{summarizeMPT}
 \title{Summarize JAGS Output for Hierarchical MPT Models}
 \usage{
-summarizeMPT(mcmc, mptInfo)
+summarizeMPT(mcmc, mptInfo, summ = NULL)
 }
 \arguments{
-\item{mcmc}{the actual output of the sampler of a fitted MPT model (accesible via \code{fittedModel$mcmc})}
+\item{mcmc}{the actual mcmc.list output of the sampler of a fitted MPT model (accesible via \code{fittedModel$runjags$mcmc})}
 
 \item{mptInfo}{the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})}
+
+\item{summ}{optional for internal use}
 }
 \description{
 Provide clean and readable summary statistics tailored to MPT models based on the JAGS output.
@@ -18,10 +20,12 @@ Provide clean and readable summary statistics tailored to MPT models based on th
 The MPT-specific summary is computed directly after fitting a model. However, this function might be used manually after removing MCMC samples (e.g., extending the burnin period).
 }
 \examples{
-# Remove MCMC samples and recompute MPT summary
+# Remove additional burnin samples and recompute MPT summary
 \dontrun{
-mcmc.subsample <- update(fit$mcmc)
-newMPTsummary <- summarizeMPT(oldMPT$mcmc, oldMPT$mptInfo)
+# start later or thin (see ?window)
+mcmc.subsamp <- window(fittedModel$runjags$mcmc, start=3001, thin=2)
+new.mpt.summary <- summarizeMPT(mcmc.subsamp, fittedModel$mptInfo)
+new.mpt.summary
 }
 }
 

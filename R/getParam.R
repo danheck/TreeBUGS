@@ -4,7 +4,7 @@
 #'
 #' @param fittedModel a fitted latent-trait MPT model (see \code{\link{traitMPT}}) or beta MPT model (see \code{\link{betaMPT}})
 #' @param parameter which parameter(s) should be returned? (see below for details)
-#' @param posterior whether to show the posterior \code{"Mean"}, \code{"Median"}, or \code{"SD"}
+#' @param posterior whether to show the posterior \code{"Mean"}, \code{"50\%"} (median), or \code{"SD"}
 #' @details
 #' In the latent-trait MPT, the following parameters are being estimated:
 #' \itemize{
@@ -23,7 +23,7 @@
 #' \item \code{"theta"} (individual MPT parameters)
 #' }
 #'
-#' Note that this function is only a wrapper to conveniently access the information stored in \code{summary(fittedModel$mcmc)}
+#' Note that this function is only a wrapper to conveniently access the information stored in \code{fittedModel$mcmc.summ}
 #' @seealso \code{\link{traitMPT}}, \code{\link{betaMPT}}
 #' @author Daniel Heck
 #' @export
@@ -33,7 +33,7 @@ getParam <- function(fittedModel, parameter="mean", posterior="Mean"){
 
   thetaUnique <- fittedModel$mptInfo$thetaUnique
   S <- length(thetaUnique)
-  summ <- summary(fittedModel$mcmc)
+  summ <- fittedModel$mcmc.summ # summary(fittedModel$mcmc)
   allnam <- rownames(summ)
   select <- setdiff(grep(parameter,allnam) , grep(".pred",allnam))
   if(length(select) == 0)

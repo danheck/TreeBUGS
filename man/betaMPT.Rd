@@ -8,7 +8,7 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
   transformedParameters, T1group, corProbit = FALSE,
   alpha = "dunif(.01,5000)", beta = "dunif(.01,5000)", n.iter = 20000,
   n.adapt = 2000, n.burnin = 2000, n.thin = 5, n.chains = 3,
-  modelfilename, parEstFile, autojags = NULL, ...)
+  dic = FALSE, modelfilename, parEstFile, autojags = NULL, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -41,6 +41,8 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
 
 \item{n.chains}{number of MCMC chains}
 
+\item{dic}{whether to compute DIC using \code{\link[runjags]{extract}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
+
 \item{modelfilename}{Name that the modelfile that is made by the function to work with JAGS should get.
 Default is to write this information to the tempdir as required by CRAN standards.}
 
@@ -55,7 +57,7 @@ a list of the class \code{betaMPT} with the objects:
 \itemize{
  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
- \item \code{mcmc}: the object returned from the MCMC sampler. Note that the object \code{fittedModel$mcmc} is an \link[runjags]{runjags} object, whereas \code{fittedModel$mcmc$mcmc} is a mcmc.list as used by the coda package (\link[coda]{mcmc})
+ \item \code{runjags}: the object returned from the MCMC sampler. Note that the object \code{fittedModel$runjags} is an \link[runjags]{runjags} object, whereas \code{fittedModel$runjags$mcmc} is a \code{mcmc.list} as used by the coda package (\link[coda]{mcmc})
 }
 }
 \description{

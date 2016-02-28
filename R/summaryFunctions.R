@@ -3,32 +3,35 @@
 #' Provide clean and readable summary statistics tailored to MPT models based on the JAGS output.
 #'
 # @param model either \code{"betaMPT"} or \code{"traitMPT"}
-#' @param mcmc the actual output of the sampler of a fitted MPT model (accesible via \code{fittedModel$mcmc})
+#' @param mcmc the actual mcmc.list output of the sampler of a fitted MPT model (accesible via \code{fittedModel$runjags$mcmc})
 #' @param mptInfo the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})
+# @param dic whether to compute DIC statistic for model selection (requires additional sampling!)
+#' @param summ optional for internal use
+# @param ... further arguments passed to \code{\link[coda]{dic.samples}} (e.g., \code{n.iter})
 #' @details The MPT-specific summary is computed directly after fitting a model. However, this function might be used manually after removing MCMC samples (e.g., extending the burnin period).
 #' @examples
-#' # Remove MCMC samples and recompute MPT summary
+#' # Remove additional burnin samples and recompute MPT summary
 #' \dontrun{
-#' mcmc.subsample <- update(fit$mcmc)
-#' newMPTsummary <- summarizeMPT(oldMPT$mcmc, oldMPT$mptInfo)
+#' # start later or thin (see ?window)
+#' mcmc.subsamp <- window(fittedModel$runjags$mcmc, start=3001, thin=2)
+#' new.mpt.summary <- summarizeMPT(mcmc.subsamp, fittedModel$mptInfo)
+#' new.mpt.summary
 #' }
 #' @export
-summarizeMPT <- function(
-  # model,
-                         mcmc,
-                         mptInfo
-                         # thetaNames,
-#                          predFactorLevels=NULL,
-#                          transformedParameters=NULL,
-#                          NgroupT1=NULL
+summarizeMPT <- function(mcmc,
+                         mptInfo,
+                         summ = NULL
                          ){
+  if(is.null(summ))
+    summ <- summarizeMCMC(mcmc)
+
   predFactorLevels <- mptInfo$predFactorLevels
   transformedParameters <- mptInfo$transformedParameters
   NgroupT1 <- mptInfo$T1group$NgroupT1
   thetaNames <- mptInfo$thetaNames
   model <- mptInfo$model
 
-  summ <- summary(mcmc) # mcmc$BUGSoutput$summary
+  # summary <- summary(mcmc) # mcmc$BUGSoutput$summary
   # number of parameters
   S <- max(thetaNames[,"theta"])
 
@@ -38,21 +41,21 @@ summarizeMPT <- function(
   N <- nrow(mptInfo$data)
   # which statistics to select:
   # colsel <- c(1:3,5,7:9) # for R2JAGS
-  colsel <- c("Mean","SD","Lower95","Median","Upper95","SSeff","psrf") # for runjags
+  # colsel <- c("Mean","SD","Lower95","Median","Upper95","SSeff","psrf") # for runjags
   uniqueNames <- mptInfo$thetaUnique # thetaNames[!duplicated(thetaNames[,"theta"]),"Parameter"]
 
   selCov <- grep("cor_", rownames(summ))
   if(length(selCov) != 0){
-    correlation <- summ[selCov, colsel, drop=FALSE]
+    correlation <- summ[selCov, , drop=FALSE]
   }else{correlation <- NULL}
 
   ############################## BETA MPT SUMMARY
   if(model == "betaMPT"){
     # mean and individual parameter estimates
-    mu <- summ[paste0("mean", idx),colsel, drop=FALSE]
-    SD <- summ[paste0("sd",idx),colsel, drop=FALSE]
-    alpha <- summ[paste0("alph",idx),colsel, drop=FALSE]
-    beta <- summ[paste0("bet",idx),colsel, drop=FALSE]
+    mu <- summ[paste0("mean", idx),, drop=FALSE]
+    SD <- summ[paste0("sd",idx),, drop=FALSE]
+    alpha <- summ[paste0("alph",idx),, drop=FALSE]
+    beta <- summ[paste0("bet",idx),, drop=FALSE]
 
     rownames(mu) <-paste0("mean_", uniqueNames)
     rownames(SD) <-paste0("sd_", uniqueNames)
@@ -64,13 +67,13 @@ summarizeMPT <- function(
   }else{
 
     ############################## LATENT-TRAIT SUMMARY
-    mu <- summ[paste0("mu",idx),colsel, drop=FALSE]
-    mean <- summ[paste0("mean",idx),colsel, drop=FALSE]
-    sigma <- summ[paste0("sigma",idx),colsel, drop=FALSE]
+    mu <- summ[paste0("mu",idx),, drop=FALSE]
+    mean <- summ[paste0("mean",idx),, drop=FALSE]
+    sigma <- summ[paste0("sigma",idx),, drop=FALSE]
     rho <- rhoNames <- c()
     cnt <- 1
     while(cnt<S){
-      rho <- rbind(rho, summ[paste0("rho[",cnt,",",(cnt+1):S,"]"),colsel, drop=FALSE])
+      rho <- rbind(rho, summ[paste0("rho[",cnt,",",(cnt+1):S,"]"),, drop=FALSE])
       rhoNames <- c(rhoNames,
                     paste0("rho[",uniqueNames[cnt],",",uniqueNames[(cnt+1):S],"]"))
       cnt <- cnt+1
@@ -84,11 +87,11 @@ summarizeMPT <- function(
     selCov <- grepl("slope_", rownames(summ))
     selFac <- grepl("factor_", rownames(summ))
     if(any(selCov)){
-      slope <- summ[selCov, colsel, drop=FALSE]
+      slope <- summ[selCov, , drop=FALSE]
     }else{slope <- NULL}
     if(any(selFac)){
       selFacSD <- grepl("SD_factor_", rownames(summ))
-      factor <- summ[selFac & !selFacSD, colsel, drop=FALSE]
+      factor <- summ[selFac & !selFacSD, , drop=FALSE]
 
       # rename factor levels
       tmpNames <- sapply(rownames(factor), function(xx) strsplit(xx, split="_")[[1]][3])
@@ -100,7 +103,7 @@ summarizeMPT <- function(
       }
 
 
-      factorSD <- summ[ selFacSD, colsel, drop=FALSE]
+      factorSD <- summ[ selFacSD, , drop=FALSE]
     }else{
       factor <- NULL ; factorSD <- NULL
     }
@@ -112,26 +115,27 @@ summarizeMPT <- function(
   }
   theta.names <- apply(as.matrix(data.frame(lapply(expand.grid("theta[",1:S, ",",1:N,"]"), as.character))),
                        1, paste0, collapse="")
-  individParameters <- array(data = summ[theta.names,colsel],
-                             dim = c(S,N,length(colsel)))
+  individParameters <- array(data = summ[theta.names,],
+                             dim = c(S,N,ncol(summ)))
   dimnames(individParameters) <- list(Parameter=uniqueNames,
                                       ID=1:N,
-                                      Statistic=colsel)
+                                      Statistic=colnames(summ))
 
   ############################## goodness of fit and deviance
   if(is.null(transformedParameters)){
     transPar <- NULL
   }else{
-    transPar <- summ[transformedParameters,colsel, drop=FALSE]
+    transPar <- summ[transformedParameters,, drop=FALSE]
   }
-  dic <- extract(mcmc, "dic")
+  # dic <- extract(mcmc, "dic")
   summary <- list(groupParameters=groupParameters,
                   individParameters=individParameters,
                   fitStatistics=list(
-                    "overall"=c("DIC"=sum(dic$deviance) + mean( sum(dic$penalty)), #$BUGSoutput$DIC,
-                                "T1.observed"=summ["T1.obs","Mean"],
-                                "T1.predicted"=summ["T1.pred","Mean"],
-                                "p.T1"=summ["p.T1","Mean"]),
+                    "overall"=c(
+                      # "DIC"=sum(dic$deviance) + mean( sum(dic$penalty)), #$BUGSoutput$DIC,
+                      "T1.observed"=summ["T1.obs","Mean"],
+                      "T1.predicted"=summ["T1.pred","Mean"],
+                      "p.T1"=summ["p.T1","Mean"]),
                     "p.T1.individual"=summ[paste0("p.T1ind[",1:N,"]"),"Mean"], #mcmc$BUGSoutput$mean$p.T1ind),
                   transformedParameters=transPar))
   selT1group <- grep("p.T1.group", rownames(summ))
@@ -170,6 +174,9 @@ print.summary.betaMPT <- function(x,  ...){
 
     cat("\n##############\n",
         "Overall model fit statistics (T1: Posterior predictive check):\n")
+    if(!is.null(x$dic)){
+      print(x$dic)
+    }
     print(round(x$fitStatistics$overall, x$round))
     cat("\nPoster predictive p-values for participants:\n")
     print(round(x$fitStatistics$p.T1.individual, x$round))
@@ -212,6 +219,9 @@ print.summary.traitMPT <- function(x,  ...){
 
     cat("\n##############\n",
         "Overall model fit statistics (T1: Posterior predictive check):\n")
+    if(!is.null(x$dic)){
+      print(x$dic)
+    }
     print(round(x$fitStatistics$overall, x$round))
     cat("\nPoster predictive p-values for participants:\n")
     print(round(x$fitStatistics$p.T1.individual, x$round))
@@ -303,4 +313,15 @@ getRhoMatrix <- function (uniqueNames, rho) {
     }
   }
   rho.matrix
+}
+
+
+# own MCMC summary
+summarizeMCMC <- function(mcmc){
+  summ <- summary(mcmc, quantiles = c(0.025, 0.5, 0.975))
+  gelman <- try(gelman.diag(mcmc, multivariate=FALSE)[[1]])
+  n.eff <- try(effectiveSize(mcmc) )
+  summTab <- cbind(summ[[1]][,1:2], summ[[2]], "Time-series SE"=summ[[1]][,4],
+                   "n.eff" = round(n.eff),
+                   "Rhat" = gelman[,1], "R_95%"=gelman[,2])
 }

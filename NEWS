@@ -1,3 +1,10 @@
+TreeBUGS 0.4.3 (February 2016)
+===========
+
+* Use own summary function (functions in runjags are slow and unstable)
+* Estimation of DIC requries argument "dic=TRUE" or can be estimated afterwards by: fit$dic <- extract(fit$runjags, "dic")
+
+
 TreeBUGS 0.4.2 (February 2016)
 ===========
 

@@ -20,6 +20,7 @@
 #' @param n.burnin Number of samples for burnin (samples will not be stored and removed from n.iter)
 #' @param n.thin Thinning rate.
 #' @param n.chains number of MCMC chains
+#' @param dic whether to compute DIC using \code{\link[runjags]{extract}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}
 #' @param autojags if provided (as an empty list or with arguments passed to \link[runjags]{autoextend.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)
 #' @param ... Arguments to be passed to the JAGS sampling function (i.e., to \code{\link[runjags]{run.jags}}.
 #'
@@ -29,7 +30,7 @@
 #' \itemize{
 #'  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
 #'  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
-#'  \item \code{mcmc}: the object returned from the MCMC sampler. Note that the object \code{fittedModel$mcmc} is an \link[runjags]{runjags} object, whereas \code{fittedModel$mcmc$mcmc} is a mcmc.list as used by the coda package (\link[coda]{mcmc})
+#'  \item \code{runjags}: the object returned from the MCMC sampler. Note that the object \code{fittedModel$runjags} is an \link[runjags]{runjags} object, whereas \code{fittedModel$runjags$mcmc} is a \code{mcmc.list} as used by the coda package (\link[coda]{mcmc})
 #' }
 #' @author Daniel Heck, Nina R. Arnold, Denis Arnold,
 #' @references Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.
@@ -52,6 +53,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     n.burnin=2000,
                     n.thin=5,
                     n.chains=3,
+                    dic =FALSE,
 
                     # File Handling stuff:
                     modelfilename,
@@ -62,6 +64,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   if(missing(covData)) covData <- NULL
   if(missing(covStructure)) covStructure <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
+  if(missing(T1group)) T1group <- NULL
 
   checkParEstFile(parEstFile)
   modelfilename <- checkModelfilename(modelfilename)
@@ -122,7 +125,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
 
   time0 <- Sys.time()
   cat("MCMC sampling started at ", format(time0), "\n")
-  mcmc <- callingSampler(model = "betaMPT",
+  runjags <- callingSampler(model = "betaMPT",
                          mergedTree = mergedTree,
                          data = data,
                          modelfile = modelfilename,
@@ -157,20 +160,21 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                   T1group=groupT1)
 
 
+  # own summary (more stable than runjags)
+  mcmc.summ <- summarizeMCMC(runjags$mcmc)
   # Beta MPT: rename parameters and get specific summaries
-#   summary <- summarizeMPT(model = "betaMPT",
-#                           mcmc = mcmc,
-#                           thetaNames = thetaNames,
-#                           transformedParameters = transformedPar$transformedParameters,
-#                           NgroupT1 = groupT1$NgroupT1)
-  summary <- summarizeMPT(mptInfo = mptInfo,
-                          mcmc = mcmc)
+  summary <- summarizeMPT(mcmc = runjags$mcmc, mptInfo = mptInfo, summ=mcmc.summ)
+  if(dic){
+    summary$dic <-   extract(runjags, "dic", ...)
+  }else{summary$dic <- NULL}
+
 
   # class structure for TreeBUGS
   # mcmc$BUGSoutput <- renameBUGSoutput(mcmc$BUGSoutput, thetaUnique, "betaMPT")
   fittedModel <- list(summary = summary,
                       mptInfo = mptInfo,
-                      mcmc = mcmc,
+                      mcmc.summ = mcmc.summ,
+                      runjags = runjags,
                       call = match.call(),
                       time = time1-time0)
 

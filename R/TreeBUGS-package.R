@@ -8,9 +8,9 @@
 #' @author Daniel Heck, Denis Arnold, & Nina Arnold
 #' @docType package
 #' @name TreeBUGS
-#' @import runjags
+#' @importFrom runjags run.jags extract autoextend.jags
 #run.jags  summary.runjags extract autorun.jags autoextend.jags
-# @importFrom R2jags jags.parallel autojags recompile
+#' @importFrom coda gelman.diag effectiveSize
 #' @importFrom utils read.csv write.table
 #' @importFrom graphics axis plot points  segments abline boxplot curve hist lines par
 #' @importFrom grDevices rainbow
