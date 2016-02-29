@@ -42,7 +42,7 @@ getParam <- function(fittedModel, parameter="mean", posterior="Mean"){
   if(length(par) == S){
     names(par) <- paste0(names(par), "_", thetaUnique)
   }else if(parameter == "theta"){
-    par <- matrix(par, ncol=S)
+    par <- matrix(par, ncol=S, byrow=TRUE)
     colnames(par) <- thetaUnique
   }else if(parameter == "rho"){
     par <- getRhoMatrix (thetaUnique, par)
