@@ -52,17 +52,17 @@ summarizeMPT <- function(mcmc,
   ############################## BETA MPT SUMMARY
   if(model == "betaMPT"){
     # mean and individual parameter estimates
-    mu <- summ[paste0("mean", idx),, drop=FALSE]
+    mean <- summ[paste0("mean", idx),, drop=FALSE]
     SD <- summ[paste0("sd",idx),, drop=FALSE]
     alpha <- summ[paste0("alph",idx),, drop=FALSE]
     beta <- summ[paste0("bet",idx),, drop=FALSE]
 
-    rownames(mu) <-paste0("mean_", uniqueNames)
+    rownames(mean) <-paste0("mean_", uniqueNames)
     rownames(SD) <-paste0("sd_", uniqueNames)
     rownames(alpha) <-paste0("alpha_", uniqueNames)
     rownames(beta) <-paste0("beta_", uniqueNames)
 
-    groupParameters <- list(mean=mu, SD=SD, alpha=alpha, beta=beta, correlation=correlation)
+    groupParameters <- list(mean=mean, SD=SD, alpha=alpha, beta=beta, correlation=correlation)
 
   }else{
 
@@ -319,9 +319,19 @@ getRhoMatrix <- function (uniqueNames, rho) {
 # own MCMC summary
 summarizeMCMC <- function(mcmc){
   summ <- summary(mcmc, quantiles = c(0.025, 0.5, 0.975))
-  gelman <- try(gelman.diag(mcmc, multivariate=FALSE)[[1]])
-  n.eff <- try(effectiveSize(mcmc) )
+
   summTab <- cbind(summ[[1]][,1:2], summ[[2]], "Time-series SE"=summ[[1]][,4],
-                   "n.eff" = round(n.eff),
-                   "Rhat" = gelman[,1], "R_95%"=gelman[,2])
+                   "n.eff" = NA ,
+                   "Rhat" = NA, "R_95%"=NA)
+  rn <- rownames(summTab)
+  sel.notT1 <- setdiff(1:nrow(summTab), union(grep("T1", rn), grep(".pred.mean", rn)))
+  try({
+    summTab[,7] <- round(effectiveSize(mcmc))
+    summTab[sel.notT1,8:9] <- gelman.diag(mcmc[,sel.notT1], multivariate=FALSE)[[1]]
+  })
+#   if(any(is.na(summTab[,"Rhat"])))
+#     warning("Gelman-Rubin convergence diagnostic Rhat could not be computed.")
+  # n.eff <-
+
+  summTab
 }
