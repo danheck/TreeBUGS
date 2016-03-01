@@ -216,6 +216,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   # write results to file
   writeSummary(fittedModel, parEstFile)
 
+  gc(verbose=FALSE)
 
   return(fittedModel)
 }

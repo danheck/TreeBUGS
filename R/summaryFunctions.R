@@ -318,17 +318,23 @@ getRhoMatrix <- function (uniqueNames, rho) {
 
 # own MCMC summary
 summarizeMCMC <- function(mcmc){
-  summ <- summary(mcmc, quantiles = c(0.025, 0.5, 0.975))
-
-  summTab <- cbind(summ[[1]][,1:2], summ[[2]], "Time-series SE"=summ[[1]][,4],
-                   "n.eff" = NA ,
+  # summ <- summary(mcmc, quantiles = c(0.025, 0.5, 0.975))
+  mcmc.mat <- do.call("rbind", mcmc)
+  summTab <- cbind("Mean"=apply(mcmc.mat,2,mean),
+                   "SD"=apply(mcmc.mat,2,sd),
+                   t(apply(mcmc.mat, 2, quantile, c(.05,.5,.95))),
+                   "Time-series SE"=NA, "n.eff" = NA ,
                    "Rhat" = NA, "R_95%"=NA)
+  #     summ[[1]][,1:2], summ[[2]], "Time-series SE"=summ[[1]][,4]
+#   rm(summ)
+#   gc(verbose=FALSE)
   rn <- rownames(summTab)
   sel.notT1 <- setdiff(1:nrow(summTab), union(grep("T1", rn), grep(".pred.mean", rn)))
   try({
-    summTab[,7] <- round(effectiveSize(mcmc))
-    summTab[sel.notT1,8:9] <- gelman.diag(mcmc[,sel.notT1], multivariate=FALSE)[[1]]
+    summTab[sel.notT1,7] <- round(effectiveSize(mcmc[,sel.notT1]))
+    summTab[sel.notT1,6] <- summTab[sel.notT1,2] / sqrt(summTab[sel.notT1,7]  )
   })
+  try( summTab[sel.notT1,8:9] <- gelman.diag(mcmc[,sel.notT1], multivariate=FALSE)[[1]])
 #   if(any(is.na(summTab[,"Rhat"])))
 #     warning("Gelman-Rubin convergence diagnostic Rhat could not be computed.")
   # n.eff <-
