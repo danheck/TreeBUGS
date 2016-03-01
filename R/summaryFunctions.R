@@ -326,8 +326,8 @@ summarizeMCMC <- function(mcmc){
                    "Time-series SE"=NA, "n.eff" = NA ,
                    "Rhat" = NA, "R_95%"=NA)
   #     summ[[1]][,1:2], summ[[2]], "Time-series SE"=summ[[1]][,4]
-#   rm(summ)
-#   gc(verbose=FALSE)
+  rm(mcmc.mat)
+  gc(verbose=FALSE)
   rn <- rownames(summTab)
   sel.notT1 <- setdiff(1:nrow(summTab), union(grep("T1", rn), grep(".pred.mean", rn)))
   try({
