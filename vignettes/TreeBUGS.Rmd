@@ -193,7 +193,7 @@ After fitting the model, the results appear when typing `summary(fitMPT)`.
 
 In the latent-trait model, it is possible to include discrete factors as predictor variables, similar as in the general linear model formulation of an ANOVA. Compared to continuous covariates only the following changes:
 
-* New argument `predType`: Predictor variables can be set as
+* New argument `predType`, which is a character vector that assignes each column in `covData` a specific tyoe (i.e., how it is used in `predStructure`). Specifically, predictor variables can be set as
     * continuous (`"c"`)
     * fixed effect (`"f"`)
     * random effect (`"r"`)

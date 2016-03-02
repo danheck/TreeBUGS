@@ -42,7 +42,7 @@ summarizeMPT <- function(mcmc,
   # which statistics to select:
   # colsel <- c(1:3,5,7:9) # for R2JAGS
   # colsel <- c("Mean","SD","Lower95","Median","Upper95","SSeff","psrf") # for runjags
-  uniqueNames <- mptInfo$thetaUnique # thetaNames[!duplicated(thetaNames[,"theta"]),"Parameter"]
+  uniqueNames <- mptInfo$thetaUnique
 
   selCov <- grep("cor_", rownames(summ))
   if(length(selCov) != 0){
@@ -97,7 +97,7 @@ summarizeMPT <- function(mcmc,
       tmpNames <- sapply(rownames(factor), function(xx) strsplit(xx, split="_")[[1]][3])
       for(ff in 1:length(predFactorLevels)){
         if( !is.null(predFactorLevels[[ff]])){
-          selrow <- grepl(names(predFactorLevels)[ff], tmpNames)
+          selrow <- grepl(paste0(names(predFactorLevels)[ff],"["), tmpNames, fixed=TRUE)
           rownames(factor)[selrow] <- paste0(rownames(factor)[selrow],"_", predFactorLevels[[ff]])
         }
       }
@@ -242,8 +242,8 @@ print.summary.traitMPT <- function(x,  ...){
     if(!is.null(x$groupParameters$factor)){
       cat("\nEffects of factors on latent scale (additive shift from overall mean):\n")
       print(round(x$groupParameters$factor, x$round))
-      cat("\nFactor SD on latent scale:\n")
-      print(round(x$groupParameters$factorSD, x$round))
+#       cat("\nFactor SD on latent scale:\n")
+#       print(round(x$groupParameters$factorSD, x$round))
     }
 
     if(!is.null(x$groupParameters$correlation) && !nrow(x$groupParameters$correlation) == 0){
@@ -322,7 +322,7 @@ summarizeMCMC <- function(mcmc){
   mcmc.mat <- do.call("rbind", mcmc)
   summTab <- cbind("Mean"=apply(mcmc.mat,2,mean),
                    "SD"=apply(mcmc.mat,2,sd),
-                   t(apply(mcmc.mat, 2, quantile, c(.05,.5,.95))),
+                   t(apply(mcmc.mat, 2, quantile, c(.025,.5,.975))),
                    "Time-series SE"=NA, "n.eff" = NA ,
                    "Rhat" = NA, "R_95%"=NA)
   #     summ[[1]][,1:2], summ[[2]], "Time-series SE"=summ[[1]][,4]

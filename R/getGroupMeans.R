@@ -30,9 +30,8 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
   summaryMat <- matrix(NA,0, 5)
   cnt <- 0
   for(s in 1:S){
-
     # parameter s of S
-    select <- grep("mu", varnames(traitMPT$runjags$mcmc))
+    select <- grep(paste0("mu[",s,"]"), varnames(traitMPT$runjags$mcmc), fixed=TRUE)
     muPosterior <- do.call("rbind", traitMPT$runjags$mcmc[,select]) #traitMPT$mcmc$BUGSoutput$sims.list[["mu"]][,s,drop=FALSE]
 
     # select only relevant predictors
@@ -53,7 +52,8 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
         parnam <- as.character(subset(predTable, predTable$Covariate == factors[j])[,"covPar"])
         if(length(facLevelNames[[factors[j]]]) >1)
            parnam <- paste0(parnam, "[",1:length(facLevelNames[[factors[j]]]),"]")
-        facPosterior[[j]] <- do.call("rbind", traitMPT$runjags$mcmc[,parnam])  #traitMPT$mcmc$BUGSoutput$sims.list[[parnam, drop=FALSE]]
+        facPosterior[[j]] <- do.call("rbind", traitMPT$runjags$mcmc[,parnam])
+        #traitMPT$mcmc$BUGSoutput$sims.list[[parnam, drop=FALSE]]
         colnames(facPosterior[[j]]) <-  facLevelNames[[factors[j]]]
       }
 
