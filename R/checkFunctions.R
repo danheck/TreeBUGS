@@ -33,9 +33,7 @@ readData  <- function(data){
     data = read.csv(data, header=TRUE, sep=",")
   }
   if(any(is.na(data))){
-    warning("Check missings in the data file
-(JAGS will automatically impute missing values
-  based on the estimated posterior). ")
+    stop("Missings in the data file!")
   }
   data
 }

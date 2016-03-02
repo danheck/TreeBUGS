@@ -334,10 +334,29 @@ summarizeMCMC <- function(mcmc){
     summTab[sel.notT1,7] <- round(effectiveSize(mcmc[,sel.notT1]))
     summTab[sel.notT1,6] <- summTab[sel.notT1,2] / sqrt(summTab[sel.notT1,7]  )
   })
-  try( summTab[sel.notT1,8:9] <- gelman.diag(mcmc[,sel.notT1], multivariate=FALSE)[[1]])
+  gc(verbose=FALSE)
+  try({
+    # split for 100 variables per batch
+    n.summ <- length(sel.notT1)
+    if(n.summ >100){
+      for(ii in 1:(n.summ %/% 100)){
+        idx <- (ii-1)*100 + 1:100
+        summ.idx <- sel.notT1[idx]
+        summTab[summ.idx,8:9] <- gelman.diag(mcmc[,summ.idx], multivariate=FALSE)[[1]]
+        gc(verbose=FALSE)
+      }
+      if((ii*100+1) < n.summ){
+        summ.idx <- (ii*100+1):n.summ
+        summTab[summ.idx,8:9] <- gelman.diag(mcmc[,summ.idx], multivariate=FALSE)[[1]]
+      }
+    }else{
+      summTab[sel.notT1,8:9] <- gelman.diag(mcmc[,sel.notT1], multivariate=FALSE)[[1]]
+    }
+  })
 #   if(any(is.na(summTab[,"Rhat"])))
 #     warning("Gelman-Rubin convergence diagnostic Rhat could not be computed.")
   # n.eff <-
+  gc(verbose=FALSE)
 
   summTab
 }

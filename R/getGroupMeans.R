@@ -67,7 +67,7 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
           samples <- pnorm(samples)
 
         summaryMat <- rbind(summaryMat, c(Mean = mean(samples), SD = sd(samples),
-                                          quantile(samples, c(.05,.5,.95))))
+                                          quantile(samples, c(.025,.5,.975))))
         rownames(summaryMat)[cnt <- cnt+1] <- paste0(uniqueNames[s],"_", paste0(paste0(
                                          colnames(combinations), "[",combNames[i,], "]"), collapse="_"))
 

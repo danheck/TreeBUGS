@@ -72,7 +72,8 @@ callingSampler <- function(model,
     assign(name.items, rowSums(responses[(index+1):(index+NresponsesTree[i])]))
 
     # check whether any N=0
-    if (any(rowSums(responses[(index+1):(index+NresponsesTree[i])]) == 0))
+    rowsums <- rowSums(responses[(index+1):(index+NresponsesTree[i])])
+    if (any(is.na(rowsums)) || any(rowsums == 0))
       warning("One or more participants do not have responses for tree",
               treeNames[i], ". As a solution, the critical participants might be excluded.")
 
