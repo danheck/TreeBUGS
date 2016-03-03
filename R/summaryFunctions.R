@@ -242,8 +242,8 @@ print.summary.traitMPT <- function(x,  ...){
     if(!is.null(x$groupParameters$factor)){
       cat("\nEffects of factors on latent scale (additive shift from overall mean):\n")
       print(round(x$groupParameters$factor, x$round))
-#       cat("\nFactor SD on latent scale:\n")
-#       print(round(x$groupParameters$factorSD, x$round))
+      cat("\nFactor SD on latent scale:\n")
+      print(round(x$groupParameters$factorSD, x$round))
     }
 
     if(!is.null(x$groupParameters$correlation) && !nrow(x$groupParameters$correlation) == 0){
@@ -336,17 +336,18 @@ summarizeMCMC <- function(mcmc){
   })
   gc(verbose=FALSE)
   try({
+    batchSize <- 200
     # split for 100 variables per batch
     n.summ <- length(sel.notT1)
-    if(n.summ >100){
-      for(ii in 1:(n.summ %/% 100)){
-        idx <- (ii-1)*100 + 1:100
+    if(n.summ >batchSize){
+      for(ii in 1:(n.summ %/% batchSize)){
+        idx <- (ii-1)*batchSize + 1:batchSize
         summ.idx <- sel.notT1[idx]
         summTab[summ.idx,8:9] <- gelman.diag(mcmc[,summ.idx], multivariate=FALSE)[[1]]
         gc(verbose=FALSE)
       }
-      if((ii*100+1) < n.summ){
-        summ.idx <- (ii*100+1):n.summ
+      if((ii*batchSize+1) < n.summ){
+        summ.idx <- sel.notT1[(ii*batchSize+1):n.summ]
         summTab[summ.idx,8:9] <- gelman.diag(mcmc[,summ.idx], multivariate=FALSE)[[1]]
       }
     }else{
