@@ -1,12 +1,15 @@
 
 # read, check and mean-center covData
-covDataRead <- function(covData, N){
+covDataRead <- function(covData, N, binaryToNumeric=FALSE){
 
   if(!is.null(covData)){
+
     # list / path to file
     if(is.character(covData)){
       covData <- read.csv(covData, header=T, sep= ",", strip.white = T)
     }
+    try(covData <- as.data.frame(covData))
+
 
     if(nrow(covData) != N){
       stop("Number of individuals in 'data' and 'covData' differs!")
@@ -14,6 +17,16 @@ covDataRead <- function(covData, N){
 
     if(is.null(colnames(covData)))
       stop("Check names of covariates in covData!")
+
+    if(binaryToNumeric){
+      for(k in 1:ncol(covData)){
+        if(class(covData[,k]) %in% c("factor","ordered","character")){
+          if(length(unique(covData[,k])) == 2){
+            covData[,k] <- as.numeric(as.factor(covData[,k]))
+          }
+        }
+      }
+    }
   }
   covData
 }

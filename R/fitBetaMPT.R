@@ -95,7 +95,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   N <- nrow(data)
 
   # covariate: reading + checking
-  covData <- covDataRead(covData, N)
+  covData <- covDataRead(covData, N, binaryToNumeric=TRUE)
   predType <- predTypeDefault(covData, predType=NULL)
   # get neat table and appropriate JAGS string
   covTmp1 <- covHandling(covData, covStructure, N, thetaNames, predType=predType, defaultExclude=NULL)
