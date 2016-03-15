@@ -35,5 +35,6 @@ readData  <- function(data){
   if(any(is.na(data))){
     stop("Missings in the data file!")
   }
+  colnames(data) <- gsub(" ", "", colnames(data), fixed=TRUE)
   data
 }

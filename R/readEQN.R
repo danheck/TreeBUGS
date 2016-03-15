@@ -38,7 +38,7 @@ readEQN <- function(file, restrictions=NULL, paramOrder = FALSE){
   # number of branches implied by number of rows in model file:
   numberOfBranches <- nrow(multiTreeDefinition)
   cols <- ncol(multiTreeDefinition)
-  Tree <- data.frame(Tree = multiTreeDefinition$V1,
+  Tree <- data.frame(Tree = paste0("T_",multiTreeDefinition$V1),
                      Category = multiTreeDefinition$V2,
                      Equation = multiTreeDefinition$V3)
   Tree$Equation <- apply(multiTreeDefinition[,3:cols, drop=FALSE], 1, paste0, collapse="")

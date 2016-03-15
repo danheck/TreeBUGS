@@ -53,11 +53,17 @@ getParameter<-function(TreeData){
 # #' @export
 readSubjectData<-function(data,Category){
 
-  if(sum(names(data) %in% Category)!=length(Category)){
+  sel <- Category %in% names(data)
+  sel2 <- names(data) %in% Category
+  if(sum(sel)!=length(Category)){
     if(dim(data)[2]!=length(Category)){
-      stop("Number of categories differs in eqn and csv file.")
+      stop("Number of categories (",length(Category),") in EQN differs from number of columns in data/csv file (",dim(data)[2], ").")
     }else{
-      stop("At least one name of the categories differs in eqn and csv file")
+      stop("The following category names are mismataching:\n",
+           "   EQN file: ",
+           paste( paste0("'",Category[!sel],"'"), collapse = "; "),
+           "\n   data column names: ",
+           paste( paste0("'",names(data)[!sel2], "'"), collapse = "; "))
     }
   }
 
