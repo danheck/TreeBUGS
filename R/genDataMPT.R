@@ -31,6 +31,8 @@ genMPT <- function(theta, numItems, eqnfile){
     warning("Tree labels for numitems are missing. Tree labels are assigned by default as:\n  ",
             paste(treeLabels, collapse=", "))
     names(numItems) <- treeLabels
+  }else{
+    names(numItems) <- paste0("T_", names(numItems))
   }
   checkThetaNames(theta, thetaNames)
   checkNumItems(numItems, treeLabels)

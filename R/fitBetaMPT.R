@@ -83,7 +83,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   mergedTree <- tHoutput$mergedTree
 
   thetaNames <- tHoutput[[1]][,1:2]
-  thetaUnique <- thetaNames$Parameter[as.numeric(rownames(unique(thetaNames[2])))]
+  thetaUnique <- thetaNames[rownames(unique(thetaNames[2])),]$Parameter
   S <- max(SubPar$theta)
   isIdentifiable(S, mergedTree)
 

@@ -180,6 +180,7 @@ callingSampler <- function(model,
                         method="parallel",
                         ...)
 
+
     if(!is.null(autojags)){
       cat("#####################################\n
 #### Autojags started. Might require some time
