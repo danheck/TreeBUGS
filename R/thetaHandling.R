@@ -8,7 +8,7 @@
 thetaHandling <-function(mergedTree, restrictions){
 
   mergedTree$Eqn <- mergedTree$Equation
-  Parameter=getParameter(mergedTree)
+  Parameter <- getParameter(mergedTree)
 
   SubPar <- data.frame(Parameter = Parameter,
                        theta = 1:length(Parameter),
@@ -26,12 +26,19 @@ thetaHandling <-function(mergedTree, restrictions){
       restrVector <- read.csv(restrictions, header=F,stringsAsFactors=F)$V1
       restrictions <- as.list(restrVector)
     }
-    restrVector <- gsub(" ", "", restrVector)
+    restrVector <- gsub(" ", "", restrVector, fixed = TRUE)
 
     for(k in 1:length(restrVector)){
       splitRestr <- strsplit(restrVector[k], "=")[[1]]
+      selFE <- splitRestr %in% c("FE", "FIXED_EFFECT")
       if(length(splitRestr) == 1){
         warning("Restriction not well defined: Equality sign '=' missing in:\n  ",splitRestr)
+
+      }else if(any(selFE)){
+        # fixed effect: negative index
+        index <- - match(splitRestr[!selFE], SubPar$Parameter)
+        SubPar[ - index, "theta"]<- index[1]
+
       }else{
         index <- match(splitRestr, SubPar$Parameter)
         suppressWarnings(consts <- as.numeric(splitRestr))
@@ -46,6 +53,7 @@ thetaHandling <-function(mergedTree, restrictions){
           }
           # replace index
           SubPar[index[2:length(index)], "theta"]<- index[1]
+
         }else if(sum(!is.na(consts)) == 1){
           # contrained to constant values
           CONST <- consts[!is.na(consts)]
@@ -63,6 +71,7 @@ thetaHandling <-function(mergedTree, restrictions){
   }
 
   isConstant <- SubPar$theta <= 0
+  isFE <-  SubPar$theta
 
   ############## replaced constant parameter values:
   if(sum(isConstant) > 0){
@@ -92,6 +101,14 @@ thetaHandling <-function(mergedTree, restrictions){
   ############## replaced constant parameter values:
   SubPar$sub <- paste0("theta[", SubPar$theta, ",n]")
   for(j in 1:nrow(SubPar)){
+    mergedTree$Equation <- gsub(
+      pattern = paste0("(^|\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\))",
+                       SubPar$Parameter[j],
+                       "(\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\)|$)"),
+      replacement = paste0("\\1",SubPar$sub[j],"\\2"),
+      mergedTree$Equation, perl=T)
+
+    # two times for special case that same parameter occurs twice directly after each other: u*u
     mergedTree$Equation <- gsub(
       pattern = paste0("(^|\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\))",
                        SubPar$Parameter[j],
