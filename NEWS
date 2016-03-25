@@ -1,3 +1,11 @@
+TreeBUGS 0.4.5 (March 2016)
+===========
+
+* Special case of a single hierarchical parameter in traitMPT()  [Wishart reduces to chi^2]
+* Allow fixed effect MPT parameters (e.g., a single guessing parameter for all participants). Specified in restrictions = list("g=FE")
+* Bayesian p-value in getGroupMeans() to test whether group mean differs from overall mean
+
+
 TreeBUGS 0.4.4 (March 2016)
 ===========
 

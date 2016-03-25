@@ -37,7 +37,7 @@ thetaHandling <-function(mergedTree, restrictions){
       }else if(any(selFE)){
         # fixed effect: negative index
         index <- - match(splitRestr[!selFE], SubPar$Parameter)
-        SubPar[ - index, "theta"]<- index[1]
+        SubPar[ - index, "theta"]<- index[1] - 1 # substract one to make it different from equality constraints
 
       }else{
         index <- match(splitRestr, SubPar$Parameter)
@@ -70,11 +70,11 @@ thetaHandling <-function(mergedTree, restrictions){
     }
   }
 
-  isConstant <- SubPar$theta <= 0
-  isFE <-  SubPar$theta
+  isConstant <- SubPar$theta <= 0 & SubPar$theta >= -1
+  isFE <-  SubPar$theta < -1
 
   ############## replaced constant parameter values:
-  if(sum(isConstant) > 0){
+  if(any(isConstant)){
     constants <- SubPar[isConstant,, drop=FALSE]
     SubPar <- SubPar[!isConstant,, drop=FALSE]
     constants$sub <- - constants$theta
@@ -87,11 +87,31 @@ thetaHandling <-function(mergedTree, restrictions){
         replacement = paste0("\\1",constants$sub[j],"\\2"),
         mergedTree$Equation, perl=T)
     }
-    #     }
   }else{
     constants <- NULL
   }
+  if(any(isFE)){
+    fixedPar <- SubPar[isFE,, drop=FALSE]
+    # fixedPar$theta <- - fixedPar$theta - 1
+    SubPar <- SubPar[!isFE,, drop=FALSE]
+    tmp <- unique(fixedPar$theta)
+    for(tt in 1:length(tmp)){
+      fixedPar$theta[fixedPar$theta == tmp[tt]] <- tt
+    }
+    fixedPar$sub <- paste0("thetaFE[", fixedPar$theta , "]")
 
+
+    for(j in 1:nrow(fixedPar)){
+      mergedTree$Equation <- gsub(
+        pattern = paste0("(^|\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\))",
+                         fixedPar$Parameter[j],
+                         "(\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\)|$)"),
+        replacement = paste0("\\1",fixedPar$sub[j],"\\2"),
+        mergedTree$Equation, perl=T)
+    }
+  } else{
+    fixedPar <- NULL
+  }
   # use new, increasing indices 1....S for parameters:
   tmp <- unique(SubPar$theta)
   for(tt in 1:length(tmp)){
@@ -118,7 +138,8 @@ thetaHandling <-function(mergedTree, restrictions){
   }
 
   output=list(SubPar = SubPar, mergedTree = mergedTree,
-              constants=constants, restrictions = restrictions)
+              constants=constants, fixedPar=fixedPar,
+              restrictions = restrictions)
 
   return(output)
 

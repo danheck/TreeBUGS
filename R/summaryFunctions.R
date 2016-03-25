@@ -49,6 +49,12 @@ summarizeMPT <- function(mcmc,
     correlation <- summ[selCov, , drop=FALSE]
   }else{correlation <- NULL}
 
+  selFE <- grep("thetaFE", rownames(summ))
+  if(length(selFE) != 0){
+    thetaFE <- summ[selFE, , drop=FALSE]
+    rownames(thetaFE) <- paste0("thetaFE_", mptInfo$thetaFixed)
+  }else{thetaFE <- NULL}
+
   ############################## BETA MPT SUMMARY
   if(model == "betaMPT"){
     # mean and individual parameter estimates
@@ -62,7 +68,7 @@ summarizeMPT <- function(mcmc,
     rownames(alpha) <-paste0("alpha_", uniqueNames)
     rownames(beta) <-paste0("beta_", uniqueNames)
 
-    groupParameters <- list(mean=mean, SD=SD, alpha=alpha, beta=beta, correlation=correlation)
+    groupParameters <- list(mean=mean, SD=SD, alpha=alpha, beta=beta, correlation=correlation, thetaFE=thetaFE)
 
   }else{
 
@@ -78,6 +84,7 @@ summarizeMPT <- function(mcmc,
                     paste0("rho[",uniqueNames[cnt],",",uniqueNames[(cnt+1):S],"]"))
       cnt <- cnt+1
     }
+    if(S == 1) rho <- matrix(1,1,1, dimnames=list(uniqueNames,uniqueNames))
 
     rownames(mu) <-paste0("latent_mu_", uniqueNames)
     rownames(mean) <-paste0("mean_", uniqueNames)
@@ -111,7 +118,8 @@ summarizeMPT <- function(mcmc,
     rho.matrix <- getRhoMatrix(uniqueNames, rho)
     groupParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho,
                             rho.matrix=rho.matrix,
-                            slope = slope, factor = factor, factorSD = factorSD, correlation=correlation)
+                            slope = slope, factor = factor, factorSD = factorSD,
+                            correlation=correlation, thetaFE=thetaFE)
   }
   theta.names <- apply(as.matrix(data.frame(lapply(expand.grid("theta[",1:S, ",",1:N,"]"), as.character))),
                        1, paste0, collapse="")
@@ -169,10 +177,14 @@ print.summary.betaMPT <- function(x,  ...){
     print(round(x$groupParameters$SD, x$round))
     cat("\nAlpha parameters of beta distributions:\n")
     print(round(x$groupParameters$alpha, x$round))
-    cat("\nBeta parameters of beta distributions:\n\n")
+    cat("\nBeta parameters of beta distributions:\n")
     print(round(x$groupParameters$beta, x$round))
+    if(!is.null(x$groupParameters$thetaFE)){
+      cat("\nFixed effects MPT parameters (= identical for all subjects):\n")
+      print(round(x$groupParameters$thetaFE, x$round))
+    }
 
-    cat("\n##############\n",
+    cat("\n\n##############\n",
         "Overall model fit statistics (T1: Posterior predictive check):\n")
     if(!is.null(x$dic)){
       print(x$dic)
@@ -212,10 +224,17 @@ print.summary.traitMPT <- function(x,  ...){
     print(round(x$groupParameters$mu, x$round))
     cat("\nStandard deviation of latent-trait values (probit scale) across individuals:\n")
     print(round(x$groupParameters$sigma, x$round))
-    cat("\nCorrelations of latent-trait values on probit scale:\n")
-    print(round(x$groupParameters$rho, x$round))
-    cat("\nCorrelations (posterior mean estimates) in matrix form:\n")
-    print(round(x$groupParameters$rho.matrix, x$round))
+    if(!is.null(x$groupParameters$thetaFE)){
+      cat("\nFixed effects MPT parameters (= identical for all subjects):\n")
+      print(round(x$groupParameters$thetaFE, x$round))
+    }
+
+    if(nrow(x$groupParameters$rho.matrix) != 1){
+      cat("\nCorrelations of latent-trait values on probit scale:\n")
+      print(round(x$groupParameters$rho, x$round))
+      cat("\nCorrelations (posterior mean estimates) in matrix form:\n")
+      print(round(x$groupParameters$rho.matrix, x$round))
+    }
 
     cat("\n##############\n",
         "Overall model fit statistics (T1: Posterior predictive check):\n")

@@ -27,11 +27,13 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
   }
   S <- length(uniqueNames)
 
-  summaryMat <- matrix(NA,0, 5)
+  summaryMat <- matrix(NA,0, 6)
   cnt <- 0
+
   for(s in 1:S){
     # parameter s of S
-    select <- grep(paste0("mu[",s,"]"), varnames(traitMPT$runjags$mcmc), fixed=TRUE)
+    select <- grep(paste0("mu",ifelse(S==1, "",paste0("[",s,"]"))),
+                   varnames(traitMPT$runjags$mcmc), fixed=TRUE)
     muPosterior <- do.call("rbind", traitMPT$runjags$mcmc[,select]) #traitMPT$mcmc$BUGSoutput$sims.list[["mu"]][,s,drop=FALSE]
 
     # select only relevant predictors
@@ -51,8 +53,9 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
       for(j in 1:length(factors)){
         parnam <- as.character(subset(predTable, predTable$Covariate == factors[j])[,"covPar"])
         if(length(facLevelNames[[factors[j]]]) >1)
-           parnam <- paste0(parnam, "[",1:length(facLevelNames[[factors[j]]]),"]")
-        facPosterior[[j]] <- do.call("rbind", traitMPT$runjags$mcmc[,parnam])
+           grep.est <- setdiff(grep(parnam, varnames(traitMPT$runjags$mcmc)),
+                               grep("SD_", varnames(traitMPT$runjags$mcmc)))#paste0(parnam, "[",1:length(facLevelNames[[factors[j]]]),"]")
+        facPosterior[[j]] <- do.call("rbind", traitMPT$runjags$mcmc[,grep.est])
         #traitMPT$mcmc$BUGSoutput$sims.list[[parnam, drop=FALSE]]
         colnames(facPosterior[[j]]) <-  facLevelNames[[factors[j]]]
       }
@@ -63,11 +66,19 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
         for(j in 1:ncol(combinations)){
           samples <- samples + facPosterior[[j]][,combinations[i,j]]
         }
-        if(!probit)
+        if(mean(samples) > mean(muPosterior)){
+          pval <- mean(samples < muPosterior)
+        }else{
+          pval <- mean(samples > muPosterior)
+        }
+        if(!probit){
           samples <- pnorm(samples)
+        }
+
 
         summaryMat <- rbind(summaryMat, c(Mean = mean(samples), SD = sd(samples),
-                                          quantile(samples, c(.025,.5,.975))))
+                                          quantile(samples, c(.025,.5,.975)),
+                                          "p(one-sided vs. overall)"= pval))
         rownames(summaryMat)[cnt <- cnt+1] <- paste0(uniqueNames[s],"_", paste0(paste0(
                                          colnames(combinations), "[",combNames[i,], "]"), collapse="_"))
 

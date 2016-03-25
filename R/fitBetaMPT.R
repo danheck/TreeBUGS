@@ -4,7 +4,7 @@
 #'
 #' @param eqnfile The (full path to the) file that specifies the MPT model (standard .eqn syntax)
 #' @param data The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)
-#' @param restrictions  Optional: Either the (full path to the) file that specifies which parameters should be constants and which should be equal; alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
+#' @param restrictions  Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
 #' @param covData The path to the csv data file for the individual values on the covariates (comma-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)
 #' @param covStructure  Optional: Which correlations to compute? Either the (full path to the) file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Default: All continuous variables in covData included.
 #' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
@@ -81,6 +81,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   tHoutput <- thetaHandling(mergedTree,restrictions)
   SubPar <- tHoutput$SubPar
   mergedTree <- tHoutput$mergedTree
+  fixedPar <- tHoutput$fixedPar
 
   thetaNames <- tHoutput[[1]][,1:2]
   thetaUnique <- thetaNames[rownames(unique(thetaNames[2])),]$Parameter
@@ -121,7 +122,8 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                 hyperprior = list(alpha=alpha, beta = beta),
                 corString = corString,
                 parString = transformedPar$modelstring,
-                groupMatT1=groupT1$groupMatT1)
+                groupMatT1=groupT1$groupMatT1,
+                fixedPar=fixedPar)
 
   time0 <- Sys.time()
   cat("MCMC sampling started at ", format(time0), "\n")
@@ -130,6 +132,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                          data = data,
                          modelfile = modelfilename,
                          S = max(SubPar$theta),
+                         fixedPar=fixedPar,
                          transformedPar = transformedPar$transformedParameters,
                          covPars = covPars,
                          covData = covData,
@@ -149,6 +152,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   mptInfo <- list(model="betaMPT",
                   thetaNames = thetaNames,
                   thetaUnique = thetaUnique,
+                  thetaFixed = unique(fixedPar$Parameter),
                   MPT=mergedTree,
                   eqnfile = eqnfile,
                   data = data,

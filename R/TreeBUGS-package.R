@@ -8,7 +8,7 @@
 #' @author Daniel Heck, Denis Arnold, & Nina Arnold
 #' @docType package
 #' @name TreeBUGS
-#' @importFrom runjags run.jags extract autoextend.jags
+#' @importFrom runjags run.jags extract autoextend.jags extend.jags
 #run.jags  summary.runjags extract autorun.jags autoextend.jags
 #' @importFrom coda gelman.diag effectiveSize
 #' @importFrom utils read.csv write.table

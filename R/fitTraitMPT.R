@@ -83,6 +83,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   tHoutput <- thetaHandling(mergedTree,restrictions)
   SubPar <- tHoutput$SubPar
   mergedTree <- tHoutput$mergedTree
+  fixedPar <- tHoutput$fixedPar
 
   thetaNames <- SubPar[,1:2]
   thetaUnique <- thetaNames[rownames(unique(thetaNames[2])),]$Parameter
@@ -145,7 +146,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                 predString = predString,
                 corString = corString,
                 parString=transformedPar$modelstring,
-                groupMatT1=groupT1$groupMatT1)
+                groupMatT1=groupT1$groupMatT1,
+                fixedPar=fixedPar)
 
   time0 <- Sys.time()
   cat("MCMC sampling started at ", format(time0), "\n")
@@ -154,6 +156,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          data = data,
                          modelfile = modelfilename,
                          S = max(SubPar$theta),
+                         fixedPar=fixedPar,
                          transformedPar = transformedPar$transformedParameters,
                          covPars=c(corPars, predPars),
                          covData=covData,
@@ -183,6 +186,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   mptInfo <- list(model="traitMPT",
                   thetaNames = thetaNames,
                   thetaUnique = thetaUnique,
+                  thetaFixed = fixedPar$Parameter[!duplicated(fixedPar$theta)],
                   MPT=mergedTree,
                   eqnfile=eqnfile,
                   data=data,

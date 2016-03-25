@@ -22,6 +22,7 @@ callingSampler <- function(model,
                            data,
                            modelfile,
                            S,
+                           fixedPar=NULL,
                            transformedPar=NULL,
                            covPars=NULL,
                            covData=NULL,
@@ -44,6 +45,9 @@ callingSampler <- function(model,
     parameters <- list("theta", "alph","bet", "mean", "sd")
   }else{
     parameters <- list("theta", "mu", "mean", "rho", "sigma")
+  }
+  if(!is.null(fixedPar)){
+    parameters <- c(parameters, "thetaFE")
   }
 
   responses <- data
@@ -144,7 +148,7 @@ callingSampler <- function(model,
     }else{
       inits <- function() list("delta.part.raw" = matrix(rnorm(subjs*S, 0,1), S, subjs),
                                "xi"=runif(S,2/3,3/2), "mu" = rnorm(S, 0, .5),
-                               "T.prec.part" = rWishart(1,2*df,V)[,,1]
+                               "T.prec.part" = as.matrix(rWishart(1,2*df,V)[,,1])
                                )
     }
     inits.list <- replicate(n.chains, inits(), simplify=FALSE)

@@ -16,7 +16,8 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
                          corString=NULL,   # model string to compute correlations
                          predString=NULL,  # model string to include predictors (in traitMPT)
                          parString="",
-                         groupMatT1=NULL    # a G x 2 matrix that contains the grouping indices for T1 per group (column 1:2 = from:to)
+                         groupMatT1=NULL,    # a G x 2 matrix that contains the grouping indices for T1 per group (column 1:2 = from:to)
+                         fixedPar=NULL
                          ){
 
   treeNames <- as.character(sort(unique(mergedTree$Tree)))
@@ -63,7 +64,12 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 	                                                     xi = hyperprior$xi)
 	)
 
-	cat(hyperprior, file=filename, append=T)
+	cat(hyperprior, file=filename, append=TRUE)
+	if(! is.null(fixedPar)){
+	  S.fixed <- length(unique(fixedPar$theta))
+	  cat("\nfor(i in 1:", S.fixed,"){\n",
+	      "      thetaFE[i] ~ dunif(0,1)\n}\n", file=filename, append=TRUE)
+	}
 
 	######################################### END OF MODEL SPECIFIC HYPERPRIOR PART ##########################
 
@@ -278,9 +284,15 @@ for(i in 1:subjs) {
   delta.part.raw[1:S,i] ~ dmnorm(mu.delta.raw[1:S],T.prec.part[1:S,1:S])
 }
 
-T.prec.part[1:S,1:S] ~ dwish(V, df)
-Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
+",
+######################## special case if S=1:
+ifelse(S>1,"
+T.prec.part[1:S,1:S] ~ dwish(V, df)",
+       "
+T.prec.part[1,1] ~ dchisq(df)"),
 
+"
+Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
 
 for(s in 1:S){
   mu.delta.raw[s] <- 0
