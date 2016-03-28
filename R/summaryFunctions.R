@@ -21,7 +21,7 @@
 summarizeMPT <- function(mcmc,
                          mptInfo,
                          summ = NULL
-                         ){
+){
   if(is.null(summ))
     summ <- summarizeMCMC(mcmc)
 
@@ -68,7 +68,12 @@ summarizeMPT <- function(mcmc,
     rownames(alpha) <-paste0("alpha_", uniqueNames)
     rownames(beta) <-paste0("beta_", uniqueNames)
 
-    groupParameters <- list(mean=mean, SD=SD, alpha=alpha, beta=beta, correlation=correlation, thetaFE=thetaFE)
+    rho <- getRhoBeta(uniqueNames, mcmc, corProbit=mptInfo$corProbit)
+    rho.matrix <- getRhoMatrix(uniqueNames, rho)
+
+    groupParameters <- list(mean=mean, SD=SD, alpha=alpha, beta=beta,
+                            rho=rho, rho.matrix = rho.matrix,
+                            correlation=correlation, thetaFE=thetaFE)
 
   }else{
 
@@ -145,10 +150,10 @@ summarizeMPT <- function(mcmc,
                       "T1.predicted"=summ["T1.pred","Mean"],
                       "p.T1"=summ["p.T1","Mean"]),
                     "p.T1.individual"=summ[paste0("p.T1ind[",1:N,"]"),"Mean"], #mcmc$BUGSoutput$mean$p.T1ind),
-                  transformedParameters=transPar))
+                    transformedParameters=transPar))
   selT1group <- grep("p.T1.group", rownames(summ))
   if(length(selT1group) != 0){
-  # if(!is.null(mcmc$BUGSoutput$mean$p.T1.group)){
+    # if(!is.null(mcmc$BUGSoutput$mean$p.T1.group)){
     summary$fitStatistics$p.T1.group <- rbind(N_per_group=NgroupT1,
                                               p.T1.group=summ[selT1group,"Mean"])
     # colnames(summary$p.T1.individual) <- names(NgroupT1)
@@ -286,7 +291,7 @@ summary.traitMPT <- function(object, round=3, ...){
   summ <- object$summary
   summ$call <- object$call
   summ$round <- round
-#   class(summ) <- "summary.traitMPT"
+  #   class(summ) <- "summary.traitMPT"
   return(summ)
 }
 
@@ -295,8 +300,8 @@ print.betaMPT <- function(x,  ...){
   cat("Call: \n")
   print(x$call)
   cat("\n")
-    print(round(cbind("Group Mean" = x$summary$groupParameters$mean[,1],
-                      "Group SD" = x$summary$groupParameters$SD[,1]),4))
+  print(round(cbind("Group Mean" = x$summary$groupParameters$mean[,1],
+                    "Group SD" = x$summary$groupParameters$SD[,1]),4))
 
   cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
 }
@@ -306,18 +311,41 @@ print.traitMPT <- function(x,  ...){
   cat("Call: \n")
   print(x$call)
   cat("\n")
-#   if(!x$sampler %in% c("jags", "JAGS")){
-#     warning("\nClean MPT summary only available when fitting with JAGS.")
-#   }else{
-    print(round(cbind("Mean(MPT Parameters)" = x$summary$groupParameters$mean[,1],
-                      "Mu(latent-traits)" = x$summary$groupParameters$mu[,1],
-                      "SD(latent-traits)" = x$summary$groupParameters$sigma[,1]),4))
+  #   if(!x$sampler %in% c("jags", "JAGS")){
+  #     warning("\nClean MPT summary only available when fitting with JAGS.")
+  #   }else{
+  print(round(cbind("Mean(MPT Parameters)" = x$summary$groupParameters$mean[,1],
+                    "Mu(latent-traits)" = x$summary$groupParameters$mu[,1],
+                    "SD(latent-traits)" = x$summary$groupParameters$sigma[,1]),4))
 
   cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
 }
 
 
 
+getRhoBeta <- function(uniqueNames, mcmc, corProbit=FALSE){
+  S <- length(uniqueNames)
+  if(S == 1){
+    return(NULL)
+  }
+
+  nams <- varnames(mcmc)
+  sel <- grep("theta[", nams, fixed=TRUE)
+  rho <- sapply(mcmc , simplify=FALSE,
+                function(mmm){
+                  cor.mat <- t(apply(mmm[,sel], 1,
+                                     function(theta){
+                                       if(corProbit) theta <- qnorm(theta)
+                                       cor(matrix(theta, ncol=S, byrow = TRUE))
+                                     }))
+                  colnames(cor.mat) <- apply(expand.grid("rho[",1:S,",",1:S,"]"),1,paste0, collapse="")
+                  as.mcmc(cor.mat)
+                })
+  summ <- summarizeMCMC(as.mcmc.list(rho))
+  rownames(summ) <- paste0("rho[",apply(expand.grid(uniqueNames,uniqueNames), 1, paste0, collapse=","),"]")
+  summ[! duplicated(summ[,"Mean"]) & summ[,"Mean"] != 1,, drop=FALSE]
+
+}
 
 
 getRhoMatrix <- function (uniqueNames, rho) {
@@ -373,8 +401,8 @@ summarizeMCMC <- function(mcmc){
       summTab[sel.notT1,8:9] <- gelman.diag(mcmc[,sel.notT1], multivariate=FALSE)[[1]]
     }
   })
-#   if(any(is.na(summTab[,"Rhat"])))
-#     warning("Gelman-Rubin convergence diagnostic Rhat could not be computed.")
+  #   if(any(is.na(summTab[,"Rhat"])))
+  #     warning("Gelman-Rubin convergence diagnostic Rhat could not be computed.")
   # n.eff <-
   gc(verbose=FALSE)
 

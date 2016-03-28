@@ -10,7 +10,7 @@
 #' @name TreeBUGS
 #' @importFrom runjags run.jags extract autoextend.jags extend.jags
 #run.jags  summary.runjags extract autorun.jags autoextend.jags
-#' @importFrom coda gelman.diag effectiveSize
+#' @importFrom coda gelman.diag effectiveSize as.mcmc.list as.mcmc
 #' @importFrom utils read.csv write.table
 #' @importFrom graphics axis plot points  segments abline boxplot curve hist lines par
 #' @importFrom grDevices rainbow
