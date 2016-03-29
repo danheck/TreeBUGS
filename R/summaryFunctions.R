@@ -323,7 +323,7 @@ print.traitMPT <- function(x,  ...){
 
 
 
-getRhoBeta <- function(uniqueNames, mcmc, corProbit=FALSE){
+getRhoBeta <- function(uniqueNames, mcmc, corProbit=FALSE, truncation=5){
   S <- length(uniqueNames)
   if(S == 1){
     return(NULL)
@@ -335,7 +335,11 @@ getRhoBeta <- function(uniqueNames, mcmc, corProbit=FALSE){
                 function(mmm){
                   cor.mat <- t(apply(mmm[,sel], 1,
                                      function(theta){
-                                       if(corProbit) theta <- qnorm(theta)
+                                       if(corProbit){
+                                         theta <- qnorm(theta)
+                                         theta[theta < -truncation] <- -truncation
+                                         theta[theta > truncation] <- truncation
+                                       }
                                        cor(matrix(theta, ncol=S, byrow = TRUE))
                                      }))
                   colnames(cor.mat) <- apply(expand.grid("rho[",1:S,",",1:S,"]"),1,paste0, collapse="")
