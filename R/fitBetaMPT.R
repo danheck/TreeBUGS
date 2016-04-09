@@ -12,7 +12,7 @@
 #'        Default is to write this information to the tempdir as required by CRAN standards.
 #' @param T1group a name of the factor or character variable in covData that is used to compute the T1 statistic separately per group (e.g., per experimental condition)
 #' @param corProbit whether to use probit-transformed MPT parameters to compute correlations. Default for beta-MPT: MPT parameters are used on the probability scale [0,1]
-#' @param alpha Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).
+#' @param alpha Hyperprior for the alpha and beta parameters in JAGS syntax (default: uniform prior on the interval [1,5000] for all parameters). A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).
 #' @param beta Second hyperprior, see \code{alpha}
 #' @param parEstFile Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")
 #' @param n.iter Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.

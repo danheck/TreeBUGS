@@ -245,6 +245,20 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 makeBetaHyperprior <-function(S,
                               alpha = "dunif(1,5000)",
                               beta = "dunif(1,5000)"){
+
+  if(class(alpha) != "character" || !length(alpha) %in% c(1,S)){
+    stop("Hyperprior for 'alpha' must be a character vector of length 1
+     if the same prior should be used for all MPT parameters (default)
+     or a vector of the same length as the number of parameters (=", S, "; to
+     check the order see ?readEQN).")
+  }
+  if(class(beta) != "character" || !length(beta) %in% c(1,S)){
+    stop("Hyperprior for 'beta' must be a character vector of length 1
+     if the same prior should be used for all MPT parameters (default)
+     or a vector of the same length as the number of parameters (=", S, "; to
+     check the order see ?readEQN).")
+  }
+
   modelString <- paste0("
 
 for(s in 1:S){
@@ -253,18 +267,16 @@ for(s in 1:S){
   }
 }
 
-for(s in 1:S){",
-
-# ifelse(sampler%in%c("openbugs","OpenBUGS","winbugs","WinBUGS"),
-#        "\nzero[s] <- 0", "\n"),
-"
-  zero[s] ~dpois(phi[s])
-  phi[s] <- -log(1/pow(alph[s]+bet[s],5/2))
-  alph[s] ~",alpha,"
-  bet[s] ~",beta,"
-  mean[s] <- alph[s]/(alph[s]+bet[s])
+for(s in 1:S){
+",
+  # WinBUGS: zero[s] ~dpois(phi[s])
+  # WinBUGS: phi[s] <- -log(1/pow(alph[s]+bet[s],5/2))
+"  mean[s] <- alph[s]/(alph[s]+bet[s])
   sd[s] <- sqrt(alph[s]*bet[s]/(pow(alph[s]+bet[s],2)*(alph[s]+bet[s]+1)))
 }
+",
+paste0("\nalph[", 1:S, "] ~ ", alpha, collapse = ""),
+paste0("\nbet[", 1:S, "] ~ ", beta, collapse = ""),"
 
 ")
 
@@ -277,6 +289,20 @@ makeTraitHyperprior <-function(S,
                                predString,
                                mu = "dnorm(0,1)",
                                xi = "dunif(0,100)"){
+
+  if(class(mu) != "character" || !length(mu) %in% c(1,S)){
+    stop("Hyperprior for 'mu' must be a character vector of length 1
+     if the same prior should be used for all MPT parameters (default)
+     or a vector of the same length as the number of parameters (=", S, "; to
+     check the order see ?readEQN).")
+  }
+  if(class(xi) != "character" || !length(xi) %in% c(1,S)){
+    stop("Hyperprior for 'xi' must be a character vector of length 1
+     if the same prior should be used for all MPT parameters (default)
+     or a vector of the same length as the number of parameters (=", S, "; to
+     check the order see ?readEQN).")
+  }
+
   modelString <- paste0(predString, "
 
 # hyperpriors
@@ -296,9 +322,7 @@ Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
 
 for(s in 1:S){
   mu.delta.raw[s] <- 0
-  mu[s] ~ ", mu, "
   mean[s] <- phi(mu[s])
-  xi[s] ~ ", xi, "
   for(q in 1:S){
     # Off-diagonal elements of S (correlations not affected by xi)
     rho[s,q] <- Sigma.raw[s,q]/sqrt(Sigma.raw[s,s]*Sigma.raw[q,q])
@@ -306,6 +330,10 @@ for(s in 1:S){
   # Diagonal elements of S (rescale sigma)
   sigma[s] <- xi[s]*sqrt(Sigma.raw[s,s])
 }
+",
+paste0("\nmu[", 1:S, "] ~ ", mu, collapse = ""),
+paste0("\nxi[", 1:S, "] ~ ", xi, collapse = ""),"
+
 ")
 
 

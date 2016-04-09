@@ -1,3 +1,9 @@
+TreeBUGS 0.4.6 (April 2016)
+===========
+
+* Parameter-specific hyperpriors for betaMPT (alpha and beta) and traitMPT (mu and xi)
+
+
 TreeBUGS 0.4.5 (March 2016)
 ===========
 

@@ -27,7 +27,7 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
 
 \item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations. Default for beta-MPT: MPT parameters are used on the probability scale [0,1]}
 
-\item{alpha}{Hyperprior of for the alpha and beta parameters (default: uniform prior on the interval [1,5000]).}
+\item{alpha}{Hyperprior for the alpha and beta parameters in JAGS syntax (default: uniform prior on the interval [1,5000] for all parameters). A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).}
 
 \item{beta}{Second hyperprior, see \code{alpha}}
 
