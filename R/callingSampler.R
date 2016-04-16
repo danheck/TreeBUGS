@@ -115,7 +115,7 @@ callingSampler <- function(model,
 
     if(length(X_list) != 0){
       for(pp in 1:length(X_list))
-          assign(names(X_list)[pp], X_list[[pp]])
+        assign(names(X_list)[pp], X_list[[pp]])
       data <- c(data, names(X_list))
     }
   }
@@ -129,73 +129,95 @@ callingSampler <- function(model,
   }
 
   # call Sampler
-    parametervector=c(unlist(parameters),
-                      "T1.obs","T1.pred","p.T1","p.T1ind",
-                      transformedPar, covPars)
+  parametervector=c(unlist(parameters),
+                    "T1.obs","T1.pred","p.T1","p.T1ind",
+                    transformedPar, covPars)
 
-    if(!is.null(groupT1)){
-      groupMatT1 <- groupT1$groupMatT1
-      NgroupT1 <- groupT1$NgroupT1
-      data <- c(data, "groupMatT1", "NgroupT1")
-      parametervector <- c(parametervector, "T1.group.obs", "T1.group.pred", "p.T1.group",
-                           paste0("group.resp.",treeNames, ".pred.mean"))
+  if(!is.null(groupT1)){
+    groupMatT1 <- groupT1$groupMatT1
+    NgroupT1 <- groupT1$NgroupT1
+    data <- c(data, "groupMatT1", "NgroupT1")
+    parametervector <- c(parametervector, "T1.group.obs", "T1.group.pred", "p.T1.group",
+                         paste0("group.resp.",treeNames, ".pred.mean"))
+  }
+
+  # random initial values: required (otherwise T1 statistic results in errors: no variance!)
+  if(model == "betaMPT"){
+    inits <- function() list("theta"=matrix(runif(subjs*S), S, subjs)
+    )
+  }else{
+    # draw appropriate random starting values:
+    mu <- xi <- rep(NA, S)
+    for(s in 1:S){
+      tmp <- ifelse(length(hyperpriors$mu)<=1,hyperpriors$mu[1],hyperpriors$mu[s])
+      mu[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
+      tmp <- ifelse(length(hyperpriors$xi)<=1,hyperpriors$xi[1],hyperpriors$xi[s])
+      xi[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
     }
 
-    # random initial values: required (otherwise T1 statistic results in errors: no variance!)
-    if(model == "betaMPT"){
-      inits <- function() list("theta"=matrix(runif(subjs*S), S, subjs)
-                               )
-    }else{
-      inits <- function() list("delta.part.raw" = matrix(rnorm(subjs*S, 0,1), S, subjs),
-                               "xi"=runif(S,2/3,3/2), "mu" = rnorm(S, 0, .5),
-                               "T.prec.part" = as.matrix(rWishart(1,2*df,V)[,,1])
-                               )
-    }
-    inits.list <- replicate(n.chains, inits(), simplify=FALSE)
-    for(i in 1:length(inits.list))
-      inits.list[[i]]$.RNG.name <- c("base::Wichmann-Hill",
-                                     "base::Marsaglia-Multicarry",
-                                     "base::Super-Duper",
-                                     "base::Mersenne-Twister")[1+ (i-1)%% 4]
-#         samples2 <- jags.parallel(data,
-#                             inits=inits,
-#                             parameters.to.save=parametervector,
-#                             model.file = modelfile,
-#                             n.iter=n.iter,
-#                             n.burnin=n.burnin,
-#                             n.chains=n.chains,
-#                             DIC=T,
-#                             envir=environment(),
-#                             ...)
-
-    data.list <-  lapply(data, get, envir=environment())
-    names(data.list) <- data
-    samples <- run.jags(model = modelfile,
-                        monitor=parametervector,
-                        data=data.list,
-                        n.chains=n.chains,
-                        inits=inits.list,
-                        burnin=n.burnin,
-                        adapt=n.adapt,
-                        sample=ceiling((n.iter-n.burnin)/n.thin),
-                        thin=n.thin,
-                        modules=c("dic","glm"),
-                        summarise=FALSE,
-                        method="parallel",
-                        ...)
+    inits <- function() list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
+                             "xi"=xi,  "mu" = mu,
+                             "T.prec.part" = as.matrix(rWishart(1,df,V)[,,1])
+    )
+  }
+  inits.list <- replicate(n.chains, inits(), simplify=FALSE)
+  for(i in 1:length(inits.list))
+    inits.list[[i]]$.RNG.name <- c("base::Wichmann-Hill",
+                                   "base::Marsaglia-Multicarry",
+                                   "base::Super-Duper",
+                                   "base::Mersenne-Twister")[1+ (i-1)%% 4]
+  #         samples2 <- jags.parallel(data,
+  #                             inits=inits,
+  #                             parameters.to.save=parametervector,
+  #                             model.file = modelfile,
+  #                             n.iter=n.iter,
+  #                             n.burnin=n.burnin,
+  #                             n.chains=n.chains,
+  #                             DIC=T,
+  #                             envir=environment(),
+  #                             ...)
+  n.samples <- ceiling((n.iter-n.burnin)/n.thin)
+  choice <- ""
+  if(n.samples > 10000){
+    choice <- readline(prompt =
+                         paste0("\n############ Warning ################\n",
+                                "Your present MCMC settings for n.burnin/n.iter/n.thin\n",
+                                "imply that more than 10,000 samples are stored per parameter per chain.\n",
+                                "This might result in problems due to an overload of your computers memory (RAM).\n",
+                                "If you are sure you want to continue, press <RETURN>."))
+  }
+  if(choice != "")
+    stop("Model fitting terminated by user.")
 
 
-    if(!is.null(autojags)){
-      cat("#####################################\n
-#### Autojags started. Might require some time
-#### (use max.time to adjust maximum time for updating). See ?autoextend.jags\n
-#####################################\n")
-#       recompile(samples, n.iter=n.iter)
-#       samples <- autojags(samples, n.update = n.update)
-      samples <- do.call(autoextend.jags, c(list(runjags.object = samples,
-                                                 summarise=FALSE),
-                                            autojags))  # additional user arguments
-    }
+  data.list <-  lapply(data, get, envir=environment())
+  names(data.list) <- data
+  samples <- run.jags(model = modelfile,
+                      monitor=parametervector,
+                      data=data.list,
+                      n.chains=n.chains,
+                      inits=inits.list,
+                      burnin=n.burnin,
+                      adapt=n.adapt,
+                      sample=n.samples,
+                      thin=n.thin,
+                      modules=c("dic","glm"),
+                      summarise=FALSE,
+                      method="parallel",
+                      ...)
+
+
+  if(!is.null(autojags)){
+    cat("#####################################\n
+        #### Autojags started. Might require some time
+        #### (use max.time to adjust maximum time for updating). See ?autoextend.jags\n
+        #####################################\n")
+    #       recompile(samples, n.iter=n.iter)
+    #       samples <- autojags(samples, n.update = n.update)
+    samples <- do.call(autoextend.jags, c(list(runjags.object = samples,
+                                               summarise=FALSE),
+                                          autojags))  # additional user arguments
+  }
 
   return(samples)   # own summary
 }

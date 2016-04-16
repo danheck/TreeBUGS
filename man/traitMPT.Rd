@@ -6,7 +6,7 @@
 \usage{
 traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
   predType, transformedParameters, T1group, corProbit = TRUE,
-  mu = "dnorm(0,1)", xi = "dunif(0,100)", V, df, IVprec = "dchisq(1)",
+  mu = "dnorm(0,1)", xi = "dunif(0,10)", V, df, IVprec = "dchisq(1)",
   n.iter = 20000, n.adapt = 2000, n.burnin = 2000, n.thin = 5,
   n.chains = 3, dic = FALSE, modelfilename, parEstFile, autojags = NULL,
   ...)
@@ -34,7 +34,7 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
 
 \item{mu}{hyperprior for group means of probit-transformed parameters in JAGS syntax. Default is a standard normal distribution, which implies a uniform distribution on the MPT probability parameters. A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).}
 
-\item{xi}{hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,100]. Similarly as for \code{mu}, a vector of different priors can be used.}
+\item{xi}{hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,10]. Similarly as for \code{mu}, a vector of different priors can be used. Less informative priors can be used (e.g., \code{"dunif(0,100)")}) but might result in reduced stability.}
 
 \item{V}{S x S matrix used as a hyperprior for the inverse-Wishart hyperprior parameters with as many rows and columns as there are core MPT parameters. Default is a diagonal matrix.}
 

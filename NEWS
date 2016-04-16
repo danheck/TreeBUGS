@@ -1,3 +1,10 @@
+TreeBUGS 0.4.7 (April 2016)
+===========
+
+* New function plotPriorPost() to compare prior vs. posterior densities
+* Default prior for traitMPT changed to xi="dunif(0,10)" for stability
+
+
 TreeBUGS 0.4.6 (April 2016)
 ===========
 

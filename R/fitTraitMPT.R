@@ -7,7 +7,7 @@
 #' @param predType a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.
 #' @param corProbit whether to use probit-transformed MPT parameters to compute correlations (the default for trait-MPT)
 #' @param mu hyperprior for group means of probit-transformed parameters in JAGS syntax. Default is a standard normal distribution, which implies a uniform distribution on the MPT probability parameters. A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).
-#' @param xi hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,100]. Similarly as for \code{mu}, a vector of different priors can be used.
+#' @param xi hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,10]. Similarly as for \code{mu}, a vector of different priors can be used. Less informative priors can be used (e.g., \code{"dunif(0,100)")}) but might result in reduced stability.
 #' @param V  S x S matrix used as a hyperprior for the inverse-Wishart hyperprior parameters with as many rows and columns as there are core MPT parameters. Default is a diagonal matrix.
 #' @param df degrees of freedom for the inverse-Wishart hyperprior for the individual parameters. Minimum is S+1, where S gives the number of core MPT parameters.
 #'
@@ -42,7 +42,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
 
                     # hyperpriors:
                     mu = "dnorm(0,1)",
-                    xi = "dunif(0,100)",
+                    xi = "dunif(0,10)",
                     V,
                     df,
                     IVprec = "dchisq(1)",  # change to "dcat(1)" to set beta ~ dnorm(0,1)
@@ -162,7 +162,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          covData=covData,
                          X_list=predTmp2$X_list,
                          groupT1=groupT1,
-                         hyperpriors = list(V=V, df=df),
+                         hyperpriors = list(V=V, df=df, mu = mu, xi = xi),
                          n.iter = n.iter,
                          n.adapt = n.adapt,
                          n.burnin = n.burnin,
@@ -197,7 +197,8 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                   predTable=predTable,
                   predFactorLevels=predFactorLevels,
                   transformedParameters=transformedPar$transformedParameters,
-                  T1group=groupT1)
+                  T1group=groupT1,
+                  hyperprior=list(mu=mu, xi=xi, V=V, df=df, IVprec=IVprec))
 
   # own summary (more stable than runjags)
   mcmc.summ <- summarizeMCMC(runjags$mcmc)

@@ -161,7 +161,8 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                   covTable=covTable,
                   corProbit=corProbit,
                   transformedParameters=transformedPar$transformedParameters,
-                  T1group=groupT1)
+                  T1group=groupT1,
+                  hyperprior=list(alpha=alpha, beta=beta))
 
 
   # own summary (more stable than runjags)
