@@ -242,18 +242,18 @@ print.summary.traitMPT <- function(x,  ...){
       print(round(x$groupParameters$rho.matrix, x$round))
     }
 
-    cat("\n##############\n",
-        "Overall model fit statistics (T1: Posterior predictive check):\n")
-    if(!is.null(x$dic)){
-      print(x$dic)
-    }
-    print(round(x$fitStatistics$overall, x$round))
-    cat("\nPoster predictive p-values for participants:\n")
-    print(round(x$fitStatistics$p.T1.individual, x$round))
-    if(!is.null(x$fitStatistics$p.T1.group)){
-      cat("\nPoster predictive p-values per group:\n")
-      print(round(x$fitStatistics$p.T1.group, x$round))
-    }
+    # cat("\n##############\n",
+    #     "Overall model fit statistics (T1: Posterior predictive check):\n")
+    # if(!is.null(x$dic)){
+    #   print(x$dic)
+    # }
+    # print(round(x$fitStatistics$overall, x$round))
+    # cat("\nPoster predictive p-values for participants:\n")
+    # print(round(x$fitStatistics$p.T1.individual, x$round))
+    # if(!is.null(x$fitStatistics$p.T1.group)){
+    #   cat("\nPoster predictive p-values per group:\n")
+    #   print(round(x$fitStatistics$p.T1.group, x$round))
+    # }
     if(!is.null(x$transformedParameters)){
       cat("\nTransformed parameters:\n")
       print(round(x$transformedParameters, x$round))

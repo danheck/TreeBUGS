@@ -33,7 +33,7 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
     aa <- eval(parse(text=hyp.eval[[1]][s]))
     bb <- eval(parse(text=hyp.eval[[2]][s]))
 
-    if(fittedModel$mptInfo$model == "betaMPTb"){
+    if(fittedModel$mptInfo$model == "betaMPT"){
       # formulas for mean and SD of beta distribution:
       mean <- aa/(aa+bb)
       sd <-  sqrt(aa*bb/((aa+bb)^2*(aa+bb+1)))
