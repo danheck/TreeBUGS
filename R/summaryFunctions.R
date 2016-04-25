@@ -146,18 +146,19 @@ summarizeMPT <- function(mcmc,
                   fitStatistics=list(
                     "overall"=c(
                       # "DIC"=sum(dic$deviance) + mean( sum(dic$penalty)), #$BUGSoutput$DIC,
-                      "T1.observed"=summ["T1.obs","Mean"],
-                      "T1.predicted"=summ["T1.pred","Mean"],
-                      "p.T1"=summ["p.T1","Mean"]),
-                    "p.T1.individual"=summ[paste0("p.T1ind[",1:N,"]"),"Mean"], #mcmc$BUGSoutput$mean$p.T1ind),
+                    #   "T1.observed"=summ["T1.obs","Mean"],
+                    #   "T1.predicted"=summ["T1.pred","Mean"],
+                    #   "p.T1"=summ["p.T1","Mean"]),
+                    # "p.T1.individual"=summ[paste0("p.T1ind[",1:N,"]"),"Mean"], #mcmc$BUGSoutput$mean$p.T1ind
+                      ),
                     transformedParameters=transPar))
-  selT1group <- grep("p.T1.group", rownames(summ))
-  if(length(selT1group) != 0){
-    # if(!is.null(mcmc$BUGSoutput$mean$p.T1.group)){
-    summary$fitStatistics$p.T1.group <- rbind(N_per_group=NgroupT1,
-                                              p.T1.group=summ[selT1group,"Mean"])
-    # colnames(summary$p.T1.individual) <- names(NgroupT1)
-  }
+  # selT1group <- grep("p.T1.group", rownames(summ))
+  # if(length(selT1group) != 0){
+  #   # if(!is.null(mcmc$BUGSoutput$mean$p.T1.group)){
+  #   summary$fitStatistics$p.T1.group <- rbind(N_per_group=NgroupT1,
+  #                                             p.T1.group=summ[selT1group,"Mean"])
+  #   # colnames(summary$p.T1.individual) <- names(NgroupT1)
+  # }
 
   summary$call <- "(summarizeMPT called manually)"
   summary$round <- 3
@@ -189,18 +190,18 @@ print.summary.betaMPT <- function(x,  ...){
       print(round(x$groupParameters$thetaFE, x$round))
     }
 
-    cat("\n\n##############\n",
-        "Overall model fit statistics (T1: Posterior predictive check):\n")
-    if(!is.null(x$dic)){
-      print(x$dic)
-    }
-    print(round(x$fitStatistics$overall, x$round))
-    cat("\nPoster predictive p-values for participants:\n")
-    print(round(x$fitStatistics$p.T1.individual, x$round))
-    if(!is.null(x$fitStatistics$p.T1.group)){
-      cat("\nPoster predictive p-values per group:\n")
-      print(round(x$fitStatistics$p.T1.group, x$round))
-    }
+    # cat("\n\n##############\n",
+    #     "Overall model fit statistics (T1: Posterior predictive check):\n")
+    # if(!is.null(x$dic)){
+    #   print(x$dic)
+    # }
+    # print(round(x$fitStatistics$overall, x$round))
+    # cat("\nPoster predictive p-values for participants:\n")
+    # print(round(x$fitStatistics$p.T1.individual, x$round))
+    # if(!is.null(x$fitStatistics$p.T1.group)){
+    #   cat("\nPoster predictive p-values per group:\n")
+    #   print(round(x$fitStatistics$p.T1.group, x$round))
+    # }
 
     if(!is.null(x$transformedParameters)){
       cat("\nTransformed parameters:\n")

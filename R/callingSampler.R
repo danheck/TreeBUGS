@@ -58,7 +58,7 @@ callingSampler <- function(model,
 
   treeNames=unique(mergedTree$Tree)
   NresponsesTree=vector("numeric",length=length(treeNames))
-  parameters <- c(parameters, paste("response",treeNames, "pred.mean", sep="."))
+  # parameters <- c(parameters, paste("response",treeNames, "pred.mean", sep="."))
 
   for(i in 1:length(treeNames)){
     NresponsesTree[i]=length(which(mergedTree$Tree==treeNames[i]))
@@ -69,7 +69,7 @@ callingSampler <- function(model,
   index=0
   for(i in 1:length(treeNames)){
     ### variable names in JAGS
-    name.mean <-     paste("response",treeNames[i],"mean",sep=".")
+    # name.mean <-     paste("response",treeNames[i],"mean",sep=".")
     name.response <- paste("response",treeNames[i],sep=".")
     name.items <- paste("items",treeNames[i],sep=".")
 
@@ -85,11 +85,13 @@ callingSampler <- function(model,
                                   ncol=NresponsesTree[i],nrow=subjs,byrow=TRUE))
 
     # mean frequencies for T1 statistic
-    assign(name.mean, colMeans(get(name.response)))
+    # assign(name.mean, colMeans(get(name.response)))
 
     index=index+NresponsesTree[i]
 
-    data <- c(data, name.mean, name.response, name.items)
+    data <- c(data,
+              # name.mean,
+              name.response, name.items)
 
     # add G x numCat matrix with mean frequencies (one line per group)
     if(!is.null(groupT1)){
@@ -130,14 +132,15 @@ callingSampler <- function(model,
 
   # call Sampler
   parametervector=c(unlist(parameters),
-                    "T1.obs","T1.pred","p.T1","p.T1ind",
+                    # "T1.obs","T1.pred","p.T1","p.T1ind",
                     transformedPar, covPars)
 
   if(!is.null(groupT1)){
     groupMatT1 <- groupT1$groupMatT1
     NgroupT1 <- groupT1$NgroupT1
     data <- c(data, "groupMatT1", "NgroupT1")
-    parametervector <- c(parametervector, "T1.group.obs", "T1.group.pred", "p.T1.group",
+    parametervector <- c(parametervector,
+                         # "T1.group.obs", "T1.group.pred", "p.T1.group",
                          paste0("group.resp.",treeNames, ".pred.mean"))
   }
 
@@ -214,9 +217,10 @@ callingSampler <- function(model,
         #####################################\n")
     #       recompile(samples, n.iter=n.iter)
     #       samples <- autojags(samples, n.update = n.update)
-    samples <- do.call(autoextend.jags, c(list(runjags.object = samples,
-                                               summarise=FALSE),
-                                          autojags))  # additional user arguments
+    samples <- do.call(autoextend.jags,
+                       c(list(runjags.object = samples,
+                              summarise=FALSE),
+                         autojags))  # additional user arguments
   }
 
   return(samples)   # own summary

@@ -82,102 +82,102 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 
 
 	############################## Posterior predictive checks:
-
-	cat("\n############# T1: posterior predictive check of mean frequencies\n", file=filename,append=T)
-
-  cat("for(n in 1:subjs) {\n",file=filename,append=T)
-  for(i in 1:NOT){
-    # sample predicted: frequencies from posterior
-    cat("response.",treeNames[i],".pred[n,1:",ncatPerTree[i],"]~dmulti(",
-        treeNames[i],"[n,1:",ncatPerTree[i],"],items.",treeNames[i],
-        "[n])\n",sep="",file=filename,append=T)
-
-    # compute expected frequencies:
-    cat("n.expected.",treeNames[i],"[n,1:",ncatPerTree[i],"] <- ",
-        treeNames[i],"[n,1:",ncatPerTree[i],"] * items.",treeNames[i],
-        "[n]\n",sep="",file=filename,append=T)
-
-    # get means of expected and predicted frequencies:
-
-  }
-
-  cat("\n\n### T1statistic for individual data:\n",
-      "T1ind.obs[n] <- 0", file=filename,append=T )
-  for(i in 1:NOT){
-    cat("+ sum( (response.",treeNames[i],"[n,] - n.expected.",treeNames[i],"[n,])^2/n.expected.",treeNames[i],"[n,])",
-        sep="", file=filename,append=T)
-  }
-
-  # T1 for predicted means:
-  cat("\nT1ind.pred[n] <- 0", file=filename,append=T )
-  for(i in 1:NOT){
-    cat("+ sum( (response.",treeNames[i],".pred[n,] - n.expected.",treeNames[i],
-        "[n,])^2/n.expected.",treeNames[i],"[n,])", sep="", file=filename,append=T)
-  }
-
-  cat("\np.T1ind[n] <- T1ind.pred[n] > T1ind.obs[n]\n",
-      "}\n",file=filename,append=T)
-
-
-
-  cat("\n\n### T1 statistic for aggregated data:\n", file=filename,append=T)
-  for(i in 1:NOT){
-    cat("for(k in 1:",ncatPerTree[i],") {\n",
-        "n.expected.",treeNames[i],".mean[k] <- mean(n.expected.",treeNames[i],"[,k])\n",
-        "response.",treeNames[i],".pred.mean[k] <- mean(response.",treeNames[i],".pred[,k])\n",
-        sep="",file=filename,append=T)
-
-    # T1 per group
-#     for(s in 1:S){
-#       pred.group.mean[s,k] <- mean(pred[study.idx[s,1]:study.idx[s,2],k])
+#
+# 	cat("\n############# T1: posterior predictive check of mean frequencies\n", file=filename,append=T)
+#
+#   cat("for(n in 1:subjs) {\n",file=filename,append=T)
+#   for(i in 1:NOT){
+#     # sample predicted: frequencies from posterior
+#     cat("response.",treeNames[i],".pred[n,1:",ncatPerTree[i],"]~dmulti(",
+#         treeNames[i],"[n,1:",ncatPerTree[i],"],items.",treeNames[i],
+#         "[n])\n",sep="",file=filename,append=T)
+#
+#     # compute expected frequencies:
+#     cat("n.expected.",treeNames[i],"[n,1:",ncatPerTree[i],"] <- ",
+#         treeNames[i],"[n,1:",ncatPerTree[i],"] * items.",treeNames[i],
+#         "[n]\n",sep="",file=filename,append=T)
+#
+#     # get means of expected and predicted frequencies:
+#
+#   }
+#
+#   cat("\n\n### T1statistic for individual data:\n",
+#       "T1ind.obs[n] <- 0", file=filename,append=T )
+#   for(i in 1:NOT){
+#     cat("+ sum( (response.",treeNames[i],"[n,] - n.expected.",treeNames[i],"[n,])^2/n.expected.",treeNames[i],"[n,])",
+#         sep="", file=filename,append=T)
+#   }
+#
+#   # T1 for predicted means:
+#   cat("\nT1ind.pred[n] <- 0", file=filename,append=T )
+#   for(i in 1:NOT){
+#     cat("+ sum( (response.",treeNames[i],".pred[n,] - n.expected.",treeNames[i],
+#         "[n,])^2/n.expected.",treeNames[i],"[n,])", sep="", file=filename,append=T)
+#   }
+#
+#   cat("\np.T1ind[n] <- T1ind.pred[n] > T1ind.obs[n]\n",
+#       "}\n",file=filename,append=T)
+#
+#
+#
+#   cat("\n\n### T1 statistic for aggregated data:\n", file=filename,append=T)
+#   for(i in 1:NOT){
+#     cat("for(k in 1:",ncatPerTree[i],") {\n",
+#         "n.expected.",treeNames[i],".mean[k] <- mean(n.expected.",treeNames[i],"[,k])\n",
+#         "response.",treeNames[i],".pred.mean[k] <- mean(response.",treeNames[i],".pred[,k])\n",
+#         sep="",file=filename,append=T)
+#
+#     # T1 per group
+# #     for(s in 1:S){
+# #       pred.group.mean[s,k] <- mean(pred[study.idx[s,1]:study.idx[s,2],k])
+# #     }
+#     if(!is.null(groupMatT1)){
+#       cat("for(g in 1:",nrow(groupMatT1),") {\n",
+#
+#           "group.n.exp.",treeNames[i],".mean[g,k] <- mean(n.expected.",treeNames[i],  # expected per group
+#           "[groupMatT1[g,1:NgroupT1[g]],k])\n",
+#           "group.resp.",treeNames[i],".pred.mean[g,k] <- mean(response.",treeNames[i],  # sampled per group
+#           ".pred[groupMatT1[g,1:NgroupT1[g]],k])\n",
+#
+#           "}\n", sep="",file=filename,append=T)
 #     }
-    if(!is.null(groupMatT1)){
-      cat("for(g in 1:",nrow(groupMatT1),") {\n",
-
-          "group.n.exp.",treeNames[i],".mean[g,k] <- mean(n.expected.",treeNames[i],  # expected per group
-          "[groupMatT1[g,1:NgroupT1[g]],k])\n",
-          "group.resp.",treeNames[i],".pred.mean[g,k] <- mean(response.",treeNames[i],  # sampled per group
-          ".pred[groupMatT1[g,1:NgroupT1[g]],k])\n",
-
-          "}\n", sep="",file=filename,append=T)
-    }
-    cat("}\n", file=filename,append=T )
-  }
-  if(!is.null(groupMatT1)){
-    # T1 for observed means:
-    cat("\n###### T1 (per group)\n",
-        "for(g in 1:",nrow(groupMatT1),") {\n",
-        "T1.group.obs[g] <- 0", file=filename,append=T )
-    for(i in 1:NOT){
-      cat("+ sum( (group.resp.",treeNames[i],".mean[g,] - group.n.exp.",treeNames[i],".mean[g,])^2/",
-          "group.n.exp.",treeNames[i],".mean[g,])",
-          sep="", file=filename,append=T)
-    }
-
-    # T1 for predicted means:
-    cat("\nT1.group.pred[g] <- 0", file=filename,append=T )
-    for(i in 1:NOT){
-      cat("+ sum( (group.resp.",treeNames[i],".pred.mean[g,] - group.n.exp.",treeNames[i],".mean[g,])^2/",
-          "group.n.exp.",treeNames[i],".mean[g,])",
-          sep="", file=filename,append=T)
-    }
-    cat("\n## T1 (per group) comparison:\n",
-        "p.T1.group[g] <- T1.group.pred[g] > T1.group.obs[g]\n}\n",  file=filename,append=T)
-  }
-
-  # T1 for observed means:
-  cat("T1.obs <- 0", file=filename,append=T )
-  for(i in 1:NOT){
-    cat("+ sum( (response.",treeNames[i],".mean - n.expected.",treeNames[i],".mean)^2/n.expected.",treeNames[i],".mean)",
-        sep="", file=filename,append=T)
-  }
-
-  # T1 for predicted means:
-  cat("\nT1.pred <- 0", file=filename,append=T )
-  for(i in 1:NOT){
-    cat("+ sum( (response.",treeNames[i],".pred.mean - n.expected.",treeNames[i],".mean)^2/n.expected.",treeNames[i],".mean)", sep="", file=filename,append=T)
-  }
-  cat("\np.T1 <- T1.pred > T1.obs\n",  file=filename,append=T)
+#     cat("}\n", file=filename,append=T )
+#   }
+#   if(!is.null(groupMatT1)){
+#     # T1 for observed means:
+#     cat("\n###### T1 (per group)\n",
+#         "for(g in 1:",nrow(groupMatT1),") {\n",
+#         "T1.group.obs[g] <- 0", file=filename,append=T )
+#     for(i in 1:NOT){
+#       cat("+ sum( (group.resp.",treeNames[i],".mean[g,] - group.n.exp.",treeNames[i],".mean[g,])^2/",
+#           "group.n.exp.",treeNames[i],".mean[g,])",
+#           sep="", file=filename,append=T)
+#     }
+#
+#     # T1 for predicted means:
+#     cat("\nT1.group.pred[g] <- 0", file=filename,append=T )
+#     for(i in 1:NOT){
+#       cat("+ sum( (group.resp.",treeNames[i],".pred.mean[g,] - group.n.exp.",treeNames[i],".mean[g,])^2/",
+#           "group.n.exp.",treeNames[i],".mean[g,])",
+#           sep="", file=filename,append=T)
+#     }
+#     cat("\n## T1 (per group) comparison:\n",
+#         "p.T1.group[g] <- T1.group.pred[g] > T1.group.obs[g]\n}\n",  file=filename,append=T)
+#   }
+#
+#   # T1 for observed means:
+#   cat("T1.obs <- 0", file=filename,append=T )
+#   for(i in 1:NOT){
+#     cat("+ sum( (response.",treeNames[i],".mean - n.expected.",treeNames[i],".mean)^2/n.expected.",treeNames[i],".mean)",
+#         sep="", file=filename,append=T)
+#   }
+#
+#   # T1 for predicted means:
+#   cat("\nT1.pred <- 0", file=filename,append=T )
+#   for(i in 1:NOT){
+#     cat("+ sum( (response.",treeNames[i],".pred.mean - n.expected.",treeNames[i],".mean)^2/n.expected.",treeNames[i],".mean)", sep="", file=filename,append=T)
+#   }
+#   cat("\np.T1 <- T1.pred > T1.obs\n",  file=filename,append=T)
 
 
 	### Transformed parameters:
