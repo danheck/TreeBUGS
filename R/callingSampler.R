@@ -128,6 +128,10 @@ callingSampler <- function(model,
       covSD <- apply(covData, 2, sd, na.rm=TRUE)
       data <- c(data, "covSD")
     }
+
+    if(any(is.na(covData))){
+      warning("Data frame with covariates contains missing values (NA).\n  This is likely to cause problems for JAGS.")
+    }
   }
 
   # call Sampler

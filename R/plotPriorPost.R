@@ -37,7 +37,11 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
       # formulas for mean and SD of beta distribution:
       mean <- aa/(aa+bb)
       sd <-  sqrt(aa*bb/((aa+bb)^2*(aa+bb+1)))
-      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sd[",s,"]")]),  from=0, to=.5)
+      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sd[",s,"]")]),
+                      from=0, to=.5)
+      ci.sd <- quantile(unlist(fittedModel$runjags$mcmc[,paste0("sd[",s,"]")]),
+                        c((1-ci)/2,1-(1-ci)/2))
+
       prior.sd <- density(sd, from=0, to=.5)
       xlab.sd = "Group SD"
     }else{
