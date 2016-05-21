@@ -5,10 +5,10 @@
 \title{Fit a Hierarchical latent-trait MPT Model}
 \usage{
 traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
-  predType, transformedParameters, T1group, corProbit = TRUE,
-  mu = "dnorm(0,1)", xi = "dunif(0,10)", V, df, IVprec = "dchisq(1)",
-  n.iter = 20000, n.adapt = 2000, n.burnin = 2000, n.thin = 5,
-  n.chains = 3, dic = FALSE, modelfilename, parEstFile, autojags = NULL,
+  predType, transformedParameters, corProbit = TRUE, mu = "dnorm(0,1)",
+  xi = "dunif(0,10)", V, df, IVprec = "dchisq(1)", n.iter = 20000,
+  n.adapt = 2000, n.burnin = 2000, n.thin = 5, n.chains = 3,
+  dic = FALSE, M.T1 = 1000, modelfilename, parEstFile, autojags = NULL,
   ...)
 }
 \arguments{
@@ -27,8 +27,6 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
 \item{predType}{a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.}
 
 \item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
-
-\item{T1group}{a name of the factor or character variable in covData that is used to compute the T1 statistic separately per group (e.g., per experimental condition)}
 
 \item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations (the default for trait-MPT)}
 
@@ -53,6 +51,8 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
 \item{n.chains}{number of MCMC chains}
 
 \item{dic}{whether to compute DIC using \code{\link[runjags]{extract}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
+
+\item{M.T1}{number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})}
 
 \item{modelfilename}{Name that the modelfile that is made by the function to work with JAGS should get.
 Default is to write this information to the tempdir as required by CRAN standards.}

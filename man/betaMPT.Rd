@@ -5,10 +5,10 @@
 \title{Fit a Hierarchical Beta-MPT Model}
 \usage{
 betaMPT(eqnfile, data, restrictions, covData, covStructure,
-  transformedParameters, T1group, corProbit = FALSE,
-  alpha = "dunif(.01,5000)", beta = "dunif(.01,5000)", n.iter = 20000,
-  n.adapt = 2000, n.burnin = 2000, n.thin = 5, n.chains = 3,
-  dic = FALSE, modelfilename, parEstFile, autojags = NULL, ...)
+  transformedParameters, corProbit = FALSE, alpha = "dunif(.01,5000)",
+  beta = "dunif(.01,5000)", n.iter = 20000, n.adapt = 2000,
+  n.burnin = 2000, n.thin = 5, n.chains = 3, dic = FALSE, M.T1 = 1000,
+  modelfilename, parEstFile, autojags = NULL, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
@@ -22,8 +22,6 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
 \item{covStructure}{Optional: Which correlations to compute? Either the (full path to the) file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Default: All continuous variables in covData included.}
 
 \item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
-
-\item{T1group}{a name of the factor or character variable in covData that is used to compute the T1 statistic separately per group (e.g., per experimental condition)}
 
 \item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations. Default for beta-MPT: MPT parameters are used on the probability scale [0,1]}
 
@@ -42,6 +40,8 @@ betaMPT(eqnfile, data, restrictions, covData, covStructure,
 \item{n.chains}{number of MCMC chains}
 
 \item{dic}{whether to compute DIC using \code{\link[runjags]{extract}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
+
+\item{M.T1}{number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})}
 
 \item{modelfilename}{Name that the modelfile that is made by the function to work with JAGS should get.
 Default is to write this information to the tempdir as required by CRAN standards.}

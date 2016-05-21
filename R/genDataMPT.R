@@ -49,11 +49,12 @@ genMPT <- function(theta, numItems, eqnfile){
     numTrees <- length(unique(mergedTree$Tree))
     for(k in 1:numTrees){
       sel <- mergedTree$Tree %in% names(numItems)[k]
-      cat <- findInterval(runif(numItems[k]), cumsum(mergedTree$prob[sel]))+1
-      catLabel <- mergedTree$Category[sel][cat]
-      freq[n,mergedTree$Category[sel]] <- table(factor(catLabel,
-                                                       levels=mergedTree$Category[sel]),
-                                                exclude=NA)
+      # cat <- findInterval(runif(numItems[k]), cumsum(mergedTree$prob[sel]))+1
+      # catLabel <- mergedTree$Category[sel][cat]
+      freq[n,mergedTree$Category[sel]] <- rmultinom(1, size = numItems[k], prob=mergedTree$prob[sel])
+        # table(factor(catLabel,
+        #                                                levels=mergedTree$Category[sel]),
+        #                                         exclude=NA)
     }
   }
 

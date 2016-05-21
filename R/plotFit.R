@@ -1,23 +1,25 @@
 
-#' Plot Goodness of Fit
+#' Plot Posterior Predictive Mean Frequencies
 #'
-#' Plots observed mean frequencies against sampled mean frequencies.
+#' Plots observed mean frequencies and boxplot of mean frequencies sampled from posterior distribution (posterior predictive).
 #'
-#' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})
+#' @inheritParams posteriorPredictive
 #' @param ... arguments passed to \code{\link{boxplot}}
 #' @export
-plotFit <- function(fittedModel,...){
+plotFit <- function(fittedModel, M=1000, ...){
 
+  # get information about model:
   dat <- fittedModel$mptInfo$dat
   tree <- fittedModel$mptInfo$MPT$Tree
   TreeNames <- unique(tree)
-  nam <- paste("response", TreeNames, "pred.mean", sep=".")
-  select <- unlist(sapply(nam, grep, x=varnames(fittedModel$runjags$mcmc)))
-  # pred <- do.call("cbind", fittedModel$mcmc$BUGSoutput$sims.list[nam])
-  pred <- do.call("rbind", fittedModel$runjags$mcmc[,select])
+
+  # get posterior predictive:
+  freq.list <- posteriorPredictive(fittedModel, M=M)
+  pred <- t(sapply(freq.list, colMeans))
+
+  # Plot:
   boxplot(pred, xaxt="n", main="Observed (red) and predicted (boxplot) mean frequencies", ...)
   axis(1, 1:ncol(dat), labels = colnames(dat))
-
   xx <- by(1:length(tree), tree, mean)
   axis(1, xx,  TreeNames, tick=F, line=NA, mgp=c(3, 2.5, 0))
   points(1:ncol(dat), colMeans(dat), col="red", cex=1.3, pch=19)

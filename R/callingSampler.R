@@ -27,7 +27,7 @@ callingSampler <- function(model,
                            covPars=NULL,
                            covData=NULL,
                            X_list=list(),   # list with design matrices for fixed effects
-                           groupT1=NULL,    # list with groupMatT1 und NgroupT1  for splitted T1 statistic
+                           # groupT1=NULL,    # list with groupMatT1 und NgroupT1  for splitted T1 statistic
                            hyperpriors=NULL,
                            n.iter=20000,
                            n.adapt=2000,
@@ -94,19 +94,19 @@ callingSampler <- function(model,
               name.response, name.items)
 
     # add G x numCat matrix with mean frequencies (one line per group)
-    if(!is.null(groupT1)){
-      name.group.mean <- paste0("group.resp.",treeNames[i],".mean")
-
-      mean.per.group <- c()
-      for(g in 1:nrow(groupT1$groupMatT1)){
-        idx <- groupT1$groupMatT1[1:groupT1$NgroupT1[g]]
-        mean.per.group <- rbind(mean.per.group,
-                                colMeans(get(name.response)[idx,,drop=FALSE]))
-
-      }
-      assign(name.group.mean, mean.per.group)
-      data <- c(data, name.group.mean)
-    }
+    # if(!is.null(groupT1)){
+    #   name.group.mean <- paste0("group.resp.",treeNames[i],".mean")
+    #
+    #   mean.per.group <- c()
+    #   for(g in 1:nrow(groupT1$groupMatT1)){
+    #     idx <- groupT1$groupMatT1[1:groupT1$NgroupT1[g]]
+    #     mean.per.group <- rbind(mean.per.group,
+    #                             colMeans(get(name.response)[idx,,drop=FALSE]))
+    #
+    #   }
+    #   assign(name.group.mean, mean.per.group)
+    #   data <- c(data, name.group.mean)
+    # }
   }
 
 
@@ -139,14 +139,14 @@ callingSampler <- function(model,
                     # "T1.obs","T1.pred","p.T1","p.T1ind",
                     transformedPar, covPars)
 
-  if(!is.null(groupT1)){
-    groupMatT1 <- groupT1$groupMatT1
-    NgroupT1 <- groupT1$NgroupT1
-    data <- c(data, "groupMatT1", "NgroupT1")
-    parametervector <- c(parametervector,
-                         # "T1.group.obs", "T1.group.pred", "p.T1.group",
-                         paste0("group.resp.",treeNames, ".pred.mean"))
-  }
+  # if(!is.null(groupT1)){
+  #   groupMatT1 <- groupT1$groupMatT1
+  #   NgroupT1 <- groupT1$NgroupT1
+  #   data <- c(data, "groupMatT1", "NgroupT1")
+  #   parametervector <- c(parametervector,
+  #                        # "T1.group.obs", "T1.group.pred", "p.T1.group",
+  #                        paste0("group.resp.",treeNames, ".pred.mean"))
+  # }
 
   # random initial values: required (otherwise T1 statistic results in errors: no variance!)
   if(model == "betaMPT"){

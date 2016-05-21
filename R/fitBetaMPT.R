@@ -10,7 +10,6 @@
 #' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
 #' @param modelfilename Name that the modelfile that is made by the function to work with JAGS should get.
 #'        Default is to write this information to the tempdir as required by CRAN standards.
-#' @param T1group a name of the factor or character variable in covData that is used to compute the T1 statistic separately per group (e.g., per experimental condition)
 #' @param corProbit whether to use probit-transformed MPT parameters to compute correlations. Default for beta-MPT: MPT parameters are used on the probability scale [0,1]
 #' @param alpha Hyperprior for the alpha and beta parameters in JAGS syntax (default: uniform prior on the interval [1,5000] for all parameters). A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).
 #' @param beta Second hyperprior, see \code{alpha}
@@ -21,6 +20,7 @@
 #' @param n.thin Thinning rate.
 #' @param n.chains number of MCMC chains
 #' @param dic whether to compute DIC using \code{\link[runjags]{extract}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}
+#' @param M.T1 number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})
 #' @param autojags if provided (as an empty list or with arguments passed to \link[runjags]{autoextend.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)
 #' @param ... Arguments to be passed to the JAGS sampling function (i.e., to \code{\link[runjags]{run.jags}}.
 #'
@@ -42,7 +42,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     covData,
                     covStructure,
                     transformedParameters,
-                    T1group,
                     corProbit=FALSE,
                     alpha = "dunif(.01,5000)",
                     beta = "dunif(.01,5000)",
@@ -54,6 +53,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                     n.thin=5,
                     n.chains=3,
                     dic =FALSE,
+                    M.T1 = 1000,
 
                     # File Handling stuff:
                     modelfilename,
@@ -64,7 +64,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   if(missing(covData)) covData <- NULL
   if(missing(covStructure)) covStructure <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
-  if(missing(T1group)) T1group <- NULL
 
   checkParEstFile(parEstFile)
   modelfilename <- checkModelfilename(modelfilename)
@@ -109,8 +108,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
   covTmp2 <- covStringCorrelation(covTable, corProbit=corProbit)
   corString <- covTmp2$modelString
   covPars <- covTmp2$covPar
-  # T1 per group split
-  groupT1 <- getGroupT1(covData, predType, T1group=T1group)
   covData <- covData[,sapply(covData, class) %in% c("numeric", "integer"), drop=FALSE]
 
 
@@ -122,7 +119,6 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                 hyperprior = list(alpha=alpha, beta = beta),
                 corString = corString,
                 parString = transformedPar$modelstring,
-                groupMatT1=groupT1$groupMatT1,
                 fixedPar=fixedPar)
 
   time0 <- Sys.time()
@@ -136,7 +132,7 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                          transformedPar = transformedPar$transformedParameters,
                          covPars = covPars,
                          covData = covData,
-                         groupT1=groupT1,
+
                          # parameters,
                          n.iter = n.iter,
                          n.adapt = n.adapt,
@@ -161,14 +157,13 @@ betaMPT <- function(eqnfile,  # statistical model stuff
                   covTable=covTable,
                   corProbit=corProbit,
                   transformedParameters=transformedPar$transformedParameters,
-                  T1group=groupT1,
                   hyperprior=list(alpha=alpha, beta=beta))
 
 
   # own summary (more stable than runjags)
   mcmc.summ <- summarizeMCMC(runjags$mcmc)
   # Beta MPT: rename parameters and get specific summaries
-  summary <- summarizeMPT(mcmc = runjags$mcmc, mptInfo = mptInfo, summ=mcmc.summ)
+  summary <- summarizeMPT(mcmc = runjags$mcmc, mptInfo = mptInfo, M=M.T1, summ=mcmc.summ)
   if(dic){
     summary$dic <-   extract(runjags, "dic", ...)
   }else{summary$dic <- NULL}

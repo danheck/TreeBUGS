@@ -2,16 +2,18 @@
 % Please edit documentation in R/plotFit.R
 \name{plotFit}
 \alias{plotFit}
-\title{Plot Goodness of Fit}
+\title{Plot Posterior Predictive Mean Frequencies}
 \usage{
-plotFit(fittedModel, ...)
+plotFit(fittedModel, M = 1000, ...)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
+\item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
+
 \item{...}{arguments passed to \code{\link{boxplot}}}
 }
 \description{
-Plots observed mean frequencies against sampled mean frequencies.
+Plots observed mean frequencies and boxplot of mean frequencies sampled from posterior distribution (posterior predictive).
 }
 

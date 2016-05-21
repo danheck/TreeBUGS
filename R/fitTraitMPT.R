@@ -37,7 +37,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     predStructure,  # predictor structure
                     predType,    # c("c," f", "r")
                     transformedParameters,
-                    T1group,
                     corProbit=TRUE,
 
                     # hyperpriors:
@@ -54,6 +53,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     n.thin=5,
                     n.chains=3,
                     dic =FALSE,
+                    M.T1 = 1000,
 
                     # File Handling stuff:
                     modelfilename,
@@ -66,7 +66,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   if(missing(predStructure)) predStructure <- NULL
   if(missing(predType)) predType <- NULL
   if(missing(transformedParameters)) transformedParameters <- NULL
-  if(missing(T1group)) T1group <- NULL
 
   checkParEstFile(parEstFile)
   modelfilename <- checkModelfilename(modelfilename)
@@ -100,13 +99,12 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   # covariate: reading + checking
   covData <- covDataRead(covData, N)
   predType <- predTypeDefault(covData, predType=predType)
-  groupT1 <- getGroupT1(covData, predType, T1group=T1group)
   covData <- covDataCenter(covData, predType=predType)
 
 
   # PREDICTORS: assign covariates to parameters and handle factor levels
   predTmp1 <- covHandling(covData, predStructure, N, thetaNames, predType=predType,
-                          defaultExclude="ALL_COVARIATES", T1group=T1group)
+                          defaultExclude="ALL_COVARIATES")
   predFactorLevels <- predTmp1$predFactorLevels
   predTable <- predTmp1$covTable
   covData <- predTmp1$covData
@@ -124,7 +122,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
   corString <- covTmp2$modelString
   corPars <- covTmp2$covPar
 
-  # T1 per group split
   covData <- covData[,sapply(covData, class) %in% c("numeric", "integer"), drop=FALSE]
 
   if( any(covTable$Covariate %in% predTable$Covariate))
@@ -146,7 +143,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                 predString = predString,
                 corString = corString,
                 parString=transformedPar$modelstring,
-                groupMatT1=groupT1$groupMatT1,
                 fixedPar=fixedPar)
 
   time0 <- Sys.time()
@@ -161,7 +157,6 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                          covPars=c(corPars, predPars),
                          covData=covData,
                          X_list=predTmp2$X_list,
-                         groupT1=groupT1,
                          hyperpriors = list(V=V, df=df, mu = mu, xi = xi),
                          n.iter = n.iter,
                          n.adapt = n.adapt,
@@ -197,12 +192,11 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                   predTable=predTable,
                   predFactorLevels=predFactorLevels,
                   transformedParameters=transformedPar$transformedParameters,
-                  T1group=groupT1,
                   hyperprior=list(mu=mu, xi=xi, V=V, df=df, IVprec=IVprec))
 
   # own summary (more stable than runjags)
   mcmc.summ <- summarizeMCMC(runjags$mcmc)
-  summary <- summarizeMPT(mcmc = runjags$mcmc, mptInfo = mptInfo, summ=mcmc.summ)
+  summary <- summarizeMPT(mcmc = runjags$mcmc, mptInfo = mptInfo, M=M.T1, summ=mcmc.summ)
   if(dic){
     summary$dic <-   extract(runjags, "dic", ...)
   }else{summary$dic <- NULL}

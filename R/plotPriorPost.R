@@ -69,7 +69,7 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
     plot(d.sd,   main=paste0("Group SD of ", fittedModel$mptInfo$thetaUnique[s]),
          xlab=xlab.sd)
     lines(prior.sd, col="blue", lty="dashed")
-    abline(v=ci.sd,col="red", lty="dotted")
+    abline(v=ci.sd,col="red")
   }
   if(fittedModel$mptInfo$model == "traitMPT" & S>1){
     cnt <- 0
@@ -87,7 +87,7 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
              xlab="Correlation (on latent probit scale)")
         lines(prior.cor, col="blue", lty="dashed")
         abline(v= quantile(unlist(fittedModel$runjags$mcmc[,paste0("rho[",s1,",",s2,"]")]),
-                           c((1-ci)/2,1-(1-ci)/2)), col="red", lty="dotted")
+                           c((1-ci)/2,1-(1-ci)/2)), col="red")
       }
     }
   }

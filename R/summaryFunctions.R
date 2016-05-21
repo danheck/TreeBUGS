@@ -6,6 +6,7 @@
 #' @param mcmc the actual mcmc.list output of the sampler of a fitted MPT model (accesible via \code{fittedModel$runjags$mcmc})
 #' @param mptInfo the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})
 # @param dic whether to compute DIC statistic for model selection (requires additional sampling!)
+#' @param M number of posterior predictive samples to compute T1 statistic
 #' @param summ optional for internal use
 # @param ... further arguments passed to \code{\link[coda]{dic.samples}} (e.g., \code{n.iter})
 #' @details The MPT-specific summary is computed directly after fitting a model. However, this function might be used manually after removing MCMC samples (e.g., extending the burnin period).
@@ -20,6 +21,7 @@
 #' @export
 summarizeMPT <- function(mcmc,
                          mptInfo,
+                         M=2000,
                          summ = NULL
 ){
   if(is.null(summ))
@@ -27,7 +29,6 @@ summarizeMPT <- function(mcmc,
 
   predFactorLevels <- mptInfo$predFactorLevels
   transformedParameters <- mptInfo$transformedParameters
-  NgroupT1 <- mptInfo$T1group$NgroupT1
   thetaNames <- mptInfo$thetaNames
   model <- mptInfo$model
 
@@ -141,24 +142,20 @@ summarizeMPT <- function(mcmc,
     transPar <- summ[transformedParameters,, drop=FALSE]
   }
   # dic <- extract(mcmc, "dic")
+  if(M>0){
+    ppp <- getPPP(list(mptInfo=mptInfo, runjags=list(mcmc=mcmc) ), M=M)
+  }
   summary <- list(groupParameters=groupParameters,
                   individParameters=individParameters,
                   fitStatistics=list(
                     "overall"=c(
                       # "DIC"=sum(dic$deviance) + mean( sum(dic$penalty)), #$BUGSoutput$DIC,
-                    #   "T1.observed"=summ["T1.obs","Mean"],
-                    #   "T1.predicted"=summ["T1.pred","Mean"],
-                    #   "p.T1"=summ["p.T1","Mean"]),
+                      "T1.observed"=mean(ppp$T1.obs),
+                      "T1.predicted"=mean(ppp$T1.pred),
+                      "p.T1"=ppp$T1.p
                     # "p.T1.individual"=summ[paste0("p.T1ind[",1:N,"]"),"Mean"], #mcmc$BUGSoutput$mean$p.T1ind
                       ),
                     transformedParameters=transPar))
-  # selT1group <- grep("p.T1.group", rownames(summ))
-  # if(length(selT1group) != 0){
-  #   # if(!is.null(mcmc$BUGSoutput$mean$p.T1.group)){
-  #   summary$fitStatistics$p.T1.group <- rbind(N_per_group=NgroupT1,
-  #                                             p.T1.group=summ[selT1group,"Mean"])
-  #   # colnames(summary$p.T1.individual) <- names(NgroupT1)
-  # }
 
   summary$call <- "(summarizeMPT called manually)"
   summary$round <- 3
@@ -190,12 +187,12 @@ print.summary.betaMPT <- function(x,  ...){
       print(round(x$groupParameters$thetaFE, x$round))
     }
 
-    # cat("\n\n##############\n",
-    #     "Overall model fit statistics (T1: Posterior predictive check):\n")
-    # if(!is.null(x$dic)){
-    #   print(x$dic)
-    # }
-    # print(round(x$fitStatistics$overall, x$round))
+    cat("\n\n##############\n",
+        "Overall model fit statistics (T1: Posterior predictive check):\n")
+    if(!is.null(x$dic)){
+      print(x$dic)
+    }
+    print(round(x$fitStatistics$overall, x$round))
     # cat("\nPoster predictive p-values for participants:\n")
     # print(round(x$fitStatistics$p.T1.individual, x$round))
     # if(!is.null(x$fitStatistics$p.T1.group)){
@@ -242,12 +239,12 @@ print.summary.traitMPT <- function(x,  ...){
       print(round(x$groupParameters$rho.matrix, x$round))
     }
 
-    # cat("\n##############\n",
-    #     "Overall model fit statistics (T1: Posterior predictive check):\n")
-    # if(!is.null(x$dic)){
-    #   print(x$dic)
-    # }
-    # print(round(x$fitStatistics$overall, x$round))
+    cat("\n##############\n",
+        "Overall model fit statistics (T1: Posterior predictive check):\n")
+    if(!is.null(x$dic)){
+      print(x$dic)
+    }
+    print(round(x$fitStatistics$overall, x$round))
     # cat("\nPoster predictive p-values for participants:\n")
     # print(round(x$fitStatistics$p.T1.individual, x$round))
     # if(!is.null(x$fitStatistics$p.T1.group)){
@@ -381,29 +378,30 @@ summarizeMCMC <- function(mcmc){
   rm(mcmc.mat)
   gc(verbose=FALSE)
   rn <- rownames(summTab)
-  sel.notT1 <- setdiff(1:nrow(summTab), union(grep("T1", rn), grep(".pred.mean", rn)))
+  # sel.notT1 <- setdiff(1:nrow(summTab), union(grep("T1", rn), grep(".pred.mean", rn)))
   try({
-    summTab[sel.notT1,7] <- round(effectiveSize(mcmc[,sel.notT1]))
-    summTab[sel.notT1,6] <- summTab[sel.notT1,2] / sqrt(summTab[sel.notT1,7]  )
+    summTab[,7] <- round(effectiveSize(mcmc))
+    summTab[,6] <- summTab[,2] / sqrt(summTab[,7]  )
   })
   gc(verbose=FALSE)
   try({
     batchSize <- 200
     # split for 100 variables per batch
-    n.summ <- length(sel.notT1)
+    n.summ <- nrow(summTab)
     if(n.summ >batchSize){
       for(ii in 1:(n.summ %/% batchSize)){
         idx <- (ii-1)*batchSize + 1:batchSize
-        summ.idx <- sel.notT1[idx]
-        summTab[summ.idx,8:9] <- gelman.diag(mcmc[,summ.idx], multivariate=FALSE)[[1]]
+        # summ.idx <- sel.notT1[idx]
+        summTab[idx,8:9] <- gelman.diag(mcmc[,idx], multivariate=FALSE)[[1]]
         gc(verbose=FALSE)
       }
       if((ii*batchSize+1) < n.summ){
-        summ.idx <- sel.notT1[(ii*batchSize+1):n.summ]
-        summTab[summ.idx,8:9] <- gelman.diag(mcmc[,summ.idx], multivariate=FALSE)[[1]]
+        # summ.idx <- sel.notT1[(ii*batchSize+1):n.summ]
+        idx <- (ii*batchSize+1):n.summ
+        summTab[idx,8:9] <- gelman.diag(mcmc[,idx], multivariate=FALSE)[[1]]
       }
     }else{
-      summTab[sel.notT1,8:9] <- gelman.diag(mcmc[,sel.notT1], multivariate=FALSE)[[1]]
+      summTab[,8:9] <- gelman.diag(mcmc, multivariate=FALSE)[[1]]
     }
   })
   #   if(any(is.na(summTab[,"Rhat"])))
