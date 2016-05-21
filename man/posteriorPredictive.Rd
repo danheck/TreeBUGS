@@ -4,7 +4,7 @@
 \alias{posteriorPredictive}
 \title{Get Posterior Predictive Samples}
 \usage{
-posteriorPredictive(fittedModel, M = 100, expected = FALSE)
+posteriorPredictive(fittedModel, M = 100, expected = FALSE, nCPU = 4)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
@@ -12,6 +12,8 @@ posteriorPredictive(fittedModel, M = 100, expected = FALSE)
 \item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
 
 \item{expected}{if \code{TRUE}, the expected frequencies per person are returned (without additional sampling from a multinomial distribution)}
+
+\item{nCPU}{number of CPUs used for parallel sampling}
 }
 \value{
 a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.

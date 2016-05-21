@@ -7,6 +7,8 @@
 plotDistribution(fittedModel, scale = "probability", ...)
 }
 \arguments{
+\item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
+
 \item{scale}{only for latent-trait MPT: should estimates be plotted on the \code{"latent"} or the \code{"probability"} scale (i.e., as MPT parameters). Can be abbreviated by \code{"l"}  and \code{"p"}.}
 
 \item{...}{further arguments passed to \code{\link{hist}} (e.g., \code{breaks=50} to get a more fine-grained histogram or \code{xlim=0:1} to use the same x-scale for all histograms)}

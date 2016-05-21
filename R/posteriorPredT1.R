@@ -3,7 +3,7 @@
 # T1 statistic:
 
 
-getPPP <- function(fittedModel, M=1000){
+getPPP <- function(fittedModel, M=1000, nCPU=4){
 
   cats <- fittedModel$mptInfo$MPT$Category
   tree <- fittedModel$mptInfo$MPT$Tree
@@ -14,9 +14,11 @@ getPPP <- function(fittedModel, M=1000){
   sel <- lapply(TreeNames, function(tt) tree %in% tt)
 
   # expected frequencies:
-  freq.exp <- posteriorPredictive(fittedModel, M, expected = TRUE)
+  freq.exp <- posteriorPredictive(fittedModel, M, expected = TRUE, nCPU=nCPU)
   M <- length(freq.exp)
 
+  cl <- makeCluster(nCPU)
+  clusterExport(cl, c("TreeNames"), envir=environment())
   # sample conditional on expected probabilities:
   freq.pred <- lapply(freq.exp, function(fe){
     for(k in 1:length(TreeNames)){
@@ -25,6 +27,7 @@ getPPP <- function(fittedModel, M=1000){
     }
     fe
   })
+  stopCluster(cl)
 
   freq.obs <- fittedModel$mptInfo$data[,colnames(freq.pred[[1]])]
 

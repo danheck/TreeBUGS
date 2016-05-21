@@ -143,7 +143,7 @@ summarizeMPT <- function(mcmc,
   }
   # dic <- extract(mcmc, "dic")
   if(M>0){
-    ppp <- getPPP(list(mptInfo=mptInfo, runjags=list(mcmc=mcmc) ), M=M)
+    ppp <- getPPP(list(mptInfo=mptInfo, runjags=list(mcmc=mcmc) ), M=M, nCPU=length(mcmc))
   }
   summary <- list(groupParameters=groupParameters,
                   individParameters=individParameters,

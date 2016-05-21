@@ -65,7 +65,7 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
          xlab="Group mean")
     lines(prior.mean, col="blue", lty="dashed")
     abline(v= quantile(unlist(fittedModel$runjags$mcmc[,paste0("mean[",s,"]")]),
-                               c((1-ci)/2,1-(1-ci)/2)), col="red", lty="dotted")
+                               c((1-ci)/2,1-(1-ci)/2)), col="red")
     plot(d.sd,   main=paste0("Group SD of ", fittedModel$mptInfo$thetaUnique[s]),
          xlab=xlab.sd)
     lines(prior.sd, col="blue", lty="dashed")

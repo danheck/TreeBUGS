@@ -3,6 +3,7 @@
 #'
 #' Plots histograms of the mean posterior estimates for participants including the estimated shape on the group level (e.g., the beta distribution in case of the beta-MPT)
 #'
+#' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})
 #' @inheritParams plotFit
 #' @param scale only for latent-trait MPT: should estimates be plotted on the \code{"latent"} or the \code{"probability"} scale (i.e., as MPT parameters). Can be abbreviated by \code{"l"}  and \code{"p"}.
 #' @param ... further arguments passed to \code{\link{hist}} (e.g., \code{breaks=50} to get a more fine-grained histogram or \code{xlim=0:1} to use the same x-scale for all histograms)
