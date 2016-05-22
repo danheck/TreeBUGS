@@ -53,7 +53,9 @@ summarizeMPT <- function(mcmc,
   selFE <- grep("thetaFE", rownames(summ))
   if(length(selFE) != 0){
     thetaFE <- summ[selFE, , drop=FALSE]
-    rownames(thetaFE) <- paste0("thetaFE_", mptInfo$thetaFixed)
+    if(length(mptInfo$thetaFixed) == nrow(thetaFE)){
+      rownames(thetaFE) <- paste0("thetaFE_", mptInfo$thetaFixed)
+    }
   }else{thetaFE <- NULL}
 
   ############################## BETA MPT SUMMARY
@@ -142,20 +144,27 @@ summarizeMPT <- function(mcmc,
     transPar <- summ[transformedParameters,, drop=FALSE]
   }
   # dic <- extract(mcmc, "dic")
-  if(M>0){
-    ppp <- getPPP(list(mptInfo=mptInfo, runjags=list(mcmc=mcmc) ), M=M, nCPU=length(mcmc))
-  }
   summary <- list(groupParameters=groupParameters,
                   individParameters=individParameters,
-                  fitStatistics=list(
-                    "overall"=c(
-                      # "DIC"=sum(dic$deviance) + mean( sum(dic$penalty)), #$BUGSoutput$DIC,
-                      "T1.observed"=mean(ppp$T1.obs),
-                      "T1.predicted"=mean(ppp$T1.pred),
-                      "p.T1"=ppp$T1.p
-                    # "p.T1.individual"=summ[paste0("p.T1ind[",1:N,"]"),"Mean"], #mcmc$BUGSoutput$mean$p.T1ind
-                      ),
-                    transformedParameters=transPar))
+                  fitStatistics=NULL,
+                  transformedParameters=transPar)
+  if(M>0){
+    ppp <- PPP(list(mptInfo=mptInfo, runjags=list(mcmc=mcmc) ), M=M, nCPU=length(mcmc))
+    try(
+      summary$fitStatistics <- list(
+        "overall"=c(
+          # "DIC"=sum(dic$deviance) + mean( sum(dic$penalty)), #$BUGSoutput$DIC,
+          "T1.observed"=mean(ppp$T1.obs),
+          "T1.predicted"=mean(ppp$T1.pred),
+          "p.T1"=ppp$T1.p,
+          "T2.observed"=mean(ppp$T2.obs),
+          "T2.predicted"=mean(ppp$T2.pred),
+          "p.T2"=ppp$T2.p
+          # "p.T1.individual"=summ[paste0("p.T1ind[",1:N,"]"),"Mean"], #mcmc$BUGSoutput$mean$p.T1ind
+        ))
+    )
+  }
+
 
   summary$call <- "(summarizeMPT called manually)"
   summary$round <- 3
@@ -188,7 +197,7 @@ print.summary.betaMPT <- function(x,  ...){
     }
 
     cat("\n\n##############\n",
-        "Overall model fit statistics (T1: Posterior predictive check):\n")
+        "Model fit statistics (posterior predictive p-values):\n")
     if(!is.null(x$dic)){
       print(x$dic)
     }
@@ -240,7 +249,7 @@ print.summary.traitMPT <- function(x,  ...){
     }
 
     cat("\n##############\n",
-        "Overall model fit statistics (T1: Posterior predictive check):\n")
+        "Model fit statistics (posterior predictive p-values):\n")
     if(!is.null(x$dic)){
       print(x$dic)
     }

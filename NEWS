@@ -1,9 +1,16 @@
+TreeBUGS 0.4.9 (May 2016)
+===========
+
+* T2 statistic implemented (posterior predictive check of covariance structure)
+* Posterior predictive checks with parallel computation using multiple cores
+* Bug fix for posterior predictive with fixed effects
+
+
 TreeBUGS 0.4.8 (May 2016)
 ===========
 
 * New function posteriorPredictive() to draw samples of individual frequencies from posterior
 * T1 statistic now computed outside of JAGS (more stable, smaller mcmc object, additional argument M.T1 to specifiy the number of posterior samples used)
-
 
 
 TreeBUGS 0.4.7 (April 2016)
