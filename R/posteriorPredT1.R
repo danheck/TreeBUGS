@@ -4,11 +4,14 @@
 #'
 #' Computes posterior predictive p-values to test model fit.
 #' @inheritParams posteriorPredictive
+#' @param T2 whether to compute T2 statistic to check coveriance structure (can take a lot of time)
 #' @author Daniel Heck
 #' @references
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 #' @export
-PPP <- function(fittedModel, M=1000, nCPU=4){
+#' @importFrom  stats cov
+#' @importFrom  utils combn
+PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE){
 
   cats <- fittedModel$mptInfo$MPT$Category
   tree <- fittedModel$mptInfo$MPT$Tree
@@ -21,6 +24,8 @@ PPP <- function(fittedModel, M=1000, nCPU=4){
   # expected frequencies:
   freq.exp <- posteriorPredictive(fittedModel, M, expected = TRUE, nCPU=nCPU)
   M <- length(freq.exp)
+
+
 
   cl <- makeCluster(nCPU)
   clusterExport(cl, c("TreeNames"), envir=environment())
@@ -45,14 +50,18 @@ PPP <- function(fittedModel, M=1000, nCPU=4){
   T1.obs <- T1.pred <-T2.obs <- T2.pred <- NULL
   try({
     T1.obs <- apply(mean.exp, 1, T1stat, n=mean.obs)
+    T1.pred <- mapply(T1stat,
+                      n.exp=matAsList(mean.exp),
+                      n=matAsList(mean.pred))
+
     T2.obs <- sapply(freq.exp, T2stat, n.ind=freq.obs, tree=tree)
-    for(m in 1:M){
-      T1.pred[m] <- T1stat(mean.exp[m,], mean.pred[m,])
-      T2.pred[m] <- T2stat(n.ind.exp=freq.exp[[m]],
-                           n.ind=freq.pred[[m]],
-                           tree=tree)
-    }
+    T2.pred <- mapply(T2stat,
+                      n.ind.exp=freq.exp,
+                      n.ind=freq.pred,
+                      MoreArgs=list(tree=tree))
+
   })
+
 
   # PPP-value:
   T1.p <- mean(T1.obs < T1.pred)
@@ -72,20 +81,18 @@ print.postPredP <- function(x, ...){
       "Observed = ", mean(x$T2.obs), "; Predicted = ", mean(x$T2.pred), "; p-value = ", mean(x$T2.p),"\n")
 }
 
+matAsList <- function(matrix){
+  lapply(apply(matrix, 1, list), function(x) x[[1]])
+}
+
+
+
 T1stat <- function(n.exp, n){
   n.exp[n.exp==0] <- 1e-10
   dev <- (n-n.exp)^2/n.exp
   sum(dev)
 }
 
-
-
-# check:
-# n.ind.exp <- freq.exp[[1]]
-# n.ind <- freq.obs
-
-#' @importFrom  stats cov
-#' @importFrom  utils combn
 T2stat <- function(n.ind.exp, n.ind, tree){
 
   N <- nrow(n.ind)

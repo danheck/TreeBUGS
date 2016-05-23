@@ -201,7 +201,11 @@ print.summary.betaMPT <- function(x,  ...){
     if(!is.null(x$dic)){
       print(x$dic)
     }
-    print(round(x$fitStatistics$overall, x$round))
+    if(!is.null(x$fitStatistics$overall)){
+      print(round(x$fitStatistics$overall, x$round))
+    }else{
+      cat("Use PPP(fittedModel) to get T1 and T2 posterior predictive checks.\n")
+    }
     # cat("\nPoster predictive p-values for participants:\n")
     # print(round(x$fitStatistics$p.T1.individual, x$round))
     # if(!is.null(x$fitStatistics$p.T1.group)){
@@ -253,7 +257,11 @@ print.summary.traitMPT <- function(x,  ...){
     if(!is.null(x$dic)){
       print(x$dic)
     }
-    print(round(x$fitStatistics$overall, x$round))
+    if(!is.null(x$fitStatistics$overall)){
+      print(round(x$fitStatistics$overall, x$round))
+    }else{
+      cat("Use PPP(fittedModel) to get T1 and T2 posterior predictive checks.\n")
+    }
     # cat("\nPoster predictive p-values for participants:\n")
     # print(round(x$fitStatistics$p.T1.individual, x$round))
     # if(!is.null(x$fitStatistics$p.T1.group)){

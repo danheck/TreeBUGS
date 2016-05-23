@@ -53,7 +53,7 @@ traitMPT <- function(eqnfile,  # statistical model stuff
                     n.thin=5,
                     n.chains=3,
                     dic =FALSE,
-                    M.T1 = 1000,
+                    M.T1 = 0,
 
                     # File Handling stuff:
                     modelfilename,
