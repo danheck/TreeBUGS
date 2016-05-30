@@ -38,7 +38,7 @@ Target    Hit    (1-Do)*g
 Target    Miss   (1-Do)*(1-g)
 Lure      FA     (1-Dn)*g
 Lure      CR     (1-Dn)*(1-g)
-Lure      CR     (1-Dn)
+Lure      CR     Dn
 ``` 
 
 Note that model equations require the multiplication sign `*` and parameters should not be summarized, e.g., by `a^2*(1-a)`. As an input for TreeBUGS, the model file (e.g., `"2htm.txt"`) needs to be saved in the current working directory. Otherwise, the relative or absolute path to the file must be specified (e.g., `/models/2htm.txt`). To check how TreeBUGS interprets a given .eqn-file, use:
@@ -90,7 +90,7 @@ require("TreeBUGS")
 # fit the model:
 fitHierarchicalMPT <- betaMPT(eqnfile="2htm.txt",              # .eqn file
                               data="data_ind.csv",             # individual data
-                              restrictions=c("do=dn"),         # parameter restrictions (or path to file)
+                              restrictions=list("Dn=Do"),      # parameter restrictions (or path to file)
                               
                               ### optional MCMC input:                 
                               n.iter = 50000,                  # number of iterations
@@ -110,16 +110,16 @@ The functions `betaMPT` and `traitMPT` return a list including the original samp
 
 ```{r, eval=FALSE}
 # Default: Traceplot and density
-plot(fittedModel,    # fitted model
+plot(fitHierarchicalMPT,    # fitted model
      parameter ="mean"            # which parameter to plot
 )
 # further arguments are passed to ?plot.mcmc.list
 
 # Auto-correlation plots:
-plot(fittedModel,  parameter = "mean", type = "acf")
+plot(fitHierarchicalMPT,  parameter = "mean", type = "acf")
 
 # Gelman-Rubin plots:
-plot(fittedModel,  parameter = "mean", type = "gelman")
+plot(fitHierarchicalMPT,  parameter = "mean", type = "gelman")
 ```
 
 See \link{coda} and \link{runjags} for further convergence statistics and plots. Note that inferences from from the model are likely not to be valid if the Markov-Chain Monte-Carlo (MCMC) sampler did not reach convergence!
@@ -179,7 +179,7 @@ Overall, the code could look like this:
 ```{r, eval=F}
 fitMPT <- traitMPT(eqnfile = "2htm.txt", 
                    data = "data_ind.csv",   
-                   restrictions = c("do=dn"),  
+                   restrictions = list("Dn=Do"),  
                    covData = "data_covariates.csv", 
                    covStructure = list("Do Dn ; weight",  "g ; age height"),  # correlations
                    predStructure = list("Do Dn ; IQ"),   # IQ as predictor variable
