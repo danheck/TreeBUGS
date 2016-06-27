@@ -54,11 +54,13 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE){
                       n.exp=matAsList(mean.exp),
                       n=matAsList(mean.pred))
 
-    T2.obs <- sapply(freq.exp, T2stat, n.ind=freq.obs, tree=tree)
-    T2.pred <- mapply(T2stat,
-                      n.ind.exp=freq.exp,
-                      n.ind=freq.pred,
-                      MoreArgs=list(tree=tree))
+    if(T2){
+      T2.obs <- sapply(freq.exp, T2stat, n.ind=freq.obs, tree=tree)
+      T2.pred <- mapply(T2stat,
+                        n.ind.exp=freq.exp,
+                        n.ind=freq.pred,
+                        MoreArgs=list(tree=tree))
+    }
 
   })
 

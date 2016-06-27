@@ -7,7 +7,7 @@
 betaMPT(eqnfile, data, restrictions, covData, covStructure,
   transformedParameters, corProbit = FALSE, alpha = "dunif(.01,5000)",
   beta = "dunif(.01,5000)", n.iter = 20000, n.adapt = 2000,
-  n.burnin = 2000, n.thin = 5, n.chains = 3, dic = FALSE, M.T1 = 1000,
+  n.burnin = 2000, n.thin = 5, n.chains = 3, dic = FALSE, M.T1 = 0,
   modelfilename, parEstFile, autojags = NULL, ...)
 }
 \arguments{

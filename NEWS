@@ -1,3 +1,8 @@
+TreeBUGS 0.5.0 (June 2016)
+===========
+
+* getParam() and getGroupMean() allow to save results in .csv-file
+
 TreeBUGS 0.4.9 (May 2016)
 ===========
 

@@ -6,10 +6,17 @@
 #' @param factor whether to get group estimates for all combinations of factor levels (default) or only for specific factors (requires the names of the covariates in covData)
 # @param computeT1 whether to compute posterior predictive checks per group by using the T1 statistic (similar to chi square)
 #' @param probit whether to use probit scale or probability scale
-#' @seealso \code{\link{traitMPT}}
+#' @param file filename to export results in .csv format (e.g., \code{file="fit_group.csv"})
+#'
+#' @examples
+#' \dontrun{
+#' # save group means (probability scale):
+#' getGroupMeans(traitMPT, file = "groups.csv")
+#' }
+#' @seealso \code{\link{getParam}} for parameter estimates
 #' @author Daniel Heck
 #' @export
-getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
+getGroupMeans <- function(traitMPT, factor="all", probit=FALSE, file = NULL){
 
   if(is.null(traitMPT$mptInfo$predTable))
     stop("Model does not contain discrete predictors.")
@@ -86,5 +93,10 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE){
     }
 
   }
+
+  if(!is.null(file)){
+    write.csv(summaryMat, file = file)
+  }
+
   summaryMat
 }

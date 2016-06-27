@@ -8,8 +8,7 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
   predType, transformedParameters, corProbit = TRUE, mu = "dnorm(0,1)",
   xi = "dunif(0,10)", V, df, IVprec = "dchisq(1)", n.iter = 20000,
   n.adapt = 2000, n.burnin = 2000, n.thin = 5, n.chains = 3,
-  dic = FALSE, M.T1 = 1000, modelfilename, parEstFile, autojags = NULL,
-  ...)
+  dic = FALSE, M.T1 = 0, modelfilename, parEstFile, autojags = NULL, ...)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}

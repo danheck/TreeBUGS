@@ -4,7 +4,7 @@
 \alias{getGroupMeans}
 \title{Get Mean Group Estimates}
 \usage{
-getGroupMeans(traitMPT, factor = "all", probit = FALSE)
+getGroupMeans(traitMPT, factor = "all", probit = FALSE, file = NULL)
 }
 \arguments{
 \item{traitMPT}{a fitted \code{\link{traitMPT}} model}
@@ -12,14 +12,22 @@ getGroupMeans(traitMPT, factor = "all", probit = FALSE)
 \item{factor}{whether to get group estimates for all combinations of factor levels (default) or only for specific factors (requires the names of the covariates in covData)}
 
 \item{probit}{whether to use probit scale or probability scale}
+
+\item{file}{filename to export results in .csv format (e.g., \code{file="fit_group.csv"})}
 }
 \description{
 For hierarchical latent-trait MPT models with discrete predictor variables.
+}
+\examples{
+\dontrun{
+# save group means (probability scale):
+getGroupMeans(traitMPT, file = "groups.csv")
+}
 }
 \author{
 Daniel Heck
 }
 \seealso{
-\code{\link{traitMPT}}
+\code{\link{getParam}} for parameter estimates
 }
 

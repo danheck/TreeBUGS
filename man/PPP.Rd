@@ -4,7 +4,7 @@
 \alias{PPP}
 \title{Compute Posterior Predictive P-Values}
 \usage{
-PPP(fittedModel, M = 1000, nCPU = 4)
+PPP(fittedModel, M = 1000, nCPU = 4, T2 = TRUE)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
@@ -12,6 +12,8 @@ PPP(fittedModel, M = 1000, nCPU = 4)
 \item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
 
 \item{nCPU}{number of CPUs used for parallel sampling}
+
+\item{T2}{whether to compute T2 statistic to check coveriance structure (can take a lot of time)}
 }
 \description{
 Computes posterior predictive p-values to test model fit.

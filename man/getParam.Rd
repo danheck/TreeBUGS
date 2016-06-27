@@ -2,22 +2,26 @@
 % Please edit documentation in R/getParam.R
 \name{getParam}
 \alias{getParam}
-\title{Get Parameter Posterior Estimates}
+\title{Get Parameter Posterior Statistics}
 \usage{
-getParam(fittedModel, parameter = "mean", posterior = "Mean")
+getParam(fittedModel, parameter = "mean", statistic = "mean", file = NULL)
 }
 \arguments{
 \item{fittedModel}{a fitted latent-trait MPT model (see \code{\link{traitMPT}}) or beta MPT model (see \code{\link{betaMPT}})}
 
 \item{parameter}{which parameter(s) should be returned? (see below for details)}
 
-\item{posterior}{whether to show the posterior \code{"Mean"}, \code{"50\%"} (median), or \code{"SD"}}
+\item{statistic}{whether to get the posterior \code{"mean"}, \code{"median"}, \code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility interval)}
+
+\item{file}{filename to export results in .csv format (e.g., \code{file="est_param.csv"})}
 }
 \description{
 Returns posterior statistics (e.g., mean, median) for the parameters of a hierarchical MPT model.
 }
 \details{
-In the latent-trait MPT, the following parameters are being estimated:
+This function is a convenient way to get the information stored in \code{fittedModel$mcmc.summ}.
+
+The latent-trait MPT includes the following parameters:
 \itemize{
 \item \code{"mean"} (group means on probability scale)
 \item \code{"mu"} (group means on probit scale)
@@ -26,20 +30,27 @@ In the latent-trait MPT, the following parameters are being estimated:
 \item \code{"theta"} (individual MPT parameters)
 }
 
-In the beta MPT, the following parameters are being estimated:
+The beta MPT includes the following parameters:
 \itemize{
 \item \code{"mean"} (group means on probability scale)
 \item \code{"sd"} (SD on probability scale)
 \item \code{"alph"},\code{"bet"} (group parameters of beta distribution)
 \item \code{"theta"} (individual MPT parameters)
 }
+}
+\examples{
+\dontrun{
+# mean estimates per person:
+getParam(fittedModel, parameter = "theta")
 
-Note that this function is only a wrapper to conveniently access the information stored in \code{fittedModel$mcmc.summ}
+# save summary of individual estimates:
+getParam(fittedModel, parameter = "theta",
+         statistic = "summary", file= "ind_summ.csv")}
 }
 \author{
 Daniel Heck
 }
 \seealso{
-\code{\link{traitMPT}}, \code{\link{betaMPT}}
+\code{\link{getGroupMeans}} mean group estimates
 }
 

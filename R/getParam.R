@@ -1,12 +1,15 @@
-#' Get Parameter Posterior Estimates
+#' Get Parameter Posterior Statistics
 #'
 #' Returns posterior statistics (e.g., mean, median) for the parameters of a hierarchical MPT model.
 #'
 #' @param fittedModel a fitted latent-trait MPT model (see \code{\link{traitMPT}}) or beta MPT model (see \code{\link{betaMPT}})
 #' @param parameter which parameter(s) should be returned? (see below for details)
-#' @param posterior whether to show the posterior \code{"Mean"}, \code{"50\%"} (median), or \code{"SD"}
-#' @details
-#' In the latent-trait MPT, the following parameters are being estimated:
+#' @param statistic whether to get the posterior \code{"mean"}, \code{"median"}, \code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility interval)
+#' @param file filename to export results in .csv format (e.g., \code{file="est_param.csv"})
+#'
+#' @details This function is a convenient way to get the information stored in \code{fittedModel$mcmc.summ}.
+#'
+#' The latent-trait MPT includes the following parameters:
 #' \itemize{
 #' \item \code{"mean"} (group means on probability scale)
 #' \item \code{"mu"} (group means on probit scale)
@@ -15,7 +18,7 @@
 #' \item \code{"theta"} (individual MPT parameters)
 #' }
 #'
-#' In the beta MPT, the following parameters are being estimated:
+#' The beta MPT includes the following parameters:
 #' \itemize{
 #' \item \code{"mean"} (group means on probability scale)
 #' \item \code{"sd"} (SD on probability scale)
@@ -23,11 +26,22 @@
 #' \item \code{"theta"} (individual MPT parameters)
 #' }
 #'
-#' Note that this function is only a wrapper to conveniently access the information stored in \code{fittedModel$mcmc.summ}
-#' @seealso \code{\link{traitMPT}}, \code{\link{betaMPT}}
+#' @examples
+#' \dontrun{
+#' # mean estimates per person:
+#' getParam(fittedModel, parameter = "theta")
+#'
+#' # save summary of individual estimates:
+#' getParam(fittedModel, parameter = "theta",
+#'          statistic = "summary", file= "ind_summ.csv")}
 #' @author Daniel Heck
+#' @seealso \code{\link{getGroupMeans}} mean group estimates
 #' @export
-getParam <- function(fittedModel, parameter="mean", posterior="Mean"){
+getParam <- function(fittedModel,
+                     parameter="mean",
+                     statistic="mean",
+                     file = NULL){
+
   if(! class(fittedModel) %in% c("betaMPT", "traitMPT"))
     stop("Only for hierarchical MPT models (see ?traitMPT & ?betaMPT).")
 
@@ -38,14 +52,36 @@ getParam <- function(fittedModel, parameter="mean", posterior="Mean"){
   select <- setdiff(grep(parameter,allnam) , grep(".pred",allnam))
   if(length(select) == 0)
     stop("parameter not found.")
-  par <-  summ[select, posterior]
-  if(length(par) == S){
-    names(par) <- paste0(names(par), "_", thetaUnique)
-  }else if(parameter == "theta"){
-    par <- matrix(par, ncol=S, byrow=TRUE)
-    colnames(par) <- thetaUnique
-  }else if(parameter == "rho"){
-    par <- getRhoMatrix (thetaUnique, par)
+
+  label <- c("Mean", "SD", "2.5%", "97.5%")
+  sel.stat <- switch(statistic,
+                     "mean" = "Mean",
+                     "sd" = "SD",
+                     "median" = "50%",
+                     "summary" = label)
+  par <-  summ[select, sel.stat]
+
+  if(statistic != "summary"){
+    if(length(par) == S){
+      names(par) <- paste0(names(par), "_", thetaUnique)
+    }else if(parameter == "theta"){
+      par <- matrix(par, ncol=S, byrow=TRUE)
+      colnames(par) <- thetaUnique
+    }else if(parameter == "rho"){
+      par <- getRhoMatrix (thetaUnique, par)
+    }
+  }else{
+    if(length(select) == S){
+      colnames(par) <- paste0(names(par), "_", thetaUnique, "_", label)
+    }else if(parameter == "theta"){
+      par <- matrix(t(par), ncol=S*4, byrow=TRUE)
+      colnames(par) <- paste0( rep(thetaUnique, each=4), "_" , label)
+    }
+  }
+
+  if(!is.null(file)){
+    if(is.null(dim(par))) par <- t(par)
+    write.csv(par, file = file, row.names = FALSE)
   }
 
   par
