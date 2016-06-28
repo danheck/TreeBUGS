@@ -5,7 +5,6 @@
 #' @inheritParams betaMPT
 #' @param predStructure  Similar to \code{covStructure}, but defines the mapping which variables in \code{covData} are predictors for which MPT parameters (whereas \code{covStructure} determines only sampled correlations). Default: No predictors.
 #' @param predType a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.
-#' @param corProbit whether to use probit-transformed MPT parameters to compute correlations (the default for trait-MPT)
 #' @param mu hyperprior for group means of probit-transformed parameters in JAGS syntax. Default is a standard normal distribution, which implies a uniform distribution on the MPT probability parameters. A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).
 #' @param xi hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,10]. Similarly as for \code{mu}, a vector of different priors can be used. Less informative priors can be used (e.g., \code{"dunif(0,100)")}) but might result in reduced stability.
 #' @param V  S x S matrix used as a hyperprior for the inverse-Wishart hyperprior parameters with as many rows and columns as there are core MPT parameters. Default is a diagonal matrix.
@@ -29,193 +28,204 @@
 
 #' @export
 
-traitMPT <- function(eqnfile,  # statistical model stuff
-                    data,
-                    restrictions,
-                    covData,
-                    covStructure,   # correlation
+traitMPT <- function(eqnfile, data, restrictions,
+                    covData, #covStructure,   # correlation
                     predStructure,  # predictor structure
                     predType,    # c("c," f", "r")
-                    transformedParameters,
-                    corProbit=TRUE,
+                    transformedParameters, corProbit=TRUE,
 
                     # hyperpriors:
-                    mu = "dnorm(0,1)",
-                    xi = "dunif(0,10)",
-                    V,
-                    df,
-                    IVprec = "dchisq(1)",  # change to "dcat(1)" to set beta ~ dnorm(0,1)
+                    mu = "dnorm(0,1)", xi = "dunif(0,10)",
+                    V, df, IVprec = "dchisq(1)",  # change to "dcat(1)" to set beta ~ dnorm(0,1)
 
                     # MCMC stuff:
-                    n.iter=20000,
-                    n.adapt = 2000,
-                    n.burnin=2000,
-                    n.thin=5,
-                    n.chains=3,
-                    dic =FALSE,
-                    M.T1 = 0,
+                    n.iter=20000, n.adapt = 2000,
+                    n.burnin=2000,  n.thin=5,
+                    n.chains=3, dic =FALSE, ppp = 0,
 
                     # File Handling stuff:
-                    modelfilename,
-                    parEstFile,
-                    autojags=NULL,
-                    ...){
-  if(missing(restrictions)) restrictions <- NULL
-  if(missing(covData)) covData <- NULL
-  if(missing(covStructure)) covStructure <- NULL
-  if(missing(predStructure)) predStructure <- NULL
-  if(missing(predType)) predType <- NULL
-  if(missing(transformedParameters)) transformedParameters <- NULL
-
-  checkParEstFile(parEstFile)
-  modelfilename <- checkModelfilename(modelfilename)
-  data <- readData(data)
-
-  if(n.iter <= n.burnin)
-    stop("n.iter must be larger than n.burnin")
-
-  # MPT structure
-  Tree <- readEQN(eqnfile)
-  mergedTree <- mergeBranches(Tree)
-  data <- readSubjectData(data, unique(mergedTree$Category))
-
-  tHoutput <- thetaHandling(mergedTree,restrictions)
-  SubPar <- tHoutput$SubPar
-  mergedTree <- tHoutput$mergedTree
-  fixedPar <- tHoutput$fixedPar
-
-  thetaNames <- SubPar[,1:2]
-  thetaUnique <- thetaNames[rownames(unique(thetaNames[2])),]$Parameter
-  S <- max(SubPar$theta)
-  isIdentifiable(S, mergedTree)
-
-  # transformed parameters
-  transformedPar <- getTransformed(model = "traitMPT",
-                                   thetaNames = thetaNames,
-                                   transformedParameters = transformedParameters)
-  N <- nrow(data)
+                    modelfilename, parEstFile,
+                    autojags=NULL,   ...){
 
 
-  # covariate: reading + checking
-  covData <- covDataRead(covData, N)
-  predType <- predTypeDefault(covData, predType=predType)
-  covData <- covDataCenter(covData, predType=predType)
+  if(missing(V)) V <- NULL
+  if(missing(df)) df <- NULL
+  hyperprior <- list(mu=mu, xi=xi, V=V, df=df, IVprec=IVprec)
 
-
-  # PREDICTORS: assign covariates to parameters and handle factor levels
-  predTmp1 <- covHandling(covData, predStructure, N, thetaNames, predType=predType,
-                          defaultExclude="ALL_COVARIATES")
-  predFactorLevels <- predTmp1$predFactorLevels
-  predTable <- predTmp1$covTable
-  covData <- predTmp1$covData
-  # get model string: phi(....)
-  predTmp2 <- covStringPredictor(predTable, S=S,
-                                 predFactorLevels=predFactorLevels, IVprec=IVprec)
-  predString <- predTmp2$modelString
-  predPars <- predTmp2$covPars
-
-  # CORRELATIONS
-  covTmp1 <- covHandling(covData, covStructure, N, thetaNames, predType=predType,
-                         defaultExclude=unique(predTable$Covariate))
-  covTable <- covTmp1$covTable
-  covTmp2 <- covStringCorrelation(covTable, corProbit=corProbit)
-  corString <- covTmp2$modelString
-  corPars <- covTmp2$covPar
-
-  covData <- covData[,sapply(covData, class) %in% c("numeric", "integer"), drop=FALSE]
-
-  if( any(covTable$Covariate %in% predTable$Covariate))
-    warning("Some variables in covData appear both as predictors and as covariates:\n    ",
-            paste(covTable$Covariate[covTable$Covariate %in% predTable$Covariate], collapse=", "))
-
-
-  # hyperpriors
-  if(missing(V) || is.null(V))
-    V <- diag(S)
-  if(missing(df) || is.null(df))
-    df <- S+1
-
-  makeModelFile(model = "traitMPT",
-                filename = modelfilename,
-                mergedTree = mergedTree ,
-                S = S,
-                hyperprior = list(mu = mu, xi = xi),
-                predString = predString,
-                corString = corString,
-                parString=transformedPar$modelstring,
-                fixedPar=fixedPar)
-
-  time0 <- Sys.time()
-  cat("MCMC sampling started at ", format(time0), "\n")
-  runjags <- callingSampler(model = "traitMPT",
-                         mergedTree = mergedTree,
-                         data = data,
-                         modelfile = modelfilename,
-                         S = max(SubPar$theta),
-                         fixedPar=fixedPar,
-                         transformedPar = transformedPar$transformedParameters,
-                         covPars=c(corPars, predPars),
-                         covData=covData,
-                         X_list=predTmp2$X_list,
-                         hyperpriors = list(V=V, df=df, mu = mu, xi = xi),
-                         n.iter = n.iter,
-                         n.adapt = n.adapt,
-                         n.burnin = n.burnin,
-                         n.thin = n.thin,
-                         n.chains = n.chains,
-                         autojags = autojags,
-                         ...)
-  time1 <- Sys.time()
-  cat("MCMC sampling finished at", format(time1), "\n  ")
-  print(time1-time0)
-
-  # Beta MPT: rename parameters and get specific summaries
-#   summary <- summarizeMPT(model = "traitMPT",
-#                           mcmc = mcmc,
-#                           thetaNames = thetaNames,
-#                          # covIncluded = !is.null(covData),
-#                           predFactorLevels=predFactorLevels,
-#                           transformedParameters = transformedPar$transformedParameters,
-#                           NgroupT1 = groupT1$NgroupT1)
-
-  mptInfo <- list(model="traitMPT",
-                  thetaNames = thetaNames,
-                  thetaUnique = thetaUnique,
-                  thetaFixed = fixedPar$Parameter[!duplicated(fixedPar$theta)],
-                  MPT=mergedTree,
-                  eqnfile=eqnfile,
-                  data=data,
-                  restrictions=restrictions,
-                  covData=covData,
-                  covTable=covTable,
-                  corProbit=corProbit,
-                  predTable=predTable,
-                  predFactorLevels=predFactorLevels,
-                  transformedParameters=transformedPar$transformedParameters,
-                  hyperprior=list(mu=mu, xi=xi, V=V, df=df, IVprec=IVprec))
-
-  # own summary (more stable than runjags)
-  mcmc.summ <- summarizeMCMC(runjags$mcmc)
-  summary <- summarizeMPT(mcmc = runjags$mcmc, mptInfo = mptInfo, M=M.T1, summ=mcmc.summ)
-  if(dic){
-    summary$dic <-   extract(runjags, "dic", ...)
-  }else{summary$dic <- NULL}
-
-
-  # class structure for TreeBUGS
-  # mcmc$BUGSoutput <- renameBUGSoutput(mcmc$BUGSoutput, thetaUnique, "traitMPT")
-  fittedModel <- list(summary=summary,
-                      mptInfo=mptInfo,
-                      mcmc.summ = mcmc.summ,
-                      runjags = runjags,
-                      call=match.call(),
-                      time=time1-time0)
-  class(fittedModel) <- "traitMPT"
-
-  # write results to file
-  writeSummary(fittedModel, parEstFile)
-
-  gc(verbose=FALSE)
+  fittedModel <- fitModel(type="traitMPT", eqnfile=eqnfile,
+                          data=data,restrictions=restrictions,
+                          covData=covData,#covStructure=covStructure,
+                          predStructure=predStructure,
+                          predType=predType,    # c("c," f", "r")
+                          transformedParameters=transformedParameters,
+                          corProbit=corProbit,
+                          hyperprior=hyperprior,
+                          n.iter=n.iter,
+                          n.adapt = n.adapt,
+                          n.burnin=n.burnin,
+                          n.thin=n.thin,
+                          n.chains=n.chains,
+                          dic =dic,
+                          ppp = ppp,
+                          modelfilename=modelfilename,
+                          parEstFile=parEstFile,
+                          autojags=autojags,
+                          ...)
+  fittedModel$call <- match.call()
 
   return(fittedModel)
 }
+
+
+
+
+######################## OLD DUPLICATE CODE (=> see fitModel)
+
+
+# if(missing(restrictions)) restrictions <- NULL
+# if(missing(covData)) covData <- NULL
+# if(missing(covStructure)) covStructure <- NULL
+# if(missing(transformedParameters)) transformedParameters <- NULL
+#
+# checkParEstFile(parEstFile)
+# modelfilename <- checkModelfilename(modelfilename)
+# data <- readData(data)
+#
+# if(n.iter <= n.burnin)
+#   stop("n.iter must be larger than n.burnin")
+#
+# # MPT structure
+# Tree <- readEQN(eqnfile)
+# mergedTree <- mergeBranches(Tree)
+# data <- readSubjectData(data, unique(mergedTree$Category))
+#
+# tHoutput <- thetaHandling(mergedTree,restrictions)
+# SubPar <- tHoutput$SubPar
+# mergedTree <- tHoutput$mergedTree
+# fixedPar <- tHoutput$fixedPar
+#
+# thetaNames <- SubPar[,1:2]
+# thetaUnique <- thetaNames[rownames(unique(thetaNames[2])),]$Parameter
+# S <- max(SubPar$theta)
+# isIdentifiable(S, mergedTree)
+#
+# # transformed parameters
+# transformedPar <- getTransformed(model = "traitMPT",
+#                                  thetaNames = thetaNames,
+#                                  transformedParameters = transformedParameters)
+# N <- nrow(data)
+#
+#
+# # covariate: reading + checking
+# covData <- covDataRead(covData, N)
+# predType <- predTypeDefault(covData, predType=predType)
+# covData <- covDataCenter(covData, predType=predType)
+#
+#
+# # PREDICTORS: assign covariates to parameters and handle factor levels
+# predTmp1 <- covHandling(covData, predStructure, N, thetaNames, predType=predType,
+#                         defaultExclude="ALL_COVARIATES")
+# predFactorLevels <- predTmp1$predFactorLevels
+# predTable <- predTmp1$covTable
+# covData <- predTmp1$covData
+# # get model string: phi(....)
+# predTmp2 <- covStringPredictor(predTable, S=S,
+#                                predFactorLevels=predFactorLevels, IVprec=IVprec)
+# predString <- predTmp2$modelString
+# predPars <- predTmp2$covPars
+#
+# # CORRELATIONS
+# covTmp1 <- covHandling(covData, covStructure, N, thetaNames, predType=predType,
+#                        defaultExclude=unique(predTable$Covariate))
+# covTable <- covTmp1$covTable
+# covTmp2 <- covStringCorrelation(covTable, corProbit=corProbit)
+# corString <- covTmp2$modelString
+# corPars <- covTmp2$covPar
+#
+# covData <- covData[,sapply(covData, class) %in% c("numeric", "integer"), drop=FALSE]
+#
+# if( any(covTable$Covariate %in% predTable$Covariate))
+#   warning("Some variables in covData appear both as predictors and as covariates:\n    ",
+#           paste(covTable$Covariate[covTable$Covariate %in% predTable$Covariate], collapse=", "))
+#
+#
+# # hyperpriors
+# if(missing(V) || is.null(V))
+#   V <- diag(S)
+# if(missing(df) || is.null(df))
+#   df <- S+1
+#
+# makeModelFile(model = "traitMPT",
+#               filename = modelfilename,
+#               mergedTree = mergedTree ,
+#               S = S,
+#               hyperprior = list(mu = mu, xi = xi),
+#               predString = predString,
+#               corString = corString,
+#               parString=transformedPar$modelstring,
+#               fixedPar=fixedPar)
+#
+# time0 <- Sys.time()
+# cat("MCMC sampling started at ", format(time0), "\n")
+# runjags <- callingSampler(model = "traitMPT",
+#                        mergedTree = mergedTree,
+#                        data = data,
+#                        modelfile = modelfilename,
+#                        S = max(SubPar$theta),
+#                        fixedPar=fixedPar,
+#                        transformedPar = transformedPar$transformedParameters,
+#                        covPars=c(corPars, predPars),
+#                        covData=covData,
+#                        X_list=predTmp2$X_list,
+#                        hyperpriors = list(V=V, df=df, mu = mu, xi = xi),
+#                        n.iter = n.iter,
+#                        n.adapt = n.adapt,
+#                        n.burnin = n.burnin,
+#                        n.thin = n.thin,
+#                        n.chains = n.chains,
+#                        autojags = autojags,
+#                        ...)
+# time1 <- Sys.time()
+# cat("MCMC sampling finished at", format(time1), "\n  ")
+# print(time1-time0)
+#
+# # store details about model:
+# mptInfo <- list(model="traitMPT",
+#                 thetaNames = thetaNames,
+#                 thetaUnique = thetaUnique,
+#                 thetaFixed = fixedPar$Parameter[!duplicated(fixedPar$theta)],
+#                 MPT=mergedTree,
+#                 eqnfile=eqnfile,
+#                 data=data,
+#                 restrictions=restrictions,
+#                 covData=covData,
+#                 covTable=covTable,
+#                 corProbit=corProbit,
+#                 predTable=predTable,
+#                 predFactorLevels=predFactorLevels,
+#                 transformedParameters=transformedPar$transformedParameters,
+#                 hyperprior=list(mu=mu, xi=xi, V=V, df=df, IVprec=IVprec))
+#
+# # own summary (more stable than runjags)
+# mcmc.summ <- summarizeMCMC(runjags$mcmc)
+# summary <- summarizeMPT(mcmc = runjags$mcmc, mptInfo = mptInfo, M=M.T1, summ=mcmc.summ)
+# if(dic){
+#   summary$dic <-   extract(runjags, "dic", ...)
+# }else{summary$dic <- NULL}
+#
+#
+# # class structure for TreeBUGS
+# # mcmc$BUGSoutput <- renameBUGSoutput(mcmc$BUGSoutput, thetaUnique, "traitMPT")
+# fittedModel <- list(summary=summary,
+#                     mptInfo=mptInfo,
+#                     mcmc.summ = mcmc.summ,
+#                     runjags = runjags,
+#                     call=match.call(),
+#                     time=time1-time0)
+# class(fittedModel) <- "traitMPT"
+#
+# # write results to file
+# writeSummary(fittedModel, parEstFile)
+#
+# gc(verbose=FALSE)
+

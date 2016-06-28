@@ -58,6 +58,18 @@ summarizeMPT <- function(mcmc,
     }
   }else{thetaFE <- NULL}
 
+  rho <- rhoNames <- c()
+  cnt <- 1
+  while(cnt<S){
+    rho <- rbind(rho, summ[paste0("rho[",cnt,",",(cnt+1):S,"]"),, drop=FALSE])
+    rhoNames <- c(rhoNames,
+                  paste0("rho[",uniqueNames[cnt],",",uniqueNames[(cnt+1):S],"]"))
+    cnt <- cnt+1
+  }
+  if(S == 1) rho <- matrix(1,1,1, dimnames=list(uniqueNames,uniqueNames))
+  rownames(rho) <- rhoNames
+  rho.matrix <- getRhoMatrix(uniqueNames, rho)
+
   ############################## BETA MPT SUMMARY
   if(model == "betaMPT"){
     # mean and individual parameter estimates
@@ -71,8 +83,8 @@ summarizeMPT <- function(mcmc,
     rownames(alpha) <-paste0("alpha_", uniqueNames)
     rownames(beta) <-paste0("beta_", uniqueNames)
 
-    rho <- getRhoBeta(uniqueNames, mcmc, corProbit=mptInfo$corProbit)
-    rho.matrix <- getRhoMatrix(uniqueNames, rho)
+    # rho <- summgetRhoBeta(uniqueNames, mcmc, corProbit=mptInfo$corProbit)
+    # rho.matrix <- getRhoMatrix(uniqueNames, rho)
 
     groupParameters <- list(mean=mean, SD=SD, alpha=alpha, beta=beta,
                             rho=rho, rho.matrix = rho.matrix,
@@ -84,20 +96,11 @@ summarizeMPT <- function(mcmc,
     mu <- summ[paste0("mu",idx),, drop=FALSE]
     mean <- summ[paste0("mean",idx),, drop=FALSE]
     sigma <- summ[paste0("sigma",idx),, drop=FALSE]
-    rho <- rhoNames <- c()
-    cnt <- 1
-    while(cnt<S){
-      rho <- rbind(rho, summ[paste0("rho[",cnt,",",(cnt+1):S,"]"),, drop=FALSE])
-      rhoNames <- c(rhoNames,
-                    paste0("rho[",uniqueNames[cnt],",",uniqueNames[(cnt+1):S],"]"))
-      cnt <- cnt+1
-    }
-    if(S == 1) rho <- matrix(1,1,1, dimnames=list(uniqueNames,uniqueNames))
+
 
     rownames(mu) <-paste0("latent_mu_", uniqueNames)
     rownames(mean) <-paste0("mean_", uniqueNames)
     rownames(sigma) <-paste0("latent_sigma_", uniqueNames)
-    rownames(rho) <- rhoNames
 
     selCov <- grepl("slope_", rownames(summ))
     selFac <- grepl("factor_", rownames(summ))
@@ -123,7 +126,6 @@ summarizeMPT <- function(mcmc,
       factor <- NULL ; factorSD <- NULL
     }
 
-    rho.matrix <- getRhoMatrix(uniqueNames, rho)
     groupParameters <- list(mean = mean, mu = mu, sigma = sigma, rho = rho,
                             rho.matrix=rho.matrix,
                             slope = slope, factor = factor, factorSD = factorSD,
@@ -148,23 +150,6 @@ summarizeMPT <- function(mcmc,
                   individParameters=individParameters,
                   fitStatistics=NULL,
                   transformedParameters=transPar)
-  if(M>0){
-    ppp <- PPP(list(mptInfo=mptInfo, runjags=list(mcmc=mcmc) ), M=M, nCPU=length(mcmc))
-    try(
-      summary$fitStatistics <- list(
-        "overall"=c(
-          # "DIC"=sum(dic$deviance) + mean( sum(dic$penalty)), #$BUGSoutput$DIC,
-          "T1.observed"=mean(ppp$T1.obs),
-          "T1.predicted"=mean(ppp$T1.pred),
-          "p.T1"=ppp$T1.p,
-          "T2.observed"=mean(ppp$T2.obs),
-          "T2.predicted"=mean(ppp$T2.pred),
-          "p.T2"=ppp$T2.p
-          # "p.T1.individual"=summ[paste0("p.T1ind[",1:N,"]"),"Mean"], #mcmc$BUGSoutput$mean$p.T1ind
-        ))
-    )
-  }
-
 
   summary$call <- "(summarizeMPT called manually)"
   summary$round <- 3
@@ -338,33 +323,33 @@ print.traitMPT <- function(x,  ...){
 
 
 
-getRhoBeta <- function(uniqueNames, mcmc, corProbit=FALSE, truncation=5){
-  S <- length(uniqueNames)
-  if(S == 1){
-    return(NULL)
-  }
-
-  nams <- varnames(mcmc)
-  sel <- grep("theta[", nams, fixed=TRUE)
-  rho <- sapply(mcmc , simplify=FALSE,
-                function(mmm){
-                  cor.mat <- t(apply(mmm[,sel], 1,
-                                     function(theta){
-                                       if(corProbit){
-                                         theta <- qnorm(theta)
-                                         theta[theta < -truncation] <- -truncation
-                                         theta[theta > truncation] <- truncation
-                                       }
-                                       cor(matrix(theta, ncol=S, byrow = TRUE))
-                                     }))
-                  colnames(cor.mat) <- apply(expand.grid("rho[",1:S,",",1:S,"]"),1,paste0, collapse="")
-                  as.mcmc(cor.mat)
-                })
-  summ <- summarizeMCMC(as.mcmc.list(rho))
-  rownames(summ) <- paste0("rho[",apply(expand.grid(uniqueNames,uniqueNames), 1, paste0, collapse=","),"]")
-  summ[! duplicated(summ[,"Mean"]) & summ[,"Mean"] != 1,, drop=FALSE]
-
-}
+# getRhoBeta <- function(uniqueNames, mcmc, corProbit=FALSE, truncation=5){
+#   S <- length(uniqueNames)
+#   if(S == 1){
+#     return(NULL)
+#   }
+#
+#   nams <- varnames(mcmc)
+#   sel <- grep("theta[", nams, fixed=TRUE)
+#   rho <- sapply(mcmc , simplify=FALSE,
+#                 function(mmm){
+#                   cor.mat <- t(apply(mmm[,sel], 1,
+#                                      function(theta){
+#                                        if(corProbit){
+#                                          theta <- qnorm(theta)
+#                                          theta[theta < -truncation] <- -truncation
+#                                          theta[theta > truncation] <- truncation
+#                                        }
+#                                        cor(matrix(theta, ncol=S, byrow = TRUE))
+#                                      }))
+#                   colnames(cor.mat) <- apply(expand.grid("rho[",1:S,",",1:S,"]"),1,paste0, collapse="")
+#                   as.mcmc(cor.mat)
+#                 })
+#   summ <- summarizeMCMC(as.mcmc.list(rho))
+#   rownames(summ) <- paste0("rho[",apply(expand.grid(uniqueNames,uniqueNames), 1, paste0, collapse=","),"]")
+#   summ[! duplicated(summ[,"Mean"]) & summ[,"Mean"] != 1,, drop=FALSE]
+#
+# }
 
 
 getRhoMatrix <- function (uniqueNames, rho) {
@@ -386,9 +371,9 @@ getRhoMatrix <- function (uniqueNames, rho) {
 summarizeMCMC <- function(mcmc){
   # summ <- summary(mcmc, quantiles = c(0.025, 0.5, 0.975))
   mcmc.mat <- do.call("rbind", mcmc)
-  summTab <- cbind("Mean"=apply(mcmc.mat,2,mean),
-                   "SD"=apply(mcmc.mat,2,sd),
-                   t(apply(mcmc.mat, 2, quantile, c(.025,.5,.975))),
+  summTab <- cbind("Mean"=apply(mcmc.mat,2,mean, na.rm = TRUE),
+                   "SD"=apply(mcmc.mat,2,sd, na.rm = TRUE),
+                   t(apply(mcmc.mat, 2, quantile, c(.025,.5,.975), na.rm = TRUE)),
                    "Time-series SE"=NA, "n.eff" = NA ,
                    "Rhat" = NA, "R_95%"=NA)
   #     summ[[1]][,1:2], summ[[2]], "Time-series SE"=summ[[1]][,4]

@@ -22,6 +22,8 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
   }
 
   for(s in 1:S){
+    label <- ifelse( S== 1, "", paste0("[",s,"]"))
+
     # both betaMPT and traitMPT have at least two hyperprior elements
     # that may have either length one (default) or length S:
     for(i in 1:2){
@@ -37,9 +39,9 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
       # formulas for mean and SD of beta distribution:
       mean <- aa/(aa+bb)
       sd <-  sqrt(aa*bb/((aa+bb)^2*(aa+bb+1)))
-      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sd[",s,"]")]),
+      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sd", label)]),
                       from=0, to=.5)
-      ci.sd <- quantile(unlist(fittedModel$runjags$mcmc[,paste0("sd[",s,"]")]),
+      ci.sd <- quantile(unlist(fittedModel$runjags$mcmc[,paste0("sd", label)]),
                         c((1-ci)/2,1-(1-ci)/2))
 
       prior.sd <- density(sd, from=0, to=.5)
@@ -49,13 +51,13 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
       mean= sd <- pnorm(aa)
       sd <- bb * sqrt(ss[s,s,])
 
-      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sigma[",s,"]")]))
+      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sigma", label)]))
       prior.sd <- density(sd)
       xlab.sd = "Group SD (on latent probit scale)"
-      ci.sd <- quantile(unlist(fittedModel$runjags$mcmc[,paste0("sigma[",s,"]")]),
+      ci.sd <- quantile(unlist(fittedModel$runjags$mcmc[,paste0("sigma", label)]),
                         c((1-ci)/2,1-(1-ci)/2))
     }
-    d.mean <- density(unlist(fittedModel$runjags$mcmc[,paste0("mean[",s,"]")]), from=0, to=1)
+    d.mean <- density(unlist(fittedModel$runjags$mcmc[,paste0("mean", label)]), from=0, to=1)
     prior.mean <- density(mean, from=0, to=1)
 
 
@@ -64,7 +66,7 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
     plot(d.mean, main=paste0( "Group mean of ", fittedModel$mptInfo$thetaUnique[s]),
          xlab="Group mean")
     lines(prior.mean, col="blue", lty="dashed")
-    abline(v= quantile(unlist(fittedModel$runjags$mcmc[,paste0("mean[",s,"]")]),
+    abline(v= quantile(unlist(fittedModel$runjags$mcmc[,paste0("mean", label)]),
                                c((1-ci)/2,1-(1-ci)/2)), col="red")
     plot(d.sd,   main=paste0("Group SD of ", fittedModel$mptInfo$thetaUnique[s]),
          xlab=xlab.sd)

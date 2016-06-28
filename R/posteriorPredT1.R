@@ -68,9 +68,9 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE){
   # PPP-value:
   T1.p <- mean(T1.obs < T1.pred)
   T2.p <- mean(T2.obs < T2.pred)
-  res <- list(T1.obs=T1.obs, T1.pred=T1.pred,
-              T2.obs=T2.obs, T2.pred=T2.pred,
-              T1.p=T1.p, T2.p=T2.p)
+  res <- list(T1.obs=T1.obs, T1.pred=T1.pred,T1.p=T1.p,
+              T2.obs=T2.obs, T2.pred=T2.pred,T2.p=T2.p,
+              freq.exp=freq.exp, freq.pred=freq.pred, freq.obs=freq.obs)
   class(res) <- "postPredP"
   res
 }
@@ -78,9 +78,14 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE){
 #' @export
 print.postPredP <- function(x, ...){
   cat(" ## Mean structure (T1):\n",
-      "Observed = ", mean(x$T1.obs), "; Predicted = ", mean(x$T1.pred), "; p-value = ", mean(x$T1.p),"\n",
+      "Observed = ", mean(x$T1.obs),
+      "; Predicted = ", mean(x$T1.pred),
+      "; p-value = ", mean(x$T1.p),"\n",
+
       "## Covariance structure (T2):\n",
-      "Observed = ", mean(x$T2.obs), "; Predicted = ", mean(x$T2.pred), "; p-value = ", mean(x$T2.p),"\n")
+      "Observed = ", mean(x$T2.obs),
+      "; Predicted = ", mean(x$T2.pred),
+      "; p-value = ", mean(x$T2.p),"\n")
 }
 
 matAsList <- function(matrix){

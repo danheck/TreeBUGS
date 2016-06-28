@@ -5,13 +5,41 @@
 #' @inheritParams betaMPT
 #' @param ... further arguments passed to \link[runjags]{extend.jags}
 #' @export
-extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0, n.thin = 1, ...){
+extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,  ...){
 
+  # remove correlations (otherwise, extension not possible)
+  sel.cor <- grep("cor_", varnames(fittedModel$runjags$mcmc), fixed=TRUE)
+  if(class(fittedModel) == "betaMPT")
+    sel.cor <- c(sel.cor, grep("rho", varnames(fittedModel$runjags$mcmc), fixed=TRUE))
+  fittedModel$runjags$mcmc <- fittedModel$runjags$mcmc[,- sel.cor]
   tmp <- extend.jags(fittedModel$runjags,
                      burnin = n.burnin,
-                     sample = ceiling((n.iter-n.burnin)/n.thin),
+                     sample = ceiling((n.iter-n.burnin)/fittedModel$runjags$thin),
                      adapt = n.adapt,
-                     thin=n.thin,summarise = FALSE, ...)
+                     # thin=n.thin,
+                     summarise = FALSE, ...)
+
+  # add correlations
+  covData <- fittedModel$mptInfo$covData
+  predTable <- fittedModel$mptInfo$predTable
+  if(!is.null(covData)){
+    if(!is.null(predTable)){
+      isPred <- (1:ncol(covData)) %in% predTable$covIdx
+    }else{
+      isPred <- rep(FALSE, length(fittedModel$mptInfo$predType))
+    }
+
+    sel <- fittedModel$mptInfo$predType == "c" & !isPred
+    if(any(sel) | class(fittedModel) == "betaMPT"){
+      cdat <- covData[,sel,drop = FALSE]
+      fittedModel$runjags$mcmc <- as.mcmc.list(
+        lapply(fittedModel$runjags$mcmc, corSamples,
+               covData=cdat,
+               thetaUnique=fittedModel$mptInfo$thetaUnique,
+               rho=ifelse(class(fittedModel) == "betaMPT", TRUE, FALSE),
+               corProbit = fittedModel$mptInfo$corProbit))
+    }
+  }
 
   fittedModel$mcmc.summ <- summarizeMCMC(tmp$mcmc)
   fittedModel$summary <- summarizeMPT(mcmc = tmp$mcmc,

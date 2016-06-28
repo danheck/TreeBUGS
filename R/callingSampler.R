@@ -111,9 +111,9 @@ callingSampler <- function(model,
 
 
   if(model == "traitMPT"){
-    data <- c(data, "V", "df")
-    df <- hyperpriors$df
+   df <- hyperpriors$df
     V <- hyperpriors$V
+    data <- c(data, "V", "df")
 
     if(length(X_list) != 0){
       for(pp in 1:length(X_list))

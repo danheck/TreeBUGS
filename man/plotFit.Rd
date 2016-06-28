@@ -16,4 +16,7 @@ plotFit(fittedModel, M = 1000, ...)
 \description{
 Plots observed mean frequencies and boxplot of mean frequencies sampled from posterior distribution (posterior predictive).
 }
+\details{
+If posterior predictive p-values were computed when fitting the model (e.g., \code{traitMPT(...,ppp=1000)} ), the stored posterior samples are re-used for plotting.
+}
 

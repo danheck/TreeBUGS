@@ -1,7 +1,13 @@
 TreeBUGS 0.5.0 (June 2016)
 ===========
 
+* function fitModel() that fits both trait and beta MPT (avoids duplicated code)
+* correlations of parameters are computed in R, not in JAGS anymore (increase in speed)
+* argument "covStructure" removed (all correlations computed by default)
+* save posterior predictive samples in traitMPT/betaMPT object (i.e., expected/predicted/observed frequencies)
+* to get posterior predictive p-values, use ppp=1000 (previously: M.T1=1000)
 * getParam() and getGroupMean() allow to save results in .csv-file
+
 
 TreeBUGS 0.4.9 (May 2016)
 ===========

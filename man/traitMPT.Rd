@@ -4,14 +4,14 @@
 \alias{traitMPT}
 \title{Fit a Hierarchical latent-trait MPT Model}
 \usage{
-traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
-  predType, transformedParameters, corProbit = TRUE, mu = "dnorm(0,1)",
+traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
+  transformedParameters, corProbit = TRUE, mu = "dnorm(0,1)",
   xi = "dunif(0,10)", V, df, IVprec = "dchisq(1)", n.iter = 20000,
   n.adapt = 2000, n.burnin = 2000, n.thin = 5, n.chains = 3,
-  dic = FALSE, M.T1 = 0, modelfilename, parEstFile, autojags = NULL, ...)
+  dic = FALSE, ppp = 0, modelfilename, parEstFile, autojags = NULL, ...)
 }
 \arguments{
-\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax)}
+\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}}
 
 \item{data}{The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)}
 
@@ -19,15 +19,13 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
 
 \item{covData}{The path to the csv data file for the individual values on the covariates (comma-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)}
 
-\item{covStructure}{Optional: Which correlations to compute? Either the (full path to the) file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Default: All continuous variables in covData included.}
-
 \item{predStructure}{Similar to \code{covStructure}, but defines the mapping which variables in \code{covData} are predictors for which MPT parameters (whereas \code{covStructure} determines only sampled correlations). Default: No predictors.}
 
 \item{predType}{a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.}
 
 \item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
 
-\item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations (the default for trait-MPT)}
+\item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations (probit-values of \code{+Inf} are truncated to \code{max(5,max(probit))}; similarly for \code{-Inf}). Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
 
 \item{mu}{hyperprior for group means of probit-transformed parameters in JAGS syntax. Default is a standard normal distribution, which implies a uniform distribution on the MPT probability parameters. A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).}
 
@@ -41,17 +39,17 @@ traitMPT(eqnfile, data, restrictions, covData, covStructure, predStructure,
 
 \item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.}
 
-\item{n.adapt}{number of adaption samples to adjust samplers in JAGS}
+\item{n.adapt}{number of adaption samples to adjust MCMC sampler in JAGS. The sampler will be more efficient if it is tuned well.}
 
 \item{n.burnin}{Number of samples for burnin (samples will not be stored and removed from n.iter)}
 
 \item{n.thin}{Thinning rate.}
 
-\item{n.chains}{number of MCMC chains}
+\item{n.chains}{number of MCMC chains (sampled in parallel).}
 
 \item{dic}{whether to compute DIC using \code{\link[runjags]{extract}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
 
-\item{M.T1}{number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})}
+\item{ppp}{number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})}
 
 \item{modelfilename}{Name that the modelfile that is made by the function to work with JAGS should get.
 Default is to write this information to the tempdir as required by CRAN standards.}

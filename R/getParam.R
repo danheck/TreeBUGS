@@ -58,7 +58,8 @@ getParam <- function(fittedModel,
                      "mean" = "Mean",
                      "sd" = "SD",
                      "median" = "50%",
-                     "summary" = label)
+                     "summary" = label,
+                     stop("statistic not supported."))
   par <-  summ[select, sel.stat]
 
   if(statistic != "summary"){

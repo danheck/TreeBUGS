@@ -56,32 +56,33 @@ posteriorPredictive <- function(fittedModel, M=100, expected=FALSE, nCPU=4){
                       "tree","TreeNames","n.thetaFE","sel.cat"), envir=environment())
 
   # loop across replications:
-  freq.list <- parApply(cl, cbind(par.thetaFE, par.ind), 1, function(tt){
+  freq.list <- parApply(cl, cbind(par.thetaFE, par.ind), 1,
+                        function(tt){
 
-    # single replication theta:
-    theta <- matrix(tt[(n.thetaFE+1):length(tt)], S, N)
-    if(n.thetaFE>0)
-      thetaFE <- tt[1:n.thetaFE]
+                          # single replication theta:
+                          theta <- matrix(tt[(n.thetaFE+1):length(tt)], S, N)
+                          if(n.thetaFE>0)
+                            thetaFE <- tt[1:n.thetaFE]
 
-    # loop across participants:
-    freq.rep <- t(sapply(1:N, function(n){
+                          # loop across participants:
+                          freq.rep <- t(sapply(1:N, function(n){
 
-      # single participant:
-      freq <- rep(NA, nrow(mptInfo$MPT))
-      names(freq) <- mptInfo$MPT$Category
-      prob <- sapply(mptInfo$MPT$Equation,
-                     function(ff) eval(parse(text=ff)))
+                            # single participant:
+                            freq <- rep(NA, nrow(mptInfo$MPT))
+                            names(freq) <- mptInfo$MPT$Category
+                            prob <- sapply(mptInfo$MPT$Equation,
+                                           function(ff) eval(parse(text=ff)))
 
-      # EXPECTED frequencies:
-      freq <- prob*numItems[n,tree]
-      names(freq) <- mptInfo$MPT$Category
-      return(freq)
-    }
-    ))
+                            # EXPECTED frequencies:
+                            freq <- prob*numItems[n,tree]
+                            names(freq) <- mptInfo$MPT$Category
+                            return(freq)
+                          }
+                          ))
 
-    # return list to avoid parsing to matrix (loss of dimensions)
-    list(freq.rep)
-  })
+                          # return list to avoid parsing to matrix (loss of dimensions)
+                          list(freq.rep)
+                        })
 
   # remove strange list structure:
   freq.list <- lapply(freq.list, function(xx) xx[[1]])
