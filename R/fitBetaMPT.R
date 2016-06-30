@@ -5,8 +5,7 @@
 #' @param eqnfile The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}
 #' @param data The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)
 #' @param restrictions  Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
-#' @param covData The path to the csv data file for the individual values on the covariates (comma-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)
-# @param covStructure  Optional: Which correlations to compute? Either the (full path to the) file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Default: All continuous variables in covData included.
+#' @param covData Data that contains covariates, for which correlations with individual MPT parameters will be sampled. Either the path to a .csv file (comma-separated: rows=individuals in the same order as \code{data}; first row must contain covariate labels); or alternatively: a data frame or matrix (rows=individuals, columns = variables; covariate labels as column names). Note that in \code{betaMPT}, correlatios are computed for discrete variables that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})
 #' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
 #' @param modelfilename Name that the modelfile that is made by the function to work with JAGS should get.
 #'        Default is to write this information to the tempdir as required by CRAN standards.
@@ -66,8 +65,9 @@ betaMPT <- function(eqnfile, data, restrictions,
                           modelfilename=modelfilename,
                           parEstFile=parEstFile,
                           autojags=autojags,
+                          call = match.call(),
                           ...)
-  fittedModel$call <- match.call()
+  # fittedModel$call <- match.call()
 
   return(fittedModel)
 }

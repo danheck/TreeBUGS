@@ -17,7 +17,7 @@ betaMPT(eqnfile, data, restrictions, covData, transformedParameters,
 
 \item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
 
-\item{covData}{The path to the csv data file for the individual values on the covariates (comma-separated; rows=individuals in the same order as \code{data}, covariate labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual values on covariates, covariate labels as column names)}
+\item{covData}{Data that contains covariates, for which correlations with individual MPT parameters will be sampled. Either the path to a .csv file (comma-separated: rows=individuals in the same order as \code{data}; first row must contain covariate labels); or alternatively: a data frame or matrix (rows=individuals, columns = variables; covariate labels as column names). Note that in \code{betaMPT}, correlatios are computed for discrete variables that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})}
 
 \item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
 

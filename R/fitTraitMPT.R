@@ -3,7 +3,7 @@
 #' Fits a latent-trait MPT model (Klauer, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
 #'
 #' @inheritParams betaMPT
-#' @param predStructure  Similar to \code{covStructure}, but defines the mapping which variables in \code{covData} are predictors for which MPT parameters (whereas \code{covStructure} determines only sampled correlations). Default: No predictors.
+#' @param predStructure  Defines which variables in \code{covData} are included as predictors for which MPT parameters. Either the path to the file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Note that no correlations of MPT parameters and predictors are computed.
 #' @param predType a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.
 #' @param mu hyperprior for group means of probit-transformed parameters in JAGS syntax. Default is a standard normal distribution, which implies a uniform distribution on the MPT probability parameters. A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).
 #' @param xi hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,10]. Similarly as for \code{mu}, a vector of different priors can be used. Less informative priors can be used (e.g., \code{"dunif(0,100)")}) but might result in reduced stability.
@@ -70,8 +70,9 @@ traitMPT <- function(eqnfile, data, restrictions,
                           modelfilename=modelfilename,
                           parEstFile=parEstFile,
                           autojags=autojags,
+                          call = match.call(),
                           ...)
-  fittedModel$call <- match.call()
+  # fittedModel$call <- match.call()
 
   return(fittedModel)
 }

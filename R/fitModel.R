@@ -26,6 +26,7 @@ fitModel <- function(type,
                      modelfilename,
                      parEstFile,
                      autojags=NULL,
+                     call = NULL,
                      ...){
 
   if(missing(restrictions)) restrictions <- NULL
@@ -192,7 +193,7 @@ fitModel <- function(type,
                       mcmc.summ = mcmc.summ,
                       runjags = runjags,
                       postpred=NULL,
-                      call=NULL,
+                      call=call,
                       time=time1-time0)
   class(fittedModel) <- type
 
