@@ -28,7 +28,7 @@ plotParam <- function(x, includeIndividual=TRUE, ...){
   if(includeIndividual){
     for(i in 1:N){
       points(1:S+seq(-.2,.2, length.out = N)[i],
-             col=adjustcolor("black", alpha=.6), #col=rainbow(N, alpha=.4)[i],
+             col=adjustcolor(col = "black", alpha.f=.5), #col=rainbow(N, alpha=.4)[i],
              pch=16,
              x$summary$individParameters[,i,1], cex=.9)
     }

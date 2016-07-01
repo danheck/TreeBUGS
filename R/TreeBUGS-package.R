@@ -11,10 +11,11 @@
 #' @importFrom runjags run.jags extract autoextend.jags extend.jags
 #run.jags  summary.runjags extract autorun.jags autoextend.jags
 #' @importFrom coda gelman.diag effectiveSize as.mcmc.list as.mcmc
-#' @importFrom utils read.csv write.table
+#' @importFrom utils read.csv write.table write.csv
 #' @importFrom graphics axis plot points  segments abline boxplot curve hist lines par
-#' @importFrom grDevices rainbow
-#' @importFrom stats pnorm rnorm runif sd qnorm dnorm dbeta quantile rWishart
+#' @importFrom grDevices rainbow adjustcolor
+#' @importFrom stats pnorm rnorm runif sd qnorm dnorm dbeta quantile rWishart ave pchisq
+#' @importFrom parallel parSapply
 #' @references
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 #'

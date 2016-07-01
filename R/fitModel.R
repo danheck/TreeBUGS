@@ -198,7 +198,8 @@ fitModel <- function(type,
   class(fittedModel) <- type
 
   if(ppp>0){
-    postPred <- PPP(fittedModel, M=ppp, nCPU=length(mcmc))
+    postPred <- PPP(fittedModel, M=ppp,
+                    nCPU=length(runjags$mcmc))
     fittedModel$postpred <- postPred[c("freq.exp", "freq.pred", "freq.obs")]
     try(
       fittedModel$summary$fitStatistics <- list(

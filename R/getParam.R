@@ -60,7 +60,7 @@ getParam <- function(fittedModel,
                      "median" = "50%",
                      "summary" = label,
                      stop("statistic not supported."))
-  par <-  summ[select, sel.stat]
+  par <-  summ[select, sel.stat, drop = FALSE]
 
   if(statistic != "summary"){
     if(length(par) == S){
@@ -73,7 +73,7 @@ getParam <- function(fittedModel,
     }
   }else{
     if(length(select) == S){
-      colnames(par) <- paste0(names(par), "_", thetaUnique, "_", label)
+      rownames(par) <- paste0(rownames(par), "_", thetaUnique)
     }else if(parameter == "theta"){
       par <- matrix(t(par), ncol=S*4, byrow=TRUE)
       colnames(par) <- paste0( rep(thetaUnique, each=4), "_" , label)

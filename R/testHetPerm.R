@@ -8,6 +8,7 @@
 #' @param source whether to test for \code{"person"} or \code{"item"} homogeneity
 # @param stat which statistic to use (either \code{"var"} or \code{"chisq"})
 #' @param rep number of permutations to be sampled
+#' @param nCPU number of CPUs used for parallel Monte Carlo sampling of permutations
 #' @details
 #' If an item/person has zero frequencies on all categories in an MPT tree, these zeros are neglected when computing mean frequencies per column. As an example, consider a simple recognition test with a fixed assignments of words to the learn/test list. In such an experiment, all learned words will result in hits or misses (i.e., the MPT tree of old items), whereas new words are always false alarms/correct rejections and thus belong to the MPT tree of new items (this is not necessarily the case if words are assigned randomly).
 #'
@@ -16,33 +17,20 @@
 #' @author Daniel W. Heck
 #' @references Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. http://doi.org/10.3758/PBR.15.4.713
 #' @examples
-#' # generate heterogeneous data:
-#' N <- 20
-#' M <- 50
-#' data <- data.frame(id =   rep(1:N, each=M),
-#'                    item = rep(1:M, N))
-#'
-#' # no item but high participant variabiltiy:
-#' person <- rep(rnorm(N,0,1.5), each=M)
-#' item <- rnorm(M,0,.2)
-#' data$cat <- apply(cbind(person, item),
-#'                   1, function(xx){
-#'   d <- pnorm(sum(xx))
-#'   sample(c("h","m","fa","cr"),1,
-#'          prob = c(d*(1-d)*.5,1-.5,
-#'                   .5,d+(1-d)*(1-.5)))
-#'   })
+#' # generate homogeneous data
+#' # (N=15 participants, M=30 items)
+#' data <- data.frame(id = rep(1:15, each=30),
+#'                    item = rep(1:30, 15))
+#' data$cat <- sample(c("h","cr","m","fa"),15*30,
+#'                    replace = TRUE,
+#'                    prob = c(.7,.3,.4,.6))
 #' head(data)
+#' tree <- list(old = c("h","m"),
+#'              new = c("fa", "cr"))
 #'
-#' # participants are heterogeneous:
-#' tmp <- testHetPerm(data, tree, rep=500)
+#' # test participant homogeneity:
+#' tmp <- testHetPerm(data, tree, rep=200, nCPU=1)
 #' tmp[2:3]
-#' testHetChi(table(data$id, data$cat), c(1,1,2,2))
-#'
-#' # items are homogeneous:
-#' tmp2 <- testHetPerm(data, tree, source="item", rep=500)
-#' tmp2[2:3]
-#' testHetChi(table(data$item, data$cat), c(1,1,2,2))
 #' @export
 testHetPerm <- function(data,
                         tree,
