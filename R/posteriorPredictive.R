@@ -51,55 +51,52 @@ posteriorPredictive <- function(fittedModel, M=100, expected=FALSE, nCPU=4){
     }
   }
 
-  cl <- makeCluster(nCPU)
-  clusterExport(cl, c("S","N","mptInfo","numItems",
-                      "tree","TreeNames","n.thetaFE","sel.cat"), envir=environment())
+  expectedFreq <- function(n, theta, thetaFE){
+    sapply(mptInfo$MPT$Equation,USE.NAMES = FALSE,
+           function(ff) {
+             eval(parse(text=ff),
+                  envir = list(n=n, theta=theta, thetaFE=thetaFE) )
+           })
+  }
 
-  # loop across replications:
-  freq.list <- parApply(cl, cbind(par.thetaFE, par.ind), 1,
-                        function(tt){
+  getPostPred <- function(tt){
 
-                          # single replication theta:
-                          theta <- matrix(tt[(n.thetaFE+1):length(tt)], S, N)
-                          if(n.thetaFE>0)
-                            thetaFE <- tt[1:n.thetaFE]
+    # single replication theta:
+    theta <- matrix(tt[(n.thetaFE+1):length(tt)], S, N)
+    if(n.thetaFE>0){
+      thetaFE <- tt[1:n.thetaFE]
+    }else{
+      thetaFE <- NULL
+    }
 
-                          # loop across participants:
-                          freq.rep <- t(sapply(1:N, function(n){
+    freq.exp <- t(sapply(1:N, expectedFreq,
+                         theta = theta, thetaFE = thetaFE))*numItems[,tree]
 
-                            # single participant:
-                            freq <- rep(NA, nrow(mptInfo$MPT))
-                            names(freq) <- mptInfo$MPT$Category
-                            prob <- sapply(mptInfo$MPT$Equation,
-                                           function(ff) eval(parse(text=ff)))
+    if(!expected){
+      # multinomial sampling:
+      for(k in 1:length(TreeNames)){
+        freq.exp[,sel.cat[[k]]] <- t(apply(freq.exp[,sel.cat[[k]]], 1,
+                                           function(x)
+                                             rmultinom(1, size=sum(x), prob=x/sum(x))))
+      }
+    }
 
-                            # EXPECTED frequencies:
-                            freq <- prob*numItems[n,tree]
-                            names(freq) <- mptInfo$MPT$Category
-                            return(freq)
-                          }
-                          ))
+    list(freq.exp)
+  }
 
-                          # return list to avoid parsing to matrix (loss of dimensions)
-                          list(freq.rep)
-                        })
+  if(nCPU >1){
+    cl <- makeCluster(nCPU)
+    clusterExport(cl, c("S","N","mptInfo","numItems","expected","expectedFreq",
+                        "tree","TreeNames","n.thetaFE","sel.cat"), envir=environment())
+    # loop across replications:
+    freq.list <- parApply(cl, cbind(par.thetaFE, par.ind), 1, getPostPred)
+    stopCluster(cl)
+  }else{
+    freq.list <- apply(cbind(par.thetaFE, par.ind), 1, getPostPred)
+  }
 
   # remove strange list structure:
   freq.list <- lapply(freq.list, function(xx) xx[[1]])
-
-  # posterior PREDICTIVE sampling:
-  if(!expected){
-    # multinomial sampling:
-    freq.list <- parLapply(cl, freq.list, function(fe){
-      for(k in 1:length(TreeNames)){
-        fe[,sel.cat[[k]]] <- t(apply(fe[,sel.cat[[k]]], 1,
-                                 function(x) rmultinom(1, size=sum(x), prob=x/sum(x))))
-      }
-      fe
-    })
-  }
-  stopCluster(cl)
-
 
   if(M == 1){
     freq.list[[1]]
