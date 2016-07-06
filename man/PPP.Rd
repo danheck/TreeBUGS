@@ -11,7 +11,7 @@ PPP(fittedModel, M = 1000, nCPU = 4, T2 = TRUE)
 
 \item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
 
-\item{nCPU}{number of CPUs used for parallel sampling}
+\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.}
 
 \item{T2}{whether to compute T2 statistic to check coveriance structure (can take a lot of time)}
 }

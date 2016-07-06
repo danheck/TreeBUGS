@@ -9,7 +9,7 @@
 #' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})
 #' @param M number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.
 #' @param expected if \code{TRUE}, the expected frequencies per person are returned (without additional sampling from a multinomial distribution)
-#' @param nCPU number of CPUs used for parallel sampling
+#' @param nCPU number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.
 #' @return a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.
 #' @export
 #' @importFrom parallel clusterExport makeCluster stopCluster parLapply parApply
@@ -80,6 +80,7 @@ posteriorPredictive <- function(fittedModel, M=100, expected=FALSE, nCPU=4){
                                              rmultinom(1, size=sum(x), prob=x/sum(x))))
       }
     }
+    colnames(freq.exp) <- mptInfo$MPT$Category
 
     list(freq.exp)
   }

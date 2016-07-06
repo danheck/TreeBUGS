@@ -13,7 +13,7 @@ posteriorPredictive(fittedModel, M = 100, expected = FALSE, nCPU = 4)
 
 \item{expected}{if \code{TRUE}, the expected frequencies per person are returned (without additional sampling from a multinomial distribution)}
 
-\item{nCPU}{number of CPUs used for parallel sampling}
+\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.}
 }
 \value{
 a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.

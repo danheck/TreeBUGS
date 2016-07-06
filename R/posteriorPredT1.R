@@ -27,8 +27,8 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE){
 
 
 
-  cl <- makeCluster(nCPU)
-  clusterExport(cl, c("TreeNames"), envir=environment())
+  # cl <- makeCluster(nCPU)
+  # clusterExport(cl, c("TreeNames"), envir=environment())
   # sample conditional on expected probabilities:
   freq.pred <- lapply(freq.exp, function(fe){
     for(k in 1:length(TreeNames)){
@@ -37,7 +37,7 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE){
     }
     fe
   })
-  stopCluster(cl)
+  # stopCluster(cl)
 
   freq.obs <- fittedModel$mptInfo$data[,colnames(freq.pred[[1]])]
 
