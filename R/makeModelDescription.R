@@ -28,18 +28,14 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 
 
   #  ###################################### MODEL ###################
-  #  cat("model\n",file=filename,append=T)
-  #}else{
-    cat("model\n",file=filename)
-  #}
+  cat("model\n{\n", file=filename)
 
-	cat("{\n",file=filename,append=T)
 	cat("for (n in 1: subjs){\n",file=filename,append=T)
-
 
 	for(i in 1:NOT){
 		for(j in 1:ncatPerTree[i]){
-		cat(treeNames[i],"[n,",j,"]<-",mergedTree$Equation[count],"\n",sep="",file=filename,append=T)
+		cat(treeNames[i],"[n,",j,"]<-",mergedTree$Equation[count],
+		    "\n",sep="",file=filename,append=T)
 		count=count+1
 		}
 	}

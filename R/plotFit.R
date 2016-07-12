@@ -31,6 +31,21 @@ plotFit <- function(fittedModel, M=1000, ...){
   axis(1, xx,  TreeNames, tick=F, line=NA, mgp=c(3, 2.5, 0))
   points(1:ncol(dat), colMeans(dat), col="red", cex=1.4, pch=17)
   abline(v=cumsum(table(tree))[1:(length(TreeNames)-1)]+.5)
+
+  # pred.mean <- colMeans(pred)
+  # pred.95 <- apply(pred, 2, quantile, probs = c((1-ci)/2, 1- (1-ci)/2))
+  # maxi <- max(pred.mean, pred.95, colMeans(dat))
+  #
+  # # Plot:
+  # plot(pred.mean, pch=15, col="gray30",ylim=c(0, maxi),xaxt="n",cex=1, las=1,
+  #      xlab="", ylab = "Mean frequencies",
+  #      main="Observed (red) and predicted (gray) mean frequencies", ...)
+  # segments(x0 = 1:ncol(pred.95), y0 = pred.95[1,], y1 = pred.95[2,], lwd = 2)
+  # axis(1, 1:ncol(dat), labels = colnames(dat))
+  # xx <- by(1:length(tree), tree, mean)
+  # axis(1, xx,  TreeNames, tick=F, line=NA, mgp=c(3, 2.5, 0))
+  # points(1:ncol(dat)+.1, colMeans(dat), col="red", cex=1, pch=16)
+  # abline(v=cumsum(table(tree))[1:(length(TreeNames)-1)]+.5)
 }
 
 

@@ -48,6 +48,9 @@ testHetPerm <- function(data,
   # tree <- list(old = c("h","m"),
   #              new = c("fa", "cr"))
 
+  if(is.character(data)){
+    data <- read.csv(file = data)
+  }
   data <- as.data.frame(data)
 
   if(ncol(data) != 3){
