@@ -18,7 +18,7 @@ To install TreeBUGS, run:
 ```
 install.packages("devtools")
 library(devtools)
-install_github("denis-arnold/TreeBUGS")
+install_github("denis-arnold/TreeBUGS", build_vignettes = TRUE)
 ```
 
 ### References
