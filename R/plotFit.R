@@ -55,7 +55,6 @@ plotFit <- function(fittedModel, M=1000, stat = "mean", ...){
     nams <- outer(rownames(c.obs), colnames(c.obs), paste, sep="-")
     K <- sum(upper.tri(c.obs, diag=TRUE))
 
-    par(mfrow=c(1,1))
     boxplot(t(c.pred), col="gray", ylab="Covariance",
             main="Observed (red) and predicted (gray) covariances",
             xaxt="n")

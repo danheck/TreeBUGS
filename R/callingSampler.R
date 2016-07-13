@@ -54,11 +54,9 @@ callingSampler <- function(model,
   subjs <- nrow(responses)
 
 
-  ### prepare data for WinBUGS
-
+  ### prepare data for JAGS
   treeNames=unique(mergedTree$Tree)
   NresponsesTree=vector("numeric",length=length(treeNames))
-  # parameters <- c(parameters, paste("response",treeNames, "pred.mean", sep="."))
 
   for(i in 1:length(treeNames)){
     NresponsesTree[i]=length(which(mergedTree$Tree==treeNames[i]))
@@ -68,8 +66,8 @@ callingSampler <- function(model,
   data <- c("subjs", "S")
   index=0
   for(i in 1:length(treeNames)){
+
     ### variable names in JAGS
-    # name.mean <-     paste("response",treeNames[i],"mean",sep=".")
     name.response <- paste("response",treeNames[i],sep=".")
     name.items <- paste("items",treeNames[i],sep=".")
 
@@ -84,34 +82,15 @@ callingSampler <- function(model,
     assign(name.response,  matrix(as.vector(t(responses[(index+1):(index+NresponsesTree[i])])),
                                   ncol=NresponsesTree[i],nrow=subjs,byrow=TRUE))
 
-    # mean frequencies for T1 statistic
-    # assign(name.mean, colMeans(get(name.response)))
-
     index=index+NresponsesTree[i]
 
     data <- c(data,
-              # name.mean,
               name.response, name.items)
-
-    # add G x numCat matrix with mean frequencies (one line per group)
-    # if(!is.null(groupT1)){
-    #   name.group.mean <- paste0("group.resp.",treeNames[i],".mean")
-    #
-    #   mean.per.group <- c()
-    #   for(g in 1:nrow(groupT1$groupMatT1)){
-    #     idx <- groupT1$groupMatT1[1:groupT1$NgroupT1[g]]
-    #     mean.per.group <- rbind(mean.per.group,
-    #                             colMeans(get(name.response)[idx,,drop=FALSE]))
-    #
-    #   }
-    #   assign(name.group.mean, mean.per.group)
-    #   data <- c(data, name.group.mean)
-    # }
   }
 
 
   if(model == "traitMPT"){
-   df <- hyperpriors$df
+    df <- hyperpriors$df
     V <- hyperpriors$V
     data <- c(data, "V", "df")
 
@@ -121,32 +100,24 @@ callingSampler <- function(model,
       data <- c(data, names(X_list))
     }
   }
+
   if(!is.null(covData) & !any(dim(covData) == 0)){
+
     covData <- as.matrix(covData)
-    data <- c(data, "covData")
-    if(any(grepl("cor_", covPars))){
-      covSD <- apply(covData, 2, sd, na.rm=TRUE)
-      data <- c(data, "covSD")
+    if(any(is.na(covData))){
+      warning("Data frame with covariates contains missing values (NA).",
+              "\n  This is likely to cause problems for JAGS.")
     }
 
-    if(any(is.na(covData))){
-      warning("Data frame with covariates contains missing values (NA).\n  This is likely to cause problems for JAGS.")
-    }
+    # covData only required for predictors/discrete factors:
+    if(!is.null(covPars))
+      data <- c(data, "covData")
   }
+
 
   # call Sampler
   parametervector=c(unlist(parameters),
-                    # "T1.obs","T1.pred","p.T1","p.T1ind",
                     transformedPar, covPars)
-
-  # if(!is.null(groupT1)){
-  #   groupMatT1 <- groupT1$groupMatT1
-  #   NgroupT1 <- groupT1$NgroupT1
-  #   data <- c(data, "groupMatT1", "NgroupT1")
-  #   parametervector <- c(parametervector,
-  #                        # "T1.group.obs", "T1.group.pred", "p.T1.group",
-  #                        paste0("group.resp.",treeNames, ".pred.mean"))
-  # }
 
   # random initial values: required (otherwise T1 statistic results in errors: no variance!)
   if(model == "betaMPT"){
@@ -200,7 +171,7 @@ callingSampler <- function(model,
   data.list <-  lapply(data, get, envir=environment())
   names(data.list) <- data
   samples <- run.jags(model = modelfile,
-                      monitor=parametervector,
+                      monitor=c(parametervector, "deviance"),
                       data=data.list,
                       n.chains=n.chains,
                       inits=inits.list,

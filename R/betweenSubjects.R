@@ -1,0 +1,122 @@
+
+#' Between-Subject Comparison of Parameters
+#'
+#' Computes differencesor other statistics of MPT parameters for two hierarchical MPT models fitted separately to between-subjects data
+#'
+#' @param model1 fitted hierarchical MPT model for first between-subjects condition
+#' @param model2 fitted hierarchical MPT model for second between-subjects condition
+#' @param par1 label of parameter from first model for which statistic should be computed
+#' @param par2 label of parameter from second model. Default: The same parameter as in the first model
+#' @param statistic function of the parameters using \code{"x"} and \code{"y"} as placeholders for the parameters from the first and second model, respectively. By default, the difference between parameters is computed
+# @param level whether to compute parameter differences at the \code{"group"} or \code{"individual"} level
+#' @param plot whether to plot the convergence of the difference in parameters
+#'
+#' @return a list of the class \code{betweenMPT} with the values:
+#' \itemize{
+#'  \item \code{summary}: Summary for parameter difference
+#'  \item \code{mptInfo1}, \code{mptInfo2}: info about MPT models (eqn and data file etc.)
+#'  \item \code{mcmc}: the MCMC samples of the differences in parameters
+#' }
+#' @author Daniel Heck
+#' @export
+#' @importFrom coda mcmc.list mcmc
+betweenSubjectMPT <- function(model1, model2,
+                              par1, par2=par1,
+                              statistic = "x-y",
+                              # level = "group",
+                              plot = FALSE){
+
+  ################ check input
+
+  if(class(model1) != class(model2) ||
+     ! class(model1) %in% c("betaMPT","traitMPT") ||
+     ! class(model2) %in% c("betaMPT","traitMPT"))
+    stop("The two models 'model1' and 'model2' must be hierarchical MPT models",
+         "\n  of the same class (both traitMPT or betaMPT).")
+  if(missing(par1) || length(par1) != 1 || !is.character(par1))
+    stop("'par1' must be a single par1 label!")
+  if(length(par2) != 1 || !is.character(par2))
+    stop("'par2' must be a single par1 label!")
+  if( any(model1$mptInfo$thetaUnique !=  model2$mptInfo$thetaUnique))
+    warning("Hierarchical MPT models have different sets of parameters.")
+  if(! par1 %in%  model1$mptInfo$thetaUnique |
+     ! par2 %in%  model2$mptInfo$thetaUnique)
+    stop("MPT parameters not found in models. Must be in the set:\n  ",
+         paste0(union(model1$mptInfo$thetaUnique,
+                      model2$mptInfo$thetaUnique), collapse = "; "))
+
+
+  ################ get MCMC samples of both models
+  idx1 <- match(par1, model1$mptInfo$thetaUnique)
+  idx2 <- match(par2, model2$mptInfo$thetaUnique)
+  nam1 <- paste0("mean[", idx1,"]")
+  nam2 <- paste0("mean[", idx2,"]")
+  pp1 <- model1$runjags$mcmc[,nam1, drop=FALSE]
+  pp2 <- model2$runjags$mcmc[,nam2, drop=FALSE]
+
+  namDiff <- gsub("x",  paste0(par1,".m1"), statistic, fixed = TRUE)
+  namDiff <- gsub("y",  paste0(par2,".m2"), namDiff, fixed = TRUE)
+
+  ################ check MCMC iterations
+  if(length(pp1) != length(pp2)){
+    warning("Different number of chains for the two models. Some chains are dropped!")
+    chains <- min(length(pp1), length(pp1))
+    pp1 <- pp1[1:chains]
+    pp2 <- pp2[1:chains]
+  }
+
+  if(nrow(pp1[[1]]) != nrow(pp2[[1]])){
+    warning("Different numbers of iterations for both models. Some iterations are dropped!")
+    nn <- min(nrow(pp1[[1]]), nrow(pp2[[1]]))
+    for(mm in 1:length(pp1)){
+      pp1[[mm]] <- pp1[[mm]][,1:nn]
+      pp2[[mm]] <- pp2[[mm]][,1:nn]
+    }
+  }
+
+  ################ compute differences
+  res <- mcmc.list()
+  for(mm in 1:length(pp1)){
+    res[[mm]] <- mcmc(eval(parse(text = statistic),
+                           envir = list(x = pp1[[mm]],
+                                        y = pp2[[mm]])))
+    colnames(res[[mm]]) <- namDiff
+  }
+  if(plot)
+    plot(res)
+
+  summ <- summarizeMCMC(res)
+  out <- list(summary = summ,
+              mptInfo1 = model1$mptInfo,
+              mptInfo2 = model2$mptInfo,
+              mcmc = res)
+  class(out) <- "betweenMPT"
+  out
+}
+
+
+#' @export
+print.betweenMPT <- function(x, round = 3, ...){
+  print(round(x$summary,round))
+}
+
+
+
+
+############### OLD CODE (differences for individuals, meaningless)
+
+
+# }else{
+#   if(N1 != N2)
+#     stop("Sample sizes of participants do not match for both models.",
+#          "\n  Use 'level=\"group\" ' to compare the parameter on the mean level.")
+#   nam1 <- paste0("theta[",idx,",",1:N1,"]")
+#   nam2 <- paste0("theta[",idx,",",1:N2,"]")
+# }
+
+
+
+
+# if(level != "group"){
+#   namDiff <- paste0(namDiff, "[",1:N1, "]")
+# }

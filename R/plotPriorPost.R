@@ -15,7 +15,8 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
   S <- length(fittedModel$mptInfo$thetaUnique)
 
   if(fittedModel$mptInfo$model == "traitMPT"){
-    ww <- rWishart(n = M, df = fittedModel$mptInfo$hyperprior$df,
+    ww <- rWishart(n = M,
+                   df = fittedModel$mptInfo$hyperprior$df,
                    Sigma = fittedModel$mptInfo$hyperprior$V)
     ss <- array(apply(ww,3, solve), c(S,S,M))
     cc <- array(apply(ss,3, cov2cor), c(S,S,M))
@@ -31,6 +32,13 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
         hyp[[i]][s] <- hyp[[i]][1]
       hyp.eval[[i]][s] <- sub("(", paste0("(",M,","),
                      sub("d", "r", hyp[[i]][s]),  fixed=TRUE)
+
+      # JAGS uses precision for normal distribution:
+      if(grepl("norm",hyp.eval[[i]][s] )){
+        tmp <- strsplit(hyp.eval[[i]][s], c( "[,\\(\\)]"), perl=F)[[1]]
+        tmp[3] <- 1/sqrt(as.numeric(tmp[3]))
+        hyp.eval[[i]][s] <- paste0(tmp[1],"(",tmp[2],",",tmp[3],")")
+      }
     }
     aa <- eval(parse(text=hyp.eval[[1]][s]))
     bb <- eval(parse(text=hyp.eval[[2]][s]))
@@ -48,11 +56,11 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
       xlab.sd = "Group SD"
     }else{
       # probit transform:
-      mean= sd <- pnorm(aa)
-      sd <- bb * sqrt(ss[s,s,])
+      mean <- pnorm(aa)
+      sd <- bb * sqrt(ss[s,s,])   # scaled SD on group level
 
-      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sigma", label)]))
-      prior.sd <- density(sd)
+      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sigma", label)]), from = 0)
+      prior.sd <- density(sd, from = 0)
       xlab.sd = "Group SD (on latent probit scale)"
       ci.sd <- quantile(unlist(fittedModel$runjags$mcmc[,paste0("sigma", label)]),
                         c((1-ci)/2,1-(1-ci)/2))

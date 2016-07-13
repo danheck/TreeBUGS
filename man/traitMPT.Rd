@@ -27,7 +27,7 @@ traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
 
 \item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations (probit-values of \code{+Inf} are truncated to \code{max(5,max(probit))}; similarly for \code{-Inf}). Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
 
-\item{mu}{hyperprior for group means of probit-transformed parameters in JAGS syntax. Default is a standard normal distribution, which implies a uniform distribution on the MPT probability parameters. A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).}
+\item{mu}{hyperprior for group means of probit-transformed parameters in JAGS syntax. Default is a standard normal distribution, which implies a uniform distribution on the MPT probability parameters. A vector can be used to specify separate hyperpriors for each MPT parameter (the order of parameters is determined by the names of the vector or by the default order as shown in \code{\link{readEQN}} with \code{paramOrder = TRUE}).}
 
 \item{xi}{hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,10]. Similarly as for \code{mu}, a vector of different priors can be used. Less informative priors can be used (e.g., \code{"dunif(0,100)")}) but might result in reduced stability.}
 

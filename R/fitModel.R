@@ -202,6 +202,7 @@ fitModel <- function(type,
   class(fittedModel) <- type
 
   if(ppp>0){
+    cat("\nComputing posterior-predictive p-values....\n")
     postPred <- PPP(fittedModel, M=ppp,
                     nCPU=length(runjags$mcmc))
     fittedModel$postpred <- postPred[c("freq.exp", "freq.pred", "freq.obs")]

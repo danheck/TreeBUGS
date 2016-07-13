@@ -1,14 +1,14 @@
 bibentry("Manual",
-		title="TreeBUGS: Hierarchical MPT Modeling",
-		author="Daniel W. Heck, Nina Arnold, and Denis Arnold",
+		title="TreeBUGS: An R Package for Hierarchical Multinomial-Processing-Tree Modeling",
+		author="Daniel W. Heck, Nina R. Arnold, and Denis Arnold",
 		year="2016",
-		note="(Version 0.4.9)",
-		url="http://psycho3.uni-mannheim.de/Home/Research/Software/TreeBUGS/",
+		note="(Version 0.5.2)",
+		url="https://github.com/denis-arnold/TreeBUGS",
 
 		textVersion =
-		paste("Heck, D.W., Arnold, N., & Arnold, D. (2016). ",
-				"TreeBUGS: Hierarchical MPT Modeling (Version 0.4.9). ",
-				"http://psycho3.uni-mannheim.de/Home/Research/Software/TreeBUGS/",
+		paste("Heck, D. W., Arnold, N. R., & Arnold, D. (2016). ",
+				"TreeBUGS: An R Package for Hierarchical Multinomial-Processing-Tree Modeling (Version 0.5.2). ",
+				"https://github.com/denis-arnold/TreeBUGS",
 				sep=""),
 
 		mheader = "To cite TreeBUGS in publications use:")

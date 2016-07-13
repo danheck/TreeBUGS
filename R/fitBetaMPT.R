@@ -10,8 +10,8 @@
 #' @param modelfilename Name that the modelfile that is made by the function to work with JAGS should get.
 #'        Default is to write this information to the tempdir as required by CRAN standards.
 #' @param corProbit whether to use probit-transformed MPT parameters to compute correlations (probit-values of \code{+Inf} are truncated to \code{max(5,max(probit))}; similarly for \code{-Inf}). Default for beta-MPT: MPT parameters are used on the probability scale [0,1].
-#' @param alpha Hyperprior for the alpha and beta parameters in JAGS syntax (default: uniform prior on the interval [1,5000] for all parameters). A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).
-#' @param beta Second hyperprior, see \code{alpha}
+#' @param alpha Hyperprior for the shape parameters \eqn{\alpha} of the group-level beta distributions (in JAGS syntax). Default: Gamma distributions for \eqn{\alpha} and \eqn{\beta} with shape 1 and rate .1. To use uniform priors on the interval [.01,5000] as proposed by Smith and Batchelder (2008), use \code{alpha = "dunif(.01,5000)"} and \code{beta = "dunif(.01,5000)"}. Note that a vector can be used to specify separate hyperpriors for each MPT parameter (the order of parameters is determined by the names of the vector or by the default order as shown in \code{\link{readEQN}} with \code{paramOrder = TRUE}).
+#' @param beta Hyperprior for \eqn{\beta} of group-level distributions, see \code{alpha}
 #' @param parEstFile Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")
 #' @param n.iter Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.
 #' @param n.adapt number of adaption samples to adjust MCMC sampler in JAGS. The sampler will be more efficient if it is tuned well.
@@ -39,8 +39,8 @@ betaMPT <- function(eqnfile, data, restrictions,
                     covData, #covStructure,
                     transformedParameters,
                     corProbit=FALSE,
-                    alpha = "dunif(.01,5000)",
-                    beta = "dunif(.01,5000)",
+                    alpha = "dgamma(1,.1)",
+                    beta = "dgamma(1,.1)",
 
                     # MCMC stuff:
                     n.iter=20000, n.adapt=2000,

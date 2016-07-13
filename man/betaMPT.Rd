@@ -5,7 +5,7 @@
 \title{Fit a Hierarchical Beta-MPT Model}
 \usage{
 betaMPT(eqnfile, data, restrictions, covData, transformedParameters,
-  corProbit = FALSE, alpha = "dunif(.01,5000)", beta = "dunif(.01,5000)",
+  corProbit = FALSE, alpha = "dgamma(1,.1)", beta = "dgamma(1,.1)",
   n.iter = 20000, n.adapt = 2000, n.burnin = 2000, n.thin = 5,
   n.chains = 3, dic = FALSE, ppp = 0, modelfilename, parEstFile,
   autojags = NULL, ...)
@@ -23,9 +23,9 @@ betaMPT(eqnfile, data, restrictions, covData, transformedParameters,
 
 \item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations (probit-values of \code{+Inf} are truncated to \code{max(5,max(probit))}; similarly for \code{-Inf}). Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
 
-\item{alpha}{Hyperprior for the alpha and beta parameters in JAGS syntax (default: uniform prior on the interval [1,5000] for all parameters). A vector can be used to specify separate hyperpriors for each MPT parameter (to check the order of parameters, use \code{\link{readEQN}} with \code{paramOrder = TRUE}).}
+\item{alpha}{Hyperprior for the shape parameters \eqn{\alpha} of the group-level beta distributions (in JAGS syntax). Default: Gamma distributions for \eqn{\alpha} and \eqn{\beta} with shape 1 and rate .1. To use uniform priors on the interval [.01,5000] as proposed by Smith and Batchelder (2008), use \code{alpha = "dunif(.01,5000)"} and \code{beta = "dunif(.01,5000)"}. Note that a vector can be used to specify separate hyperpriors for each MPT parameter (the order of parameters is determined by the names of the vector or by the default order as shown in \code{\link{readEQN}} with \code{paramOrder = TRUE}).}
 
-\item{beta}{Second hyperprior, see \code{alpha}}
+\item{beta}{Hyperprior for \eqn{\beta} of group-level distributions, see \code{alpha}}
 
 \item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.}
 
