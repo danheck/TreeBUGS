@@ -16,7 +16,7 @@ summarizeMCMC <- function(mcmc){
   try({
     summTab[,7] <- round(effectiveSize(mcmc))
     summTab[,6] <- summTab[,2] / sqrt(summTab[,7]  )
-  })
+  }, silent = TRUE)
   gc(verbose=FALSE)
   try({
     batchSize <- 200

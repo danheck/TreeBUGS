@@ -4,7 +4,7 @@
 #'
 #' @param fittedModel a fitted latent-trait MPT model (see \code{\link{traitMPT}}) or beta MPT model (see \code{\link{betaMPT}})
 #' @param parameter which parameter(s) should be returned? (see below for details)
-#' @param statistic whether to get the posterior \code{"mean"}, \code{"median"}, \code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility interval)
+#' @param stat whether to get the posterior \code{"mean"}, \code{"median"}, \code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility interval)
 #' @param file filename to export results in .csv format (e.g., \code{file="est_param.csv"})
 #'
 #' @details This function is a convenient way to get the information stored in \code{fittedModel$mcmc.summ}.
@@ -33,13 +33,13 @@
 #'
 #' # save summary of individual estimates:
 #' getParam(fittedModel, parameter = "theta",
-#'          statistic = "summary", file= "ind_summ.csv")}
+#'          stat = "summary", file= "ind_summ.csv")}
 #' @author Daniel Heck
 #' @seealso \code{\link{getGroupMeans}} mean group estimates
 #' @export
 getParam <- function(fittedModel,
                      parameter="mean",
-                     statistic="mean",
+                     stat="mean",
                      file = NULL){
 
   if(! class(fittedModel) %in% c("betaMPT", "traitMPT"))
@@ -54,7 +54,7 @@ getParam <- function(fittedModel,
     stop("parameter not found.")
 
   label <- c("Mean", "SD", "2.5%", "97.5%")
-  sel.stat <- switch(statistic,
+  sel.stat <- switch(stat,
                      "mean" = "Mean",
                      "sd" = "SD",
                      "median" = "50%",
@@ -62,7 +62,7 @@ getParam <- function(fittedModel,
                      stop("statistic not supported."))
   par <-  summ[select, sel.stat, drop = FALSE]
 
-  if(statistic != "summary"){
+  if(stat != "summary"){
     if(length(par) == S){
       names(par) <- paste0(names(par), "_", thetaUnique)
     }else if(parameter == "theta"){

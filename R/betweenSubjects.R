@@ -7,8 +7,7 @@
 #' @param model2 fitted hierarchical MPT model for second between-subjects condition
 #' @param par1 label of parameter from first model for which statistic should be computed
 #' @param par2 label of parameter from second model. Default: The same parameter as in the first model
-#' @param statistic function of the parameters using \code{"x"} and \code{"y"} as placeholders for the parameters from the first and second model, respectively. By default, the difference between parameters is computed
-# @param level whether to compute parameter differences at the \code{"group"} or \code{"individual"} level
+#' @param stat one or more functions of the parameters using \code{"x"} and \code{"y"} as placeholders for the parameters from the first and second model, respectively. Default: Compute (A) the difference between parameters and (B) a Bayesian p-value (by counting how often x<y).
 #' @param plot whether to plot the convergence of the difference in parameters
 #'
 #' @return a list of the class \code{betweenMPT} with the values:
@@ -22,7 +21,7 @@
 #' @importFrom coda mcmc.list mcmc
 betweenSubjectMPT <- function(model1, model2,
                               par1, par2=par1,
-                              statistic = "x-y",
+                              stat = c("x-y","x<y"),
                               # level = "group",
                               plot = FALSE){
 
@@ -54,7 +53,7 @@ betweenSubjectMPT <- function(model1, model2,
   pp1 <- model1$runjags$mcmc[,nam1, drop=FALSE]
   pp2 <- model2$runjags$mcmc[,nam2, drop=FALSE]
 
-  namDiff <- gsub("x",  paste0(par1,".m1"), statistic, fixed = TRUE)
+  namDiff <- gsub("x",  paste0(par1,".m1"), stat, fixed = TRUE)
   namDiff <- gsub("y",  paste0(par2,".m2"), namDiff, fixed = TRUE)
 
   ################ check MCMC iterations
@@ -77,9 +76,10 @@ betweenSubjectMPT <- function(model1, model2,
   ################ compute differences
   res <- mcmc.list()
   for(mm in 1:length(pp1)){
-    res[[mm]] <- mcmc(eval(parse(text = statistic),
-                           envir = list(x = pp1[[mm]],
-                                        y = pp2[[mm]])))
+    res[[mm]] <- mcmc(sapply(stat, function(ss)
+      eval(parse(text = ss),
+           envir = list(x = pp1[[mm]],
+                        y = pp2[[mm]]))))
     colnames(res[[mm]]) <- namDiff
   }
   if(plot)

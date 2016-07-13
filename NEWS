@@ -4,6 +4,7 @@ TreeBUGS 0.5.2 (July 2016)
 * New function betweenSubjectMPT() that computes between-subject comparisons (e.g., differences) of parameters from two fitted hierarchical models
 * Extended plotFit() to fit observed against posterior-predicted covariances
 * Hyperpriors matched by vector names
+* Split vignette into "Intro" and "Extended"
 
 
 TreeBUGS 0.5.1 (June 2016)

@@ -4,7 +4,7 @@
 \alias{betweenSubjectMPT}
 \title{Between-Subject Comparison of Parameters}
 \usage{
-betweenSubjectMPT(model1, model2, par1, par2 = par1, statistic = "x-y",
+betweenSubjectMPT(model1, model2, par1, par2 = par1, stat = c("x-y", "x<y"),
   plot = FALSE)
 }
 \arguments{
@@ -16,7 +16,7 @@ betweenSubjectMPT(model1, model2, par1, par2 = par1, statistic = "x-y",
 
 \item{par2}{label of parameter from second model. Default: The same parameter as in the first model}
 
-\item{statistic}{function of the parameters using \code{"x"} and \code{"y"} as placeholders for the parameters from the first and second model, respectively. By default, the difference between parameters is computed}
+\item{stat}{one or more functions of the parameters using \code{"x"} and \code{"y"} as placeholders for the parameters from the first and second model, respectively. Default: Compute (A) the difference between parameters and (B) a Bayesian p-value (by counting how often x<y).}
 
 \item{plot}{whether to plot the convergence of the difference in parameters}
 }
