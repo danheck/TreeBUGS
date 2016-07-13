@@ -4,12 +4,14 @@
 \alias{plotFit}
 \title{Plot Posterior Predictive Mean Frequencies}
 \usage{
-plotFit(fittedModel, M = 1000, ...)
+plotFit(fittedModel, M = 1000, stat = "mean", ...)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
 \item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
+
+\item{stat}{whether to plot mean frequencies (\code{"mean"}) or covariances of individual frequencies (\code{"cov"})}
 
 \item{...}{arguments passed to \code{\link{boxplot}}}
 }
@@ -17,6 +19,16 @@ plotFit(fittedModel, M = 1000, ...)
 Plots observed mean frequencies and boxplot of mean frequencies sampled from posterior distribution (posterior predictive).
 }
 \details{
-If posterior predictive p-values were computed when fitting the model (e.g., \code{traitMPT(...,ppp=1000)} ), the stored posterior samples are re-used for plotting.
+If posterior predictive p-values were computed when fitting the model (e.g., by adding the argument \code{traitMPT(...,ppp=1000)} ), the stored posterior samples are re-used for plotting. Moreover, posterior samples can be added to a model after fitting as shown in the examples.
+}
+\examples{
+\dontrun{
+# add posterior predictive samples to fitted model:
+fittedModel$postpred$freq.pred <-
+     posteriorPredictive(fittedModel, M=1000)
+
+# plot model fit
+plotFit(fittedModel, stat = "mean")
+}
 }
 

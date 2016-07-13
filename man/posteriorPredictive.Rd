@@ -21,4 +21,11 @@ a list of \code{M} matrices with individual frequencies (rows=participants, colu
 \description{
 Draw frequencies based on posterior distribution of individual estimates.
 }
+\examples{
+\dontrun{
+# add posterior predictive samples that are reused in ?plotFit
+fittedModel$postpred$freq.pred <-
+     posteriorPredictive(fittedModel, M=1000)
+}
+}
 

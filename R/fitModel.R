@@ -76,6 +76,7 @@ fitModel <- function(type,
       hyperprior$V <- diag(S)
     if(is.null(hyperprior$df))
       hyperprior$df <- S+1
+    hyperprior$mu <- check.hyperprior(hyperprior$mu, thetaUnique, label="mu")
 
     ##################### TRAIT MPT
     covData <- covDataCenter(covData, predType=predType)
@@ -98,6 +99,9 @@ fitModel <- function(type,
 
   }else{
     ##################### BETA MPT
+    hyperprior$alpha <- check.hyperprior(hyperprior$alpha, thetaUnique, label="alpha")
+    hyperprior$beta <- check.hyperprior(hyperprior$beta, thetaUnique, label="beta")
+
     predString <- NULL
     X_list <- covDataNumeric <- covPars <- NULL
     predTable <- predFactorLevels <- NULL

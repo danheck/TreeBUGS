@@ -38,3 +38,17 @@ readData  <- function(data){
   colnames(data) <- gsub(" ", "", colnames(data), fixed=TRUE)
   data
 }
+
+
+
+
+check.hyperprior <- function(par, thetaUnique, label="parameter"){
+  if(length(par) == length(thetaUnique) && !is.null(names(par))){
+    if(any(thetaUnique != sort(names(par))))
+      stop("Names of the hyperprior vector '", label, "' do not match model parameters.",
+           "\n  Use read.EQN(.., paramOrder=TRUE) to get the correct parameter labels.")
+    par <- par[thetaUnique]
+  }
+
+  par
+}

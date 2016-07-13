@@ -12,6 +12,12 @@
 #' @param nCPU number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.
 #' @return a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.
 #' @export
+#' @examples
+#' \dontrun{
+#' # add posterior predictive samples that are reused in ?plotFit
+#' fittedModel$postpred$freq.pred <-
+#'      posteriorPredictive(fittedModel, M=1000)
+#' }
 #' @importFrom parallel clusterExport makeCluster stopCluster parLapply parApply
 #' @importFrom  stats cor cov2cor density rmultinom
 posteriorPredictive <- function(fittedModel, M=100, expected=FALSE, nCPU=4){
