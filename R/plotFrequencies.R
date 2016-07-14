@@ -3,14 +3,22 @@
 #' Plot Raw Frequencies
 #'
 #' Plot observed raw frequencies
-#' @param fittedModel fitted hierarchical MPT model (see \code{\link{traitMPT}} or \code{\link{betaMPT}})
-#' @param freq whether to plot absolute frequencies or relative frequencies (which sum up to one within each tree)
+#' @param fittedModel fitted hierarchical MPT model (see \code{\link{traitMPT}} or \code{\link{betaMPT}}). Can also be a path to a .csv-file with individual frequencies or a matrix/data frame.
+#' @param freq whether to plot absolute frequencies or relative frequencies (which sum up to one within each tree; only if \code{fittedModel} is a hierarchical model)
 #' @param select a numeric vector with participant indices to select which raw frequencies to plot (default: \code{"all"})
+#' @param eqnfile optional argument to get MPT tree structure if \code{fittedModel} is the path to a .csv-file or a matrix/data frame
 #' @export
-plotFreq <- function(fittedModel, freq=TRUE, select="all"){
+plotFreq <- function(fittedModel, freq=TRUE, select="all", eqnfile){
 
-  par(mfrow=c(1,1))
-  dat <- fittedModel$mptInfo$data
+
+  if(class(fittedModel) %in% c("betaMPT", "traitMPT")){
+    dat <- fittedModel$mptInfo$data
+  }else if(class(fittedModel) == "character"){
+    dat <- read.csv(fittedModel)
+  }else{
+    try(dat <- as.data.frame(dat))
+  }
+
   K <- ncol(dat)
   N <- nrow(dat)
 
@@ -23,8 +31,17 @@ plotFreq <- function(fittedModel, freq=TRUE, select="all"){
     N <- nrow(dat)
   }
 
-  treeNames <- fittedModel$mptInfo$MPT$Tree
-  treeLabels <- unique(treeNames)
+  if(class(fittedModel) %in% c("betaMPT", "traitMPT")){
+    treeNames <- fittedModel$mptInfo$MPT$Tree
+    treeLabels <- unique(treeNames)
+  }else if(!missing(eqnfile)){
+    tmp <- unique(readEQN(eqnfile)[,1:2])
+    treeNames <- tmp$Tree
+    treeLabels <- unique(treeNames)
+  }else{
+    treeNames <- rep(ncol(dat), "")
+    treeLabels <- ""
+  }
 
   # absolute frequencies
   if(!freq){
@@ -33,8 +50,8 @@ plotFreq <- function(fittedModel, freq=TRUE, select="all"){
       sel <- treeNames == treeLabels[t]
       dat[,sel] <- dat[,sel] / rep(rowSums(dat[,sel]), each=sum(sel))
     }
-
   }
+
   means <- colMeans(dat)
 
 

@@ -4,14 +4,16 @@
 \alias{plotFreq}
 \title{Plot Raw Frequencies}
 \usage{
-plotFreq(fittedModel, freq = TRUE, select = "all")
+plotFreq(fittedModel, freq = TRUE, select = "all", eqnfile)
 }
 \arguments{
-\item{fittedModel}{fitted hierarchical MPT model (see \code{\link{traitMPT}} or \code{\link{betaMPT}})}
+\item{fittedModel}{fitted hierarchical MPT model (see \code{\link{traitMPT}} or \code{\link{betaMPT}}). Can also be a path to a .csv-file with individual frequencies or a matrix/data frame.}
 
-\item{freq}{whether to plot absolute frequencies or relative frequencies (which sum up to one within each tree)}
+\item{freq}{whether to plot absolute frequencies or relative frequencies (which sum up to one within each tree; only if \code{fittedModel} is a hierarchical model)}
 
 \item{select}{a numeric vector with participant indices to select which raw frequencies to plot (default: \code{"all"})}
+
+\item{eqnfile}{optional argument to get MPT tree structure if \code{fittedModel} is the path to a .csv-file or a matrix/data frame}
 }
 \description{
 Plot observed raw frequencies
