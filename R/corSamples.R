@@ -5,7 +5,9 @@ corSamples <- function(mcmc, covData, thetaUnique,
                        rho=FALSE, corProbit = FALSE){
 
   # extract theta samples:
-  sel.theta <- grep("theta", colnames(mcmc), fixed=TRUE)
+  S <- length(thetaUnique)
+  sel.theta <- setdiff(grep("theta", varnames(mcmc), fixed=TRUE),
+                       grep("thetaFE", varnames(mcmc), fixed=TRUE))
   theta <- mcmc[,sel.theta, drop = FALSE]
   if(corProbit){
     theta <- qnorm(theta)
@@ -28,9 +30,9 @@ corSamples <- function(mcmc, covData, thetaUnique,
   }
 
   ########## intercorrelations for theta (=rho)
-  if(rho){
+  if(rho & ncol(theta)>1){
     rho.samp <- matrix(t(apply(theta, 1, function(tt){
-      theta.tmp <- matrix(tt, nrow=nrow(covData), byrow=TRUE)
+      theta.tmp <- matrix(tt, nrow=length(tt)/S, byrow=TRUE)
       cc <- cor(theta.tmp)
       # cc[lower.tri(cc)]
       cc

@@ -160,7 +160,7 @@ fitModel <- function(type,
                   hyperprior=hyperprior)
 
   # correlation of posterior samples:
-  if(!is.null(covData)){
+  if(!is.null(covData) | type == "betaMPT"){
     if(!is.null(predTable)){
       isPred <- (1:ncol(covData)) %in% predTable$covIdx
     }else{
@@ -183,6 +183,7 @@ fitModel <- function(type,
   mcmc.summ <- summarizeMCMC(runjags$mcmc)
   summary <- summarizeMPT(mcmc = runjags$mcmc, mptInfo = mptInfo,
                           summ=mcmc.summ)
+  summary$call <- call
 
   if(dic){
     summary$dic <-   extract(runjags, "dic", ...)

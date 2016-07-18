@@ -19,6 +19,7 @@
 #' new.mpt.summary
 #' }
 #' @export
+#' @import rjags
 summarizeMPT <- function(mcmc,
                          mptInfo,
                          M=2000,

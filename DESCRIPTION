@@ -16,7 +16,8 @@ Depends:
     utils,
     grDevices,
     coda,
-    parallel
+    parallel,
+    rjags
 Suggests:
     knitr
 VignetteBuilder: knitr
