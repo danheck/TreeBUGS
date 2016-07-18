@@ -110,8 +110,12 @@ callingSampler <- function(model,
     }
 
     # covData only required for predictors/discrete factors:
-    if(!is.null(covPars))
-      data <- c(data, "covData")
+    if(!is.null(covPars)){
+      # standardization:
+      covVar <- diag(cov(covData))
+      # covData <- as.matrix(scale(covData))
+      data <- c(data, "covData", "covVar")
+    }
   }
 
 

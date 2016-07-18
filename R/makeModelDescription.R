@@ -77,7 +77,119 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 
 
 
-	############################## Posterior predictive checks:
+	### Transformed parameters:
+  cat(parString, file=filename, append = TRUE)
+
+  cat("}\n",file=filename,append=T)
+}
+
+
+
+################### Beta-MPT specific hyperprior part
+makeBetaHyperprior <-function(S,
+                              alpha = "dunif(1,5000)",
+                              beta = "dunif(1,5000)"){
+
+  if(class(alpha) != "character" || !length(alpha) %in% c(1,S)){
+    stop("Hyperprior for 'alpha' must be a character vector of length 1
+     if the same prior should be used for all MPT parameters (default)
+     or a vector of the same length as the number of parameters (=", S, "; to
+     check the order see ?readEQN).")
+  }
+  if(class(beta) != "character" || !length(beta) %in% c(1,S)){
+    stop("Hyperprior for 'beta' must be a character vector of length 1
+     if the same prior should be used for all MPT parameters (default)
+     or a vector of the same length as the number of parameters (=", S, "; to
+     check the order see ?readEQN).")
+  }
+
+  modelString <- paste0("
+
+for(s in 1:S){
+  for(n in 1:subjs) {
+    theta[s,n] ~dbeta(alph[s],bet[s])
+  }
+}
+
+for(s in 1:S){
+",
+  # WinBUGS: zero[s] ~dpois(phi[s])
+  # WinBUGS: phi[s] <- -log(1/pow(alph[s]+bet[s],5/2))
+"  mean[s] <- alph[s]/(alph[s]+bet[s])
+  sd[s] <- sqrt(alph[s]*bet[s]/(pow(alph[s]+bet[s],2)*(alph[s]+bet[s]+1)))
+}
+",
+paste0("\nalph[", 1:S, "] ~ ", alpha, collapse = ""),
+paste0("\nbet[", 1:S, "] ~ ", beta, collapse = ""),"
+
+")
+
+  return(modelString)
+}
+
+
+################### latent-trait-MPT specific hyperprior part
+makeTraitHyperprior <-function(S,
+                               predString,
+                               mu = "dnorm(0,1)",
+                               xi = "dunif(0,100)"){
+
+  if(class(mu) != "character" || !length(mu) %in% c(1,S)){
+    stop("Hyperprior for 'mu' must be a character vector of length 1
+     if the same prior should be used for all MPT parameters (default)
+     or a vector of the same length as the number of parameters (=", S, "; to
+     check the order see ?readEQN).")
+  }
+  if(class(xi) != "character" || !length(xi) %in% c(1,S)){
+    stop("Hyperprior for 'xi' must be a character vector of length 1
+     if the same prior should be used for all MPT parameters (default)
+     or a vector of the same length as the number of parameters (=", S, "; to
+     check the order see ?readEQN).")
+  }
+
+  modelString <- paste0(predString, "
+
+# hyperpriors
+for(i in 1:subjs) {
+  delta.part.raw[1:S,i] ~ dmnorm(mu.delta.raw[1:S],T.prec.part[1:S,1:S])
+}
+
+",
+######################## special case if S=1:
+ifelse(S>1,"
+T.prec.part[1:S,1:S] ~ dwish(V, df)",
+       "
+T.prec.part[1,1] ~ dchisq(df)"),
+
+"
+Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
+
+for(s in 1:S){
+  mu.delta.raw[s] <- 0
+  mean[s] <- phi(mu[s])
+  for(q in 1:S){
+    # Off-diagonal elements of S (correlations not affected by xi)
+    rho[s,q] <- Sigma.raw[s,q]/sqrt(Sigma.raw[s,s]*Sigma.raw[q,q])
+  }
+  # Diagonal elements of S (rescale sigma)
+  sigma[s] <- xi[s]*sqrt(Sigma.raw[s,s])
+}
+",
+paste0("\nmu[", 1:S, "] ~ ", mu, collapse = ""),
+paste0("\nxi[", 1:S, "] ~ ", xi, collapse = ""),"
+
+")
+
+
+  return(modelString)
+}
+
+
+
+
+
+
+############################## Posterior predictive checks:
 #
 # 	cat("\n############# T1: posterior predictive check of mean frequencies\n", file=filename,append=T)
 #
@@ -176,15 +288,6 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 #   cat("\np.T1 <- T1.pred > T1.obs\n",  file=filename,append=T)
 
 
-	### Transformed parameters:
-  cat(parString, file=filename, append = TRUE)
-
-  cat("}\n",file=filename,append=T)
-}
-
-
-
-
 
 # ############# T2: posterior predictive check of covariance structure
 #
@@ -232,106 +335,3 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 
 
 
-
-
-
-
-
-################### Beta-MPT specific hyperprior part
-makeBetaHyperprior <-function(S,
-                              alpha = "dunif(1,5000)",
-                              beta = "dunif(1,5000)"){
-
-  if(class(alpha) != "character" || !length(alpha) %in% c(1,S)){
-    stop("Hyperprior for 'alpha' must be a character vector of length 1
-     if the same prior should be used for all MPT parameters (default)
-     or a vector of the same length as the number of parameters (=", S, "; to
-     check the order see ?readEQN).")
-  }
-  if(class(beta) != "character" || !length(beta) %in% c(1,S)){
-    stop("Hyperprior for 'beta' must be a character vector of length 1
-     if the same prior should be used for all MPT parameters (default)
-     or a vector of the same length as the number of parameters (=", S, "; to
-     check the order see ?readEQN).")
-  }
-
-  modelString <- paste0("
-
-for(s in 1:S){
-  for(n in 1:subjs) {
-    theta[s,n] ~dbeta(alph[s],bet[s])
-  }
-}
-
-for(s in 1:S){
-",
-  # WinBUGS: zero[s] ~dpois(phi[s])
-  # WinBUGS: phi[s] <- -log(1/pow(alph[s]+bet[s],5/2))
-"  mean[s] <- alph[s]/(alph[s]+bet[s])
-  sd[s] <- sqrt(alph[s]*bet[s]/(pow(alph[s]+bet[s],2)*(alph[s]+bet[s]+1)))
-}
-",
-paste0("\nalph[", 1:S, "] ~ ", alpha, collapse = ""),
-paste0("\nbet[", 1:S, "] ~ ", beta, collapse = ""),"
-
-")
-
-  return(modelString)
-}
-
-
-################### Beta-MPT specific hyperprior part
-makeTraitHyperprior <-function(S,
-                               predString,
-                               mu = "dnorm(0,1)",
-                               xi = "dunif(0,100)"){
-
-  if(class(mu) != "character" || !length(mu) %in% c(1,S)){
-    stop("Hyperprior for 'mu' must be a character vector of length 1
-     if the same prior should be used for all MPT parameters (default)
-     or a vector of the same length as the number of parameters (=", S, "; to
-     check the order see ?readEQN).")
-  }
-  if(class(xi) != "character" || !length(xi) %in% c(1,S)){
-    stop("Hyperprior for 'xi' must be a character vector of length 1
-     if the same prior should be used for all MPT parameters (default)
-     or a vector of the same length as the number of parameters (=", S, "; to
-     check the order see ?readEQN).")
-  }
-
-  modelString <- paste0(predString, "
-
-# hyperpriors
-for(i in 1:subjs) {
-  delta.part.raw[1:S,i] ~ dmnorm(mu.delta.raw[1:S],T.prec.part[1:S,1:S])
-}
-
-",
-######################## special case if S=1:
-ifelse(S>1,"
-T.prec.part[1:S,1:S] ~ dwish(V, df)",
-       "
-T.prec.part[1,1] ~ dchisq(df)"),
-
-"
-Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
-
-for(s in 1:S){
-  mu.delta.raw[s] <- 0
-  mean[s] <- phi(mu[s])
-  for(q in 1:S){
-    # Off-diagonal elements of S (correlations not affected by xi)
-    rho[s,q] <- Sigma.raw[s,q]/sqrt(Sigma.raw[s,s]*Sigma.raw[q,q])
-  }
-  # Diagonal elements of S (rescale sigma)
-  sigma[s] <- xi[s]*sqrt(Sigma.raw[s,s])
-}
-",
-paste0("\nmu[", 1:S, "] ~ ", mu, collapse = ""),
-paste0("\nxi[", 1:S, "] ~ ", xi, collapse = ""),"
-
-")
-
-
-  return(modelString)
-}

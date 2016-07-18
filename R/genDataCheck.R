@@ -5,7 +5,7 @@
 checkNumItems <- function(numItems, treeLabels){
   if(any(sort(treeLabels) != sort(names(numItems))))
     stop("Names for numItems do not match the tree labels in EQN file:\n  ",
-         paste(treeLabels, collapse=", "))
+         paste(substr(treeLabels, 3, 100), collapse=", "))
   if(length(numItems) != length(treeLabels))
     stop("Argument numItems has the wrong length (should be", length(treeLabels),")")
 }

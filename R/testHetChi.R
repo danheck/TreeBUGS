@@ -53,6 +53,7 @@ testHetChi <- function(freq, tree){
   # numer of items per person/tree:
   if(length(unique(tree)) == 1){
     M <- matrix(rowSums(freq))
+    colnames(M) <- unique(tree)
   }else{
     M <- t(apply(freq, 1, function(xx) tapply(xx, tree, sum)))
   }

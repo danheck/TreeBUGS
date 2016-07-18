@@ -10,7 +10,13 @@
 #' @param V  S x S matrix used as a hyperprior for the inverse-Wishart hyperprior parameters with as many rows and columns as there are core MPT parameters. Default is a diagonal matrix.
 #' @param df degrees of freedom for the inverse-Wishart hyperprior for the individual parameters. Minimum is S+1, where S gives the number of core MPT parameters.
 #'
-#' @param IVprec hyperprior on the precision (i.e., the inverse of the variance) of the slope parameter for continuous independent variables. Default implies a Cauchy prior (Rouder et. al, 2012). To use a more-informative standard-normal prior, use \code{IVprec = 'dcat(1)'}.
+#' @param IVprec hyperprior on the precision (i.e., the inverse of the variance) of the slope parameters for the z-standardized continuous predictors. For ease of interpretation, TreeBUGS reports unstandardized regression coefficients. See details below.
+#'
+#' @details
+#' Continuous (discrete) predictors are added on the latent-probit scale via: \deqn{\theta = \Phi(\mu + X \beta +\delta ),} where X is a design matrix with continuous (dummy) predictor values. TreeBUGS reports unstandardized regression coefficients, but uses z-standardized variables with mean zero and SD=1 internally (note that the coeeficients are not standardized with respect to the 'depend variable' as in Rouder & Morey, 2012).
+#'
+#' For continuous predictors, the default prior \code{IVprec = "dchisq(1)"} implies a Cauchy prior on each standardized \eqn{\beta} (similar to the Zellner-Siow prior with scale parameter \eqn{s=1}; for details, see: Rouder et. al, 2012; Rouder & Morey, 2012). If small effects are expected, smaller scale values \eqn{s} can be used by \code{IVprec = 'dgamma(1/2,(s^2)/2)'}. To use a more-informative standard-normal prior on the standardized slopes, use \code{IVprec = 'dcat(1)'}.
+#'
 #' @return a list of the class \code{traitMPT} with the objects:
 #' \itemize{
 #'  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
@@ -24,6 +30,9 @@
 #' Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205-235.
 #'
 #' Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56, 356-374.
+#'
+#' Rouder, J. N., & Morey, R. D. (2012). Default Bayes Factors for Model Selection in Regression. Multivariate Behavioral Research, 47, 877-903.
+
 
 
 #' @export

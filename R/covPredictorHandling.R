@@ -66,13 +66,27 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dchis
 
     covPars <- covTable$covPar
     X_list <- list()  # list with design matrices for fixed effects)
+
+    # inverse-g prior for Zellner-Siow priors (contin. predictors)
+    if("c" %in% covTable$predType){
+      parWithPred <- unique(subset(covTable, covTable$predType == "c")$Parameter)
+      for(pp in seq_along(parWithPred)){
+        modelString <- paste0(modelString, "\n",
+                              "ginv_",parWithPred[pp], " ~ ",IVprec )
+      }
+    }
+
     for(pp in 1:nrow(covTable)){
       if(covTable$predType[pp] == "c"){
 
         # hyperpriors for slopes
         modelString <- paste0(modelString, "\n",
-                              covPars[pp], " ~ dnorm(0,tau_",covPars[pp],")","\n",
-                              "tau_",covPars[pp]," ~ ",IVprec, "\n")
+                              # "tau_",covPars[pp]," <- ginv_",covTable$Parameter[pp],
+                              # "* covVar[",covTable$covIdx[pp],"]\n",
+                              # * sigma[",covTable$theta[pp],"]^(-2)
+
+                              covPars[pp], " ~ dnorm(0,","ginv_",
+                              covTable$Parameter[pp],"* covVar[",covTable$covIdx[pp],"])")
 
       }else if(covTable$predType[pp] == "r"){
         numLevel <- length(predFactorLevels[[covTable$covIdx[pp]]])
@@ -81,7 +95,8 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dchis
                               "\nfor(level in 1:", numLevel,"){\n  ",
                               covPars[pp], "[level] ~ dnorm(0, tau_",covPars[pp],") \n}\n",
                               "tau_", covPars[pp], " ~ dchisq(1)\n",
-                              "SD_", covPars[pp], " <- sqrt(inverse(tau_",covPars[pp] ,"))")
+                              "SD_", covPars[pp], " <- sqrt(inverse(tau_",covPars[pp] ,"))"
+                              )
 
         covPars <- c(covPars, paste0("SD_", covPars[pp]))
       }else{
