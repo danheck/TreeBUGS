@@ -21,6 +21,13 @@ library(devtools)
 install_github("denis-arnold/TreeBUGS", build_vignettes = TRUE)
 ```
 
+## Citation
+
+If you use TreeBUGS, please cite the software as follows:
+
+Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (in preparation). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. Retrieved from https://github.com/denis-arnold/TreeBUGS
+
+
 ### References
 
 * Erdfelder, E., Auer, T.-S., Hilbig, B. E., Assfalg, A., Moshagen, M., & Nadarevic, L. (2009). Multinomial processing tree models: A review of the literature. Journal of Psychology, 217, 108–124. http://doi.org/10.1027/0044-3409.217.3.108
