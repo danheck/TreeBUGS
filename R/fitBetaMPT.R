@@ -41,6 +41,8 @@ betaMPT <- function(eqnfile, data, restrictions,
                     corProbit=FALSE,
                     alpha = "dgamma(1,.1)",
                     beta = "dgamma(1,.1)",
+                    # alpha = "dunif(0,1)",
+                    # beta = "dnorm(0,1)T(0,)",
 
                     # MCMC stuff:
                     n.iter=20000, n.adapt=2000,

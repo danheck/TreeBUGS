@@ -115,14 +115,41 @@ for(s in 1:S){
 ",
   # WinBUGS: zero[s] ~dpois(phi[s])
   # WinBUGS: phi[s] <- -log(1/pow(alph[s]+bet[s],5/2))
-"  mean[s] <- alph[s]/(alph[s]+bet[s])
+#
+# "
+  # alph[s] <- ( (1-mean[s])/sd[s]^2 - 1/mean[s])*mean[s]^2
+  # bet[s] <- alph[s] *(1/mean[s] - 1)
+
+# alph[s] <- xxx1[s]/xxx2[s]^2
+# bet[s] <- 1/xxx2[s]^2 - alph[s]
+
+"
+  mean[s] <- alph[s]/(alph[s]+bet[s])
   sd[s] <- sqrt(alph[s]*bet[s]/(pow(alph[s]+bet[s],2)*(alph[s]+bet[s]+1)))
 }
 ",
+# paste0("\nxxx1[", 1:S, "] ~ ", alpha, collapse = ""),
+# paste0("\nxxx2[", 1:S, "] ~ ", beta, collapse = ""),
+# "\n\n")
 paste0("\nalph[", 1:S, "] ~ ", alpha, collapse = ""),
-paste0("\nbet[", 1:S, "] ~ ", beta, collapse = ""),"
+paste0("\nbet[", 1:S, "] ~ ", beta, collapse = ""),
+"\n\n")
 
-")
+  # for(s in 1:S){
+  #   if( (length(alpha) == 1 & alpha == "default") || alpha[s] == "default"){
+  #
+  #     modelString <- paste0("alph[",s,"] <- xxx1[",s,"]/xxx2[",s,"]^2 \n",
+  #                           "xxx1[",s,"] ~ dunif(0,1) \n",
+  #                           "xxx2[",s,"] ~ dnorm(0,1)T(0,) \n",
+  #                           "\n\n")
+  #     alpha = "dunif(0,1)"
+  #     beta = "dnorm(0,1)T(0,)"
+  #   }else if(length(alpha) == 1){
+  #
+  #   }else{
+  #
+  #   }
+  # }
 
   return(modelString)
 }
