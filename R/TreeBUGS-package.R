@@ -16,6 +16,8 @@
 #' @importFrom grDevices rainbow adjustcolor
 #' @importFrom stats pnorm rnorm runif sd qnorm dnorm dbeta quantile rWishart ave pchisq
 #' @importFrom parallel parSapply
+#' @importFrom Rcpp evalCpp sourceCpp
+#' @useDynLib TreeBUGS
 #' @references
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 #'

@@ -56,7 +56,11 @@ genBetaMPT <- function(N, numItems, eqnfile, mean=NULL, sd=NULL, alpha=NULL, bet
   # individual parameters, drawn from hierarchical distribution:
   theta <- c()
   for(s in 1:S){
-    theta <- cbind(theta, rbeta(N, shape1 = alpha[s], shape2 = beta[s]))
+    if(sd[s] == 0){
+      theta <- cbind(theta,rep(mean[s],N))
+    }else{
+      theta <- cbind(theta, rbeta(N, shape1 = alpha[s], shape2 = beta[s]))
+    }
   }
   colnames(theta) <- thetaNames
 
