@@ -204,3 +204,4 @@ callingSampler <- function(model,
 
   return(samples)   # own summary
 }
+

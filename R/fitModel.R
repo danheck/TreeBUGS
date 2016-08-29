@@ -42,7 +42,7 @@ fitModel <- function(type,
   if(n.iter <= n.burnin)
     stop("n.iter must be larger than n.burnin")
 
-  # MPT structure
+  # MPT structure for JAGS
   Tree <- readEQN(eqnfile)
   mergedTree <- mergeBranches(Tree)
   data <- readSubjectData(data, unique(mergedTree$Category))

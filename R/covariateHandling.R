@@ -55,7 +55,7 @@ covHandling <- function(covData,
       for(i in 1:length(covStructure)){
         sss <- strsplit(covStructure[[i]], ";")[[1]]
         if(length(sss) <2)
-          stop("Check covStructure/predStructure (in one argument, a semicolon seems to be missing).")
+          stop("Check predStructure (in one argument, a semicolon seems to be missing).")
         pars <- strsplit(sss[1], " +")[[1]]
         covs <- strsplit(sss[2], " +")[[1]]
         pars <- pars[pars != ""]
@@ -73,10 +73,11 @@ covHandling <- function(covData,
       # replace the constrained parameters by free parameters and remove redundant rows
       parSel <- match(covTable$Parameter,  thetaNames$Parameter)
       if(any(is.na(parSel)))
-        stop("Check parameter names in covStructure. Problematic right now:\n  ",
-             covTable$Parameter[is.na(parSel)],
-             ifelse( any(defaultExclude != "ALL_COVARIATES"),
-                     "\n  (note that for correlations in covStructure, only continuous variables are allowed)",""))
+        stop("Check parameter names in predStructure. Problematic right now:\n  ",
+             covTable$Parameter[is.na(parSel)])
+
+             # ifelse( any(defaultExclude != "ALL_COVARIATES"),
+             #         "\n  (note that for correlations in covStructure, only continuous variables are allowed)",""))
       covTable$theta <- thetaNames$theta[parSel]
       covTable$Parameter <- thetaNames$Parameter[parSel]
       covTable$covIdx <- (1:ncol(covData))[match(covTable$Covariate,  covNames)]

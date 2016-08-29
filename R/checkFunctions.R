@@ -48,6 +48,9 @@ check.hyperprior <- function(par, thetaUnique, label="parameter"){
       stop("Names of the hyperprior vector '", label, "' do not match model parameters.",
            "\n  Use read.EQN(.., paramOrder=TRUE) to get the correct parameter labels.")
     par <- par[thetaUnique]
+  }else if(length(par) == 1){
+    par <- rep(par, length(thetaUnique))
+    names(par) <- thetaUnique
   }
 
   par

@@ -102,10 +102,14 @@ double sliceAB(double x,
 
 
 // [[Rcpp::export]]
-List betampt(int M, arma::mat H,
-             arma::mat a, arma::mat b, arma::vec c,
+List betampt(int M,
+             arma::mat H,
+             arma::mat a,
+             arma::mat b,
+             arma::vec c,
              arma::vec map,
-             double shape=1., double rate=.1){
+             arma::vec shape,
+             arma::vec rate){
 
   int S = a.n_cols;     // parameters
   int N = H.n_rows;     // participants
@@ -124,7 +128,6 @@ List betampt(int M, arma::mat H,
   arma::mat sig(M,S);
   arma::cube theta(M, N, S);
   theta.subcube(0,0,0, 0,N-1,S-1).randu();
-  // Q.subcube( first_row, first_col, first_slice, last_row, last_col, last_slice )
 
   // temporary MCMC objects:
   arma::mat Hfull =  arma::zeros<arma::mat>(N, B);
@@ -149,7 +152,7 @@ List betampt(int M, arma::mat H,
       if(fixprob.n_elem == 1){
         Hfull(n,as_scalar(sel)) = H(n,k);
       }else{
-        samp = Rcpp::RcppArmadillo::rmultinom(H(n,k), fp);
+        samp = RcppArmadillo::rmultinom(H(n,k), fp);
         for(int tt=0; tt<fixprob.n_elem; tt++){
           Hfull(n,arma::as_scalar(sel(tt))) = samp[tt];
         }
@@ -166,13 +169,10 @@ List betampt(int M, arma::mat H,
     if(m>0) {
       for(int s=0; s<S; s++){
         tvec = as<Rcpp::NumericVector>(wrap(reshape(theta.slice(s).row(m-1),N,1)));
-        alpha(m,s) = sliceAB(alpha(m-1,s), beta(m-1,s), tvec, shape, rate, .001);
-        beta(m,s) = sliceAB(beta(m-1,s), alpha(m,s), 1-tvec, shape, rate, .001);
+        alpha(m,s) = sliceAB(alpha(m-1,s), beta(m-1,s), tvec, shape(s), rate(s), .001);
+        beta(m,s) = sliceAB(beta(m-1,s), alpha(m,s), 1-tvec, shape(s), rate(s), .001);
       }
     }
-    // fixed effects model with uniform priors:
-    // alpha.row(m) = ones(1,S);
-    // beta.row(m) = ones(1,S);
 
     mu.row(m) = alpha.row(m)/(alpha.row(m)+beta.row(m));
     sig.row(m) = sqrt(mu.row(m) % (1-mu.row(m)) / (alpha.row(m)+beta.row(m)+1));
@@ -208,7 +208,7 @@ List betampt(int M, arma::mat H,
         if(sel.n_elem == 1){
           Hfull(n,as_scalar(sel)) = H(n,k);
         }else{
-          samp = Rcpp::RcppArmadillo::rmultinom(H(n,k), fp);
+          samp = RcppArmadillo::rmultinom(H(n,k), fp);
           for(int tt=0; tt<sel.n_elem; tt++){
             Hfull(n,arma::as_scalar(sel(tt))) = samp[tt];
           }
@@ -234,4 +234,104 @@ List betampt(int M, arma::mat H,
 
 
 
+// [[Rcpp::export]]
+List simplempt(int M,
+               arma::mat H,
+               arma::mat a,
+               arma::mat b,
+               arma::vec c,
+               arma::vec map,
+               arma::vec alpha,
+               arma::vec beta){
 
+  int S = a.n_cols;     // parameters
+  int N = H.n_rows;     // participants
+  int B = a.n_rows;     // branches
+  arma::vec cats = unique(map);
+  int K = cats.n_elem;  // categories
+
+  //  Initialize MCMC array
+  arma::cube theta(M, N, S);
+  theta.subcube(0,0,0, 0,N-1,S-1).randu();
+
+  // temporary MCMC objects:
+  arma::mat Hfull =  arma::zeros<arma::mat>(N, B);
+  arma::uvec sel;
+  arma::vec fixprob;
+  NumericVector fp;
+  IntegerVector samp;
+
+  arma::mat p(N,S);
+  arma::mat q(N,S);
+  arma::vec br(B);
+
+  //  initialize full-data matrix Hfull
+  for(int n=0; n<N; n++){
+    for(int k=0; k<K; k++){
+
+      sel = find(map == k+1);
+      fixprob = arma::ones<arma::vec>(sel.n_elem) /sel.n_elem ;
+      fp = Rcpp::as<Rcpp::NumericVector>(wrap(fixprob));
+
+      if(fixprob.n_elem == 1){
+        Hfull(n,as_scalar(sel)) = H(n,k);
+      }else{
+        samp = RcppArmadillo::rmultinom(H(n,k), fp);
+        for(int tt=0; tt<fixprob.n_elem; tt++){
+          Hfull(n,arma::as_scalar(sel(tt))) = samp[tt];
+        }
+      }
+      // Rcout << "Hfull=\n" << Hfull.row(n).t() << "H =\n" << H.row(n).t() << "\n\n";
+    }
+  }
+
+  // ################################ MCMC loop
+  for(int m=0; m<M; m++){
+
+    // ################################ MPT part
+
+    // # 3. Sample θ from θ|σ, µ, Hfull
+    for(int s=0; s<S; s++){
+      for(int n=0; n<N; n++){
+        p(n,s) = dot(a.col(s), Hfull.row(n) );
+        q(n,s) = dot(b.col(s), Hfull.row(n) );
+        theta(m,n,s) = R::rbeta(p(n,s)+alpha(s), q(n,s) + beta(s)) ;
+      }
+    }
+
+    // # 4. Sample Hfull from Hfull |θ, H
+    for(int n=0; n<N; n++){
+
+      br = c;
+      for(int bb=0; bb<B; bb++){
+        for(int s=0; s<S; s++){
+          br(bb) = br(bb)* pow(theta(m,n,s), a(bb,s))*pow(1-theta(m,n,s), b(bb,s)) ;
+        }
+      }
+      // Rcout << "theta=" << theta(span(m,m),span(n,n),span(0,S-1)) << "\nbr=" << br;
+      for(int k=0; k<K; k++){
+
+        sel = find(map == k+1);
+        fixprob = br.elem(sel) /sum(br.elem(sel)) ;
+        fp = as<Rcpp::NumericVector>(wrap(fixprob));
+        // Rcout << "k=" << k << " fixprob=\n" << fixprob.t() << "Hfull=\n" << Hfull.row(n).t() << "\n\n";
+
+        if(sel.n_elem == 1){
+          Hfull(n,as_scalar(sel)) = H(n,k);
+        }else{
+          samp = RcppArmadillo::rmultinom(H(n,k), fp);  // Rcpp::
+          for(int tt=0; tt<sel.n_elem; tt++){
+            Hfull(n,arma::as_scalar(sel(tt))) = samp[tt];
+          }
+        }
+
+      }
+      // Rcout << "Hfull=\n" << Hfull.row(n).t() << "H =\n" << H.row(n).t() << "\n\n";
+      // Rcout << "\Here, Hfull=\n" << Hfull;
+    }
+  }
+
+  return Rcpp::List::create(Rcpp::Named("theta") = theta,
+                            Rcpp::Named("alpha") = alpha,
+                            Rcpp::Named("beta") = beta);
+}

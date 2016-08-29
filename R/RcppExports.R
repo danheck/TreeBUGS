@@ -5,7 +5,11 @@ sliceAB <- function(x, fixed, theta, shape = 1., rate = .05, eps = .01, steps = 
     .Call('TreeBUGS_sliceAB', PACKAGE = 'TreeBUGS', x, fixed, theta, shape, rate, eps, steps)
 }
 
-betampt <- function(M, H, a, b, c, map, shape = 1., rate = .1) {
+betampt <- function(M, H, a, b, c, map, shape, rate) {
     .Call('TreeBUGS_betampt', PACKAGE = 'TreeBUGS', M, H, a, b, c, map, shape, rate)
+}
+
+simplempt <- function(M, H, a, b, c, map, alpha, beta) {
+    .Call('TreeBUGS_simplempt', PACKAGE = 'TreeBUGS', M, H, a, b, c, map, alpha, beta)
 }
 

@@ -24,7 +24,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // betampt
-List betampt(int M, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, double shape, double rate);
+List betampt(int M, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec shape, arma::vec rate);
 RcppExport SEXP TreeBUGS_betampt(SEXP MSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP shapeSEXP, SEXP rateSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
@@ -35,9 +35,27 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type b(bSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type c(cSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type map(mapSEXP);
-    Rcpp::traits::input_parameter< double >::type shape(shapeSEXP);
-    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type shape(shapeSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type rate(rateSEXP);
     __result = Rcpp::wrap(betampt(M, H, a, b, c, map, shape, rate));
+    return __result;
+END_RCPP
+}
+// simplempt
+List simplempt(int M, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec alpha, arma::vec beta);
+RcppExport SEXP TreeBUGS_simplempt(SEXP MSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type H(HSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type a(aSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type c(cSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type map(mapSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
+    __result = Rcpp::wrap(simplempt(M, H, a, b, c, map, alpha, beta));
     return __result;
 END_RCPP
 }

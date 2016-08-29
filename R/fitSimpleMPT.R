@@ -1,0 +1,34 @@
+
+#' C++ Sampler for Standard MPT Model
+#'
+#' Fast Gibbs sampler in C++ that is tailored to the standard MPT model (i.e., non-hierarchical MPT: assumes separate parameters if multiple data sets are supplied).
+#'
+#' @inheritParams betaMPT
+#' @param alpha first shape parameter(s) for the beta prior-distribution of the MPT parameters \eqn{\theta_s} (can be a named vector to use a different prior for each MPT parameter)
+#' @param beta second shape parameter(s)
+#' @details Beta distributions with fixed shape parameters \eqn{\alpha} and \eqn{\beta} are used. The default \eqn{\alpha=1} and \eqn{\beta=1} assumes uniform priors for all MPT parameters.
+#' @author Daniel Heck
+#' @importFrom parallel parLapply stopCluster detectCores
+#' @export
+simpleMPT <- function(eqnfile, data, restrictions,
+                      n.iter=20000, n.burnin = 2000,
+                      n.thin = 5,  n.chains=3, ppp = 0,
+                      alpha = 1, beta = 1,
+                      parEstFile){
+
+  hyperprior <- list(alpha=alpha, beta=beta)
+  if(!is.character(data) && is.null(dim(data))){
+    data <- matrix(data, nrow = 1, dimnames = list(NULL, names(data)))
+  }
+
+  fittedModel <- fitModelCpp("simpleMPT", eqnfile=eqnfile,
+                             data=data, restrictions=restrictions,
+                             hyperprior=hyperprior,
+                             n.iter=n.iter,
+                             n.burnin=n.burnin, n.thin=n.thin,
+                             n.chains=n.chains,  ppp = ppp,
+                             parEstFile=parEstFile,
+                             call = match.call())
+
+  fittedModel
+}

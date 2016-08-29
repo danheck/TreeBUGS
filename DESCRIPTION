@@ -1,8 +1,8 @@
 Package: TreeBUGS
 Type: Package
 Title: Hierarchical MPT Modeling using BUGS
-Version: 0.6.0
-Date: 2016-08-09
+Version: 0.6.1
+Date: 2016-08-29
 Authors@R: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut")),
              person("Nina", "Arnold", email="arnold@uni-mannheim.de", role = c("aut")),
              person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut","cre")))

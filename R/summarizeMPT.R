@@ -71,15 +71,22 @@ summarizeMPT <- function(mcmc,
   rownames(rho) <- rhoNames
   rho.matrix <- getRhoMatrix(uniqueNames, rho)
 
+  mean <- summ[paste0("mean", idx),, drop=FALSE]
+  rownames(mean) <-paste0("mean_", uniqueNames)
   ############################## BETA MPT SUMMARY
-  if(model == "betaMPT"){
+  if(model == "simpleMPT"){
+    SD <- summ[paste0("sd",idx),, drop=FALSE]
+    rownames(SD) <-paste0("sd_", uniqueNames)
+    groupParameters <- list(mean=mean, SD=SD,
+                            rho=rho, rho.matrix = rho.matrix,
+                            correlation=correlation, thetaFE=NULL)
+
+  }else if(model == "betaMPT"){
     # mean and individual parameter estimates
-    mean <- summ[paste0("mean", idx),, drop=FALSE]
     SD <- summ[paste0("sd",idx),, drop=FALSE]
     alpha <- summ[paste0("alph",idx),, drop=FALSE]
     beta <- summ[paste0("bet",idx),, drop=FALSE]
 
-    rownames(mean) <-paste0("mean_", uniqueNames)
     rownames(SD) <-paste0("sd_", uniqueNames)
     rownames(alpha) <-paste0("alpha_", uniqueNames)
     rownames(beta) <-paste0("beta_", uniqueNames)
@@ -91,16 +98,13 @@ summarizeMPT <- function(mcmc,
                             rho=rho, rho.matrix = rho.matrix,
                             correlation=correlation, thetaFE=thetaFE)
 
-  }else{
+  }else if (model == "traitMPT"){
 
     ############################## LATENT-TRAIT SUMMARY
     mu <- summ[paste0("mu",idx),, drop=FALSE]
-    mean <- summ[paste0("mean",idx),, drop=FALSE]
     sigma <- summ[paste0("sigma",idx),, drop=FALSE]
 
-
     rownames(mu) <-paste0("latent_mu_", uniqueNames)
-    rownames(mean) <-paste0("mean_", uniqueNames)
     rownames(sigma) <-paste0("latent_sigma_", uniqueNames)
 
     selCov <- grepl("slope_", rownames(summ))
@@ -160,194 +164,6 @@ summarizeMPT <- function(mcmc,
 }
 
 
-#' @export
-print.summary.betaMPT <- function(x,  ...){
-  cat("Call: \n")
-  print(x$call)
-  cat("\n")
-  if(is.null(x$groupParameters)){
-    warning("Clean MPT summary only available when fitting with JAGS.")
-    print(x)
-  }else{
-    cat("Mean parameters on group level:\n")
-    print(round(x$groupParameters$mean, x$round))
-    cat("\nStandard deviation of parameters across individuals:\n")
-    print(round(x$groupParameters$SD, x$round))
-    cat("\nAlpha parameters of beta distributions:\n")
-    print(round(x$groupParameters$alpha, x$round))
-    cat("\nBeta parameters of beta distributions:\n")
-    print(round(x$groupParameters$beta, x$round))
-    if(!is.null(x$groupParameters$thetaFE)){
-      cat("\nFixed effects MPT parameters (= identical for all subjects):\n")
-      print(round(x$groupParameters$thetaFE, x$round))
-    }
-
-    cat("\n\n##############\n",
-        "Model fit statistics (posterior predictive p-values):\n")
-    if(!is.null(x$fitStatistics$overall)){
-      print(round(x$fitStatistics$overall, x$round))
-    }else{
-      cat("Use PPP(fittedModel) to get T1 and T2 posterior predictive checks.\n")
-    }
-    if(!is.null(x$dic)){
-      print(x$dic)
-      cat("\n")
-    }
-    # cat("\nPoster predictive p-values for participants:\n")
-    # print(round(x$fitStatistics$p.T1.individual, x$round))
-    # if(!is.null(x$fitStatistics$p.T1.group)){
-    #   cat("\nPoster predictive p-values per group:\n")
-    #   print(round(x$fitStatistics$p.T1.group, x$round))
-    # }
-
-    if(!is.null(x$transformedParameters)){
-      cat("\nTransformed parameters:\n")
-      print(round(x$transformedParameters, x$round))
-    }
-    if(!is.null(x$groupParameters$correlation) && !nrow(x$groupParameters$correlation) == 0){
-      cat("\nSampled correlations of MPT parameters with covariates:\n")
-      print(round(x$groupParameters$correlation, x$round))
-    }
-
-  }
-}
-
-#' @export
-print.summary.traitMPT <- function(x,  ...){
-  cat("Call: \n")
-  print(x$call)
-  cat("\n")
-  if(is.null(x$groupParameters)){
-    warning("Clean MPT summary only available when fitting with JAGS.")
-    print(x)
-  }else{
-    cat("Mean parameters on group level:\n")
-    print(round(x$groupParameters$mean, x$round))
-    cat("\nMean of latent-trait values (probit-scale) across individuals:\n")
-    print(round(x$groupParameters$mu, x$round))
-    cat("\nStandard deviation of latent-trait values (probit scale) across individuals:\n")
-    print(round(x$groupParameters$sigma, x$round))
-    if(!is.null(x$groupParameters$thetaFE)){
-      cat("\nFixed effects MPT parameters (= identical for all subjects):\n")
-      print(round(x$groupParameters$thetaFE, x$round))
-    }
-
-    if(nrow(x$groupParameters$rho.matrix) != 1){
-      cat("\nCorrelations of latent-trait values on probit scale:\n")
-      print(round(x$groupParameters$rho, x$round))
-      cat("\nCorrelations (posterior mean estimates) in matrix form:\n")
-      print(round(x$groupParameters$rho.matrix, x$round))
-    }
-
-    cat("\n\n##############\n",
-        "Model fit statistics (posterior predictive p-values):\n")
-    if(!is.null(x$fitStatistics$overall)){
-      print(round(x$fitStatistics$overall, x$round))
-    }else{
-      cat("Use PPP(fittedModel) to get T1 and T2 posterior predictive checks.\n")
-    }
-    if(!is.null(x$dic)){
-      print(x$dic)
-      cat("\n")
-    }
-
-    if(!is.null(x$transformedParameters)){
-      cat("\nTransformed parameters:\n")
-      print(round(x$transformedParameters, x$round))
-    }
-
-    if(!is.null(x$groupParameters$slope)){
-      cat("\nSlope parameters for predictor variables:\n")
-      print(round(x$groupParameters$slope, x$round))
-    }
-
-    if(!is.null(x$groupParameters$factor)){
-      cat("\nEffects of factors on latent scale (additive shift from overall mean):\n")
-      print(round(x$groupParameters$factor, x$round))
-      cat("\nFactor SD on latent scale:\n")
-      print(round(x$groupParameters$factorSD, x$round))
-    }
-
-    if(!is.null(x$groupParameters$correlation) && !nrow(x$groupParameters$correlation) == 0){
-      cat("\nSampled correlations of covariates with MPT parameters:\n")
-      print(round(x$groupParameters$correlation, x$round))
-    }
-  }
-}
-
-#' @export
-summary.betaMPT <- function(object, round=3, ...){
-  summ <- object$summary
-  summ$call <- object$call
-  summ$round <- round
-  # class(summ) <- "summary.betaMPT"
-  return(summ)
-}
-
-#' @export
-summary.traitMPT <- function(object, round=3, ...){
-  summ <- object$summary
-  summ$call <- object$call
-  summ$round <- round
-  #   class(summ) <- "summary.traitMPT"
-  return(summ)
-}
-
-#' @export
-print.betaMPT <- function(x,  ...){
-  cat("Call: \n")
-  print(x$call)
-  cat("\n")
-  print(round(cbind("Group Mean" = x$summary$groupParameters$mean[,1],
-                    "Group SD" = x$summary$groupParameters$SD[,1]),4))
-
-  cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
-}
-
-#' @export
-print.traitMPT <- function(x,  ...){
-  cat("Call: \n")
-  print(x$call)
-  cat("\n")
-  #   if(!x$sampler %in% c("jags", "JAGS")){
-  #     warning("\nClean MPT summary only available when fitting with JAGS.")
-  #   }else{
-  print(round(cbind("Mean(MPT Parameters)" = x$summary$groupParameters$mean[,1],
-                    "Mu(latent-traits)" = x$summary$groupParameters$mu[,1],
-                    "SD(latent-traits)" = x$summary$groupParameters$sigma[,1]),4))
-
-  cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
-}
-
-
-
-# getRhoBeta <- function(uniqueNames, mcmc, corProbit=FALSE, truncation=5){
-#   S <- length(uniqueNames)
-#   if(S == 1){
-#     return(NULL)
-#   }
-#
-#   nams <- varnames(mcmc)
-#   sel <- grep("theta[", nams, fixed=TRUE)
-#   rho <- sapply(mcmc , simplify=FALSE,
-#                 function(mmm){
-#                   cor.mat <- t(apply(mmm[,sel], 1,
-#                                      function(theta){
-#                                        if(corProbit){
-#                                          theta <- qnorm(theta)
-#                                          theta[theta < -truncation] <- -truncation
-#                                          theta[theta > truncation] <- truncation
-#                                        }
-#                                        cor(matrix(theta, ncol=S, byrow = TRUE))
-#                                      }))
-#                   colnames(cor.mat) <- apply(expand.grid("rho[",1:S,",",1:S,"]"),1,paste0, collapse="")
-#                   as.mcmc(cor.mat)
-#                 })
-#   summ <- summarizeMCMC(as.mcmc.list(rho))
-#   rownames(summ) <- paste0("rho[",apply(expand.grid(uniqueNames,uniqueNames), 1, paste0, collapse=","),"]")
-#   summ[! duplicated(summ[,"Mean"]) & summ[,"Mean"] != 1,, drop=FALSE]
-#
-# }
 
 
 getRhoMatrix <- function (uniqueNames, rho) {
