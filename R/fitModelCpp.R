@@ -122,10 +122,12 @@ fitModelCpp <- function(type,
   cl <- makeCluster(ncpu)
   clusterExport(cl, c("simBetaMPT", "simSimpleMPT",
                       "n.iter","data","mpt.res", "S",
-                      "shape","rate","N","n.burnin","n.thin"), envir = environment())
+                      "N","n.burnin","n.thin"), envir = environment())
   if(type == "betaMPT"){
+    clusterExport(cl, c("shape","rate"), envir = environment())
     mcmc.list <- parLapply(cl, 1:n.chains, simBetaMPT)
   }else if (type == "simpleMPT"){
+    clusterExport(cl, c("alpha","beta"), envir = environment())
     mcmc.list <- parLapply(cl, 1:n.chains, simSimpleMPT)
   }
   stopCluster(cl)
