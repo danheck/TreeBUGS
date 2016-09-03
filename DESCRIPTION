@@ -1,15 +1,16 @@
 Package: TreeBUGS
-Type: Package
-Title: Hierarchical MPT Modeling using BUGS
 Version: 0.6.1
 Date: 2016-08-29
-Authors@R: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut")),
-             person("Nina", "Arnold", email="arnold@uni-mannheim.de", role = c("aut")),
-             person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut","cre")))
+Title: Hierarchical Multinomial Processing Tree Modeling
+Authors@R: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut","cre")),
+             person("Nina", "Arnold", email="arnold@uni-mannheim.de", role = c("aut","dtc")),
+             person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut")))
+Author: Daniel Heck [aut, cre],
+        Nina Arnold [aut, dtc],
+        Denis Arnold [aut]
 Maintainer: Daniel Heck <heck@uni-mannheim.de>
-Description: Fits hierarchical multinomial processing tree (MPT) models that either assume latent multivariate normal (Klauer, 2010) or indpendent beta distributions (Smith & Batchelder, 2010) for the person parameters. To fit a model, only an .eqn-file as for standard MPT models is required. Moreover, data can either be provided in a comma-separated file (.csv) or directly in R. TreeBUGS then automatically creates a model file and calls JAGS. Fitted models can be analyzed using summary and plotting functions tailored to MPT models.
-LazyData: TRUE
 Depends:
+    R (>= 3.0.0),
     runjags,
     stats,
     graphics,
@@ -20,11 +21,15 @@ Depends:
     rjags
 Imports:
     Rcpp (>= 0.12.6)
+Suggests:
+    knitr
 LinkingTo:
     Rcpp,
     RcppArmadillo
-Suggests:
-    knitr
 VignetteBuilder: knitr
-License: GPL (>=2)
+SystemRequirements: JAGS (http://mcmc-jags.sourceforge.net)
+Description: User-friendly analysis of hierarchical multinomial processing tree (MPT) models that are often used in cognitive psychology. Implements the latent-trait MPT approach (Klauer, 2010) and the beta-MPT approach (Smith & Batchelder, 2010) to model heterogeneity of participants. MPT models are conventiently specified by an .eqn-file as used by other MPT software. Data is either provided as comma-separated file (.csv) or directly in R. Models are either fitted by calling JAGS (Plummer, 2003) or by an MPT-tailored Gibbs sampler in C++ (only for nonhierarchical and beta MPT models). Provides tests of heterogeneity and MPT-tailored summaries and plotting functions.
+License: GPL-2
+URL: https://github.com/denis-arnold/TreeBUGS
 RoxygenNote: 5.0.1
+LazyData: TRUE

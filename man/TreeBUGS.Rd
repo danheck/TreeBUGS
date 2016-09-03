@@ -4,7 +4,7 @@
 \name{TreeBUGS}
 \alias{TreeBUGS}
 \alias{TreeBUGS-package}
-\title{TreeBUGS: Hierarchical MPT Modeling using BUGS}
+\title{TreeBUGS: Hierarchical Multinomial Processing Tree Modeling}
 \description{
 Uses standard MPT files in the .eqn-format (Moshagen, 2010) to fit hierarchical Bayesian MPT models. Note that the software JAGS is required (\url{http://mcmc-jags.sourceforge.net}).
 }

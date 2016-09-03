@@ -1,4 +1,4 @@
-#' TreeBUGS: Hierarchical MPT Modeling using BUGS
+#' TreeBUGS: Hierarchical Multinomial Processing Tree Modeling
 #'
 #' Uses standard MPT files in the .eqn-format (Moshagen, 2010) to fit hierarchical Bayesian MPT models. Note that the software JAGS is required (\url{http://mcmc-jags.sourceforge.net}).
 #'
