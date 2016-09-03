@@ -14,7 +14,11 @@ In the most simple user scenario, the following steps are required:
 
 These steps are explained in more detail in the package vignette, which can be opened in R by typing `vignette("TreeBUGS")`. Note that TreeBUGS requires a valid installation of the software JAGS (http://mcmc-jags.sourceforge.net/). 
 
-To install TreeBUGS, run:
+To install the latest stable release of TreeBUGS from CRAN (https://cran.r-project.org/web/packages/TreeBUGS), run:
+```
+install.packages("TreeBUGS")
+```
+To install the latest developer version of TreeBUGS from GitHub, run:
 ```
 install.packages("devtools")
 library(devtools)
