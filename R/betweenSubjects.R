@@ -59,7 +59,7 @@ betweenSubjectMPT <- function(model1, model2,
   ################ check MCMC iterations
   if(length(pp1) != length(pp2)){
     warning("Different number of chains for the two models. Some chains are dropped!")
-    chains <- min(length(pp1), length(pp1))
+    chains <- min(length(pp1), length(pp2))
     pp1 <- pp1[1:chains]
     pp2 <- pp2[1:chains]
   }
