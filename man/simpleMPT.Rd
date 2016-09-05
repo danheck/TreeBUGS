@@ -42,7 +42,7 @@ Beta distributions with fixed shape parameters \eqn{\alpha} and \eqn{\beta} are 
 EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
 d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
 fit <- simpleMPT(EQNfile, colSums(d.encoding),
-                restrictions=list("D1=D2=D3","d1=d2"))
+                restrictions=list("D1=D2=D3","d1=d2","a=g"))
 # convergence
 plot(fit)
 summary(fit)

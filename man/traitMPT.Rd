@@ -82,7 +82,7 @@ For continuous predictors, the default prior \code{IVprec = "dchisq(1)"} implies
 EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
 d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
 fit <- traitMPT(EQNfile, d.encoding, n.thin=5,
-                restrictions=list("D1=D2=D3","d1=d2"))
+                restrictions=list("D1=D2=D3","d1=d2","a=g"))
 # convergence
 plot(fit, parameter = "mean", type = "default")
 summary(fit)
