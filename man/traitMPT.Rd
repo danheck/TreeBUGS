@@ -76,6 +76,18 @@ Continuous (discrete) predictors are added on the latent-probit scale via: \deqn
 
 For continuous predictors, the default prior \code{IVprec = "dchisq(1)"} implies a Cauchy prior on each standardized \eqn{\beta} (similar to the Zellner-Siow prior with scale parameter \eqn{s=1}; for details, see: Rouder et. al, 2012; Rouder & Morey, 2012). If small effects are expected, smaller scale values \eqn{s} can be used by \code{IVprec = 'dgamma(1/2,(s^2)/2)'}. To use a more-informative standard-normal prior on the standardized slopes, use \code{IVprec = 'dcat(1)'}.
 }
+\examples{
+\dontrun{
+# fit beta-MPT model for encoding condition (see ?arnold2013):
+EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
+fit <- traitMPT(EQNfile, d.encoding, n.thin=5,
+                restrictions=list("D1=D2=D3","d1=d2"))
+# convergence
+plot(fit, parameter = "mean", type = "default")
+summary(fit)
+}
+}
 \author{
 Daniel Heck, Denis Arnold, Nina R. Arnold
 }

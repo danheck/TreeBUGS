@@ -38,6 +38,18 @@ betaMPTcpp(eqnfile, data, restrictions, covData, corProbit = FALSE,
 \description{
 Fast Gibbs sampler in C++ that is tailored to the beta-MPT model.
 }
+\examples{
+\dontrun{
+# fit beta-MPT model for encoding condition (see ?arnold2013):
+EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
+fit <- betaMPTcpp(EQNfile, d.encoding, n.thin=5,
+                  restrictions=list("D1=D2=D3","d1=d2"))
+# convergence
+plot(fit, parameter = "mean", type = "default")
+summary(fit)
+}
+}
 \author{
 Daniel Heck
 }

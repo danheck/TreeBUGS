@@ -2,10 +2,13 @@
 % Please edit documentation in R/plotConvergence.R
 \name{plot.betaMPT}
 \alias{plot.betaMPT}
+\alias{plot.simpleMPT}
 \alias{plot.traitMPT}
 \title{Plot Convergence for Hierarchical MPT Models}
 \usage{
 \method{plot}{betaMPT}(x, parameter = "mean", type = "default", ...)
+
+\method{plot}{simpleMPT}(x, type = "default", ...)
 
 \method{plot}{traitMPT}(x, parameter = "mean", type = "default", ...)
 }
@@ -24,6 +27,8 @@ Plot Convergence for Hierarchical MPT Models
 \section{Methods (by class)}{
 \itemize{
 \item \code{betaMPT}: Plot convergence for beta MPT
+
+\item \code{simpleMPT}: Plot convergence for nonhierarchical MPT model
 
 \item \code{traitMPT}: Plot convergence for latent-trait MPT
 }}

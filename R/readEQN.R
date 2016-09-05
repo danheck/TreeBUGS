@@ -21,7 +21,7 @@
 #'
 #' @examples
 #' # Example: Standard Two-High-Threshold Model (2HTM)
-#' EQNfile <- paste0(.libPaths()[1], "/TreeBUGS/MPTmodels/2htm.eqn")
+#' EQNfile <- system.file("MPTmodels/2htm.eqn", package="TreeBUGS")
 #' readEQN(file = EQNfile, paramOrder = TRUE)
 #'
 #' # with equality constraint:

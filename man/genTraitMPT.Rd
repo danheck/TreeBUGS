@@ -29,17 +29,18 @@ Generating a data file with known parameter structure using the Trait-MPT. Usefu
 }
 \examples{
 # Example: Standard Two-High-Threshold Model (2HTM)
-EQNfile <- paste0(.libPaths()[1], "/TreeBUGS/MPTmodels/2htm.eqn")
+EQNfile <- system.file("MPTmodels/2htm.eqn", package="TreeBUGS")
+rho <- matrix(c(1,.8,.2,
+                .8,1,.1,
+                .2,.1,1), nrow=3)
+colnames(rho) <- rownames(rho) <- c("Do","Dn","g")
 genDat <- genTraitMPT(N = 100,
                       numItems = c(Target=250, Lure=250),
                       eqnfile = EQNfile,
                       mean = c(Do=.7, Dn=.7, g=.5),
                       sigma =   c(Do=.3, Dn=.3, g=.15),
-                      rho = matrix(c(1 , .8, .2,
-                                     .8, 1 , .1,
-                                     .2, .1, 1 ),
-                                   nrow=3))
-
+                      rho = rho)
+head(genDat$data, 3)
 }
 \references{
 Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.

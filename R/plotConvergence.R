@@ -7,6 +7,12 @@ plot.betaMPT <- function(x, parameter="mean", type="default", ...){
   plot.traitMPT(x,parameter=parameter, type=type,...)
 }
 
+#' @export
+#' @describeIn plot Plot convergence for nonhierarchical MPT model
+plot.simpleMPT <- function(x, type="default", ...){
+  plot.traitMPT(x,parameter="theta", type=type,...)
+}
+
 
 #' Plot Convergence for Hierarchical MPT Models
 #'

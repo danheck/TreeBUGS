@@ -64,6 +64,18 @@ Fits a Beta-MPT model (Smith & Batchelder, 2010) based on a standard MPT model f
 \details{
 Note that, in the Beta-MPT model, correlations of individual MPT parameters with covariates are sampled. Hence, the covariates do not affect the estimation of the actual Beta-MPT parameters. Therefore, the correlation of covariates with the individual MPT parameters can equivalently be performed after fitting the model using the sampled posterior parameter values stored in \code{betaMPT$mcmc}
 }
+\examples{
+\dontrun{
+# fit beta-MPT model for encoding condition (see ?arnold2013):
+EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
+fit <- betaMPT(EQNfile, d.encoding, n.thin=5,
+               restrictions=list("D1=D2=D3","d1=d2"))
+# convergence
+plot(fit, parameter = "mean", type = "default")
+summary(fit)
+}
+}
 \author{
 Daniel Heck, Nina R. Arnold, Denis Arnold,
 }

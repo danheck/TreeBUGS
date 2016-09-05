@@ -32,29 +32,37 @@
 #' Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56, 356-374.
 #'
 #' Rouder, J. N., & Morey, R. D. (2012). Default Bayes Factors for Model Selection in Regression. Multivariate Behavioral Research, 47, 877-903.
-
-
-
+#' @examples
+#' \dontrun{
+#' # fit beta-MPT model for encoding condition (see ?arnold2013):
+#' EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+#' d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
+#' fit <- traitMPT(EQNfile, d.encoding, n.thin=5,
+#'                 restrictions=list("D1=D2=D3","d1=d2"))
+#' # convergence
+#' plot(fit, parameter = "mean", type = "default")
+#' summary(fit)
+#' }
 #' @export
 
 traitMPT <- function(eqnfile, data, restrictions,
-                    covData, #covStructure,   # correlation
-                    predStructure,  # predictor structure
-                    predType,    # c("c," f", "r")
-                    transformedParameters, corProbit=TRUE,
+                     covData, #covStructure,   # correlation
+                     predStructure,  # predictor structure
+                     predType,    # c("c," f", "r")
+                     transformedParameters, corProbit=TRUE,
 
-                    # hyperpriors:
-                    mu = "dnorm(0,1)", xi = "dunif(0,10)",
-                    V, df, IVprec = "dchisq(1)",  # change to "dcat(1)" to set beta ~ dnorm(0,1)
+                     # hyperpriors:
+                     mu = "dnorm(0,1)", xi = "dunif(0,10)",
+                     V, df, IVprec = "dchisq(1)",  # change to "dcat(1)" to set beta ~ dnorm(0,1)
 
-                    # MCMC stuff:
-                    n.iter=20000, n.adapt = 2000,
-                    n.burnin=2000,  n.thin=5,
-                    n.chains=3, dic =FALSE, ppp = 0,
+                     # MCMC stuff:
+                     n.iter=20000, n.adapt = 2000,
+                     n.burnin=2000,  n.thin=5,
+                     n.chains=3, dic =FALSE, ppp = 0,
 
-                    # File Handling stuff:
-                    modelfilename, parEstFile,
-                    autojags=NULL,   ...){
+                     # File Handling stuff:
+                     modelfilename, parEstFile,
+                     autojags=NULL,   ...){
 
 
   if(missing(V)) V <- NULL

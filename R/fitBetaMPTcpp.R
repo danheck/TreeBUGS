@@ -8,6 +8,17 @@
 #' @param rate rate parameter(s) of Gamma-hyperdistribution
 #' @author Daniel Heck
 #' @importFrom parallel parLapply stopCluster detectCores
+#' @examples
+#' \dontrun{
+#' # fit beta-MPT model for encoding condition (see ?arnold2013):
+#' EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+#' d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
+#' fit <- betaMPTcpp(EQNfile, d.encoding, n.thin=5,
+#'                   restrictions=list("D1=D2=D3","d1=d2"))
+#' # convergence
+#' plot(fit, parameter = "mean", type = "default")
+#' summary(fit)
+#' }
 #' @export
 betaMPTcpp <- function(eqnfile, data, restrictions,
                        covData, corProbit=FALSE,

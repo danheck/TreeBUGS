@@ -2,12 +2,12 @@ bibentry("Manual",
 		title="TreeBUGS: An R Package for Hierarchical Multinomial-Processing-Tree Modeling",
 		author="Daniel W. Heck, Nina R. Arnold, and Denis Arnold",
 		year="2016",
-		note="(Version 0.6.0)",
+		note="(Version 0.6.2)",
 		url="https://github.com/denis-arnold/TreeBUGS",
 
 		textVersion =
 		paste("Heck, D. W., Arnold, N. R., & Arnold, D. (2016). ",
-				"TreeBUGS: An R Package for Hierarchical Multinomial-Processing-Tree Modeling (Version 0.5.2). ",
+				"TreeBUGS: An R Package for Hierarchical Multinomial-Processing-Tree Modeling (Version 0.6.2). ",
 				"https://github.com/denis-arnold/TreeBUGS",
 				sep=""),
 

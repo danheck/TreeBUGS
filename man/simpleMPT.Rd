@@ -36,6 +36,18 @@ Fast Gibbs sampler in C++ that is tailored to the standard MPT model (i.e., non-
 \details{
 Beta distributions with fixed shape parameters \eqn{\alpha} and \eqn{\beta} are used. The default \eqn{\alpha=1} and \eqn{\beta=1} assumes uniform priors for all MPT parameters.
 }
+\examples{
+\dontrun{
+# fit nonhierarchical MPT model for aggregated data (see ?arnold2013):
+EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
+fit <- simpleMPT(EQNfile, colSums(d.encoding),
+                restrictions=list("D1=D2=D3","d1=d2"))
+# convergence
+plot(fit)
+summary(fit)
+}
+}
 \author{
 Daniel Heck
 }
