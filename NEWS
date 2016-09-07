@@ -1,6 +1,7 @@
 TreeBUGS 0.6.2 (September 2016)
 ===========
 
+* Bugfix: betweenSubjects with different number of chains
 * Added data "arnold2013" by Arnold, Bayen, Kuhlmann, and Vaterrodt (2013)
 * More examples in R help files
 * Convergence plots for simpleMPT

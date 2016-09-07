@@ -9,7 +9,15 @@
 #'   \item{\code{age}}{Age in years}
 #'   \item{\code{group}}{ Between-subject factor "Time of Schema Activation": Retrieval vs. encoding condition}
 #'   \item{\code{pc}}{perceived contingency}
-#'   \item{\code{EE,...,NN}}{Response frequencies for source-monitoring MPT model}
+#'   \item{\code{EE}}{Frequency of "Source E" responses to items from source "E"}
+#'   \item{\code{EU}}{Frequency of "Source U" responses to items from source "E"}
+#'   \item{\code{EN}}{Frequency of "New" responses to items from source "E"}
+#'   \item{\code{UE}}{Frequency of "Source E" responses to items from source "E"}
+#'   \item{\code{UU}}{Frequency of "Source U" responses to items from source "E"}
+#'   \item{\code{UN}}{Frequency of "New" responses to items from source "E"}
+#'   \item{\code{NE}}{Frequency of "Source E" responses to new items}
+#'   \item{\code{NU}}{Frequency of "Source U" responses to new items}
+#'   \item{\code{NN}}{Frequency of "New" responses to new items}
 #' }
 #' @references Arnold, N. R., Bayen, U. J., Kuhlmann, B. G., & Vaterrodt, B. (2013). Hierarchical modeling of contingency-based source monitoring: A test of the probability-matching account. Psychonomic Bulletin & Review, 20, 326-333.
 #' @examples
