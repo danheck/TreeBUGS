@@ -28,7 +28,7 @@ LinkingTo:
     RcppArmadillo
 VignetteBuilder: knitr
 SystemRequirements: JAGS (http://mcmc-jags.sourceforge.net)
-Description: User-friendly analysis of hierarchical multinomial processing tree (MPT) models that are often used in cognitive psychology. Implements the latent-trait MPT approach (Klauer, 2010) and the beta-MPT approach (Smith & Batchelder, 2010) to model heterogeneity of participants. MPT models are conventiently specified by an .eqn-file as used by other MPT software. Data is either provided as comma-separated file (.csv) or directly in R. Models are either fitted by calling JAGS (Plummer, 2003) or by an MPT-tailored Gibbs sampler in C++ (only for nonhierarchical and beta MPT models). Provides tests of heterogeneity and MPT-tailored summaries and plotting functions.
+Description: User-friendly analysis of hierarchical multinomial processing tree (MPT) models that are often used in cognitive psychology. Implements the latent-trait MPT approach (Klauer, 2010) <DOI:10.1007/s11336-009-9141-0> and the beta-MPT approach (Smith & Batchelder, 2010) <DOI:10.1016/j.jmp.2009.06.007> to model heterogeneity of participants. MPT models are conventiently specified by an .eqn-file as used by other MPT software. Data is either provided as comma-separated file (.csv) or directly in R. Models are either fitted by calling JAGS or by an MPT-tailored Gibbs sampler in C++ (only for nonhierarchical and beta MPT models). Provides tests of heterogeneity and MPT-tailored summaries and plotting functions.
 License: GPL-2
 URL: https://github.com/denis-arnold/TreeBUGS
 RoxygenNote: 5.0.1
