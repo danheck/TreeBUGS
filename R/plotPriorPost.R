@@ -36,8 +36,8 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
       # JAGS uses precision for normal distribution:
       if(grepl("norm",hyp.eval[[i]][s] )){
         tmp <- strsplit(hyp.eval[[i]][s], c( "[,\\(\\)]"), perl=F)[[1]]
-        tmp[3] <- 1/sqrt(as.numeric(tmp[3]))
-        hyp.eval[[i]][s] <- paste0(tmp[1],"(",tmp[2],",",tmp[3],")")
+        tmp[4] <- 1/sqrt(as.numeric(tmp[4]))
+        hyp.eval[[i]][s] <- paste0(tmp[1],"(",tmp[2],",",tmp[3],",",tmp[4],")")
       }
     }
     aa <- eval(parse(text=hyp.eval[[1]][s]))
