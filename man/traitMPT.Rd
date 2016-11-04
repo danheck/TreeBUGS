@@ -2,16 +2,17 @@
 % Please edit documentation in R/fitTraitMPT.R
 \name{traitMPT}
 \alias{traitMPT}
-\title{Fit a Hierarchical latent-trait MPT Model}
+\title{Fit a Hierarchical Latent-trait MPT Model}
 \usage{
 traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
   transformedParameters, corProbit = TRUE, mu = "dnorm(0,1)",
   xi = "dunif(0,10)", V, df, IVprec = "dchisq(1)", n.iter = 20000,
   n.adapt = 2000, n.burnin = 2000, n.thin = 5, n.chains = 3,
-  dic = FALSE, ppp = 0, modelfilename, parEstFile, autojags = NULL, ...)
+  dic = FALSE, ppp = 0, modelfilename, parEstFile, posteriorFile,
+  autojags = NULL, ...)
 }
 \arguments{
-\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}}
+\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
 
 \item{data}{The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)}
 
@@ -23,7 +24,7 @@ traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
 
 \item{predType}{a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.}
 
-\item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
+\item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples of the group-level means (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")}), or path to a text file containing one transformation per line. Transformations of individual-levelparameter can be performed after fitting a model by \code{\link{transformedParameters}}.}
 
 \item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations (probit-values of \code{+Inf} are truncated to \code{max(5,max(probit))}; similarly for \code{-Inf}). Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
 
@@ -55,6 +56,8 @@ traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
 Default is to write this information to the tempdir as required by CRAN standards.}
 
 \item{parEstFile}{Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")}
+
+\item{posteriorFile}{path to RData-file where to save the model including MCMC posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile="mcmc.RData"})}
 
 \item{autojags}{if provided (as an empty list or with arguments passed to \link[runjags]{autoextend.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)}
 

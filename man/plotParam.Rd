@@ -4,12 +4,14 @@
 \alias{plotParam}
 \title{Plot Parameter Estimates}
 \usage{
-plotParam(x, includeIndividual = TRUE, ...)
+plotParam(x, includeIndividual = TRUE, estimate = "mean", ...)
 }
 \arguments{
 \item{x}{a fitted Beta or latent-trait MPT model}
 
 \item{includeIndividual}{whether to plot individual estimates}
+
+\item{estimate}{type of point estimates for group-level and individual parameters (either \code{"mean"} or \code{"median"})}
 
 \item{...}{further arguments passed to the standard \code{\link{plot}} function}
 }

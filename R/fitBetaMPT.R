@@ -2,17 +2,18 @@
 #'
 #' Fits a Beta-MPT model (Smith & Batchelder, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
 #'
-#' @param eqnfile The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}
+#' @param eqnfile The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})
 #' @param data The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)
 #' @param restrictions  Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
 #' @param covData Data that contains covariates, for which correlations with individual MPT parameters will be sampled. Either the path to a .csv file (comma-separated: rows=individuals in the same order as \code{data}; first row must contain covariate labels); or alternatively: a data frame or matrix (rows=individuals, columns = variables; covariate labels as column names). Note that in \code{betaMPT}, correlatios are computed for discrete variables that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})
-#' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})
+#' @param transformedParameters list with parameter transformations that should be computed based on the posterior samples of the group-level means (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")}), or path to a text file containing one transformation per line. Transformations of individual-levelparameter can be performed after fitting a model by \code{\link{transformedParameters}}.
 #' @param modelfilename Name that the modelfile that is made by the function to work with JAGS should get.
 #'        Default is to write this information to the tempdir as required by CRAN standards.
 #' @param corProbit whether to use probit-transformed MPT parameters to compute correlations (probit-values of \code{+Inf} are truncated to \code{max(5,max(probit))}; similarly for \code{-Inf}). Default for beta-MPT: MPT parameters are used on the probability scale [0,1].
 #' @param alpha Hyperprior for the shape parameters \eqn{\alpha} of the group-level beta distributions (in JAGS syntax). Default: Gamma distributions for \eqn{\alpha} and \eqn{\beta} with shape 1 and rate .1. To use uniform priors on the interval [.01,5000] as proposed by Smith and Batchelder (2008), use \code{alpha = "dunif(.01,5000)"} and \code{beta = "dunif(.01,5000)"}. Note that a vector can be used to specify separate hyperpriors for each MPT parameter (the order of parameters is determined by the names of the vector or by the default order as shown in \code{\link{readEQN}} with \code{paramOrder = TRUE}).
 #' @param beta Hyperprior for \eqn{\beta} of group-level distributions, see \code{alpha}
 #' @param parEstFile Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")
+#' @param posteriorFile path to RData-file where to save the model including MCMC posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile="mcmc.RData"})
 #' @param n.iter Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.
 #' @param n.adapt number of adaption samples to adjust MCMC sampler in JAGS. The sampler will be more efficient if it is tuned well.
 #' @param n.burnin Number of samples for burnin (samples will not be stored and removed from n.iter)
@@ -62,7 +63,7 @@ betaMPT <- function(eqnfile, data, restrictions,
                     ppp = 0,
 
                     # File Handling stuff:
-                    modelfilename, parEstFile,
+                    modelfilename, parEstFile,posteriorFile,
                     autojags = NULL,   ...){
 
   hyperprior <- list(alpha=alpha, beta=beta)
@@ -77,6 +78,7 @@ betaMPT <- function(eqnfile, data, restrictions,
                           n.chains=n.chains, dic =dic,  ppp = ppp,
                           modelfilename=modelfilename,
                           parEstFile=parEstFile,
+                          posteriorFile=posteriorFile,
                           autojags=autojags,
                           call = match.call(),
                           ...)

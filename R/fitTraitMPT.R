@@ -1,4 +1,4 @@
-#' Fit a Hierarchical latent-trait MPT Model
+#' Fit a Hierarchical Latent-trait MPT Model
 #'
 #' Fits a latent-trait MPT model (Klauer, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
 #'
@@ -61,7 +61,7 @@ traitMPT <- function(eqnfile, data, restrictions,
                      n.chains=3, dic =FALSE, ppp = 0,
 
                      # File Handling stuff:
-                     modelfilename, parEstFile,
+                     modelfilename, parEstFile,posteriorFile,
                      autojags=NULL,   ...){
 
 
@@ -86,6 +86,7 @@ traitMPT <- function(eqnfile, data, restrictions,
                           ppp = ppp,
                           modelfilename=modelfilename,
                           parEstFile=parEstFile,
+                          posteriorFile=posteriorFile,
                           autojags=autojags,
                           call = match.call(),
                           ...)

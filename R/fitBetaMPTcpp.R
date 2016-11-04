@@ -24,7 +24,7 @@ betaMPTcpp <- function(eqnfile, data, restrictions,
                        covData, corProbit=FALSE,
                        n.iter=20000, n.burnin = 2000,
                        n.thin = 5,  n.chains=3, ppp = 0,
-                       shape = 1, rate = .1, parEstFile){
+                       shape = 1, rate = .1, parEstFile, posteriorFile){
 
   hyperprior <- list(shape = shape, rate = rate)
 
@@ -40,6 +40,7 @@ betaMPTcpp <- function(eqnfile, data, restrictions,
                              n.chains=n.chains,
                              ppp = ppp,
                              parEstFile=parEstFile,
+                             posteriorFile=posteriorFile,
                              call = match.call())
   fittedModel
 }

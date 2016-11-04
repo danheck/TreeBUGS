@@ -1,5 +1,6 @@
 
 
+
 #' Plot Raw Frequencies
 #'
 #' Plot observed raw frequencies
@@ -16,7 +17,7 @@ plotFreq <- function(fittedModel, freq=TRUE, select="all", eqnfile){
   }else if(class(fittedModel) == "character"){
     dat <- read.csv(fittedModel)
   }else{
-    try(dat <- as.data.frame(dat))
+    try(dat <- as.data.frame(fittedModel))
   }
 
   K <- ncol(dat)
@@ -39,7 +40,7 @@ plotFreq <- function(fittedModel, freq=TRUE, select="all", eqnfile){
     treeNames <- tmp$Tree
     treeLabels <- unique(treeNames)
   }else{
-    treeNames <- rep(ncol(dat), "")
+    treeNames <- rep("", ncol(dat))
     treeLabels <- ""
   }
 

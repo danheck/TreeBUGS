@@ -7,7 +7,7 @@
 readEQN(file, restrictions = NULL, paramOrder = FALSE)
 }
 \arguments{
-\item{file}{The (full path to the) file that specifies the multitree MPT file}
+\item{file}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (see examples).}
 
 \item{restrictions}{Optional: The (full path to the) file that specifies which parameters should be constants and which should be equal. Alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
 
@@ -32,11 +32,24 @@ As an example, the standard two-high threshold model (2HTM) is defined as follow
 }
 \examples{
 # Example: Standard Two-High-Threshold Model (2HTM)
-EQNfile <- system.file("MPTmodels/2htm.eqn", package="TreeBUGS")
+EQNfile <- system.file("MPTmodels/2htm.eqn",
+                       package="TreeBUGS")
 readEQN(file = EQNfile, paramOrder = TRUE)
 
 # with equality constraint:
-readEQN(file = EQNfile, restrictions = list("Dn=Do", "g=0.5"), paramOrder = TRUE)
+readEQN(file = EQNfile, restrictions = list("Dn=Do", "g=0.5"),
+        paramOrder = TRUE)
+
+# define MPT model directly within R
+model <-
+  "2-High Threshold Model (2HTM)
+  old hit d
+  old hit (1-d)*g
+  old miss (1-d)*(1-g)
+  new fa (1-d)*g
+  new cr (1-d)*(1-g)
+  new cr d"
+readEQN(model, paramOrder=TRUE)
 }
 \author{
 Daniel Heck, Denis Arnold, Nina Arnold

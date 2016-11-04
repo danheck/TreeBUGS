@@ -24,6 +24,7 @@ fitModelCpp <- function(type,
                         # File Handling stuff:
                         modelfilename,
                         parEstFile,
+                        posteriorFile,
                         autojags=NULL,
                         call = NULL){
 
@@ -33,12 +34,15 @@ fitModelCpp <- function(type,
   if(missing(predStructure)) predStructure <- NULL
   if(missing(predType)) predType <- NULL
 
+  ################## parse EQN file
   tab <- readEQN(eqnfile)
   mpt <- parseEQN(tab)
-
   mpt.res <- parseRestrictions(mpt, restrictions)
   thetaUnique <- colnames(mpt.res$a)
   S <- length(thetaUnique)
+  ################## merge EQN (compatibiltiy with betaMPT, traitMPT)
+  mergedTree <- thetaHandling(mergeBranches(tab),
+                              restrictions)$mergedTree
 
   data <- readData(data)
   if(is.null(colnames(data)) ||
@@ -144,7 +148,7 @@ fitModelCpp <- function(type,
                                           theta=1:ncol(mpt.res$a)),
                   thetaUnique = thetaUnique,
                   thetaFixed = NULL,
-                  MPT=mpt.res,
+                  MPT=c(mpt.res, as.list(mergedTree)),
                   eqnfile=eqnfile,
                   data=data,
                   restrictions=restrictions,
@@ -209,6 +213,9 @@ fitModelCpp <- function(type,
 
   # write results to file
   writeSummary(fittedModel, parEstFile)
+  if(!missing(posteriorFile) && !is.null(posteriorFile))
+    try(save(fittedModel, file=posteriorFile))
+  gc(verbose=FALSE)
 
   fittedModel
 }

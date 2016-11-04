@@ -25,6 +25,7 @@ fitModel <- function(type,
                      # File Handling stuff:
                      modelfilename,
                      parEstFile,
+                     posteriorFile,
                      autojags=NULL,
                      call = NULL,
                      ...){
@@ -58,8 +59,7 @@ fitModel <- function(type,
   isIdentifiable(S, mergedTree)
 
   # transformed parameters
-  transformedPar <- getTransformed(model = type,
-                                   thetaNames = thetaNames,
+  transformedPar <- getTransformed(thetaNames = thetaNames,
                                    transformedParameters = transformedParameters)
   N <- nrow(data)
 
@@ -222,6 +222,8 @@ fitModel <- function(type,
 
   # write results to file
   writeSummary(fittedModel, parEstFile)
+  if(!missing(posteriorFile) && !is.null(posteriorFile))
+    try(save(fittedModel, file=posteriorFile))
   gc(verbose=FALSE)
 
   fittedModel

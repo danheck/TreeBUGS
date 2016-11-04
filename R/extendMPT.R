@@ -22,8 +22,8 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
   # add correlations
   covData <- fittedModel$mptInfo$covData
   predTable <- fittedModel$mptInfo$predTable
-  if(!is.null(covData)){
-    if(!is.null(predTable)){
+  if(!is.null(covData) | fittedModel$mptInfo$model == "betaMPT"){
+    if(!is.null(predTable) & fittedModel$mptInfo$model == "traitMPT"){
       isPred <- (1:ncol(covData)) %in% predTable$covIdx
     }else{
       isPred <- rep(FALSE, length(fittedModel$mptInfo$predType))
@@ -32,7 +32,7 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
     sel <- fittedModel$mptInfo$predType == "c" & !isPred
     if(any(sel) | class(fittedModel) == "betaMPT"){
       cdat <- covData[,sel,drop = FALSE]
-      fittedModel$runjags$mcmc <- as.mcmc.list(
+      tmp <- as.mcmc.list(
         lapply(fittedModel$runjags$mcmc, corSamples,
                covData=cdat,
                thetaUnique=fittedModel$mptInfo$thetaUnique,
@@ -41,8 +41,8 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
     }
   }
 
-  fittedModel$mcmc.summ <- summarizeMCMC(tmp$mcmc)
-  fittedModel$summary <- summarizeMPT(mcmc = tmp$mcmc,
+  fittedModel$mcmc.summ <- summarizeMCMC(tmp)
+  fittedModel$summary <- summarizeMPT(mcmc = tmp,
                                       summ = fittedModel$mcmc.summ,
                                       mptInfo = fittedModel$mptInfo)
   fittedModel$call <- c(fittedModel$call, match.call())

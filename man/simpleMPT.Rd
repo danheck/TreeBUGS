@@ -8,7 +8,7 @@ simpleMPT(eqnfile, data, restrictions, n.iter = 20000, n.burnin = 2000,
   n.thin = 5, n.chains = 3, ppp = 0, alpha = 1, beta = 1, parEstFile)
 }
 \arguments{
-\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}}
+\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
 
 \item{data}{The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)}
 

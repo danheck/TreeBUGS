@@ -2,7 +2,7 @@
 #'
 #' Function to import MPT models from standard .eqn model files as used, for instance, by multiTree (Moshagen, 2010).
 #'
-#' @param file The (full path to the) file that specifies the multitree MPT file
+#' @param file The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (see examples).
 #' @param restrictions Optional: The (full path to the) file that specifies which parameters should be constants and which should be equal. Alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
 #' @param paramOrder if TRUE, the order of MPT parameters as interally used is printed.
 #'
@@ -21,19 +21,39 @@
 #'
 #' @examples
 #' # Example: Standard Two-High-Threshold Model (2HTM)
-#' EQNfile <- system.file("MPTmodels/2htm.eqn", package="TreeBUGS")
+#' EQNfile <- system.file("MPTmodels/2htm.eqn",
+#'                        package="TreeBUGS")
 #' readEQN(file = EQNfile, paramOrder = TRUE)
 #'
 #' # with equality constraint:
-#' readEQN(file = EQNfile, restrictions = list("Dn=Do", "g=0.5"), paramOrder = TRUE)
+#' readEQN(file = EQNfile, restrictions = list("Dn=Do", "g=0.5"),
+#'         paramOrder = TRUE)
+#'
+#' # define MPT model directly within R
+#' model <-
+#'   "2-High Threshold Model (2HTM)
+#'   old hit d
+#'   old hit (1-d)*g
+#'   old miss (1-d)*(1-g)
+#'   new fa (1-d)*g
+#'   new cr (1-d)*(1-g)
+#'   new cr d"
+#' readEQN(model, paramOrder=TRUE)
 #' @author Daniel Heck, Denis Arnold, Nina Arnold
 #' @references Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
 #' @export
 readEQN <- function(file, restrictions=NULL, paramOrder = FALSE){
 
-  multiTreeDefinition = read.csv(file, header=F,
-                                 blank.lines.skip = TRUE, sep= "",
-                                 stringsAsFactors=F, skip = 1)	#read file
+  isPath <- !grepl("\n", x=file, ignore.case = TRUE)
+  if(!isPath){
+    model <- file
+    file <- tempfile(pattern = "MPTmodel", tmpdir = tempdir(), fileext = ".eqn")
+    cat(model, file=file)
+  }
+  multiTreeDefinition <- read.csv(file, header=F,
+                                  blank.lines.skip = TRUE, sep= "",
+                                  stringsAsFactors=F, skip = 1)
+
 
   # number of branches implied by number of rows in model file:
   numberOfBranches <- nrow(multiTreeDefinition)
@@ -103,3 +123,16 @@ isIdentifiable <- function(S, Tree){
     warning(error)
   }
 }
+
+
+# mergeTree <- function(eqnfile, data, restrictions){
+#
+#   # MPT structure for JAGS
+#   Tree <- readEQN(eqnfile)
+#   mergedTree <- mergeBranches(Tree)
+#
+#   tHoutput <- thetaHandling(mergedTree,restrictions)
+#   SubPar <- tHoutput$SubPar
+#   mergedTree <- tHoutput$mergedTree
+#   fixedPar <- tHoutput$fixedPar
+# }
