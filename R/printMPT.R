@@ -3,7 +3,11 @@ printSummary <- function(x, model, ...){
   print(x$call)
   cat("\n")
 
-  cat("Mean MPT parameters:\n")
+  if(model == "betaMPT"){
+    cat("Group-level means of MPT parameters:\n")
+  }else if (model == "traitMPT"){
+    cat("Group-level medians of MPT parameters (probability scale):\n")
+  }
   print(round(x$groupParameters$mean, x$round))
 
   if(model == "betaMPT"){
@@ -14,7 +18,7 @@ printSummary <- function(x, model, ...){
     cat("\nBeta parameters of beta distributions:\n")
     print(round(x$groupParameters$beta, x$round))
   }else if (model == "traitMPT"){
-    cat("\nMean of latent-trait values (probit-scale) across individuals:\n")
+    cat("\nMean/Median of latent-trait values (probit-scale) across individuals:\n")
     print(round(x$groupParameters$mu, x$round))
     cat("\nStandard deviation of latent-trait values (probit scale) across individuals:\n")
     print(round(x$groupParameters$sigma, x$round))
@@ -130,9 +134,9 @@ print.traitMPT <- function(x,  ...){
   cat("Call: \n")
   print(x$call)
   cat("\n")
-  print(round(cbind("Mean(MPT Parameters)" = x$summary$groupParameters$mean[,1],
-                    "Mu(latent-traits)" = x$summary$groupParameters$mu[,1],
-                    "SD(latent-traits)" = x$summary$groupParameters$sigma[,1]),4))
+  print(round(cbind("Group median (probability scale)" = x$summary$groupParameters$mean[,1],
+                    "Group mean/median (latent-probit)" = x$summary$groupParameters$mu[,1],
+                    "Group SD (latent-probit)" = x$summary$groupParameters$sigma[,1]),4))
 
   cat("\nUse 'summary(fittedModel)' or 'plot(fittedModel)' to get a more detailed summary.")
 }

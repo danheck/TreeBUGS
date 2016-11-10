@@ -1,8 +1,18 @@
+TreeBUGS 0.7.1 (November 2016)
+===========
+
+* New function priorPredictive() to sample data sets from the prior
+* New function plotPrior() to plot prior distributions for group mean, SD, and correlations
+* Posterior predictive samples for new participants
+* Possible to use boxplot in plotFreq()
+* Improved data-generating functions to allow for parameter restrictions
+* Package testing via 'testthat' added
+
+
 TreeBUGS 0.7.0 (November 2016)
 ===========
 
 * Possibility to define models directly in R without requiring EQN files (by providing the EQN equations in a character value)
-* New function plotPrior() to show the prior distributions on group mean, SD, and correlations
 * New function transformedParameters() to obtain posterior samples of transformed parameters for a fitted model (both on the group and individual level)
 * Argument "transformedParameters" now accepts a path to a text file with transformations (one per line)
 * New argument "posteriorFile" to save fitted model and posterior MCMC samples in RData-file

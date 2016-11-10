@@ -4,10 +4,11 @@
 
 #' Get Posterior Predictive Samples
 #'
-#' Draw frequencies based on posterior distribution of individual estimates.
+#' Draw frequencies based on posterior distribution of individual estimates or for new participants.
 #'
 #' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})
 #' @param M number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.
+#' @param numItems if supplied (as a vector), data for a new participant are sampled with the given number of items per MPT tree (i.e., a new participant vector \eqn{\theta} is sampled from the hierarchical posterior to generate observed frequencies)
 #' @param expected if \code{TRUE}, the expected frequencies per person are returned (without additional sampling from a multinomial distribution)
 #' @param nCPU number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.
 #' @return a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.
@@ -20,38 +21,77 @@
 #' }
 #' @importFrom parallel clusterExport makeCluster stopCluster parLapply parApply
 #' @importFrom  stats cor cov2cor density rmultinom
-posteriorPredictive <- function(fittedModel, M=100, expected=FALSE, nCPU=4){
+posteriorPredictive <- function(fittedModel,
+                                M=100,
+                                numItems=NULL,
+                                expected=FALSE,
+                                nCPU=4){
 
   mptInfo <- fittedModel$mptInfo
   # get information about model:
-  dat <- mptInfo$dat
   tree <- mptInfo$MPT$Tree
   TreeNames <- unique(tree)
   # selection list for mapping of categories to trees:
   sel.cat <- lapply(TreeNames, function(tt) tree %in% tt)
 
-  N <- nrow(mptInfo$data)
   S <- length(mptInfo$thetaUnique)
   numTrees <- length(TreeNames)
   chains <- length(fittedModel$runjags$mcmc)
-  numItems <-   t(apply(mptInfo$data, 1,
-                        function(x)  tapply(x, mptInfo$MPT$Tree, sum)))
-
   sample <- nrow(fittedModel$runjags$mcmc[[1]])
   max.samp <- min(sample, ceiling(M/chains))
   # fixed effects:
   sel.thetaFE <- grep("thetaFE", varnames(fittedModel$runjags$mcmc), fixed=TRUE)
-  # standard random effects:
-  sel.var <- setdiff(grep("theta", varnames(fittedModel$runjags$mcmc), fixed=TRUE), sel.thetaFE)
-
   n.thetaFE <- length(sel.thetaFE)
 
+  if(missing(numItems) || is.null(numItems)){
+    N <- nrow(mptInfo$data)
+    numItems <-   t(apply(mptInfo$data, 1,
+                          function(x)  tapply(x, mptInfo$MPT$Tree, sum)))
+  }else{
+    if(length(numItems) != length(unique(fittedModel$mptInfo$MPT$Tree))){
+      stop("Length of 'numItems' does not match number of MPT trees.")
+    }
+    if(is.null(names(numItems))){
+      warning("numItems are ordered alphabetically:\n  ", paste(TreeNames, sep =", "))
+      names(numItems) <- TreeNames
+    }
+    numItems <- matrix(numItems, nrow=1, dimnames=list(NULL, names(numItems)))
+    N <- 1
+  }
   par.ind <- par.thetaFE <- c()
   for(m in 1:chains){
     sel.samp <- sample(1:sample, max.samp)
-    par.ind <- rbind(par.ind, as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.var]))
+
+    ######## standard random effects:
+    if(missing(numItems) || is.null(numItems)){
+      sel.var <- setdiff(grep("theta", varnames(fittedModel$runjags$mcmc), fixed=TRUE),
+                         sel.thetaFE)
+      par.tmp <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.var])
+    }else{
+      par.tmp <- matrix(NA, max.samp, S, dimnames=list(NULL, paste0("theta[",1:S, ",1]")))
+      # sample hierarchical values, then individuals
+      if(fittedModel$mptInfo$model == "betaMPT"){
+        alpha <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("alph[",1:S,"]")])
+        beta <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("bet[",1:S,"]")])
+        for(i in 1:S){
+          par.tmp[,i] <- rbeta(max.samp, alpha[,i], beta[,i])
+        }
+      }else{
+        mu <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("mu[",1:S,"]")])
+        sig <-  as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("sigma[",1:S,"]")])
+        sel.rho <- grep("rho", varnames(fittedModel$runjags$mcmc))
+        rho <-  as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.rho])
+        for(mm in 1:max.samp){
+          Sig <- matrix(rho[mm,],S,S) *( sig[mm,]  %*% t( sig[mm,] )  )
+          par.tmp[mm,] <- pnorm(mvrnorm(1, mu[mm,], Sig))
+        }
+
+      }
+    }
+    par.ind <- rbind(par.ind, par.tmp)
     if(n.thetaFE > 0){
-      par.thetaFE <- rbind(par.thetaFE, as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.thetaFE]))
+      par.thetaFE <- rbind(par.thetaFE,
+                           as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.thetaFE]))
     }else{
       par.thetaFE <- NULL
     }
@@ -81,7 +121,7 @@ posteriorPredictive <- function(fittedModel, M=100, expected=FALSE, nCPU=4){
     if(!expected){
       # multinomial sampling:
       for(k in 1:length(TreeNames)){
-        freq.exp[,sel.cat[[k]]] <- t(apply(freq.exp[,sel.cat[[k]]], 1,
+        freq.exp[,sel.cat[[k]]] <- t(apply(freq.exp[,sel.cat[[k]],drop=FALSE], 1,
                                            function(x)
                                              rmultinom(1, size=sum(x), prob=x/sum(x))))
       }

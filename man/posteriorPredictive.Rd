@@ -4,12 +4,15 @@
 \alias{posteriorPredictive}
 \title{Get Posterior Predictive Samples}
 \usage{
-posteriorPredictive(fittedModel, M = 100, expected = FALSE, nCPU = 4)
+posteriorPredictive(fittedModel, M = 100, numItems = NULL,
+  expected = FALSE, nCPU = 4)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
 \item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
+
+\item{numItems}{if supplied (as a vector), data for a new participant are sampled with the given number of items per MPT tree (i.e., a new participant vector \eqn{\theta} is sampled from the hierarchical posterior to generate observed frequencies)}
 
 \item{expected}{if \code{TRUE}, the expected frequencies per person are returned (without additional sampling from a multinomial distribution)}
 
@@ -19,7 +22,7 @@ posteriorPredictive(fittedModel, M = 100, expected = FALSE, nCPU = 4)
 a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.
 }
 \description{
-Draw frequencies based on posterior distribution of individual estimates.
+Draw frequencies based on posterior distribution of individual estimates or for new participants.
 }
 \examples{
 \dontrun{

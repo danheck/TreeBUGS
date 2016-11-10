@@ -4,14 +4,18 @@
 \alias{genMPT}
 \title{Generate MPT Frequencies}
 \usage{
-genMPT(theta, numItems, eqnfile)
+genMPT(theta, numItems, eqnfile, restrictions, warning = TRUE)
 }
 \arguments{
 \item{theta}{matrix of MPT parameters (rows: individuals; columns: parameters). Parameters are assigned by column names of the matrix. all of the parameters in the model file need to be included.}
 
 \item{numItems}{number of responses per tree (a named vector with tree labels)}
 
-\item{eqnfile}{path to EQN file specifying the MPT model}
+\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
+
+\item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
+
+\item{warning}{whether to show warning in case the naming of arguments does not match}
 }
 \description{
 Uses a matrix of individual MPT parameters to generate MPT frequencies.
@@ -19,8 +23,8 @@ Uses a matrix of individual MPT parameters to generate MPT frequencies.
 \examples{
 # Example: Standard Two-High-Threshold Model (2HTM)
 EQNfile <- system.file("MPTmodels/2htm.eqn", package="TreeBUGS")
-theta <- matrix(c(.8,.4,.5, .6,.3,.4),
-                nrow=2, byrow=TRUE,
+theta <- matrix(c(.8,.4,.5,
+                  .6,.3,.4), nrow=2, byrow=TRUE,
                 dimnames=list(NULL, c("Do","Dn","g")))
 genDat <- genMPT(theta, c(Target=250, Lure=250),
                 EQNfile)

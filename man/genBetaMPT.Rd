@@ -4,15 +4,17 @@
 \alias{genBetaMPT}
 \title{Generate Data for Beta MPT Models}
 \usage{
-genBetaMPT(N, numItems, eqnfile, mean = NULL, sd = NULL, alpha = NULL,
-  beta = NULL)
+genBetaMPT(N, numItems, eqnfile, restrictions, mean = NULL, sd = NULL,
+  alpha = NULL, beta = NULL, warning = TRUE)
 }
 \arguments{
 \item{N}{number of participants}
 
 \item{numItems}{number of responses per tree (a named vector with tree labels)}
 
-\item{eqnfile}{path to EQN file specifying the MPT model}
+\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
+
+\item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
 
 \item{mean}{Named vector of true group means of individual MPT parameters. If the vector is not named, the internal order of parameters is used (can be obtained using \code{\link{readEQN}}).}
 
@@ -23,6 +25,8 @@ genBetaMPT(N, numItems, eqnfile, mean = NULL, sd = NULL, alpha = NULL,
 \item{beta}{see \code{alpha}
 
 Data are generated independently from the JAGS model files used for fitting the Beta-MPT model. If data for an equality-constrained version of the MPT model are required, the restrictions need to be hard-coded into the EQN-model file. Note that equal means still result in nonidentical MPT parameters on the individual level!}
+
+\item{warning}{whether to show warning in case the naming of arguments does not match}
 }
 \value{
 a list including the generated frequencies (\code{data}) and the true, underlying parameters (\code{parameters})

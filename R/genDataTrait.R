@@ -2,7 +2,7 @@
 #' Generate Data for Trait MPT Models
 #'
 #' Generating a data file with known parameter structure using the Trait-MPT. Useful for simulations and robustness checks.
-#'
+#' @inheritParams betaMPT
 #' @inheritParams genMPT
 #' @param N number of participants
 #' @param mean Named vector of true group means of individual MPT parameters (probabilities in the interval [0,1]). If the vector is not named, the internal order of parameters is used (can be obtained using \code{\link{readEQN}}).
@@ -30,11 +30,19 @@
 #' @references Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 #' @seealso \code{\link{genMPT}}
 #' @export
-genTraitMPT <- function(N, numItems, eqnfile, mean=NULL, sigma=NULL, rho=NULL){
-
+genTraitMPT <- function(N, numItems, eqnfile, restrictions,
+                        mean=NULL, sigma=NULL, rho=NULL,
+                        warning=TRUE){
+  if(missing(restrictions))
+    restrictions <- NULL
   Tree <- readEQN(eqnfile)
+  # mergedTree <- mergeBranches(Tree)
+  # thetaNames <- getParameter(mergedTree)
   mergedTree <- mergeBranches(Tree)
-  thetaNames <- getParameter(mergedTree)
+  Tree.restr <- thetaHandling(mergedTree,restrictions)
+  thetaNames <-  Tree.restr$SubPar[,1:2]
+  thetaNames <- thetaNames[rownames(unique(thetaNames[2])),]$Parameter
+  treeLabels <- unique(mergedTree$Tree)
   S <- length(thetaNames)
 
   # default values:
@@ -42,31 +50,37 @@ genTraitMPT <- function(N, numItems, eqnfile, mean=NULL, sigma=NULL, rho=NULL){
     rho <- diag(S)
     dimnames(rho) <- list(thetaNames, thetaNames)
   }
-  if(is.null(sigma)){
+  if(missing(sigma) || is.null(sigma)){
     sigma <- rep(0, S)
     names(sigma) <- thetaNames
   }
-  sigma <- checkNaming(S, thetaNames, sigma, "sigma")
-  rho <- checkNamingMatrix(S, thetaNames, rho, "rho")
+  sigma <- checkNaming(S, thetaNames, sigma, "sigma", warning=warning)
+  rho <- checkNamingMatrix(S, thetaNames, rho, "rho", warning=warning)
 
 
   if(!is.null(mean)){
-    mean <- checkNaming(S, thetaNames, mean, "mean")
+    mean <- checkNaming(S, thetaNames, mean, "mean", warning=warning)
   }else{
     stop("Either 'mean' must be provided.")
   }
 
-  iidNormal <- matrix(rnorm(N*S), nrow = N, dimnames=list(NULL, thetaNames))
 
   # generate multivariate normal using cholesky decomposition
-  covMatrix <- diag(sigma) %*% rho %*% diag(sigma)
-  cholesky <- chol(covMatrix)
-  thetaLatent <- matrix(qnorm(mean), N, S, byrow = TRUE) + iidNormal %*% cholesky
+  if(S>1){
+    # iidNormal <- matrix(rnorm(N*S), nrow = N,
+    #                     dimnames=list(NULL, thetaNames)) # i.i.d. standard normal
+    covMatrix <- diag(sigma) %*% rho %*% diag(sigma)
+    # cholesky <- chol(covMatrix)
+    # thetaLatent <- matrix(qnorm(mean), N, S, byrow = TRUE) + iidNormal %*% cholesky
+    thetaLatent <- mvrnorm(N, qnorm(mean), covMatrix)
+  }else{
+    thetaLatent <- matrix(rnorm(N, qnorm(mean), sigma), N, S)
+  }
   colnames(thetaLatent) <- thetaNames
   theta <- pnorm(thetaLatent)
 
   # response frequencies:
-  freq <- genMPT(theta, numItems, eqnfile)
+  freq <- genMPT(theta, numItems, eqnfile, restrictions, warning=warning)
 
   res <- list(data = freq, parameters = list(theta=theta,
                                              thetaLatent = thetaLatent,

@@ -7,9 +7,10 @@
 #' @param fittedModel fitted hierarchical MPT model (see \code{\link{traitMPT}} or \code{\link{betaMPT}}). Can also be a path to a .csv-file with individual frequencies or a matrix/data frame.
 #' @param freq whether to plot absolute frequencies or relative frequencies (which sum up to one within each tree; only if \code{fittedModel} is a hierarchical model)
 #' @param select a numeric vector with participant indices to select which raw frequencies to plot (default: \code{"all"})
+#' @param boxplot if \code{TRUE}, plots boxplots instead of lines and points
 #' @param eqnfile optional argument to get MPT tree structure if \code{fittedModel} is the path to a .csv-file or a matrix/data frame
 #' @export
-plotFreq <- function(fittedModel, freq=TRUE, select="all", eqnfile){
+plotFreq <- function(fittedModel, freq=TRUE, select="all", boxplot=FALSE, eqnfile){
 
 
   if(class(fittedModel) %in% c("betaMPT", "traitMPT")){
@@ -55,26 +56,29 @@ plotFreq <- function(fittedModel, freq=TRUE, select="all", eqnfile){
 
   means <- colMeans(dat)
 
-
-  plot(1:K, means, ylim=c(0, max(dat)), col=1, lwd=3, pch=16, xaxt="n",
-       ylab=ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"),
-       xlab="",
-       main="Raw Frequencies")
-  axis(1, 1:K, colnames(dat))
-  for(i in 1:N){
-    lines(1:K, dat[i,], col=rainbow(N, alpha=.5)[i])
-    points(1:K, dat[i,], col=rainbow(N, alpha=.6)[i], pch=16)
-  }
-  lines(1:K, means, col=1, lwd=3)
-
-  xt <- .5
-  for(k in 2:K){
-    if( treeNames[k] != treeNames[k-1]){
-      abline(v=k-.5)
-      xt <- c(xt, k-.5)
+  if(boxplot == TRUE){
+    boxplot(dat, main= "Absolute frequency")
+    lines(1:K, means, col="red", lwd=2)
+  }else{
+    plot(1:K, means, ylim=c(0, max(dat)), col=1, lwd=3, pch=16, xaxt="n",
+         ylab=ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"),
+         xlab="", main="Raw Frequencies")
+    axis(1, 1:K, colnames(dat))
+    for(i in 1:N){
+      lines(1:K, dat[i,], col=rainbow(N, alpha=.5)[i])
+      points(1:K, dat[i,], col=rainbow(N, alpha=.6)[i], pch=16)
     }
+    lines(1:K, means, col=1, lwd=3)
+
+    xt <- .5
+    for(k in 2:K){
+      if( treeNames[k] != treeNames[k-1]){
+        abline(v=k-.5)
+        xt <- c(xt, k-.5)
+      }
+    }
+    xt <- c(xt, K+.5)
+    axis(1, xt[1:(length(xt)-1)]+ diff(xt)/2,
+         treeLabels, mgp=c(100,3,10))
   }
-  xt <- c(xt, K+.5)
-  axis(1, xt[1:(length(xt)-1)]+ diff(xt)/2,
-       treeLabels, mgp=c(100,3,10))
 }

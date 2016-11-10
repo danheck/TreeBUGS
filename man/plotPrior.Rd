@@ -18,12 +18,14 @@ Plots prior distributions for group means, standard deviation, and correlations 
 This function samples from a set of hyperpriors (either for hierarchical traitMPT or betaMPT structure) to approximate the implied prior distributions on the parameters of interest (mean, SD, correlations of MPT parameters).
 }
 \examples{
+\dontrun{
 # default priors for traitMPT:
 plotPrior(list(mu = "dnorm(0,1)", xi="dunif(0,10)",
-               V=diag(2), df=2+1), M=4000)
+          V=diag(2), df=2+1), M=4000)
 
 # default priors for betaMPT:
-plotPrior( list(alpha ="dgamma(1,.1)",
-                beta = "dgamma(1,.1)"), M=4000)
+plotPrior(list(alpha ="dgamma(1,.1)",
+          beta = "dgamma(1,.1)"), M=4000)
+}
 }
 
