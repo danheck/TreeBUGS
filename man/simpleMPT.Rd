@@ -5,7 +5,8 @@
 \title{C++ Sampler for Standard MPT Model}
 \usage{
 simpleMPT(eqnfile, data, restrictions, n.iter = 20000, n.burnin = 2000,
-  n.thin = 5, n.chains = 3, ppp = 0, alpha = 1, beta = 1, parEstFile)
+  n.thin = 5, n.chains = 3, ppp = 0, alpha = 1, beta = 1, parEstFile,
+  posteriorFile)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
@@ -29,6 +30,8 @@ simpleMPT(eqnfile, data, restrictions, n.iter = 20000, n.burnin = 2000,
 \item{beta}{second shape parameter(s)}
 
 \item{parEstFile}{Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")}
+
+\item{posteriorFile}{path to RData-file where to save the model including MCMC posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile="mcmc.RData"})}
 }
 \description{
 Fast Gibbs sampler in C++ that is tailored to the standard MPT model (i.e., non-hierarchical MPT: assumes separate parameters if multiple data sets are supplied).

@@ -1,3 +1,13 @@
+TreeBUGS 0.8.0 (November 2016)
+===========
+
+* New function withinSubjectsEQN() that replicates an MPT model multiple times with different tree, category, and parameter labels for within-subject factorial designs
+* plotFreq() uses boxplots instead of lines by default
+* Posterior-predictive p-values per participant
+* Bugfix: avoid negative "sigma" and reversed "rho" estimates in traitMPT() due to negative scaling parameters "xi"
+* Bugfix: posteriorPredictive() always sampled data for new participant (=> false T1+T2 posterior predictive checks!)
+
+
 TreeBUGS 0.7.1 (November 2016)
 ===========
 

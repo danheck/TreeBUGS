@@ -25,7 +25,7 @@ simpleMPT <- function(eqnfile, data, restrictions,
                       n.iter=20000, n.burnin = 2000,
                       n.thin = 5,  n.chains=3, ppp = 0,
                       alpha = 1, beta = 1,
-                      parEstFile){
+                      parEstFile, posteriorFile){
 
   hyperprior <- list(alpha=alpha, beta=beta)
   if(!is.character(data) && is.null(dim(data))){
@@ -39,6 +39,7 @@ simpleMPT <- function(eqnfile, data, restrictions,
                              n.burnin=n.burnin, n.thin=n.thin,
                              n.chains=n.chains,  ppp = ppp,
                              parEstFile=parEstFile,
+                             posteriorFile=posteriorFile,
                              call = match.call())
 
   fittedModel

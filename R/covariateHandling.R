@@ -55,7 +55,8 @@ covHandling <- function(covData,
       for(i in 1:length(covStructure)){
         sss <- strsplit(covStructure[[i]], ";")[[1]]
         if(length(sss) <2)
-          stop("Check predStructure (in one argument, a semicolon seems to be missing).")
+          stop("Check predStructure (in one argument, a semicolon seems to be missing):\n",
+               covStructure[[i]])
         pars <- strsplit(sss[1], " +")[[1]]
         covs <- strsplit(sss[2], " +")[[1]]
         pars <- pars[pars != ""]

@@ -63,7 +63,7 @@ covDataCenter <- function(covData, predType){
   if(!is.null(covData)){
     for(i in 1:ncol(covData)){
       if(predType[i] == "c"){
-        scaled <- scale(covData[,i], center=TRUE, scale = FALSE)
+        scaled <- scale(covData[,i], center=TRUE, scale = FALSE)  # centering of continuous variables
         if(any(scaled != covData[,i])){
           covData[,i] <- c(scaled)
         }

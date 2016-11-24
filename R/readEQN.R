@@ -5,7 +5,7 @@
 #' @param file The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (see examples).
 #' @param restrictions Optional: The (full path to the) file that specifies which parameters should be constants and which should be equal. Alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}
 #' @param paramOrder if TRUE, the order of MPT parameters as interally used is printed.
-#'
+#' @param parse whether to return a parsed MPT model description in terms of the matrices \eqn{a} and \eqn{b} (the powers of the \eqn{\theta} and \eqn{(1-\theta)}, respectively, and the vector of constants \eqn{c}. Each branch probability is then given as \eqn{c_{i}  \prod_{s} \theta^{a_{i,s}}(1-\theta)^{b_{i,s}})}
 #' @details The file format should adhere to the standard .eqn-syntax (note that the first line is skipped and can be used for comments). In each line, a separate branch of the MPT model is specified using the tree label, category label, and the model equations in full form (multiplication sign `*` required; not abbreviations such as `a^2` allowed).
 #'
 #' As an example, the standard two-high threshold model (2HTM) is defined as follows:
@@ -42,7 +42,7 @@
 #' @author Daniel Heck, Denis Arnold, Nina Arnold
 #' @references Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
 #' @export
-readEQN <- function(file, restrictions=NULL, paramOrder = FALSE){
+readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
 
   isPath <- !grepl("\n", x=file, ignore.case = TRUE)
   if(!isPath){
@@ -107,6 +107,13 @@ readEQN <- function(file, restrictions=NULL, paramOrder = FALSE){
     error <- paste0("Check .eqn-file. Probabilities do not sum up in trees:\n  ",
                     paste0(unique(Tree$Tree)[round(sumPerTree,8) != 1], collapse=", "))
     warning(error)
+  }
+
+  if(parse){
+    tmp <- Tree
+    mpt <- parseEQN(Tree)
+    Tree <- parseRestrictions(mpt, restrictions)
+    Tree$Table <- tmp
   }
 
   return(Tree)

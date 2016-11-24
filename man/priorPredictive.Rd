@@ -5,7 +5,7 @@
 \title{Prior Predictive Samples}
 \usage{
 priorPredictive(prior, eqnfile, restrictions, numItems, N = 1, M = 100,
-  nCPU = 1)
+  nCPU = 4)
 }
 \arguments{
 \item{prior}{a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}}
@@ -35,7 +35,7 @@ prior <- list(alpha="dgamma(1,.1)",
               beta="dgamma(1,.1)")
 priorPredictive(prior, eqnfile,
                 restrictions=list("g=.5","Do=Dn"),
-                numItems=c(50,50), N=25, M=1)
+                numItems=c(50,50), N=25, M=1, nCPU=1)
 
 }
 

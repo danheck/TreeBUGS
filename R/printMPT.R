@@ -45,6 +45,8 @@ printSummary <- function(x, model, ...){
       "Model fit statistics (posterior predictive p-values):\n")
   if(!is.null(x$fitStatistics$overall)){
     print(round(x$fitStatistics$overall, x$round))
+    cat("\nT1 per person:\n")
+    print(round(x$fitStatistics$individual$T1.p, x$round))
   }else{
     cat("Use PPP(fittedModel) to get T1 and T2 posterior predictive checks.\n")
   }

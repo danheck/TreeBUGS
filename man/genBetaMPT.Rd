@@ -43,6 +43,7 @@ genDat <- genBetaMPT(N = 100,
                      mean = c(Do=.7, Dn=.5, g=.5),
                      sd =   c(Do=.1, Dn=.1, g=.05))
 head(genDat$data, 3)
+plotFreq(genDat$data, eqn=EQNfile)
 }
 \references{
 Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.

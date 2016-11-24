@@ -17,7 +17,7 @@
 #'               beta="dgamma(1,.1)")
 #' priorPredictive(prior, eqnfile,
 #'                 restrictions=list("g=.5","Do=Dn"),
-#'                 numItems=c(50,50), N=25, M=1)
+#'                 numItems=c(50,50), N=25, M=1, nCPU=1)
 #'
 #' @importFrom parallel clusterExport makeCluster stopCluster parLapply parApply
 #' @importFrom  stats cor cov2cor density rmultinom
@@ -27,7 +27,7 @@ priorPredictive <- function(prior,
                             numItems,
                             N=1,
                             M=100,
-                            nCPU=1){
+                            nCPU=4){
   # 1. get MPT model
   mpt <- readEQN(eqnfile, restrictions = restrictions)
   merged <- thetaHandling(mpt, restrictions)
@@ -36,7 +36,7 @@ priorPredictive <- function(prior,
   thetaUnique <- thetaNames[rownames(unique(thetaNames[2])),]$Parameter
 
   # 2. sample group-level parameters
-  phi <- sampleHyperprior(prior, M, S)
+  phi <- sampleHyperprior(prior, M, S, nCPU=nCPU)
   if("alpha" %in% names(prior)){
    colnames(phi$alpha) <- colnames(phi$beta) <- thetaUnique
   }else{

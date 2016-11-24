@@ -5,7 +5,7 @@
 # M: number of samples
 # S: optional, only for betaMPT: number of parameters
 #' @importFrom MASS mvrnorm
-sampleHyperprior <- function(prior, M, S){
+sampleHyperprior <- function(prior, M, S, nCPU=4){
 
   if(length(prior) == 4 && all(c("mu","xi","V","df") %in% names(prior))){
     prior <- prior[c("mu","xi","V","df")]
@@ -48,10 +48,12 @@ sampleHyperprior <- function(prior, M, S){
 
   if(model == "traitMPT"){
     ww <- rWishart(n = M, df = prior$df, Sigma = prior$V)
-    ss <- array(apply(ww,3, solve), c(S,S,M))
+    cl <- makeCluster(nCPU)
+    ss <- array(parApply(cl, ww,3, solve), c(S,S,M))
     ###### SD + correlation:
     sig <- bb * sqrt(t(apply(ss, 3, diag)))
-    rho <- array(apply(ss,3, cov2cor), c(S,S,M))
+    rho <- array(parApply(cl, ss,3, cov2cor), c(S,S,M))
+    stopCluster(cl)
     ######### check with Var-Covar-Matrix:
     # Sigma <- ss
     # multi <- matrix(1, S, S)

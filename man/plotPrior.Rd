@@ -4,12 +4,14 @@
 \alias{plotPrior}
 \title{Plot Prior Distributions}
 \usage{
-plotPrior(prior, M = 10000)
+plotPrior(prior, M = 2e+05, nCPU = 3)
 }
 \arguments{
 \item{prior}{a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}}
 
-\item{M}{number of random samples to approximate prior distributions}
+\item{M}{number of random samples to approximate priors of group-level parameters}
+
+\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.}
 }
 \description{
 Plots prior distributions for group means, standard deviation, and correlations of MPT parameters across participants.
@@ -27,5 +29,8 @@ plotPrior(list(mu = "dnorm(0,1)", xi="dunif(0,10)",
 plotPrior(list(alpha ="dgamma(1,.1)",
           beta = "dgamma(1,.1)"), M=4000)
 }
+}
+\seealso{
+\code{\link{priorPredictive}}
 }
 

@@ -21,8 +21,9 @@
 plotFit <- function(fittedModel, M=1000, stat = "mean", ...){
 
   # get information about model:
-  dat <- fittedModel$mptInfo$dat
   tree <- fittedModel$mptInfo$MPT$Tree
+  cats <- fittedModel$mptInfo$MPT$Category
+  dat <- fittedModel$mptInfo$dat[,cats]
   TreeNames <- unique(tree)
 
   # get posterior predictive:
@@ -38,7 +39,7 @@ plotFit <- function(fittedModel, M=1000, stat = "mean", ...){
     pred <- t(sapply(freq.list, colMeans))
     boxplot(pred, xaxt="n", col="gray",
             main="Observed (red) and predicted (boxplot) mean frequencies", ...)
-    axis(1, 1:ncol(dat), labels = colnames(dat))
+    axis(1, 1:ncol(dat), labels = cats)
     xx <- by(1:length(tree), tree, mean)
     axis(1, xx,  TreeNames, tick=F, line=NA, mgp=c(3, 2.5, 0))
     points(1:ncol(dat), colMeans(dat), col="red", cex=1.4, pch=17)

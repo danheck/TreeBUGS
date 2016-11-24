@@ -4,16 +4,14 @@
 \alias{summarizeMPT}
 \title{Summarize JAGS Output for Hierarchical MPT Models}
 \usage{
-summarizeMPT(mcmc, mptInfo, M = 2000, summ = NULL)
+summarizeMPT(mcmc, mptInfo, summ = NULL)
 }
 \arguments{
 \item{mcmc}{the actual mcmc.list output of the sampler of a fitted MPT model (accesible via \code{fittedModel$runjags$mcmc})}
 
 \item{mptInfo}{the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})}
 
-\item{M}{number of posterior predictive samples to compute T1 statistic}
-
-\item{summ}{optional for internal use}
+\item{summ}{optional argument for internal use}
 }
 \description{
 Provide clean and readable summary statistics tailored to MPT models based on the JAGS output.

@@ -190,16 +190,21 @@ T.prec.part[1,1] ~ dchisq(df)"),
 
 "
 Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
-
 for(s in 1:S){
   mu.delta.raw[s] <- 0
   mean[s] <- phi(mu[s])
   for(q in 1:S){
+    Sigma[s,q] <- Sigma.raw[q,s]*xi[s]*xi[q]
+  }
+}
+
+for(s in 1:S){
+  for(q in 1:S){
     # Off-diagonal elements of S (correlations not affected by xi)
-    rho[s,q] <- Sigma.raw[s,q]/sqrt(Sigma.raw[s,s]*Sigma.raw[q,q])
+    rho[s,q] <- Sigma[s,q]/sqrt(Sigma[s,s]*Sigma[q,q])
   }
   # Diagonal elements of S (rescale sigma)
-  sigma[s] <- xi[s]*sqrt(Sigma.raw[s,s])
+  sigma[s] <- sqrt(Sigma[s,s])
 }
 ",
 paste0("\nmu[", 1:S, "] ~ ", mu, collapse = ""),

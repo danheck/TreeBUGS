@@ -46,6 +46,7 @@ genDat <- genTraitMPT(N = 100,
                       sigma =   c(Do=.3, Dn=.3, g=.15),
                       rho = rho)
 head(genDat$data, 3)
+plotFreq(genDat$data, eqn=EQNfile)
 }
 \references{
 Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.

@@ -6,8 +6,8 @@
 #' @param mcmc the actual mcmc.list output of the sampler of a fitted MPT model (accesible via \code{fittedModel$runjags$mcmc})
 #' @param mptInfo the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})
 # @param dic whether to compute DIC statistic for model selection (requires additional sampling!)
-#' @param M number of posterior predictive samples to compute T1 statistic
-#' @param summ optional for internal use
+# @param M number of posterior predictive samples to compute T1 statistic
+#' @param summ optional argument for internal use
 # @param ... further arguments passed to \code{\link[coda]{dic.samples}} (e.g., \code{n.iter})
 #' @details The MPT-specific summary is computed directly after fitting a model. However, this function might be used manually after removing MCMC samples (e.g., extending the burnin period).
 #' @examples
@@ -22,7 +22,7 @@
 #' @import rjags
 summarizeMPT <- function(mcmc,
                          mptInfo,
-                         M=2000,
+                         # M=2000,
                          summ = NULL
 ){
   if(is.null(summ))

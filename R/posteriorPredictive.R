@@ -4,18 +4,19 @@
 
 #' Get Posterior Predictive Samples
 #'
-#' Draw frequencies based on posterior distribution of individual estimates or for new participants.
+#' Draw predicted frequencies based on posterior distribution of (a) individual estimates (default) or (b) for new participants (if \code{numItems} is provided; without considering continuous or discrete predictors in traitMPT).
 #'
 #' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})
 #' @param M number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.
-#' @param numItems if supplied (as a vector), data for a new participant are sampled with the given number of items per MPT tree (i.e., a new participant vector \eqn{\theta} is sampled from the hierarchical posterior to generate observed frequencies)
+#' @param numItems optional: a vector with the number of items per MPT tree to sample predicted data for a new participant (i.e., a participant vector \eqn{\theta} is first sampled from the hierarchical posterior to generate observed frequencies).
 #' @param expected if \code{TRUE}, the expected frequencies per person are returned (without additional sampling from a multinomial distribution)
-#' @param nCPU number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.
+#' @param nCPU number of CPUs used for parallel sampling. For large models and many participants, this requires a considerable computer-memory resources.
 #' @return a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.
 #' @export
 #' @examples
 #' \dontrun{
-#' # add posterior predictive samples that are reused in ?plotFit
+#' # add posterior predictive samples to fitted model
+#' #     (facilitates plotting using ?plotFit)
 #' fittedModel$postpred$freq.pred <-
 #'      posteriorPredictive(fittedModel, M=1000)
 #' }
@@ -43,11 +44,17 @@ posteriorPredictive <- function(fittedModel,
   sel.thetaFE <- grep("thetaFE", varnames(fittedModel$runjags$mcmc), fixed=TRUE)
   n.thetaFE <- length(sel.thetaFE)
 
+
+  ########### sample data for participants in data set!
   if(missing(numItems) || is.null(numItems)){
+    pred.new <- FALSE
     N <- nrow(mptInfo$data)
     numItems <-   t(apply(mptInfo$data, 1,
                           function(x)  tapply(x, mptInfo$MPT$Tree, sum)))
+
+    ########### sample data for NEW participant!
   }else{
+    pred.new <- TRUE
     if(length(numItems) != length(unique(fittedModel$mptInfo$MPT$Tree))){
       stop("Length of 'numItems' does not match number of MPT trees.")
     }
@@ -58,25 +65,27 @@ posteriorPredictive <- function(fittedModel,
     numItems <- matrix(numItems, nrow=1, dimnames=list(NULL, names(numItems)))
     N <- 1
   }
+
+  ############# SAMPLING
   par.ind <- par.thetaFE <- c()
   for(m in 1:chains){
     sel.samp <- sample(1:sample, max.samp)
 
     ######## standard random effects:
-    if(missing(numItems) || is.null(numItems)){
+    if(!pred.new){
       sel.var <- setdiff(grep("theta", varnames(fittedModel$runjags$mcmc), fixed=TRUE),
                          sel.thetaFE)
       par.tmp <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.var])
     }else{
       par.tmp <- matrix(NA, max.samp, S, dimnames=list(NULL, paste0("theta[",1:S, ",1]")))
       # sample hierarchical values, then individuals
-      if(fittedModel$mptInfo$model == "betaMPT"){
+      if(class(fittedModel) == "betaMPT"){
         alpha <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("alph[",1:S,"]")])
         beta <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("bet[",1:S,"]")])
         for(i in 1:S){
           par.tmp[,i] <- rbeta(max.samp, alpha[,i], beta[,i])
         }
-      }else{
+      }else if(class(fittedModel) == "traitMPT"){
         mu <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("mu[",1:S,"]")])
         sig <-  as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("sigma[",1:S,"]")])
         sel.rho <- grep("rho", varnames(fittedModel$runjags$mcmc))
@@ -107,8 +116,8 @@ posteriorPredictive <- function(fittedModel,
 
   getPostPred <- function(tt){
 
-    # single replication theta:
-    theta <- matrix(tt[(n.thetaFE+1):length(tt)], S, N)
+    # single posterior sample for all individual parameters theta:
+    theta <- matrix(tt[(n.thetaFE+1):length(tt)], S, N, byrow=FALSE)
     if(n.thetaFE>0){
       thetaFE <- tt[1:n.thetaFE]
     }else{
@@ -131,6 +140,9 @@ posteriorPredictive <- function(fittedModel,
     list(freq.exp)
   }
 
+  # reorder by name!
+  var.names <- apply(expand.grid("theta[",1:S,",",1:N,"]"), 1, paste0, collapse="")
+  par.ind <- par.ind[,gsub(" ", "", var.names, fixed=TRUE)]
   if(nCPU >1){
     cl <- makeCluster(nCPU)
     clusterExport(cl, c("S","N","mptInfo","numItems","expected","expectedFreq",

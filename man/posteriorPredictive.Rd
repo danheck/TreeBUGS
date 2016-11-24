@@ -12,21 +12,22 @@ posteriorPredictive(fittedModel, M = 100, numItems = NULL,
 
 \item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
 
-\item{numItems}{if supplied (as a vector), data for a new participant are sampled with the given number of items per MPT tree (i.e., a new participant vector \eqn{\theta} is sampled from the hierarchical posterior to generate observed frequencies)}
+\item{numItems}{optional: a vector with the number of items per MPT tree to sample predicted data for a new participant (i.e., a participant vector \eqn{\theta} is first sampled from the hierarchical posterior to generate observed frequencies).}
 
 \item{expected}{if \code{TRUE}, the expected frequencies per person are returned (without additional sampling from a multinomial distribution)}
 
-\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.}
+\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires a considerable computer-memory resources.}
 }
 \value{
 a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.
 }
 \description{
-Draw frequencies based on posterior distribution of individual estimates or for new participants.
+Draw predicted frequencies based on posterior distribution of (a) individual estimates (default) or (b) for new participants (if \code{numItems} is provided; without considering continuous or discrete predictors in traitMPT).
 }
 \examples{
 \dontrun{
-# add posterior predictive samples that are reused in ?plotFit
+# add posterior predictive samples to fitted model
+#     (facilitates plotting using ?plotFit)
 fittedModel$postpred$freq.pred <-
      posteriorPredictive(fittedModel, M=1000)
 }

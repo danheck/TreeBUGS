@@ -2,10 +2,11 @@
 #' Plot Prior Distributions
 #'
 #' Plots prior distributions for group means, standard deviation, and correlations of MPT parameters across participants.
-#' @param M number of random samples to approximate prior distributions
+#' @param M number of random samples to approximate priors of group-level parameters
 #' @inheritParams priorPredictive
 #' @details This function samples from a set of hyperpriors (either for hierarchical traitMPT or betaMPT structure) to approximate the implied prior distributions on the parameters of interest (mean, SD, correlations of MPT parameters).
 #' @export
+#' @seealso \code{\link{priorPredictive}}
 #' @examples
 #' \dontrun{
 #' # default priors for traitMPT:
@@ -16,10 +17,10 @@
 #' plotPrior(list(alpha ="dgamma(1,.1)",
 #'           beta = "dgamma(1,.1)"), M=4000)
 #' }
-#' @importFrom evmix dbckden
-plotPrior <- function(prior, M=10000){
+# @importFrom evmix dbckden
+plotPrior <- function(prior, M=2e5, nCPU=3){
 
-  samples <- sampleHyperprior(prior, M, S=1)
+  samples <- sampleHyperprior(prior, M, S=1, nCPU=nCPU)
   model <- attr(samples, "model")
 
   mfrow <- par()$mfrow
@@ -33,7 +34,10 @@ plotPrior <- function(prior, M=10000){
     bb <- samples$beta
     mean <- aa/(aa+bb)
     sd <-  sqrt(aa*bb/((aa+bb)^2*(aa+bb+1)))
-    prior.sd <- density(sd, from=0, to=.5)
+    # sd.sub <- sd[sample(M, min(5000,M))]
+    # prior.sd <- density(sd, from=0, to=.5)
+    # prior.sd <- dbckden(quantile(sd.sub, qq),  sd.sub,
+    #                     lambda = .02, bcmethod = "beta2", xmax=.5)
     xlab.sd = "Group SD"
   }else{
     # probit transform:
@@ -41,33 +45,39 @@ plotPrior <- function(prior, M=10000){
     S <- ncol(mean)
     sd <- samples$sigma
     sd <- sd[sd<=quantile(sd, .997)]
-    prior.sd <- density(sd, from = 0)
+    # sd.sub <- sd[sample(M, min(5000,M))]
+    # prior.sd <- density(sd, from = 0)
+    # prior.sd <- dbckden(quantile(sd.sub, qq),  sd.sub, lambda = .2)#, bcmethod = "beta2", xmax=1)
     xlab.sd = "Group SD (on latent probit scale)"
   }
-  prior.mean <- dbckden(quantile(mean, qq),  mean,
-                        lambda = .03, bcmethod = "beta2", xmax=1)
+  # mean.sub <- mean[sample(M, min(5000,M))]
+  # prior.mean <- dbckden(quantile(mean.sub, qq),  mean.sub,
+  #                       lambda = .03, bcmethod = "beta2", xmax=1)
 
 
   par(mfrow=c(2,ifelse(model=="traitMPT",2,1)))
   hist(mean, bins, freq=FALSE, col=histcol,
        main=" Prior on group mean", xlab="Group mean", border = histcol )
-  lines(quantile(mean, qq), prior.mean)
+  # lines(quantile(mean.sub, qq), prior.mean)
   hist(sd, bins, freq=FALSE, col=histcol, xlim=c(0, max(quantile(sd, .995), .5)),
-       main=paste0("Prior on SD",
-                   ifelse(model=="traitMPT"," (on latent probit-scale)","")),
-       xlab="SD", border = histcol )
-  lines(prior.sd)
+       main=paste0("Prior on group SD"),
+                   # ifelse(model=="traitMPT"," (on latent probit scale)","")),
+       xlab=ifelse(model=="betaMPT",
+                   "SD (probability scale)",
+                   "SD (latent probit scale)"), border = histcol )
+  # lines(quantile(sd.sub, qq), prior.sd)
 
   if(model == "traitMPT" && S>1){
     for(s1 in 1:(S-1)){
       for(s2 in (s1+1):S){
-        prior.cor <- dbckden(quantile(samples$rho[s1,s2,], qq)+1,
-                             samples$rho[s1,s2,]+1,
-                             lambda = .03, bcmethod = "beta2", xmax=2)
+        # rho.sub <- samples$rho[,,sample(M, min(5000,M))]
+        # prior.cor <- dbckden(quantile(rho.sub[s1,s2,], qq)+1,
+        #                      rho.sub[s1,s2,]+1,
+        #                      lambda = .05, bcmethod = "beta2", xmax=2)
         hist(samples$rho[s1,s2,], bins, freq=FALSE, col=histcol,
              main=paste0("Correlation: ", s1, " and ",s2),
-             xlab="Correlation (on latent probit scale)", border = histcol )
-        lines(quantile(samples$rho[s1,s2,], qq), prior.cor)
+             xlab="Correlation (latent probit scale)", border = histcol )
+        # lines(quantile(rho.sub[s1,s2,], qq), prior.cor)
       }
     }
   }

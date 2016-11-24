@@ -202,23 +202,27 @@ fitModel <- function(type,
                       time=time1-time0)
   class(fittedModel) <- type
 
-  if(ppp>0){
-    cat("\nComputing posterior-predictive p-values....\n")
-    postPred <- PPP(fittedModel, M=ppp,
-                    nCPU=min(detectCores(), length(runjags$mcmc)))
-    fittedModel$postpred <- postPred[c("freq.exp", "freq.pred", "freq.obs")]
-    try(
-      fittedModel$summary$fitStatistics <- list(
-        "overall"=c(
-          "T1.observed"=mean(postPred$T1.obs),
-          "T1.predicted"=mean(postPred$T1.pred),
-          "p.T1"=postPred$T1.p,
-          "T2.observed"=mean(postPred$T2.obs),
-          "T2.predicted"=mean(postPred$T2.pred),
-          "p.T2"=postPred$T2.p
-        ))
-    )
-  }
+  # if(ppp>0){
+  #   cat("\nComputing posterior-predictive p-values....\n")
+  #   postPred <- PPP(fittedModel, M=ppp,
+  #                   nCPU=min(detectCores(), length(runjags$mcmc)))
+  #   fittedModel$postpred <- postPred[c("freq.exp", "freq.pred", "freq.obs")]
+  #   try(
+  #     fittedModel$summary$fitStatistics <- list(
+  #       "overall"=c(
+  #         "T1.observed"=mean(postPred$T1.obs),
+  #         "T1.predicted"=mean(postPred$T1.pred),
+  #         "p.T1"=postPred$T1.p,
+  #         "T2.observed"=mean(postPred$T2.obs),
+  #         "T2.predicted"=mean(postPred$T2.pred),
+  #         "p.T2"=postPred$T2.p,
+  #         "ind.T1.obs"=postPred$ind.T1.obs,
+  #         "ind.T1.pred"=postPred$ind.T1.pred,
+  #         "ind.T1.p"=postPred$ind.T1.p
+  #       ))
+  #   )
+  # }
+  fittedModel <- addPPP(fittedModel, M=ppp)
 
   # write results to file
   writeSummary(fittedModel, parEstFile)

@@ -23,9 +23,9 @@ plotParam <- function(x, includeIndividual=TRUE, estimate = "mean", ...){
 
   par(mfrow=c(1,1))
   plot(1:S, means, ylim=0:1, xlim=c(.5, S+.5),pch=19, xaxt="n", #size=3,
-       xlab = "MPT Parameters", ylab="Estimate", col=2,
-       main=paste0("Group-level ",estimate,"s (+ 95% CI)",
-                   ifelse(includeIndividual,paste0(" and individual ",estimate,"s"),"")), ...)
+       xlab = "MPT Parameters", ylab=paste0("Estimate (",estimate ,"s)"), col=2,
+       main=paste0("Group-level ",estimate,"s + 95% CI (red)",
+                   ifelse(includeIndividual,paste0(" and individual ",estimate,"s (gray)"),"")), ...)
   axis(side = 1, at = 1:S, labels=substr(names(means), 6, 100))
   segments(x0=1:S, y0=x$summary$groupParameters$mean[,3],
            y1=x$summary$groupParameters$mean[,5], lwd=2, col=2)

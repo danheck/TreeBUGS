@@ -4,7 +4,7 @@
 \alias{readEQN}
 \title{Read multiTree files}
 \usage{
-readEQN(file, restrictions = NULL, paramOrder = FALSE)
+readEQN(file, restrictions = NULL, paramOrder = FALSE, parse = FALSE)
 }
 \arguments{
 \item{file}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (see examples).}
@@ -12,6 +12,8 @@ readEQN(file, restrictions = NULL, paramOrder = FALSE)
 \item{restrictions}{Optional: The (full path to the) file that specifies which parameters should be constants and which should be equal. Alternatively: a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
 
 \item{paramOrder}{if TRUE, the order of MPT parameters as interally used is printed.}
+
+\item{parse}{whether to return a parsed MPT model description in terms of the matrices \eqn{a} and \eqn{b} (the powers of the \eqn{\theta} and \eqn{(1-\theta)}, respectively, and the vector of constants \eqn{c}. Each branch probability is then given as \eqn{c_{i}  \prod_{s} \theta^{a_{i,s}}(1-\theta)^{b_{i,s}})}}
 }
 \description{
 Function to import MPT models from standard .eqn model files as used, for instance, by multiTree (Moshagen, 2010).

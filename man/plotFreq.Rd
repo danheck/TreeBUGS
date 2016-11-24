@@ -4,21 +4,27 @@
 \alias{plotFreq}
 \title{Plot Raw Frequencies}
 \usage{
-plotFreq(fittedModel, freq = TRUE, select = "all", boxplot = FALSE,
-  eqnfile)
+plotFreq(x, freq = TRUE, select = "all", boxplot = TRUE, eqn)
 }
 \arguments{
-\item{fittedModel}{fitted hierarchical MPT model (see \code{\link{traitMPT}} or \code{\link{betaMPT}}). Can also be a path to a .csv-file with individual frequencies or a matrix/data frame.}
+\item{x}{either a fitted hierarchical MPT model (see \code{\link{traitMPT}}, \code{\link{betaMPT}}); or a matrix/data frame of response frequencies (can be provided as a path to a .csv-file with individual frequencies).}
 
-\item{freq}{whether to plot absolute frequencies or relative frequencies (which sum up to one within each tree; only if \code{fittedModel} is a hierarchical model)}
+\item{freq}{whether to plot absolute frequencies or relative frequencies (which sum up to one within each tree; only if \code{x} is a hierarchical model or if \code{eqn} is provided)}
 
 \item{select}{a numeric vector with participant indices to select which raw frequencies to plot (default: \code{"all"})}
 
-\item{boxplot}{if \code{TRUE}, plots boxplots instead of lines and points}
+\item{boxplot}{if \code{FALSE}, lines and points are drawn instead of boxplots}
 
-\item{eqnfile}{optional argument to get MPT tree structure if \code{fittedModel} is the path to a .csv-file or a matrix/data frame}
+\item{eqn}{optional: EQN description of an MPT model, that is, either the path to an EQN file or as a character string (only used if \code{x} refers to a matrix/data frame or .csv-file)}
 }
 \description{
-Plot observed raw frequencies
+Plot observed individual and mean frequencies.
+}
+\examples{
+# get frequency data and EQN file
+freq <- subset(arnold2013, group == "encoding", select = -(1:4))
+eqn <- EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+plotFreq(freq, eqn = eqn)
+plotFreq(freq, freq = FALSE, eqn = eqn)
 }
 
