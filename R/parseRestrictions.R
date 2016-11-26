@@ -50,7 +50,7 @@ parseRestrictions <- function(mpt, restrictions){
         index <- match(splitRestr, colnames(mpt$a))
         suppressWarnings(consts <- as.numeric(splitRestr))
 
-        if(sum(!is.na(consts)) == 0){
+        if(  all(is.na(consts)) ){
           # only parameters without constants
           if(any(is.na(index))){
             error <- paste0("Restriction contains parameters not contained in the model:\n  ",
@@ -61,14 +61,18 @@ parseRestrictions <- function(mpt, restrictions){
           # thetaNames$theta[index[2:length(index)]] <- index[1]
 
           # replace index
-          mpt$a[,index[1]] <- rowSums(mpt$a[,index])
-          mpt$b[,index[1]] <- rowSums(mpt$b[,index])
-          mpt$a <- mpt$a[,-index[2:length(index)],drop =FALSE]
-          mpt$b <- mpt$b[,-index[2:length(index)],drop =FALSE]
+          # mpt$a[,index[1]] <- rowSums(mpt$a[,index])
+          # mpt$b[,index[1]] <- rowSums(mpt$b[,index])
+          # mpt$a <- mpt$a[,-index[2:length(index)],drop =FALSE]
+          # mpt$b <- mpt$b[,-index[2:length(index)],drop =FALSE]
+          mpt$a[,min(index)] <- rowSums(mpt$a[,index])
+          mpt$b[,min(index)] <- rowSums(mpt$b[,index])
+          mpt$a <- mpt$a[,-index[-which.min(index)],drop =FALSE]
+          mpt$b <- mpt$b[,-index[-which.min(index)],drop =FALSE]
 
 
         }else if(sum(!is.na(consts)) == 1){
-          # contrained to constant values
+          # contrained to a single constant value
           CONST <- consts[!is.na(consts)]
           if(CONST <0 | CONST >1){
             error <- paste0("Check parameter restrictions. Constants are not in the interval [0,1]: ",

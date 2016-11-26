@@ -1,0 +1,23 @@
+# "sets up priors to be close to flat
+#  on the mean and standard deviation of the beta
+#  distribution"
+
+data{
+  zero <- 0
+}
+
+model{
+
+  zero ~ dpois(phi)
+  phi<- -log(1/pow(alpha+beta,power))
+
+  alpha ~ dunif(min,max)
+  beta ~ dunif(min,max)
+
+  #for(i in 1:N){
+  y ~ dbeta(alpha, beta)
+  #}
+
+  # meanp <- alpha/(alpha+beta)
+  # varp <- sqrt(alpha*beta/(pow(alpha+beta,2)*(alpha+beta+1)))
+}

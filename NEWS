@@ -1,3 +1,10 @@
+TreeBUGS 0.8.1 (November 2016)
+===========
+
+* Zeros-trick by Smith & Batchelder (2010) for betaMPT() implemented (i.e., by using the argument alpha="zero")
+* Parameter constraints result in the same parameter labels for JAGS and C++ samplers (e.g., "b=a=f" will be labeled "b")
+
+
 TreeBUGS 0.8.0 (November 2016)
 ===========
 

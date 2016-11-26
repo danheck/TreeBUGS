@@ -28,27 +28,34 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 
 
   #  ###################################### MODEL ###################
-  cat("model\n{\n", file=filename)
-
-	cat("for (n in 1: subjs){\n",file=filename,append=T)
+  cat(ifelse(model=="traitMPT",
+             "####### Hierarchical latent-trait MPT with TreeBGUS #####\n\n",
+             paste0("####### Hierarchical beta MPT with TreeBGUS #####\n\n",
+             "data{\nfor(s in 1:S){\n  zeros[s] <- 0\n}\n}\n\n")),     # for zeros-trick
+      "model{\n\n",
+      "for (n in 1: subjs){\n\n### MPT model equations:\n",
+      file=filename)
 
 	for(i in 1:NOT){
 		for(j in 1:ncatPerTree[i]){
-		cat(treeNames[i],"[n,",j,"]<-",mergedTree$Equation[count],
+		cat(treeNames[i],"[n,",j,"] <- ",mergedTree$Equation[count],
 		    "\n",sep="",file=filename,append=T)
 		count=count+1
 		}
+	  cat("\n",file=filename,append=T)
 	}
 
+  cat("\n### Multinomial likelihood:\n",file=filename,append=T)
+
 	for(i in 1:NOT){
-		cat("response.",treeNames[i],"[n,1:",ncatPerTree[i],"]~dmulti(",
+		cat("response.",treeNames[i],"[n,1:",ncatPerTree[i],"] ~ dmulti(",
 			treeNames[i],"[n,1:",ncatPerTree[i],"],items.",treeNames[i],
 			"[n])\n",sep="",file=filename,append=T)
 	}
 
 	cat("}\n",file=filename,append=T)
 
-	######################################### MODEL SPECIFIC HYPERPRIOR PART #################################
+	######################################### MODEL SPECIFIC HYPERPRIOR PART ###########
 
 	hyperprior <- switch(model,
 	                     "betaMPT" = makeBetaHyperprior(S =S ,
@@ -60,14 +67,15 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 	                                                     xi = hyperprior$xi)
 	)
 
-	cat(hyperprior, file=filename, append=TRUE)
+	cat("\n\n### Hierarchical structure:",
+	    hyperprior, file=filename, append=TRUE)
 	if(! is.null(fixedPar)){
 	  S.fixed <- length(unique(fixedPar$theta))
 	  cat("\nfor(i in 1:", S.fixed,"){\n",
 	      "      thetaFE[i] ~ dunif(0,1)\n}\n", file=filename, append=TRUE)
 	}
 
-	######################################### END OF MODEL SPECIFIC HYPERPRIOR PART ##########################
+	######################################### END OF MODEL SPECIFIC HYPERPRIOR PART #####
 
 
 	# if(model == "betaMPT" & !is.null(covString)){
@@ -107,49 +115,29 @@ makeBetaHyperprior <-function(S,
 
 for(s in 1:S){
   for(n in 1:subjs) {
-    theta[s,n] ~dbeta(alph[s],bet[s])
+    theta[s,n] ~ dbeta(alph[s], bet[s])
   }
 }
 
 for(s in 1:S){
-",
-  # WinBUGS: zero[s] ~dpois(phi[s])
-  # WinBUGS: phi[s] <- -log(1/pow(alph[s]+bet[s],5/2))
-#
-# "
-  # alph[s] <- ( (1-mean[s])/sd[s]^2 - 1/mean[s])*mean[s]^2
-  # bet[s] <- alph[s] *(1/mean[s] - 1)
-
-# alph[s] <- xxx1[s]/xxx2[s]^2
-# bet[s] <- 1/xxx2[s]^2 - alph[s]
-
-"
   mean[s] <- alph[s]/(alph[s]+bet[s])
   sd[s] <- sqrt(alph[s]*bet[s]/(pow(alph[s]+bet[s],2)*(alph[s]+bet[s]+1)))
-}
-",
-# paste0("\nxxx1[", 1:S, "] ~ ", alpha, collapse = ""),
-# paste0("\nxxx2[", 1:S, "] ~ ", beta, collapse = ""),
-# "\n\n")
-paste0("\nalph[", 1:S, "] ~ ", alpha, collapse = ""),
-paste0("\nbet[", 1:S, "] ~ ", beta, collapse = ""),
-"\n\n")
+}\n\n")
 
-  # for(s in 1:S){
-  #   if( (length(alpha) == 1 & alpha == "default") || alpha[s] == "default"){
-  #
-  #     modelString <- paste0("alph[",s,"] <- xxx1[",s,"]/xxx2[",s,"]^2 \n",
-  #                           "xxx1[",s,"] ~ dunif(0,1) \n",
-  #                           "xxx2[",s,"] ~ dnorm(0,1)T(0,) \n",
-  #                           "\n\n")
-  #     alpha = "dunif(0,1)"
-  #     beta = "dnorm(0,1)T(0,)"
-  #   }else if(length(alpha) == 1){
-  #
-  #   }else{
-  #
-  #   }
-  # }
+  for(s in 1:S){
+    if(alpha[s] == "zero" | beta[s] == "zero"){
+      modelString <- paste0(modelString,
+                            "alph[", s, "] ~ dunif(.01,5000)\n",
+                            "bet[", s, "] ~ dunif(.01,5000)\n",
+                            "zeros[",s,"] ~ dpois(phi[",s,"])\n",
+                            "phi[",s,"] <- -log(1/pow(alph[",s,"]+bet[",s,"],5/2))\n")
+    }else{
+      modelString <- paste0(modelString,
+                            "alph[", s, "] ~ ", alpha[s], "\n",
+                            "bet[",  s, "] ~ ", beta[s],  "\n")
+    }
+  }
+  modelString <- paste0(modelString, "\n")
 
   return(modelString)
 }

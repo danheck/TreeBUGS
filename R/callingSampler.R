@@ -118,37 +118,37 @@ callingSampler <- function(model,
     }
   }
 
+  parametervector=c(unlist(parameters), transformedPar, covPars)
 
-  # call Sampler
-  parametervector=c(unlist(parameters),
-                    transformedPar, covPars)
+  ############################## starting values
+  inits <- function() {
+    if(model == "betaMPT"){
+      ini <- list("theta"=matrix(runif(subjs*S), S, subjs))
+    }else{
+      # draw appropriate random starting values:
+      mu <- xi <- rep(NA, S)
+      for(s in 1:S){
+        tmp <- ifelse(length(hyperpriors$mu)<=1,hyperpriors$mu[1],hyperpriors$mu[s])
+        mu[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
 
-  # random initial values: required (otherwise T1 statistic results in errors: no variance!)
-  if(model == "betaMPT"){
-    inits <- function() list("theta"=matrix(runif(subjs*S), S, subjs)
-    )
-  }else{
-    # draw appropriate random starting values:
-    mu <- xi <- rep(NA, S)
-    for(s in 1:S){
-      tmp <- ifelse(length(hyperpriors$mu)<=1,hyperpriors$mu[1],hyperpriors$mu[s])
-      mu[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
-
-      if(hyperpriors$xi[1] == "dunif(0,10)"){
-        xi[s] <- runif(1,.5,1.5) # less extreme starting values
-      }else{
-        tmp <- ifelse(length(hyperpriors$xi)<=1,hyperpriors$xi[1],hyperpriors$xi[s])
-        xi[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
+        if(hyperpriors$xi[1] == "dunif(0,10)"){
+          xi[s] <- runif(1,.2,1)             # less extreme starting values
+        }else{
+          tmp <- ifelse(length(hyperpriors$xi)<=1,hyperpriors$xi[1],hyperpriors$xi[s])
+          xi[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
+        }
       }
-    }
 
-    inits <- function() list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
-                             "xi"=xi,  "mu" = mu,
-                             "T.prec.part" = as.matrix(rWishart(1,df+30,V)[,,1])  # start with small correlations
-    )
-    # check starting values:
-    # hist(replicate(1000,cov2cor(solve(rWishart(1,4+1+30,diag(2))[,,1]))[1,2]))
-    # hist(replicate(5000,runif(1,.5,1.5)*solve(rWishart(1,4+1+30,diag(2))[,,1])[1,1]))
+      ini <- list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
+                  "xi"=xi,  "mu" = mu,
+                  "T.prec.part" = as.matrix(rWishart(1,df+30,V)[,,1])
+                  # starts with small correlations and scaling parameters close to 1
+      )
+      # check starting values:
+      # hist(replicate(1000,cov2cor(solve(rWishart(1,4+1+30,diag(2))[,,1]))[1,2]))
+      # hist(replicate(5000,runif(1,.2,1)*sqrt(solve(rWishart(1,4+1+30,diag(2))[,,1])[1,1])))
+    }
+    ini
   }
   inits.list <- replicate(n.chains, inits(), simplify=FALSE)
   for(i in 1:length(inits.list))
@@ -156,16 +156,6 @@ callingSampler <- function(model,
                                    "base::Marsaglia-Multicarry",
                                    "base::Super-Duper",
                                    "base::Mersenne-Twister")[1+ (i-1)%% 4]
-  #         samples2 <- jags.parallel(data,
-  #                             inits=inits,
-  #                             parameters.to.save=parametervector,
-  #                             model.file = modelfile,
-  #                             n.iter=n.iter,
-  #                             n.burnin=n.burnin,
-  #                             n.chains=n.chains,
-  #                             DIC=T,
-  #                             envir=environment(),
-  #                             ...)
   n.samples <- ceiling((n.iter-n.burnin)/n.thin)
   choice <- ""
   if(n.samples > 10000){

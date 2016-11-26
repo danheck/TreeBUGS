@@ -49,7 +49,7 @@ posteriorPredictive <- function(fittedModel,
   if(missing(numItems) || is.null(numItems)){
     pred.new <- FALSE
     N <- nrow(mptInfo$data)
-    numItems <-   t(apply(mptInfo$data, 1,
+    numItems <-   t(apply(mptInfo$data[,mptInfo$MPT$Category], 1,
                           function(x)  tapply(x, mptInfo$MPT$Tree, sum)))
 
     ########### sample data for NEW participant!
@@ -107,6 +107,11 @@ posteriorPredictive <- function(fittedModel,
   }
 
   expectedFreq <- function(n, theta, thetaFE){
+    # p <- tapply(mptInfo$MPT$c*apply(theta[,n]^t(mptInfo$MPT$a) * theta[,n]^t(mptInfo$MPT$b),2,prod),
+    #             mptInfo$MPT$map, sum)
+    # names(p) <- mptInfo$MPT$cat.names
+    # p[mptInfo$MPT$Category]
+    # mptInfo$MPT$Category
     sapply(mptInfo$MPT$Equation,USE.NAMES = FALSE,
            function(ff) {
              eval(parse(text=ff),
@@ -132,7 +137,7 @@ posteriorPredictive <- function(fittedModel,
       for(k in 1:length(TreeNames)){
         freq.exp[,sel.cat[[k]]] <- t(apply(freq.exp[,sel.cat[[k]],drop=FALSE], 1,
                                            function(x)
-                                             rmultinom(1, size=sum(x), prob=x/sum(x))))
+                                             rmultinom(1, size=round(sum(x)), prob=x/sum(x))))
       }
     }
     colnames(freq.exp) <- mptInfo$MPT$Category

@@ -37,20 +37,20 @@ plotFit <- function(fittedModel, M=1000, stat = "mean", ...){
 
     # Plot mean frequencies:
     pred <- t(sapply(freq.list, colMeans))
-    boxplot(pred, xaxt="n", col="gray",
+    boxplot(pred[,cats], xaxt="n", col="gray",
             main="Observed (red) and predicted (boxplot) mean frequencies", ...)
     axis(1, 1:ncol(dat), labels = cats)
     xx <- by(1:length(tree), tree, mean)
     axis(1, xx,  TreeNames, tick=F, line=NA, mgp=c(3, 2.5, 0))
-    points(1:ncol(dat), colMeans(dat), col="red", cex=1.4, pch=17)
+    points(1:ncol(dat), colMeans(dat)[cats], col="red", cex=1.4, pch=17)
     abline(v=cumsum(table(tree))[1:(length(TreeNames)-1)]+.5, col="gray")
 
   }else{
 
     # Plot covariance of frequencies:
-    c.obs <- cov(dat)
+    c.obs <- cov(dat[,cats])
     c.pred <- sapply(freq.list, function(xx){
-      cc <- cov(xx)
+      cc <- cov(xx[,cats])
       cc[upper.tri(cc, diag=TRUE)]
     })
     nams <- outer(rownames(c.obs), colnames(c.obs), paste, sep="-")
