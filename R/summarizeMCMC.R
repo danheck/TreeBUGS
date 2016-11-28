@@ -1,7 +1,15 @@
 
-# own MCMC summary
-summarizeMCMC <- function(mcmc){
+#' MCMC Summary
+#'
+#' TreeBUGS-specific summary for \code{mcmc.list}-objects.
+#' @param mcmc a \code{\link[coda]{mcmc.list}} object
+#' @param batchSize size of batches of parameters used to reduce memory load when computing (univariate) Rhat statistics
+#' @export
+summarizeMCMC <- function(mcmc, batchSize=100){
   # summ <- summary(mcmc, quantiles = c(0.025, 0.5, 0.975))
+  if(class(mcmc) %in% c("traitMPT", "betaMPT","simpleMPT"))
+    mcmc <- mcmc$runjags$mcmc
+
   mcmc.mat <- do.call("rbind", mcmc)
   summTab <- cbind("Mean"=apply(mcmc.mat,2,mean, na.rm = TRUE),
                    "SD"=apply(mcmc.mat,2,sd, na.rm = TRUE),
@@ -19,7 +27,7 @@ summarizeMCMC <- function(mcmc){
   }, silent = TRUE)
   gc(verbose=FALSE)
   try({
-    batchSize <- 200
+    # batchSize <- 200
     # split for 100 variables per batch
     n.summ <- nrow(summTab)
     if(n.summ >batchSize){

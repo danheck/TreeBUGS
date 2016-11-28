@@ -19,6 +19,8 @@
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @useDynLib TreeBUGS
 #' @references
+#' Heck*, D. W., Arnold*, N. R., & Arnold, D. (under revision). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
+#'
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 #'
 #' Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205-235.

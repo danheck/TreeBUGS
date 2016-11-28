@@ -1,3 +1,10 @@
+TreeBUGS 0.8.2 (November 2016)
+===========
+
+* New function probitInverse() to get bivariate transformation of means and SD in probability space
+* Visible function summarizeMCMC()
+
+
 TreeBUGS 0.8.1 (November 2016)
 ===========
 
