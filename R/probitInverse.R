@@ -32,11 +32,21 @@ probitInverse <- function(mu, sigma, fittedModel=NULL){
         mp <- integrate(function(x) pnorm(x)*dnorm(x, mu, sigma), -Inf, Inf)$value
         vp <- integrate(function(x) pnorm(x)^2*dnorm(x, mu, sigma), -Inf, Inf)$value - mp^2
       })
+      if(!is.na(vp) && vp<0){
+        vp <- 0
+      }else if(is.na(vp)){
+        mp <- NA
+      }
       return(c(mean=mp, sd = sqrt(vp)))
     }, c("mu","sigma"))
 
   if(missing(fittedModel) || is.null(fittedModel)){
-    return(probitInverseVec(mu, sigma))
+    res <- t(probitInverseVec(mu, sigma))
+    if(any(is.na(res))) {
+      cat("Transformation resulted in NAs for:\n")
+      print(cbind(mu=mu, sigma=sigma, res)[apply(is.na(res),1,any),])
+    }
+    return(res)
   }else{
     if(!class(fittedModel) == "traitMPT")
       stop("'fittedModel' must be a latent-trait MPT model.")
@@ -53,7 +63,7 @@ probitInverse <- function(mu, sigma, fittedModel=NULL){
       for(s in 1:ncol(s.mu[[cc]])){
         res <- probitInverseVec(mu = s.mu[[cc]][,s], sigma=s.sig[[cc]][,s])
         rownames(res) <- paste0(c("mean_","sd_"), thetaNames[s])
-        samp[[cc]] <- cbind(samp[[cc]], t(res))
+        samp[[cc]] <- cbind(samp[[cc]], res)
       }
       samp[[cc]] <- mcmc(samp[[cc]])
       attr(samp[[cc]], "mcpar") <-  attr(fittedModel$runjags$mcmc[[cc]], "mcpar")

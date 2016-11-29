@@ -3,8 +3,9 @@
 #'
 #' Plots prior distributions for group means, standard deviation, and correlations of MPT parameters across participants.
 #' @param M number of random samples to approximate priors of group-level parameters
+#' @param probitInverse which latent-probit parameters (for \code{\link{traitMPT}} model) to transform to probability scale. Either \code{"none"}, \code{"mean"} (simple transformation \eqn{\Phi(\mu)}), or \code{"mean_sd"} (see \code{\link{probitInverse}})
 #' @inheritParams priorPredictive
-#' @details This function samples from a set of hyperpriors (either for hierarchical traitMPT or betaMPT structure) to approximate the implied prior distributions on the parameters of interest (mean, SD, correlations of MPT parameters).
+#' @details This function samples from a set of hyperpriors (either for hierarchical traitMPT or betaMPT structure) to approximate the implied prior distributions on the parameters of interest (group-level mean, SD, and correlations of MPT parameters).
 #' @export
 #' @seealso \code{\link{priorPredictive}}
 #' @examples
@@ -18,17 +19,18 @@
 #'           beta = "dgamma(1,.1)"), M=4000)
 #' }
 # @importFrom evmix dbckden
-plotPrior <- function(prior, M=2e5, nCPU=3){
+plotPrior <- function(prior, probitInverse = "none", M=5000, nCPU=3){
 
   samples <- sampleHyperprior(prior, M, S=1, nCPU=nCPU)
   model <- attr(samples, "model")
 
   mfrow <- par()$mfrow
   qq <- seq(0,1, .05)
-  bins <- min(80, round(M/40))
+  bins <- min(60, round(M/40))
   histcol <- adjustcolor("gray", alpha.f = .7)
 
   if(model == "betaMPT"){
+    S <- ncol(samples$alpha)
     # formulas for mean and SD of beta distribution:
     aa <- samples$alpha
     bb <- samples$beta
@@ -38,17 +40,32 @@ plotPrior <- function(prior, M=2e5, nCPU=3){
     # prior.sd <- density(sd, from=0, to=.5)
     # prior.sd <- dbckden(quantile(sd.sub, qq),  sd.sub,
     #                     lambda = .02, bcmethod = "beta2", xmax=.5)
-    xlab.sd = "Group SD"
   }else{
     # probit transform:
-    mean <- pnorm(samples$mu)
-    S <- ncol(mean)
-    sd <- samples$sigma
-    sd <- sd[sd<=quantile(sd, .997)]
+    S <- ncol(samples$mu)
+    if(probitInverse %in% c("none","mean")){
+      sd <- samples$sigma
+      if(probitInverse == "none")
+        mean <- samples$mu
+      else
+        mean <- pnorm(samples$mu)
+
+      for(s in 1:S){
+        sd[sd[,s]<=quantile(sd[,s], .997, na.rm = TRUE),s] <- NA ## remove extreme values
+      }
+    }
+    if (probitInverse == "mean_sd"){
+      mean <- sd <- samples$mu
+      for(s in 1:S){
+        mean_sd <- probitInverse(samples$mu[,s], samples$sigma[,s])
+        mean[,s] <- mean_sd[,1]
+        sd[,s] <- mean_sd[,2]
+      }
+    }
+
     # sd.sub <- sd[sample(M, min(5000,M))]
     # prior.sd <- density(sd, from = 0)
     # prior.sd <- dbckden(quantile(sd.sub, qq),  sd.sub, lambda = .2)#, bcmethod = "beta2", xmax=1)
-    xlab.sd = "Group SD (on latent probit scale)"
   }
   # mean.sub <- mean[sample(M, min(5000,M))]
   # prior.mean <- dbckden(quantile(mean.sub, qq),  mean.sub,
@@ -56,16 +73,38 @@ plotPrior <- function(prior, M=2e5, nCPU=3){
 
 
   par(mfrow=c(2,ifelse(model=="traitMPT",2,1)))
-  hist(mean, bins, freq=FALSE, col=histcol,
-       main=" Prior on group mean", xlab="Group mean", border = histcol )
+  hist(mean[,1], bins, freq=FALSE, col=histcol,
+       main="Prior on group mean",
+       xlab=paste0("Group mean",
+                   ifelse(model=="traitMPT",
+                          ifelse(probitInverse=="none"," (probit scale)", " (probability scale)"),
+                          "")), border = histcol )
   # lines(quantile(mean.sub, qq), prior.mean)
-  hist(sd, bins, freq=FALSE, col=histcol, xlim=c(0, max(quantile(sd, .995), .5)),
+  hist(sd[,1], bins, freq=FALSE, col=histcol, xlim=c(0, max(max(sd), .5)),
        main=paste0("Prior on group SD"),
-                   # ifelse(model=="traitMPT"," (on latent probit scale)","")),
-       xlab=ifelse(model=="betaMPT",
-                   "SD (probability scale)",
-                   "SD (latent probit scale)"), border = histcol )
+       # ifelse(model=="traitMPT"," (on latent probit scale)","")),
+       xlab=paste0("Group SD",
+                   ifelse(model=="traitMPT",
+                          ifelse(probitInverse=="mean_sd", " (probability scale)"," (probit scale)"),
+                          "")), border = histcol )
   # lines(quantile(sd.sub, qq), prior.sd)
+  if(S>1){
+    if((model == "traitMPT" && max(length(prior$mu), length(prior$xi))>1) |
+       (model == "betaMPT" && max(length(prior$alpha), length(prior$beta))>1  )){
+
+      hist(mean[,s], bins, freq=FALSE, col=histcol,
+           main=paste0("Prior on group mean ", s),
+           xlab=paste0("Group mean" , ifelse(model=="traitMPT",
+                              ifelse(probitInverse=="none"," (probit scale)", " (probability scale)"),
+                              "")), border = histcol )
+      hist(sd[,s], bins, freq=FALSE, col=histcol, xlim=c(0, max(max(sd), .5)),
+           main=paste0("Prior on group SD ", s),
+           xlab=paste0("Group SD",
+                       ifelse(model=="traitMPT",
+                              ifelse(probitInverse=="mean_sd", " (probability scale)"," (probit scale)"),
+                              "")), border = histcol )
+    }
+  }
 
   if(model == "traitMPT" && S>1){
     for(s1 in 1:(S-1)){
@@ -76,7 +115,7 @@ plotPrior <- function(prior, M=2e5, nCPU=3){
         #                      lambda = .05, bcmethod = "beta2", xmax=2)
         hist(samples$rho[s1,s2,], bins, freq=FALSE, col=histcol,
              main=paste0("Correlation: ", s1, " and ",s2),
-             xlab="Correlation (latent probit scale)", border = histcol )
+             xlab="Correlation (probit scale)", border = histcol )
         # lines(quantile(rho.sub[s1,s2,], qq), prior.cor)
       }
     }
