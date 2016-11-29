@@ -63,7 +63,7 @@ probitInverse <- function(mu, sigma, fittedModel=NULL){
       for(s in 1:ncol(s.mu[[cc]])){
         res <- probitInverseVec(mu = s.mu[[cc]][,s], sigma=s.sig[[cc]][,s])
         rownames(res) <- paste0(c("mean_","sd_"), thetaNames[s])
-        samp[[cc]] <- cbind(samp[[cc]], res)
+        samp[[cc]] <- cbind(samp[[cc]], t(res))
       }
       samp[[cc]] <- mcmc(samp[[cc]])
       attr(samp[[cc]], "mcpar") <-  attr(fittedModel$runjags$mcmc[[cc]], "mcpar")
