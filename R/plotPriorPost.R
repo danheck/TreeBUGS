@@ -23,6 +23,7 @@ plotPriorPost <- function(fittedModel, probitInverse = "mean", M=2e5, ci=.95, nC
     mean.post <- unlist(fittedModel$runjags$mcmc[,paste0("mean", label)])
     d.mean <- density(mean.post, from=0, to=1, na.rm = TRUE)
     prior.mean <- density(samples$mean[,s], from=0,to=1, na.rm = TRUE)
+    ci.mean <- quantile(mean.post, c((1-ci)/2,1-(1-ci)/2))
 
     if(fittedModel$mptInfo$model == "betaMPT"){
       sd.post <- unlist(fittedModel$runjags$mcmc[,paste0("sd", label)])
@@ -31,6 +32,7 @@ plotPriorPost <- function(fittedModel, probitInverse = "mean", M=2e5, ci=.95, nC
       prior.sd <- density(samples$sd[,s], from=0, to=.5, na.rm = TRUE)
       xlab.sd = "Group SD (probability)"
 
+      ####### traitMPT
     }else{
       sig.post <- unlist(fittedModel$runjags$mcmc[,paste0("sigma", label)])
       if(probitInverse == "mean_sd"){
@@ -38,14 +40,17 @@ plotPriorPost <- function(fittedModel, probitInverse = "mean", M=2e5, ci=.95, nC
         d.mean <- density(mean_sd[,"mean"], from=0, to=1, na.rm = TRUE)
         d.sd <- density(mean_sd[,"sd"], from = 0, to = .5, na.rm = TRUE)
         ci.sd <- quantile(mean_sd[,"sd"], c((1-ci)/2,1-(1-ci)/2))
+        ci.mean <- quantile(mean_sd[,"mean"], c((1-ci)/2,1-(1-ci)/2))
         prior.sd <- density(samples$sd[,s], from=0, to=.5 ,na.rm = TRUE)
       }else{
         prior.sd <- density(samples$sd[,s], from = 0, na.rm = TRUE)
         d.sd <- density(sig.post, from = 0, na.rm = TRUE)
         ci.sd <- quantile(sig.post, c((1-ci)/2,1-(1-ci)/2))
-        if(probitInverse == "none")
+        if(probitInverse == "none"){
           d.mean <- density(qnorm(mean.post), na.rm = TRUE)
-        prior.mean <- density(samples$mean[,s], na.rm = TRUE)
+          ci.mean <- quantile(qnorm(mean.post), c((1-ci)/2,1-(1-ci)/2))
+          prior.mean <- density(samples$mean[,s], na.rm = TRUE)
+        }
       }
 
       xlab.sd = ifelse(probitInverse=="mean_sd",
@@ -58,7 +63,7 @@ plotPriorPost <- function(fittedModel, probitInverse = "mean", M=2e5, ci=.95, nC
     plot(d.mean, main=paste0( "Group mean of ", fittedModel$mptInfo$thetaUnique[s]),
          xlab="Group mean")
     lines(prior.mean, col="blue", lty="dashed")
-    abline(v= quantile(mean.post, c((1-ci)/2,1-(1-ci)/2)), col="red")
+    abline(v= ci.mean, col="red")
     plot(d.sd,   main=paste0("Group SD of ", fittedModel$mptInfo$thetaUnique[s]),
          xlab=xlab.sd)
     lines(prior.sd, col="blue", lty="dashed")

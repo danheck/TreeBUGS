@@ -94,11 +94,11 @@ sampleHyperprior <- function(prior, M, S,
     res <- list(alpha=aa, beta=bb, mean=mean, sd=sd)
   }else{
     # probit transform:
-    sd <- sig
-    mean <- aa
+    mean <- aa   # probit mu
+    sd <- sig    # probit sigma
 
-    if(probitInverse != "mean")
-      mean <- qnorm(mean)      # => probit mu!
+    if(probitInverse == "mean")
+      mean <- pnorm(mean)      # => Phi(mu)
 
     if (probitInverse == "mean_sd"){
       for(s in 1:S){
