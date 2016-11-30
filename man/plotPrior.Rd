@@ -4,22 +4,22 @@
 \alias{plotPrior}
 \title{Plot Prior Distributions}
 \usage{
-plotPrior(prior, probitInverse = "none", M = 5000, nCPU = 3)
+plotPrior(prior, probitInverse = "mean", M = 5000, nCPU = 3)
 }
 \arguments{
-\item{prior}{a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}}
+\item{prior}{a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}. Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and precision (= 1/variance).}
 
 \item{probitInverse}{which latent-probit parameters (for \code{\link{traitMPT}} model) to transform to probability scale. Either \code{"none"}, \code{"mean"} (simple transformation \eqn{\Phi(\mu)}), or \code{"mean_sd"} (see \code{\link{probitInverse}})}
 
 \item{M}{number of random samples to approximate priors of group-level parameters}
 
-\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.}
+\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this may require a lot of memory.}
 }
 \description{
 Plots prior distributions for group means, standard deviation, and correlations of MPT parameters across participants.
 }
 \details{
-This function samples from a set of hyperpriors (either for hierarchical traitMPT or betaMPT structure) to approximate the implied prior distributions on the parameters of interest (group-level mean, SD, and correlations of MPT parameters).
+This function samples from a set of hyperpriors (either for hierarchical traitMPT or betaMPT structure) to approximate the implied prior distributions on the parameters of interest (group-level mean, SD, and correlations of MPT parameters). Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and precision (= 1/variance).
 }
 \examples{
 \dontrun{

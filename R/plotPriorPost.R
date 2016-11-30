@@ -3,91 +3,75 @@
 #'
 #' Allows to judge how much the data informed the parameter posterior distributions compared to the prior.
 #' @inheritParams plotFit
+#' @inheritParams priorPredictive
+#' @inheritParams plotPrior
 #' @param M number of random samples to approximate prior distributions
 # @param scale whether to scale the plots to give a complete picture of the \code{"prior"} or posterior (\code{scale="post"})
 #' @param ci credibility interval indicated by vertical red lines
 #' @details Prior distributions are shown as blue, dashed lines, whereas posterior distributions are shown as solid, black lines.
 #' @export
-plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
+plotPriorPost <- function(fittedModel, probitInverse = "mean", M=2e5, ci=.95, nCPU=3){
 
   mfrow <- par()$mfrow
-  hyp  <- hyp.eval <- fittedModel$mptInfo$hyperprior
-  S <- length(fittedModel$mptInfo$thetaUnique)
 
-  if(fittedModel$mptInfo$model == "traitMPT"){
-    ww <- rWishart(n = M,
-                   df = fittedModel$mptInfo$hyperprior$df,
-                   Sigma = fittedModel$mptInfo$hyperprior$V)
-    ss <- array(apply(ww,3, solve), c(S,S,M))
-    cc <- array(apply(ss,3, cov2cor), c(S,S,M))
-  }
+  S <- length(fittedModel$mptInfo$thetaUnique)
+  samples <- sampleHyperprior(fittedModel$mptInfo$hyperprior, M=M, S=S,
+                              probitInverse=probitInverse, nCPU=nCPU)
 
   for(s in 1:S){
     label <- ifelse( S== 1, "", paste0("[",s,"]"))
-
-    # both betaMPT and traitMPT have at least two hyperprior elements
-    # that may have either length one (default) or length S:
-    for(i in 1:2){
-      if(is.na( hyp[[i]][s]))
-        hyp[[i]][s] <- hyp[[i]][1]
-      hyp.eval[[i]][s] <- sub("(", paste0("(",M,","),
-                     sub("d", "r", hyp[[i]][s]),  fixed=TRUE)
-
-      # JAGS uses precision for normal distribution:
-      if(grepl("norm",hyp.eval[[i]][s] )){
-        tmp <- strsplit(hyp.eval[[i]][s], c( "[,\\(\\)]"), perl=F)[[1]]
-        tmp[4] <- 1/sqrt(as.numeric(tmp[4]))
-        hyp.eval[[i]][s] <- paste0(tmp[1],"(",tmp[2],",",tmp[3],",",tmp[4],")")
-      }
-    }
-    aa <- eval(parse(text=hyp.eval[[1]][s]))
-    bb <- eval(parse(text=hyp.eval[[2]][s]))
+    mean.post <- unlist(fittedModel$runjags$mcmc[,paste0("mean", label)])
+    d.mean <- density(mean.post, from=0, to=1, na.rm = TRUE)
+    prior.mean <- density(samples$mean[,s], from=0,to=1, na.rm = TRUE)
 
     if(fittedModel$mptInfo$model == "betaMPT"){
-      # formulas for mean and SD of beta distribution:
-      mean <- aa/(aa+bb)
-      sd <-  sqrt(aa*bb/((aa+bb)^2*(aa+bb+1)))
-      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sd", label)]),
-                      from=0, to=.5)
-      ci.sd <- quantile(unlist(fittedModel$runjags$mcmc[,paste0("sd", label)]),
-                        c((1-ci)/2,1-(1-ci)/2))
+      sd.post <- unlist(fittedModel$runjags$mcmc[,paste0("sd", label)])
+      ci.sd <- quantile(sd.post, c((1-ci)/2,1-(1-ci)/2))
+      d.sd <- density(sd.post, from=0, to=.5, na.rm = TRUE)
+      prior.sd <- density(samples$sd[,s], from=0, to=.5, na.rm = TRUE)
+      xlab.sd = "Group SD (probability)"
 
-      prior.sd <- density(sd, from=0, to=.5)
-      xlab.sd = "Group SD"
     }else{
-      # probit transform:
-      mean <- pnorm(aa)
-      sd <- bb * sqrt(ss[s,s,])   # scaled SD on group level
+      sig.post <- unlist(fittedModel$runjags$mcmc[,paste0("sigma", label)])
+      if(probitInverse == "mean_sd"){
+        mean_sd <- probitInverse(qnorm(mean.post), sig.post)
+        d.mean <- density(mean_sd[,"mean"], from=0, to=1, na.rm = TRUE)
+        d.sd <- density(mean_sd[,"sd"], from = 0, to = .5, na.rm = TRUE)
+        ci.sd <- quantile(mean_sd[,"sd"], c((1-ci)/2,1-(1-ci)/2))
+        prior.sd <- density(samples$sd[,s], from=0, to=.5 ,na.rm = TRUE)
+      }else{
+        prior.sd <- density(samples$sd[,s], from = 0, na.rm = TRUE)
+        d.sd <- density(sig.post, from = 0, na.rm = TRUE)
+        ci.sd <- quantile(sig.post, c((1-ci)/2,1-(1-ci)/2))
+        if(probitInverse == "none")
+          d.mean <- density(qnorm(mean.post), na.rm = TRUE)
+        prior.mean <- density(samples$mean[,s], na.rm = TRUE)
+      }
 
-      d.sd <- density(unlist(fittedModel$runjags$mcmc[,paste0("sigma", label)]), from = 0)
-      prior.sd <- density(sd, from = 0)
-      xlab.sd = "Group SD (on latent probit scale)"
-      ci.sd <- quantile(unlist(fittedModel$runjags$mcmc[,paste0("sigma", label)]),
-                        c((1-ci)/2,1-(1-ci)/2))
+      xlab.sd = ifelse(probitInverse=="mean_sd",
+                       "Group SD (probability scale)",
+                       "Group SD (probit scale)")
     }
-    d.mean <- density(unlist(fittedModel$runjags$mcmc[,paste0("mean", label)]), from=0, to=1)
-    prior.mean <- density(mean, from=0, to=1)
-
 
     par(mfrow=1:2)
     tmp <- readline(prompt = "Press <Enter> to show the next plot.")
     plot(d.mean, main=paste0( "Group mean of ", fittedModel$mptInfo$thetaUnique[s]),
          xlab="Group mean")
     lines(prior.mean, col="blue", lty="dashed")
-    abline(v= quantile(unlist(fittedModel$runjags$mcmc[,paste0("mean", label)]),
-                               c((1-ci)/2,1-(1-ci)/2)), col="red")
+    abline(v= quantile(mean.post, c((1-ci)/2,1-(1-ci)/2)), col="red")
     plot(d.sd,   main=paste0("Group SD of ", fittedModel$mptInfo$thetaUnique[s]),
          xlab=xlab.sd)
     lines(prior.sd, col="blue", lty="dashed")
     abline(v=ci.sd,col="red")
   }
+
   if(fittedModel$mptInfo$model == "traitMPT" & S>1){
     cnt <- 0
     for(s1 in 1:(S-1)){
       for(s2 in (s1+1):S){
         d.cor <- density(unlist(fittedModel$runjags$mcmc[,paste0("rho[",s1,",",s2,"]")]),
                          from=-1, to=1)
-        prior.cor <- density(cc[s1,s2,], from=-1, to=1)
+        prior.cor <- density(samples$rho[s1,s2,], from=-1, to=1)
         if(cnt/2 == round(cnt/2))
           tmp <- readline(prompt = "Press <Enter> to show the next plot.")
         cnt <- cnt+1
@@ -103,6 +87,5 @@ plotPriorPost <- function(fittedModel, M=2e5, ci=.95){
   }
 
   par(mfrow=mfrow)
-
 }
 

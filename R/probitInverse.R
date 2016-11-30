@@ -29,11 +29,17 @@ probitInverse <- function(mu, sigma, fittedModel=NULL){
     function(mu, sigma){
       mp <- vp <- NA
       try({
-        mp <- integrate(function(x) pnorm(x)*dnorm(x, mu, sigma), -Inf, Inf)$value
-        vp <- integrate(function(x) pnorm(x)^2*dnorm(x, mu, sigma), -Inf, Inf)$value - mp^2
+        mp <- integrate(function(x)
+          pnorm(x)*dnorm(x, mu, sigma),
+          # -Inf, Inf)$value
+          mu-5*sigma, mu+5*sigma)$value
+        vp <- integrate(function(x)
+          (pnorm(x)-mp)^2*dnorm(x, mu, sigma),
+          # -Inf, Inf)$value
+          mu-5*sigma, mu+5*sigma)$value
       })
       if(!is.na(vp) && vp<0){
-        vp <- 0
+        vp <- NA
       }else if(is.na(vp)){
         mp <- NA
       }

@@ -4,14 +4,19 @@
 \alias{plotPriorPost}
 \title{Plot Prior vs. Posterior Distribution}
 \usage{
-plotPriorPost(fittedModel, M = 2e+05, ci = 0.95)
+plotPriorPost(fittedModel, probitInverse = "mean", M = 2e+05, ci = 0.95,
+  nCPU = 3)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
+\item{probitInverse}{which latent-probit parameters (for \code{\link{traitMPT}} model) to transform to probability scale. Either \code{"none"}, \code{"mean"} (simple transformation \eqn{\Phi(\mu)}), or \code{"mean_sd"} (see \code{\link{probitInverse}})}
+
 \item{M}{number of random samples to approximate prior distributions}
 
 \item{ci}{credibility interval indicated by vertical red lines}
+
+\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this may require a lot of memory.}
 }
 \description{
 Allows to judge how much the data informed the parameter posterior distributions compared to the prior.

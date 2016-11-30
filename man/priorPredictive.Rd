@@ -4,11 +4,11 @@
 \alias{priorPredictive}
 \title{Prior Predictive Samples}
 \usage{
-priorPredictive(prior, eqnfile, restrictions, numItems, N = 1, M = 100,
-  nCPU = 4)
+priorPredictive(prior, eqnfile, restrictions, numItems, level = "data",
+  N = 1, M = 100, nCPU = 4)
 }
 \arguments{
-\item{prior}{a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}}
+\item{prior}{a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}. Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and precision (= 1/variance).}
 
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
 
@@ -16,26 +16,36 @@ priorPredictive(prior, eqnfile, restrictions, numItems, N = 1, M = 100,
 
 \item{numItems}{vector with the number of items per MPT tree (either named or assigned to alphabetically ordered tree labels)}
 
-\item{N}{number of participants}
+\item{level}{either \code{"data"} (returns individual frequencies) or \code{"parameter"} (returns group-level MPT parameters; \code{M} and \code{numItems} are ignored)}
 
-\item{M}{number of prior predictive samples (i.e., complete data sets).}
+\item{N}{number of participants per replication}
 
-\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires a lot of memory.}
+\item{M}{number of prior predictive samples (i.e., data sets with \code{N} participants).}
+
+\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this may require a lot of memory.}
 }
 \value{
-a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.
+a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). A single matrix is returned if \code{M=1} or \code{level="parameter"}.
 }
 \description{
-Sample full data sets (i.e., individual response frequencies) based on prior distribution for group-level parameters.
+Samples full data sets (i.e., individual response frequencies) or group-level MPT parameters based on prior distribution for group-level parameters.
 }
 \examples{
 eqnfile <- system.file("MPTmodels/2htm.eqn",
                        package="TreeBUGS")
+### beta-MPT:
 prior <- list(alpha="dgamma(1,.1)",
               beta="dgamma(1,.1)")
+
+### prior-predictive frequencies:
 priorPredictive(prior, eqnfile,
                 restrictions=list("g=.5","Do=Dn"),
                 numItems=c(50,50), N=25, M=1, nCPU=1)
+
+### prior samples of group-level parameters:
+priorPredictive(prior, eqnfile, level = "parameter",
+                restrictions=list("g=.5","Do=Dn"),
+                M=5, nCPU=1)
 
 }
 

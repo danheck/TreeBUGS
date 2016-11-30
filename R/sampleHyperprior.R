@@ -6,13 +6,14 @@
 # S: optional, only for betaMPT: number of parameters
 #' @importFrom MASS mvrnorm
 #' @importFrom rjags jags.model coda.samples
-sampleHyperprior <- function(prior, M, S, nCPU=4){
+sampleHyperprior <- function(prior, M, S,
+                             probitInverse = "mean", truncSig = .995, nCPU=4){
 
-  if(length(prior) == 4 && all(c("mu","xi","V","df") %in% names(prior))){
+  if(all(c("mu","xi","V","df") %in% names(prior))){
     prior <- prior[c("mu","xi","V","df")]
     model <- "traitMPT"
     S <- nrow(prior$V)
-  }else if(length(prior) ==2 && all(c("alpha","beta") %in% names(prior))){
+  }else if(all(c("alpha","beta") %in% names(prior))){
     prior <- prior[c("alpha","beta")]
     model <- "betaMPT"
     if(missing(S) || is.null(S)){
@@ -68,7 +69,7 @@ sampleHyperprior <- function(prior, M, S, nCPU=4){
     cl <- makeCluster(nCPU)
     ss <- array(parApply(cl, ww,3, solve), c(S,S,M))
     ###### SD + correlation:
-    sig <- bb * sqrt(t(apply(ss, 3, diag)))
+    sig <- abs(bb) * sqrt(t(apply(ss, 3, diag)))
     rho <- array(parApply(cl, ss,3, cov2cor), c(S,S,M))
     stopCluster(cl)
     ######### check with Var-Covar-Matrix:
@@ -83,14 +84,48 @@ sampleHyperprior <- function(prior, M, S, nCPU=4){
   }
 
   if(model == "betaMPT"){
-    res <- list(alpha=aa, beta=bb)
+    # S <- ncol(samples$alpha)
+    # formulas for mean and SD of beta distribution:
+    # aa <- samples$alpha
+    # bb <- samples$beta
+    mean <- aa/(aa+bb)
+    sd <-  sqrt(aa*bb/((aa+bb)^2*(aa+bb+1)))
+
+    res <- list(alpha=aa, beta=bb, mean=mean, sd=sd)
   }else{
-    res <- list(mu=aa, sigma=sig, rho=rho)# Sigma=Sigma)
+    # probit transform:
+    sd <- sig
+    mean <- aa
+
+    if(probitInverse == "mean")
+      mean <- pnorm(mean)
+
+    if (probitInverse == "mean_sd"){
+      for(s in 1:S){
+        mean_sd <- probitInverse(mean[,s], sig[,s])
+        mean[,s] <- mean_sd[,1]
+        sd[,s] <- mean_sd[,2]
+      }
+    }else{
+      for(s in 1:S)
+        sd[sd[,s] > quantile(sd[,s], truncSig, na.rm = TRUE),s] <- NA ## remove extreme variances
+    }
+    res <- list(mu=aa, sigma=sig, rho=rho, mean=mean, sd=sd)
   }
   attr(res, "model") <- model
 
   res
 }
+
+# transformHyperprior <- function(samples, model,
+#                                 ){
+#   if(model == "betaMPT"){
+#
+#   }else if(model == "trait"){
+#
+#   }
+#   c(samples, mean=mean, sd=sd)
+# }
 
 #
 # debug(sampleHyperprior)
