@@ -97,8 +97,8 @@ sampleHyperprior <- function(prior, M, S,
     sd <- sig
     mean <- aa
 
-    if(probitInverse == "mean")
-      mean <- pnorm(mean)
+    if(probitInverse != "mean")
+      mean <- qnorm(mean)      # => probit mu!
 
     if (probitInverse == "mean_sd"){
       for(s in 1:S){
