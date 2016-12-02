@@ -4,10 +4,12 @@ Date: 2016-11-26
 Title: Hierarchical Multinomial Processing Tree Modeling
 Authors@R: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut","cre")),
              person("Nina", "Arnold", email="arnold@uni-mannheim.de", role = c("aut","dtc")),
-             person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut")))
+             person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut")),
+             person("Alexander", "Ly", email="a.ly@uva.nl", role = c("ctb")))
 Author: Daniel Heck [aut, cre],
         Nina Arnold [aut, dtc],
-        Denis Arnold [aut]
+        Denis Arnold [aut],
+        Alexander Ly [ctb]
 Maintainer: Daniel Heck <heck@uni-mannheim.de>
 Depends:
     R (>= 3.0.0)
@@ -21,7 +23,8 @@ Imports:
     coda,
     parallel,
     rjags,
-    MASS
+    MASS,
+    hypergeo
 Suggests:
     knitr,
     testthat
