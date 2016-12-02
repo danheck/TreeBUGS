@@ -27,7 +27,7 @@ correlationPosterior(fittedModel, r, N, kappa = 1, ci = 0.95, M = 1000,
 \item{nCPU}{number of CPUs used for parallel computation of posterior distribution}
 }
 \description{
-Adjusts the posterior distribution of correlations for the sampling error of a population correlation according to the sample size (i.e., the number of participants; Ly, Verhagen, & Wagenmakers, 2016).
+Adjusts the posterior distribution of correlations for the sampling error of a population correlation according to the sample size (i.e., the number of participants; Ly, Marsman, & Wagenmakers, 2016).
 }
 \details{
 This function (1) uses all posterior samples of a correlation to (2) derive the posterior of the correlation corrected for sampling error and (3) averages these densities across the posterior samples. Thereby, the method accounts for estimation uncertainty of the MPT model (due to the use of the posterior samples) and also for sampling error of the population correlation due to sample size (cf. Ly, Boehm, Heathcote, Turner, Forstmann, Marsman, & Matzke, 2016).
@@ -42,7 +42,7 @@ correlationPosterior(r=cors, N=100, nCPU=1)
 Daniel W. Heck, Alexander Ly
 }
 \references{
-Ly, A., Verhagen, J., & Wagenmakers, E.-J. (2016). Harold Jeffreys's default Bayes factor hypothesis tests: Explanation, extension, and application in psychology. Journal of Mathematical Psychology, 72, 19-32.
+Ly, A., Marsman, M., Wagenmakers, E.-J. (2015). Analytic Posteriors for Pearson's Correlation Coefficient. Manuscript submitted for publication. https://arxiv.org/abs/1510.01188
 
 Ly, A., Boehm, U., Heathcote, A., Turner, B. M. , Forstmann, B., Marsman, M., and Matzke, D. (2016). A flexible and efficient hierarchical Bayesian approach to the exploration of individual differences in cognitive-model-based neuroscience. https://osf.io/evsyv/
 }
