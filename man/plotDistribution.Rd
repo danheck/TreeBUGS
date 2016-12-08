@@ -11,13 +11,13 @@ plotDistribution(fittedModel, scale = "probability", ...)
 
 \item{scale}{only for latent-trait MPT: should estimates be plotted on the \code{"latent"} or the \code{"probability"} scale (i.e., as MPT parameters). Can be abbreviated by \code{"l"}  and \code{"p"}.}
 
-\item{...}{further arguments passed to \code{\link{hist}} (e.g., \code{breaks=50} to get a more fine-grained histogram or \code{xlim=0:1} to use the same x-scale for all histograms)}
+\item{...}{further arguments passed to \code{\link{hist}} (e.g., \code{breaks=50} to get a more fine-grained histogram)}
 }
 \description{
-Plots histograms of the mean posterior estimates for participants including the estimated shape on the group level (e.g., the beta distribution in case of the beta-MPT)
+Plots histograms of the posterior-means of individual MPT parameters against the group-level distribution given by the posterior-mean of the hierarchical parameters (e.g., the beta distribution in case of the beta-MPT)
 }
 \details{
-Note that differences due to discrete factor levels are currently not considered in the group-level predictions (red line). Under such a model, individual estimates are not necessarily normally distributed as indicated in the plot.
+For the latent-trait MPT, differences due to continuous predictors or discrete factors are currently not considered in the group-level predictions (red line). Under such a model, individual estimates are not predicted to be normally distributed on the latent scale as shown in the plot.
 }
 \seealso{
 \code{\link{plot.traitMPT}}
