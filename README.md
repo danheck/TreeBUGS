@@ -29,7 +29,7 @@ install_github("denis-arnold/TreeBUGS", build_vignettes = TRUE)
 
 If you use TreeBUGS, please cite the software as follows:
 
-Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (in preparation). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. Retrieved from https://github.com/denis-arnold/TreeBUGS
+Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (under revision). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. Retrieved from https://github.com/denis-arnold/TreeBUGS
 
 
 ### References
