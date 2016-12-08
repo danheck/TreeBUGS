@@ -11,7 +11,8 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
   sel.cor <- grep("cor_", varnames(fittedModel$runjags$mcmc), fixed=TRUE)
   if(class(fittedModel) == "betaMPT")
     sel.cor <- c(sel.cor, grep("rho", varnames(fittedModel$runjags$mcmc), fixed=TRUE))
-  fittedModel$runjags$mcmc <- fittedModel$runjags$mcmc[,- sel.cor]
+  if(length(sel.cor)>0)
+    fittedModel$runjags$mcmc <- fittedModel$runjags$mcmc[,- sel.cor]
   tmp <- extend.jags(fittedModel$runjags,
                      burnin = n.burnin,
                      sample = ceiling((n.iter-n.burnin)/fittedModel$runjags$thin),
@@ -48,3 +49,4 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
   fittedModel$call <- c(fittedModel$call, match.call())
   fittedModel
 }
+

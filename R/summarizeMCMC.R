@@ -9,6 +9,8 @@ summarizeMCMC <- function(mcmc, batchSize=100){
   # summ <- summary(mcmc, quantiles = c(0.025, 0.5, 0.975))
   if(class(mcmc) %in% c("traitMPT", "betaMPT","simpleMPT"))
     mcmc <- mcmc$runjags$mcmc
+  if(class(mcmc) == "runjags")
+    mcmc <- mcmc$mcmc
 
   mcmc.mat <- do.call("rbind", mcmc)
   summTab <- cbind("Mean"=apply(mcmc.mat,2,mean, na.rm = TRUE),
