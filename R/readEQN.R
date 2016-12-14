@@ -48,7 +48,7 @@ readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
   if(!isPath){
     model <- file
     file <- tempfile(pattern = "MPTmodel", tmpdir = tempdir(), fileext = ".eqn")
-    cat(model, file=file)
+    cat(paste0(model,"\n"), file=file)
   }
   multiTreeDefinition <- read.csv(file, header=F,
                                   blank.lines.skip = TRUE, sep= "",

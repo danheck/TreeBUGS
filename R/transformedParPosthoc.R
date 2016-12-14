@@ -31,34 +31,48 @@ transformedParameters <- function (fittedModel,
   #### for a single MCMC chain:
   getTrans <- function(mm){
     if(level == "group"){
-      samp <- mm[,rep(1,P)]
+      if(S==1){
+        sel.mean <- "mean"
+      }else{
+        sel.mean <- paste0("mean[",1:S,"]")
+      }
+      samp <- mm[,rep(1,P), drop=FALSE]
       colnames(samp) <- parsed$transformedParameters
       for(i in 1:P){
-        samp[,i] <- apply(mm[,paste0("mean[",1:S,"]")], 1,
-                                 function(xx) eval(parse(text=parsed$modelstring[1]),
-                                                   list(mean=unlist(xx))))
+        samp[,i] <- apply(mm[,sel.mean,drop=FALSE], 1,
+                          function(xx) eval(parse(text=parsed$modelstring[1]),
+                                            list(mean=unlist(xx))))
       }
     }else{
-      samp <- mm[,rep(1,P*N)]
+      samp <- mm[,rep(1,P*N),drop=FALSE]
       for(i in 1:P){
+        if(S==1){
+          sel.theta <- paste0("theta[")
+        }else{
+          sel.theta <- paste0("theta[",1:S,",")
+        }
         idx <- (i-1)*N+1:N
         colnames(samp)[idx] <- paste0(parsed$transformedParameters[i],"[", 1:N,"]")
         for(n in 1:N){
-          samp[,idx[n]] <- apply(mm[,paste0("theta[",1:S,",",n,"]")], 1,
-                                        function(xx) eval(parse(text=parsed$modelstring[1]),
-                                                          list(mean=unlist(xx))))
+          samp[,idx[n]] <- apply(mm[,paste0(sel.theta,n,"]"),drop=FALSE], 1,
+                                 function(xx) eval(parse(text=parsed$modelstring[1]),
+                                                   list(mean=unlist(xx))))
         }
       }
     }
     samp
   }
 
-  cl <- makeCluster(nCPU)
-  clusterExport(cl, c("S","N","P","parsed",
-                      "transformedParameters","level"), envir=environment())
-  # loop across MCMC chains:
-  samp <- parLapply(cl, fittedModel$runjags$mcmc, getTrans)
-  stopCluster(cl)
+  if(nCPU>1){
+    cl <- makeCluster(nCPU)
+    clusterExport(cl, c("S","N","P","parsed",
+                        "transformedParameters","level"), envir=environment())
+    # loop across MCMC chains:
+    samp <- parLapply(cl, fittedModel$runjags$mcmc, getTrans)
+    stopCluster(cl)
+  }else{
+    samp <- lapply(fittedModel$runjags$mcmc, getTrans)
+  }
 
   as.mcmc.list(samp)
 }

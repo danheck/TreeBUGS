@@ -12,17 +12,17 @@ posteriorPredictive(fittedModel, M = 100, numItems = NULL,
 
 \item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
 
-\item{numItems}{optional: a vector with the number of items per MPT tree to sample predicted data for a new participant (i.e., a participant vector \eqn{\theta} is first sampled from the hierarchical posterior to generate observed frequencies).}
+\item{numItems}{optional: a vector with the number of items per MPT tree to sample predicted data for a new participant (first, a participant vector \eqn{\theta} is sampled from the hierarchical posterior; second, frequencies are generated).}
 
 \item{expected}{if \code{TRUE}, the expected frequencies per person are returned (without additional sampling from a multinomial distribution)}
 
-\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires a considerable computer-memory resources.}
+\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires considerable computer-memory resources (as a remedy, use \code{nCPU=1}).}
 }
 \value{
-a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.
+by default, a list of \code{M} posterior-predictive samples (i.e., matrices) with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned. If \code{numItems} is provided, a matrix with samples for a new participant is returned (rows=samples)
 }
 \description{
-Draw predicted frequencies based on posterior distribution of (a) individual estimates (default) or (b) for new participants (if \code{numItems} is provided; without considering continuous or discrete predictors in traitMPT).
+Draw predicted frequencies based on posterior distribution of (a) individual estimates (default) or (b) for a new participant (if \code{numItems} is provided; does not consider continuous or discrete predictors in traitMPT).
 }
 \examples{
 \dontrun{

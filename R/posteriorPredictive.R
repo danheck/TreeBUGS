@@ -4,14 +4,14 @@
 
 #' Get Posterior Predictive Samples
 #'
-#' Draw predicted frequencies based on posterior distribution of (a) individual estimates (default) or (b) for new participants (if \code{numItems} is provided; without considering continuous or discrete predictors in traitMPT).
+#' Draw predicted frequencies based on posterior distribution of (a) individual estimates (default) or (b) for a new participant (if \code{numItems} is provided; does not consider continuous or discrete predictors in traitMPT).
 #'
 #' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})
 #' @param M number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.
-#' @param numItems optional: a vector with the number of items per MPT tree to sample predicted data for a new participant (i.e., a participant vector \eqn{\theta} is first sampled from the hierarchical posterior to generate observed frequencies).
+#' @param numItems optional: a vector with the number of items per MPT tree to sample predicted data for a new participant (first, a participant vector \eqn{\theta} is sampled from the hierarchical posterior; second, frequencies are generated).
 #' @param expected if \code{TRUE}, the expected frequencies per person are returned (without additional sampling from a multinomial distribution)
-#' @param nCPU number of CPUs used for parallel sampling. For large models and many participants, this requires a considerable computer-memory resources.
-#' @return a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned.
+#' @param nCPU number of CPUs used for parallel sampling. For large models and many participants, this requires considerable computer-memory resources (as a remedy, use \code{nCPU=1}).
+#' @return by default, a list of \code{M} posterior-predictive samples (i.e., matrices) with individual frequencies (rows=participants, columns=MPT categories). For \code{M=1}, a single matrix is returned. If \code{numItems} is provided, a matrix with samples for a new participant is returned (rows=samples)
 #' @export
 #' @examples
 #' \dontrun{
@@ -75,21 +75,36 @@ posteriorPredictive <- function(fittedModel,
     if(!pred.new){
       sel.var <- setdiff(grep("theta", varnames(fittedModel$runjags$mcmc), fixed=TRUE),
                          sel.thetaFE)
-      par.tmp <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.var])
+      par.tmp <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.var,drop=FALSE])
     }else{
-      par.tmp <- matrix(NA, max.samp, S, dimnames=list(NULL, paste0("theta[",1:S, ",1]")))
+      par.tmp <- matrix(NA, max.samp, S,
+                        dimnames=list(NULL, paste0("theta[",1:S, ",1]")))
       # sample hierarchical values, then individuals
       if(class(fittedModel) == "betaMPT"){
-        alpha <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("alph[",1:S,"]")])
-        beta <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("bet[",1:S,"]")])
+        if(S==1){
+          alpha <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, "alph",drop=FALSE])
+          beta <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, "bet",drop=FALSE])
+        }else{
+        alpha <- as.matrix(fittedModel$runjags$mcmc[[m]][
+          sel.samp, paste0("alph[",1:S,"]"),drop=FALSE])
+        beta <- as.matrix(fittedModel$runjags$mcmc[[m]][
+          sel.samp, paste0("bet[",1:S,"]"),drop=FALSE])
+        }
         for(i in 1:S){
           par.tmp[,i] <- rbeta(max.samp, alpha[,i], beta[,i])
         }
       }else if(class(fittedModel) == "traitMPT"){
-        mu <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("mu[",1:S,"]")])
-        sig <-  as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, paste0("sigma[",1:S,"]")])
+       if(S==1){
+         mu <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, "mu",drop=FALSE])
+         sig <-  as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, "sigma",drop=FALSE])
+       } else{
+         mu <- as.matrix(fittedModel$runjags$mcmc[[m]][
+           sel.samp, paste0("mu[",1:S,"]"),drop=FALSE])
+         sig <-  as.matrix(fittedModel$runjags$mcmc[[m]][
+          sel.samp, paste0("sigma[",1:S,"]"),drop=FALSE])
+      }
         sel.rho <- grep("rho", varnames(fittedModel$runjags$mcmc))
-        rho <-  as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.rho])
+        rho <-  as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.rho,drop=FALSE])
         for(mm in 1:max.samp){
           Sig <- matrix(rho[mm,],S,S) *( sig[mm,]  %*% t( sig[mm,] )  )
           par.tmp[mm,] <- pnorm(mvrnorm(1, mu[mm,], Sig))
@@ -164,6 +179,8 @@ posteriorPredictive <- function(fittedModel,
 
   if(M == 1){
     freq.list[[1]]
+  }else if(pred.new){
+    do.call("rbind", freq.list)[1:M,,drop=FALSE]
   }else{
     freq.list[1:min(M, length(freq.list))]
   }
