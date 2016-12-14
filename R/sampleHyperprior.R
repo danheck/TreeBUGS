@@ -3,10 +3,9 @@
 #   (A) betaMPT: list(alpha="dgamma(1,.1)", beta="dgamma(1,.1)")
 #   (B) traitMPT: list(mu="dnorm(0,1)", xi="dunif(0,10)", df=3, V=diag(2))
 # M: number of samples
-# S: optional, only for betaMPT: number of parameters
 #' @importFrom MASS mvrnorm
 #' @importFrom rjags jags.model coda.samples
-sampleHyperprior <- function(prior, M, S,
+sampleHyperprior <- function(prior, M, S=1,
                              probitInverse = "mean", truncSig = .995, nCPU=4){
 
   if(all(c("mu","xi","V","df") %in% names(prior))){
@@ -16,9 +15,15 @@ sampleHyperprior <- function(prior, M, S,
   }else if(all(c("alpha","beta") %in% names(prior))){
     prior <- prior[c("alpha","beta")]
     model <- "betaMPT"
-    if(missing(S) || is.null(S)){
-      S <- 1
+    if(length(prior$alpha)>1 && length(prior$beta) == 1)
+      prior$beta <- rep(prior$beta, length(prior$alpha))
+    if(length(prior$beta)>1 && length(prior$alpha) == 1)
+      prior$alpha <- rep(prior$alpha, length(prior$beta))
+    if(length(prior$beta)==1 && length(prior$alpha) == 1){
+      prior$alpha <- rep(prior$alpha, S)
+      prior$beta <- rep(prior$beta, S)
     }
+    S <- length(prior$alpha)
   }else{
     stop("Names of the list 'prior' do not match the hyperprior parameters of\n",
          "the traitMPT (xi, V, df) or betaMPT (alpha, beta)")

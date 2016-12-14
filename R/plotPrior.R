@@ -21,7 +21,7 @@
 plotPrior <- function(prior, probitInverse = "mean", M=5000, nCPU=3){
 
   ############### prior samples
-  samples <- sampleHyperprior(prior, M, S=1,
+  samples <- sampleHyperprior(prior, M, #S=1,
                               probitInverse = probitInverse, truncSig = .995, nCPU=nCPU)
   model <- attr(samples, "model")
   S <- ncol(samples$mean)
