@@ -39,6 +39,8 @@ testHetChi <- function(freq, tree){
 
   freq <- as.matrix(freq)
 
+  if(any(is.character(freq) | freq != round(freq)))
+    stop("The data ('freq') may only contain frequencies!")
   if(missing(tree)){
     warning("It is assumed that all columns of 'freq' stem from one multinomial distribution",
             "\n  (i.e., from a single MPT tree)")
