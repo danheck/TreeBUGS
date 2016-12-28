@@ -1,7 +1,8 @@
-TreeBUGS 0.8.3 (December 2016)
+TreeBUGS 1.0.0 (December 2016)
 ===========
 
 * New function correlationPosterior() to estimate the posterior for the population correlation (taking into account the number of participants)
+* Second CRAN release
 
 
 TreeBUGS 0.8.2 (November 2016)

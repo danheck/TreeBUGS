@@ -54,11 +54,11 @@ double sliceAB(double x,
   }
 
   int cnt = 0;
-  while( norm(yy) > eps  & cnt < steps){
+  while( (norm(yy) > eps)  & (cnt < steps) ){
     cnt++;
-    if( (yy(0)<0 & yy(1)>0) | (yy(0)>0 & yy(1)<0)){
+    if( ( (yy(0)<0) & (yy(1)>0) ) | ( (yy(0)>0) & (yy(1)<0) )){
       xx(2) = xx(1);
-    }else if( (yy(2)<0 & yy(1)>0) | (yy(2)>0 & yy(1)<0)){
+    }else if( ( (yy(2)<0) & (yy(1)>0) ) | ( (yy(2)>0) & (yy(1)<0) )){
       xx(0) = xx(1);
     }
 
@@ -80,11 +80,11 @@ double sliceAB(double x,
   }
 
   cnt = 0;
-  while( norm(yy) > eps  & cnt < steps){
+  while( (norm(yy) > eps)  & (cnt < steps) ){
     cnt++;
-    if( (yy(0)<0 & yy(1)>0) | (yy(0)>0 & yy(1)<0)){
+    if( ( (yy(0)<0) & (yy(1)>0) ) | ( (yy(0)>0) & (yy(1)<0) )){
       xx(2) = xx(1);
-    }else if( (yy(2)<0 & yy(1)>0) | (yy(2)>0 & yy(1)<0)){
+    }else if( ( (yy(2)<0) & (yy(1)>0) ) | ( (yy(2)>0) & (yy(1)<0) )){
       xx(0) = xx(1);
     }
     xx(1) = (xx(2)-xx(0))/2 + xx(0);
@@ -153,7 +153,7 @@ List betampt(int M,
         Hfull(n,as_scalar(sel)) = H(n,k);
       }else{
         samp = RcppArmadillo::rmultinom(H(n,k), fp);
-        for(int tt=0; tt<fixprob.n_elem; tt++){
+        for(arma::uword tt=0; tt<fixprob.n_elem; tt++){
           Hfull(n,arma::as_scalar(sel(tt))) = samp[tt];
         }
       }
@@ -209,7 +209,7 @@ List betampt(int M,
           Hfull(n,as_scalar(sel)) = H(n,k);
         }else{
           samp = RcppArmadillo::rmultinom(H(n,k), fp);
-          for(int tt=0; tt<sel.n_elem; tt++){
+          for(arma::uword tt=0; tt<sel.n_elem; tt++){
             Hfull(n,arma::as_scalar(sel(tt))) = samp[tt];
           }
         }
@@ -277,7 +277,7 @@ List simplempt(int M,
         Hfull(n,as_scalar(sel)) = H(n,k);
       }else{
         samp = RcppArmadillo::rmultinom(H(n,k), fp);
-        for(int tt=0; tt<fixprob.n_elem; tt++){
+        for(arma::uword tt=0; tt<fixprob.n_elem; tt++){
           Hfull(n,arma::as_scalar(sel(tt))) = samp[tt];
         }
       }
@@ -320,7 +320,7 @@ List simplempt(int M,
           Hfull(n,as_scalar(sel)) = H(n,k);
         }else{
           samp = RcppArmadillo::rmultinom(H(n,k), fp);  // Rcpp::
-          for(int tt=0; tt<sel.n_elem; tt++){
+          for(arma::uword tt=0; tt<sel.n_elem; tt++){
             Hfull(n,arma::as_scalar(sel(tt))) = samp[tt];
           }
         }

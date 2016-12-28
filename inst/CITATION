@@ -2,7 +2,7 @@ bibentry("Manual",
 		title="TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling",
 		author="Daniel W. Heck, Nina R. Arnold, and Denis Arnold",
 		year="2016",
-		note="(Version 0.6.3)",
+		note="(Version 1.0.1)",
 		url="https://github.com/denis-arnold/TreeBUGS",
 
 		textVersion =

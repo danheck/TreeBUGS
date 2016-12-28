@@ -46,7 +46,7 @@ test_that('genData generates expected frequencies for constrained models', {
   names(e2) <- NULL
   d <- genMPT(par["Dn"], c(Lure=n, Target=n),
               eqnfile, restrictions = list("g=.5", "Dn=Do"))
-  expect_equal(d[2:3]/n,  e2, tolerance=.01)
+  expect_equal(d[2:3]/n,  e2, tolerance=.05)
 
   # naming errors expected:
   expect_warning(genMPT(c(.1,.4), c(Lure=n, Target=n),
@@ -80,8 +80,8 @@ test_that("genTraitMPT generates proper data", {
                      mean=mean, sigma=sigma, rho=rho)
 
   expect_equal(cov(gen$parameters$thetaLatent),
-               Sigma, tolerance=.1)
-  expect_equal(colMeans(gen$parameters$theta), mean, tolerance=.1)
+               Sigma, tolerance=.2)
+  expect_equal(colMeans(gen$parameters$theta), mean, tolerance=.2)
 
 
   # est <- simpleMPT(model, gen$data[,], restrictions=list("g=.5"),
@@ -101,8 +101,8 @@ test_that("genBetaMPT generates proper data", {
   gen <- genBetaMPT(N = N, numItems = c(Target=1000, Lure=1000),
                      eqnfile = model, restrictions = list("g=.5", "Dn=Do"),
                      mean=mean, sd=sd)
-  expect_equal(c(Dn=sd(gen$parameters$theta)), sd, tolerance=.1)
-  expect_equal(colMeans(gen$parameters$theta), mean, tolerance=.1)
+  expect_equal(c(Dn=sd(gen$parameters$theta)), sd, tolerance=.2)
+  expect_equal(colMeans(gen$parameters$theta), mean, tolerance=.2)
 
   # est <- simpleMPT(model, gen$data[,], restrictions=list("g=.5","Dn=Do"),
   #                  n.iter = 1500, n.burnin = 800, n.thin=2)

@@ -5,7 +5,7 @@
 ### * https://github.com/AlexanderLyNL/jasp-desktop/blob/development/JASP-Engine/JASP/R/correlationbayesian.R#L1581
 ###
 ### * Ly, A., Marsman, M., Wagenmakers, E.-J. (2015).
-###   Analytic Posteriors for Pearson’s Correlation Coefficient.
+###   Analytic Posteriors for Pearson's Correlation Coefficient.
 ###   Manuscript submitted for publication. https://arxiv.org/abs/1510.01188
 ###
 ### * Alexander Ly, Udo Boehm, Andrew Heathcote, Brandon M. Turner, Birte Forstmann,
