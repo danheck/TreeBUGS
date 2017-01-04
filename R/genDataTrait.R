@@ -50,6 +50,8 @@ genTraitMPT <- function(N, numItems, eqnfile, restrictions,
   if(is.null(rho)){
     rho <- diag(S)
     dimnames(rho) <- list(thetaNames, thetaNames)
+  }else if(S==1){
+    rho <- as.matrix(rho)
   }
   if(missing(sigma) || is.null(sigma)){
     sigma <- rep(0, S)

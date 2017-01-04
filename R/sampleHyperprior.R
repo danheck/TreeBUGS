@@ -71,12 +71,21 @@ sampleHyperprior <- function(prior, M, S=1,
 
   if(model == "traitMPT"){
     ww <- rWishart(n = M, df = prior$df, Sigma = prior$V)
-    cl <- makeCluster(nCPU)
-    ss <- array(parApply(cl, ww,3, solve), c(S,S,M))
-    ###### SD + correlation:
-    sig <- abs(bb) * sqrt(t(apply(ss, 3, diag)))
-    rho <- array(parApply(cl, ss,3, cov2cor), c(S,S,M))
-    stopCluster(cl)
+
+    if(nCPU>1){
+      cl <- makeCluster(nCPU)
+      ss <- array(parApply(cl, ww,3, solve), c(S,S,M))
+      rho <- array(parApply(cl, ss,3, cov2cor), c(S,S,M))
+      stopCluster(cl)
+    }else{
+      ss <- array(apply(ww,3, solve), c(S,S,M))
+      rho <- array(apply(ss,3, cov2cor), c(S,S,M))
+    }
+    if(S>1){
+      sig <- abs(bb) * sqrt(t(apply(ss, 3, diag)))
+    }else{
+      sig <- abs(bb) * sqrt(c(ss))
+    }
     ######### check with Var-Covar-Matrix:
     # Sigma <- ss
     # multi <- matrix(1, S, S)

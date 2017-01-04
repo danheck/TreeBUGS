@@ -21,12 +21,18 @@
 #' ### prior-predictive frequencies:
 #' priorPredictive(prior, eqnfile,
 #'                 restrictions=list("g=.5","Do=Dn"),
-#'                 numItems=c(50,50), N=25, M=1, nCPU=1)
+#'                 numItems=c(50,50), N=10, M=1, nCPU=1)
 #'
 #' ### prior samples of group-level parameters:
 #' priorPredictive(prior, eqnfile, level = "parameter",
 #'                 restrictions=list("g=.5","Do=Dn"),
 #'                 M=5, nCPU=1)
+#'
+#' ### latent-trait MPT
+#' priorPredictive(prior=list(mu="dnorm(0,1)", xi="dunif(0,10)",
+#'                            df=3, V=diag(2)),
+#'                 eqnfile, restrictions=list("g=.5"),
+#'                 numItems=c(50,50), N=10, M=1, nCPU=1)
 #'
 #' @importFrom parallel clusterExport makeCluster stopCluster parLapply parApply
 #' @importFrom  stats cor cov2cor density rmultinom
@@ -50,15 +56,16 @@ priorPredictive <- function(prior,
   if("alpha" %in% names(prior)){
    colnames(phi$alpha) <- colnames(phi$beta) <- thetaUnique
   }else{
-    colnames(phi$mean) <- colnames(phi$sigma) <-
-      rownames(phi$rho) <- colnames(phi$rho) <- thetaUnique
+    colnames(phi$mu) <- colnames(phi$sigma) <- thetaUnique
+    dimnames(phi$rho) <- list(thetaUnique, thetaUnique, NULL)
+    phi$mean <- phi$sd <- NULL
   }
 
   if(level == "data"){
     # 3. sample participants
     freq.list <- list()
     getData <- function(mm){
-      if(! "rho" %in% names(prior)){
+      if(! "rho" %in% names(phi)){
         freq <- genBetaMPT(N, numItems, eqnfile, restrictions,
                            alpha=phi$alpha[mm,], beta=phi$beta[mm,],
                            warning=FALSE)$data
