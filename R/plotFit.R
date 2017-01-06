@@ -38,7 +38,7 @@ plotFit <- function(fittedModel, M=1000, stat = "mean", ...){
     # Plot mean frequencies:
     pred <- t(sapply(freq.list, colMeans))
     boxplot(pred[,cats], xaxt="n", col="gray",
-            main="Observed (red) and predicted (boxplot) mean frequencies", ...)
+            main="Observed (red) and predicted (boxplot) mean frequencies", las=1, ...)
     axis(1, 1:ncol(dat), labels = cats)
     xx <- by(1:length(tree), tree, mean)
     axis(1, xx,  TreeNames, tick=F, line=NA, mgp=c(3, 2.5, 0))
@@ -58,7 +58,7 @@ plotFit <- function(fittedModel, M=1000, stat = "mean", ...){
 
     boxplot(t(c.pred), col="gray", ylab="Covariance",
             main="Observed (red) and predicted (gray) covariances",
-            xaxt="n")
+            xaxt="n", las=1, ...)
     abline(h=0, lty=1, col="gray")
     axis(1, 1:K, labels = nams[upper.tri(nams, diag=TRUE)], las=2)
     points(1:K, c.obs[upper.tri(c.obs, diag=TRUE)], col=2, pch=17)

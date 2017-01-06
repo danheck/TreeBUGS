@@ -4,7 +4,7 @@
 \alias{plotPrior}
 \title{Plot Prior Distributions}
 \usage{
-plotPrior(prior, probitInverse = "mean", M = 5000, nCPU = 3)
+plotPrior(prior, probitInverse = "mean", M = 5000, nCPU = 3, ...)
 }
 \arguments{
 \item{prior}{a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}. Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and precision (= 1/variance).}
@@ -14,6 +14,8 @@ plotPrior(prior, probitInverse = "mean", M = 5000, nCPU = 3)
 \item{M}{number of random samples to approximate priors of group-level parameters}
 
 \item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this may require a lot of memory.}
+
+\item{...}{further arguments passed to \code{plot}}
 }
 \description{
 Plots prior distributions for group means, standard deviation, and correlations of MPT parameters across participants.

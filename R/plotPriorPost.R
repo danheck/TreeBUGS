@@ -10,7 +10,7 @@
 #' @param ci credibility interval indicated by vertical red lines
 #' @details Prior distributions are shown as blue, dashed lines, whereas posterior distributions are shown as solid, black lines.
 #' @export
-plotPriorPost <- function(fittedModel, probitInverse = "mean", M=2e5, ci=.95, nCPU=3){
+plotPriorPost <- function(fittedModel, probitInverse = "mean", M=2e5, ci=.95, nCPU=3,...){
 
   mfrow <- par()$mfrow
 
@@ -61,11 +61,11 @@ plotPriorPost <- function(fittedModel, probitInverse = "mean", M=2e5, ci=.95, nC
     par(mfrow=1:2)
     tmp <- readline(prompt = "Press <Enter> to show the next plot.")
     plot(d.mean, main=paste0( "Group mean of ", fittedModel$mptInfo$thetaUnique[s]),
-         xlab="Group mean")
+         xlab="Group mean", las=1, ...)
     lines(prior.mean, col="blue", lty="dashed")
     abline(v= ci.mean, col="red")
     plot(d.sd,   main=paste0("Group SD of ", fittedModel$mptInfo$thetaUnique[s]),
-         xlab=xlab.sd)
+         xlab=xlab.sd, las=1, ...)
     lines(prior.sd, col="blue", lty="dashed")
     abline(v=ci.sd,col="red")
   }
@@ -83,7 +83,7 @@ plotPriorPost <- function(fittedModel, probitInverse = "mean", M=2e5, ci=.95, nC
         plot(d.cor, main=paste0( "Correlation between ",
                                   fittedModel$mptInfo$thetaUnique[s1], " and ",
                                   fittedModel$mptInfo$thetaUnique[s2]),
-             xlab="Correlation (on latent probit scale)")
+             xlab="Correlation (on latent probit scale)", las=1, ...)
         lines(prior.cor, col="blue", lty="dashed")
         abline(v= quantile(unlist(fittedModel$runjags$mcmc[,paste0("rho[",s1,",",s2,"]")]),
                            c((1-ci)/2,1-(1-ci)/2)), col="red")

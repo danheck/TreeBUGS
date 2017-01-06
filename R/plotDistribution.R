@@ -33,11 +33,11 @@ plotDistribution <- function(fittedModel, scale="probability", ...){
       xx <- seq(-10, 10, length.out = 3000)
       if(scale == "latent"){
         hist(qnorm(indEsts), freq=F, main=paste0("Parameter ", parnames[idx]),
-             col="gray",  xlab="Latent scale", ...)
+             col="gray",  xlab="Latent scale", las=1, ...)
         lines(xx, dnorm(xx, qnorm(means[idx]), sigma[idx]), col=2)
       }else{
         hist(indEsts, freq=F, main=paste0("Parameter ", parnames[idx]),xlim=0:1,
-             col="gray", xlab="Probability scale", ...)
+             col="gray", xlab="Probability scale", las=1, ...)
         # values on probability scale:
         xx.p <- pnorm(xx)
         # discrete approximation to density on latent scale:
@@ -50,7 +50,7 @@ plotDistribution <- function(fittedModel, scale="probability", ...){
       beta <- fittedModel$summary$groupParameters$beta[,1]
 
       hist(indEsts, freq=F, main=paste0("Parameter ", parnames[idx]),xlim=0:1,
-           col="gray",  xlab="Probability scale", ...)
+           col="gray",  xlab="Probability scale", las=1, ...)
       xx <- seq(0, 1, length.out = 1000)
       lines(xx, dbeta(xx, alpha[idx], beta[idx]), col=2)
 

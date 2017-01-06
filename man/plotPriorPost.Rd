@@ -5,7 +5,7 @@
 \title{Plot Prior vs. Posterior Distribution}
 \usage{
 plotPriorPost(fittedModel, probitInverse = "mean", M = 2e+05, ci = 0.95,
-  nCPU = 3)
+  nCPU = 3, ...)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
@@ -17,6 +17,8 @@ plotPriorPost(fittedModel, probitInverse = "mean", M = 2e+05, ci = 0.95,
 \item{ci}{credibility interval indicated by vertical red lines}
 
 \item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this may require a lot of memory.}
+
+\item{...}{arguments passed to \code{\link{boxplot}}}
 }
 \description{
 Allows to judge how much the data informed the parameter posterior distributions compared to the prior.

@@ -4,6 +4,7 @@
 #' Plots prior distributions for group means, standard deviation, and correlations of MPT parameters across participants.
 #' @param M number of random samples to approximate priors of group-level parameters
 #' @param probitInverse which latent-probit parameters (for \code{\link{traitMPT}} model) to transform to probability scale. Either \code{"none"}, \code{"mean"} (simple transformation \eqn{\Phi(\mu)}), or \code{"mean_sd"} (see \code{\link{probitInverse}})
+#' @param ... further arguments passed to \code{plot}
 #' @inheritParams priorPredictive
 #' @details This function samples from a set of hyperpriors (either for hierarchical traitMPT or betaMPT structure) to approximate the implied prior distributions on the parameters of interest (group-level mean, SD, and correlations of MPT parameters). Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and precision (= 1/variance).
 #' @export
@@ -18,7 +19,7 @@
 #' plotPrior(list(alpha ="dgamma(1,.1)",
 #'           beta = "dgamma(1,.1)"), M=4000)
 #' }
-plotPrior <- function(prior, probitInverse = "mean", M=5000, nCPU=3){
+plotPrior <- function(prior, probitInverse = "mean", M=5000, nCPU=3, ...){
 
   ############### prior samples
   samples <- sampleHyperprior(prior, M, #S=1,
@@ -50,7 +51,7 @@ plotPrior <- function(prior, probitInverse = "mean", M=5000, nCPU=3){
                      ifelse(model=="traitMPT" && probitInverse=="none",
                                    " (probit scale)",
                                    " (probability scale)")),
-         border = histcol )
+         border = histcol , las=1, ...)
 
   ######################## SD
   for(s in 1:S.plot)
@@ -64,7 +65,7 @@ plotPrior <- function(prior, probitInverse = "mean", M=5000, nCPU=3){
                      ifelse(model=="betaMPT" || probitInverse=="mean_sd",
                                    " (probability scale)",
                                    " (probit scale)")),
-         border = histcol )
+         border = histcol, las=1, ... )
 
   ######################## CORRELATION
   if(model == "traitMPT" && S>1){
@@ -72,7 +73,7 @@ plotPrior <- function(prior, probitInverse = "mean", M=5000, nCPU=3){
       for(s2 in (s1+1):S){
         hist(samples$rho[s1,s2,], bins, freq=FALSE, col=histcol,
              main=paste0("Correlation (", s1, " and ",s2, "): df=",prior$df ),
-             xlab="Correlation (probit scale)", border = histcol )
+             xlab="Correlation (probit scale)", border = histcol, las=1, ... )
       }
     }
   }

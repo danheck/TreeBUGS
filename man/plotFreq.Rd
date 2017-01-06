@@ -4,7 +4,7 @@
 \alias{plotFreq}
 \title{Plot Raw Frequencies}
 \usage{
-plotFreq(x, freq = TRUE, select = "all", boxplot = TRUE, eqn)
+plotFreq(x, freq = TRUE, select = "all", boxplot = TRUE, eqn, ...)
 }
 \arguments{
 \item{x}{either a fitted hierarchical MPT model (see \code{\link{traitMPT}}, \code{\link{betaMPT}}); or a matrix/data frame of response frequencies (can be provided as a path to a .csv-file with individual frequencies).}
@@ -16,6 +16,8 @@ plotFreq(x, freq = TRUE, select = "all", boxplot = TRUE, eqn)
 \item{boxplot}{if \code{FALSE}, lines and points are drawn instead of boxplots}
 
 \item{eqn}{optional: EQN description of an MPT model, that is, either the path to an EQN file or as a character string (only used if \code{x} refers to a matrix/data frame or .csv-file)}
+
+\item{...}{further arguments passed to \code{boxplot} and \code{plot}}
 }
 \description{
 Plot observed individual and mean frequencies.
