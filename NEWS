@@ -1,6 +1,12 @@
 TreeBUGS 1.0.3 (January 2017)
 ===========
 
+* Bugfix in readEQN: treat numeric parameter labels as constants
+
+
+TreeBUGS 1.0.3 (January 2017)
+===========
+
 * Bugfix for traitMPT in priorPredictive()
 * Optional arguments (...) for plotting functions
 

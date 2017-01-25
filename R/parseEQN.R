@@ -7,7 +7,8 @@ parseEQN <- function(tab){
 
 
   # simple extractions
-  cat.names <- unique(tab$Category)
+  cat.names <- unlist(tapply(tab$Category, tab$Tree,
+                             function(x) sort(unique(x))))
   J <- length(cat.names)
   B <- nrow(tab)
   map <- match(tab$Category,cat.names)

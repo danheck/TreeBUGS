@@ -28,26 +28,27 @@ summarizeMCMC <- function(mcmc, batchSize=100){
     summTab[,6] <- summTab[,2] / sqrt(summTab[,7]  )
   }, silent = TRUE)
   gc(verbose=FALSE)
-  try({
-    # batchSize <- 200
-    # split for 100 variables per batch
-    n.summ <- nrow(summTab)
-    if(n.summ >batchSize){
-      for(ii in 1:(n.summ %/% batchSize)){
-        idx <- (ii-1)*batchSize + 1:batchSize
-        # summ.idx <- sel.notT1[idx]
-        summTab[idx,8:9] <- gelman.diag(mcmc[,idx], multivariate=FALSE)[[1]]
-        gc(verbose=FALSE)
+  if(is.list(mcmc) && length(mcmc) > 1){
+    try({
+      # batchSize <- 200
+      # split for 100 variables per batch
+      n.summ <- nrow(summTab)
+      if(n.summ >batchSize){
+        for(ii in 1:(n.summ %/% batchSize)){
+          idx <- (ii-1)*batchSize + 1:batchSize
+          # summ.idx <- sel.notT1[idx]
+          summTab[idx,8:9] <- gelman.diag(mcmc[,idx], multivariate=FALSE)[[1]]
+          gc(verbose=FALSE)
+        }
+        if((ii*batchSize+1) < n.summ){
+          # summ.idx <- sel.notT1[(ii*batchSize+1):n.summ]
+          idx <- (ii*batchSize+1):n.summ
+          summTab[idx,8:9] <- gelman.diag(mcmc[,idx], multivariate=FALSE)[[1]]
+        }
+      }else{
+        summTab[,8:9] <- gelman.diag(mcmc, multivariate=FALSE)[[1]]
       }
-      if((ii*batchSize+1) < n.summ){
-        # summ.idx <- sel.notT1[(ii*batchSize+1):n.summ]
-        idx <- (ii*batchSize+1):n.summ
-        summTab[idx,8:9] <- gelman.diag(mcmc[,idx], multivariate=FALSE)[[1]]
-      }
-    }else{
-      summTab[,8:9] <- gelman.diag(mcmc, multivariate=FALSE)[[1]]
-    }
-  })
+    })}
   #   if(any(is.na(summTab[,"Rhat"])))
   #     warning("Gelman-Rubin convergence diagnostic Rhat could not be computed.")
   # n.eff <-

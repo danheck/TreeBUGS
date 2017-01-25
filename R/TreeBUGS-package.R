@@ -7,14 +7,14 @@
 #' Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("TreeBUGS")}
 #' @author Daniel Heck, Denis Arnold, & Nina Arnold
 #' @docType package
-#' @name TreeBUGS
+# @name TreeBUGS
 #' @importFrom runjags run.jags extract autoextend.jags extend.jags
 #run.jags  summary.runjags extract autorun.jags autoextend.jags
 #' @importFrom coda gelman.diag effectiveSize as.mcmc.list as.mcmc
 #' @importFrom utils read.csv write.table write.csv
 #' @importFrom graphics axis plot points  segments abline boxplot curve hist lines par
 #' @importFrom grDevices rainbow adjustcolor
-#' @importFrom stats pnorm rnorm runif sd qnorm dnorm dbeta quantile rWishart ave pchisq
+#' @importFrom stats pnorm rnorm runif sd qnorm dnorm dbeta quantile rWishart ave pchisq window
 #' @importFrom parallel parSapply
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @useDynLib TreeBUGS

@@ -66,7 +66,11 @@ readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
   TreeRestr <- thetaHandling(Tree, restrictions)
 
   allParameters <- getParameter(Tree)
-  freeParameters <- subset(TreeRestr$SubPar, !duplicated(TreeRestr$SubPar$theta))$Parameter
+  suppressWarnings(
+    free <- !duplicated(TreeRestr$SubPar$theta) &
+      is.na(as.numeric(TreeRestr$SubPar$Parameter))
+  )
+  freeParameters <- subset(TreeRestr$SubPar, free)$Parameter
 
   S <- length(freeParameters)
   numCat <- length(unique(Tree$Category))

@@ -18,11 +18,20 @@ To install the latest stable release of TreeBUGS from CRAN (https://cran.r-proje
 ```
 install.packages("TreeBUGS")
 ```
+
 To install the latest developer version of TreeBUGS from GitHub, run:
 ```
-install.packages("devtools")
+### Dependencies:
+# install.packages("devtools","runjags","hypergeo","rjags")
 library(devtools)
 install_github("denis-arnold/TreeBUGS", build_vignettes = TRUE)
+```
+
+To compile C++ code, Windows requires [Rtools](https://cran.r-project.org/bin/windows/Rtools/) and [Mac Xcode Command Line Tools](https://www.maketecheasier.com/install-command-line-tools-without-xcode/), respectively. Moreover, on Mac, it might be necessary to install the library `gfortran` manually by typing the following into the console ([required to compile the package `RcppArmadillo`](http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/)):
+
+```
+curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
+sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 ```
 
 ## Citation
