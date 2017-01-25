@@ -2,7 +2,7 @@
 
 TreeBUGS is an R package that facilitates using hierarchical multinomial processing tree (MPT) models that are often used in cognitive psychology (Erdfelder et al., 2009). Specifically, the Beta-MPT (Smith & Batchelder, 2010) and the latent-trait MPT model (Klauer, 2010) are implemented.
 
-## General Procedure of Using TreeBUGS
+## General Approach of Using TreeBUGS
 
 In the most simple user scenario, the following steps are required:
 
@@ -12,9 +12,11 @@ In the most simple user scenario, the following steps are required:
 4. Check convergence of MCMC chains
 5. Summarize and plot results using functions tailored to MPT models
 
-These steps are explained in more detail in the package vignette, which can be opened in R by typing `vignette("TreeBUGS")`. Note that TreeBUGS requires a valid installation of the software JAGS (http://mcmc-jags.sourceforge.net/). 
+These steps are explained in more detail in the package vignette, which can be opened in R by typing `vignette("TreeBUGS")`. 
 
-To install the latest stable release of TreeBUGS from CRAN (https://cran.r-project.org/web/packages/TreeBUGS), run:
+## Installing TreeBUGS
+
+TreeBUGS requires the software [JAGS](http://mcmc-jags.sourceforge.net/). To install the latest stable release of TreeBUGS from [CRAN](https://cran.r-project.org/web/packages/TreeBUGS), type the following into the R console:
 ```
 install.packages("TreeBUGS")
 ```
@@ -27,7 +29,7 @@ library(devtools)
 install_github("denis-arnold/TreeBUGS", build_vignettes = TRUE)
 ```
 
-To compile C++ code, Windows requires [Rtools](https://cran.r-project.org/bin/windows/Rtools/) and [Mac Xcode Command Line Tools](https://www.maketecheasier.com/install-command-line-tools-without-xcode/), respectively. Moreover, on Mac, it might be necessary to install the library `gfortran` manually by typing the following into the console ([required to compile the package `RcppArmadillo`](http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/)):
+To compile C++ code, Windows and Mac require [Rtools](https://cran.r-project.org/bin/windows/Rtools/) and [Xcode Command Line Tools](https://www.maketecheasier.com/install-command-line-tools-without-xcode/), respectively. Moreover, on Mac, it might be necessary to install the library `gfortran` manually by typing the following into the console ([required to compile the package `RcppArmadillo`](http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/)):
 
 ```
 curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
