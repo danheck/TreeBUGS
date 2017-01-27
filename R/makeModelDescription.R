@@ -30,8 +30,8 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   #  ###################################### MODEL ###################
   cat(ifelse(model=="traitMPT",
              "####### Hierarchical latent-trait MPT with TreeBGUS #####\n\n",
-             paste0("####### Hierarchical beta MPT with TreeBGUS #####\n\n",
-             "data{\nfor(s in 1:S){\n  zeros[s] <- 0\n}\n}\n\n")),     # for zeros-trick
+             "####### Hierarchical beta MPT with TreeBGUS #####\n\n"),
+             "data{\nfor(s in 1:S){\n  zeros[s] <- 0\n}\n}\n\n",     # for zeros-trick and dmnorm(zeros, Tau.prec)
       "model{\n\n",
       "for (n in 1: subjs){\n\n### MPT model equations:\n",
       file=filename)
@@ -166,7 +166,7 @@ makeTraitHyperprior <-function(S,
 
 # hyperpriors
 for(i in 1:subjs) {
-  delta.part.raw[1:S,i] ~ dmnorm(mu.delta.raw[1:S],T.prec.part[1:S,1:S])
+  delta.part.raw[1:S,i] ~ dmnorm(zeros,T.prec.part[1:S,1:S])
 }
 
 ",
@@ -179,7 +179,6 @@ T.prec.part[1,1] ~ dchisq(df)"),
 "
 Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
 for(s in 1:S){
-  mu.delta.raw[s] <- 0
   mean[s] <- phi(mu[s])
   for(q in 1:S){
     Sigma[s,q] <- Sigma.raw[q,s]*xi[s]*xi[q]
