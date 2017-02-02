@@ -17,12 +17,12 @@ These steps are explained in more detail in the package vignette, which can be o
 ## Installing TreeBUGS
 
 TreeBUGS requires the software [JAGS](http://mcmc-jags.sourceforge.net/). To install the latest stable release of TreeBUGS from [CRAN](https://cran.r-project.org/web/packages/TreeBUGS), type the following into the R console:
-```
+```r
 install.packages("TreeBUGS")
 ```
 
 To install the latest developer version of TreeBUGS from GitHub, run:
-```
+```r
 ### Dependencies:
 # install.packages("devtools","runjags","hypergeo","rjags")
 library(devtools)
