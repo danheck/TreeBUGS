@@ -1,3 +1,7 @@
+[![Rdoc](http://www.rdocumentation.org/badges/version/TreeBUGS)](http://www.rdocumentation.org/packages/TreeBUGS)
+[![Licence](https://img.shields.io/badge/licence-GPL--2-green.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+![](http://cranlogs.r-pkg.org/badges/TreeBUGS)
+
 # TreeBUGS
 
 TreeBUGS is an R package that facilitates using hierarchical multinomial processing tree (MPT) models that are often used in cognitive psychology (Erdfelder et al., 2009). Specifically, the Beta-MPT (Smith & Batchelder, 2010) and the latent-trait MPT model (Klauer, 2010) are implemented.
