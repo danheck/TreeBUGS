@@ -1,4 +1,3 @@
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TreeBUGS)](http://cran.r-project.org/package=TreeBUGS)
 [![Rdoc](http://www.rdocumentation.org/badges/version/TreeBUGS)](http://www.rdocumentation.org/packages/TreeBUGS)
 [![Licence](https://img.shields.io/badge/licence-GPL--2-green.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![monthly downloads](http://cranlogs.r-pkg.org/badges/TreeBUGS)](http://cranlogs.r-pkg.org/badges/TreeBUGS)
