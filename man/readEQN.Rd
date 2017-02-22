@@ -53,10 +53,9 @@ model <-
   new cr d"
 readEQN(model, paramOrder=TRUE)
 }
-\author{
-Daniel Heck, Denis Arnold, Nina Arnold
-}
 \references{
 Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
 }
-
+\author{
+Daniel Heck, Denis Arnold, Nina Arnold
+}

@@ -14,4 +14,3 @@ summarizeMCMC(mcmc, batchSize = 100)
 \description{
 TreeBUGS-specific summary for \code{mcmc.list}-objects.
 }
-

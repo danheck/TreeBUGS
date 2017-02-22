@@ -13,11 +13,8 @@ The core functions either fit a Beta-MPT model (\code{\link{betaMPT}};Smith & Ba
 
 Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("TreeBUGS")}
 }
-\author{
-Daniel Heck, Denis Arnold, & Nina Arnold
-}
 \references{
-Heck*, D. W., Arnold*, N. R., & Arnold, D. (under revision). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
+Heck*, D. W., Arnold*, N. R., & Arnold, D. (2017). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. Behavior Research Methods, in press.
 
 Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 
@@ -25,7 +22,17 @@ Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesi
 
 Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
 
+Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731.
 
 Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/denis-arnold/TreeBUGS}
+}
 
+}
+\author{
+Daniel Heck, Denis Arnold, & Nina Arnold
+}

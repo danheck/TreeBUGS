@@ -32,4 +32,3 @@ fittedModel$postpred$freq.pred <-
      posteriorPredictive(fittedModel, M=1000)
 }
 }
-

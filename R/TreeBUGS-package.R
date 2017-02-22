@@ -7,19 +7,20 @@
 #' Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("TreeBUGS")}
 #' @author Daniel Heck, Denis Arnold, & Nina Arnold
 #' @docType package
-# @name TreeBUGS
 #' @importFrom runjags run.jags extract autoextend.jags extend.jags
 #run.jags  summary.runjags extract autorun.jags autoextend.jags
 #' @importFrom coda gelman.diag effectiveSize as.mcmc.list as.mcmc
-#' @importFrom utils read.csv write.table write.csv
+#' @importFrom utils read.csv write.table write.csv capture.output
 #' @importFrom graphics axis plot points  segments abline boxplot curve hist lines par
 #' @importFrom grDevices rainbow adjustcolor
 #' @importFrom stats pnorm rnorm runif sd qnorm dnorm dbeta quantile rWishart ave pchisq window
 #' @importFrom parallel parSapply
 #' @importFrom Rcpp evalCpp sourceCpp
+#' @importFrom MASS fitdistr
 #' @useDynLib TreeBUGS
+#'
 #' @references
-#' Heck*, D. W., Arnold*, N. R., & Arnold, D. (under revision). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
+#' Heck*, D. W., Arnold*, N. R., & Arnold, D. (2017). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. Behavior Research Methods, in press.
 #'
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 #'
@@ -27,9 +28,9 @@
 #'
 #' Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
 #'
+#' Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731.
 #'
 #' Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.
-#'
 #'
 "_PACKAGE"
 

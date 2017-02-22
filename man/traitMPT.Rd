@@ -91,9 +91,6 @@ plot(fit, parameter = "mean", type = "default")
 summary(fit)
 }
 }
-\author{
-Daniel Heck, Denis Arnold, Nina R. Arnold
-}
 \references{
 Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 
@@ -103,4 +100,6 @@ Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default 
 
 Rouder, J. N., & Morey, R. D. (2012). Default Bayes Factors for Model Selection in Regression. Multivariate Behavioral Research, 47, 877-903.
 }
-
+\author{
+Daniel Heck, Denis Arnold, Nina R. Arnold
+}

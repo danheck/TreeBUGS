@@ -54,4 +54,3 @@ priorPredictive(prior=list(mu="dnorm(0,1)", xi="dunif(0,10)",
                 numItems=c(50,50), N=10, M=1, nCPU=1)
 
 }
-

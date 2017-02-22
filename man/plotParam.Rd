@@ -18,10 +18,9 @@ plotParam(x, includeIndividual = TRUE, estimate = "mean", ...)
 \description{
 Plot parameter estimates for hierarchical MPT models
 }
-\author{
-Daniel Heck
-}
 \seealso{
 \code{\link{betaMPT}}, \code{\link{traitMPT}}, \code{\link{plotDistribution}}
 }
-
+\author{
+Daniel Heck
+}

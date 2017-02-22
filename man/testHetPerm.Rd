@@ -41,13 +41,12 @@ tree <- list(old = c("h","m"),
 tmp <- testHetPerm(data, tree, rep=200, nCPU=1)
 tmp[2:3]
 }
-\author{
-Daniel W. Heck
-}
 \references{
 Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. http://doi.org/10.3758/PBR.15.4.713
 }
 \seealso{
 \code{\link{testHetChi}}, \code{\link{plotFreq}}
 }
-
+\author{
+Daniel W. Heck
+}

@@ -20,4 +20,3 @@ extendMPT(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0, ...)
 \description{
 Extend MCMC Sampling for MPT Model
 }
-

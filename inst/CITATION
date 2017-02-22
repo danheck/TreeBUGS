@@ -9,7 +9,7 @@ bibentry("Article",
 		textVersion =
 		paste("Heck, D. W., Arnold, N. R., & Arnold, D. (2017). ",
 			"TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. ",
-			"Behavior Research Methods, in press. Retrieved from",
+			"Behavior Research Methods, in press. Retrieved from ",
 			"https://github.com/denis-arnold/TreeBUGS",
 			sep=""),
 		mheader = "To cite TreeBUGS in publications use:")

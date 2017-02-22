@@ -34,4 +34,3 @@ mean_sd <- probitInverse(fittedModel=fit)
 summarizeMCMC(mean_sd)
 }
 }
-

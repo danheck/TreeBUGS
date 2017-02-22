@@ -54,4 +54,3 @@ Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-
 \seealso{
 \code{\link{genMPT}}
 }
-

@@ -24,4 +24,3 @@ EQNfile <- system.file("MPTmodels/2htm.eqn",
                        package="TreeBUGS")
 withinSubjectEQN(EQNfile, c("high","low"), constant=c("g"))
 }
-

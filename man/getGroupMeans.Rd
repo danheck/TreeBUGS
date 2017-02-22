@@ -24,10 +24,9 @@ For hierarchical latent-trait MPT models with discrete predictor variables.
 getGroupMeans(traitMPT, file = "groups.csv")
 }
 }
-\author{
-Daniel Heck
-}
 \seealso{
 \code{\link{getParam}} for parameter estimates
 }
-
+\author{
+Daniel Heck
+}

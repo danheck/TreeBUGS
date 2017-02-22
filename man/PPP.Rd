@@ -18,10 +18,9 @@ PPP(fittedModel, M = 1000, nCPU = 4, T2 = TRUE)
 \description{
 Computes posterior predictive p-values to test model fit.
 }
-\author{
-Daniel Heck
-}
 \references{
 Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 }
-
+\author{
+Daniel Heck
+}

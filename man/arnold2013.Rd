@@ -46,4 +46,3 @@ summary(fit)}
 Arnold, N. R., Bayen, U. J., Kuhlmann, B. G., & Vaterrodt, B. (2013). Hierarchical modeling of contingency-based source monitoring: A test of the probability-matching account. Psychonomic Bulletin & Review, 20, 326-333.
 }
 \keyword{datasets}
-

@@ -31,4 +31,3 @@ fittedModel$postpred$freq.pred <-
 plotFit(fittedModel, stat = "mean")
 }
 }
-

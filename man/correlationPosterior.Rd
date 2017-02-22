@@ -38,12 +38,11 @@ cors <- rbeta(50, 100, 70)
 correlationPosterior(r=cors, N=10, nCPU=1)
 correlationPosterior(r=cors, N=100, nCPU=1)
 }
-\author{
-Daniel W. Heck, Alexander Ly
-}
 \references{
 Ly, A., Marsman, M., Wagenmakers, E.-J. (2015). Analytic Posteriors for Pearson's Correlation Coefficient. Manuscript submitted for publication. https://arxiv.org/abs/1510.01188
 
 Ly, A., Boehm, U., Heathcote, A., Turner, B. M. , Forstmann, B., Marsman, M., and Matzke, D. (2016). A flexible and efficient hierarchical Bayesian approach to the exploration of individual differences in cognitive-model-based neuroscience. https://osf.io/evsyv/
 }
-
+\author{
+Daniel W. Heck, Alexander Ly
+}

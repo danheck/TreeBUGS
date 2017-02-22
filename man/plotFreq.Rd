@@ -29,4 +29,3 @@ eqn <- EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
 plotFreq(freq, eqn = eqn)
 plotFreq(freq, freq = FALSE, eqn = eqn)
 }
-

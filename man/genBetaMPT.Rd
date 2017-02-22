@@ -51,4 +51,3 @@ Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree 
 \seealso{
 \code{\link{genMPT}}
 }
-

@@ -28,4 +28,3 @@ new.mpt.summary <- summarizeMPT(mcmc.subsamp, fittedModel$mptInfo)
 new.mpt.summary
 }
 }
-

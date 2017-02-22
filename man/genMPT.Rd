@@ -33,4 +33,3 @@ genDat
 \seealso{
 \code{\link{genTraitMPT}} and \code{\link{genBetaMPT}} to generate data for latent normal/beta hierarchical distributions.
 }
-

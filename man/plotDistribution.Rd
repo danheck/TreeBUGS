@@ -22,4 +22,3 @@ For the latent-trait MPT, differences due to continuous predictors or discrete f
 \seealso{
 \code{\link{plot.traitMPT}}
 }
-

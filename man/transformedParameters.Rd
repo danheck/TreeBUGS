@@ -30,4 +30,3 @@ tt <- transformedParameters(fittedModel,
 summary(tt)
 }
 }
-

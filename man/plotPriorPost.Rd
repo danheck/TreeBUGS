@@ -26,4 +26,3 @@ Allows to judge how much the data informed the parameter posterior distributions
 \details{
 Prior distributions are shown as blue, dashed lines, whereas posterior distributions are shown as solid, black lines.
 }
-

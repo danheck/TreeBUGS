@@ -55,4 +55,3 @@ summary(fit)
 \author{
 Daniel Heck
 }
-

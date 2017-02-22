@@ -78,10 +78,9 @@ plot(fit, parameter = "mean", type = "default")
 summary(fit)
 }
 }
-\author{
-Daniel Heck, Nina R. Arnold, Denis Arnold,
-}
 \references{
 Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.
 }
-
+\author{
+Daniel Heck, Nina R. Arnold, Denis Arnold,
+}

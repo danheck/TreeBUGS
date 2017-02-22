@@ -37,4 +37,3 @@ plotPrior(list(alpha ="dgamma(1,.1)",
 \seealso{
 \code{\link{priorPredictive}}
 }
-
