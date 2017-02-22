@@ -1,14 +1,15 @@
-bibentry("Manual",
+bibentry("Article",
 		title="TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling",
 		author="Daniel W. Heck, Nina R. Arnold, and Denis Arnold",
+		journal = "Behavior Research Methods",
 		year="2017",
+		volume = "in press",
 		note="(Version 1.0.3)",
 		url="https://github.com/denis-arnold/TreeBUGS",
-
 		textVersion =
 		paste("Heck, D. W., Arnold, N. R., & Arnold, D. (2017). ",
-				"TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. ",
-				"https://github.com/denis-arnold/TreeBUGS",
-				sep=""),
-
+			"TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. ",
+			"Behavior Research Methods, in press. Retrieved from",
+			"https://github.com/denis-arnold/TreeBUGS",
+			sep=""),
 		mheader = "To cite TreeBUGS in publications use:")
