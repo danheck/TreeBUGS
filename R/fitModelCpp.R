@@ -43,16 +43,7 @@ fitModelCpp <- function(type,
   mergedTree <- thetaHandling(mergeBranches(mpt.res$Table),
                               restrictions)$mergedTree
 
-  data <- readData(data)
-  if(is.null(colnames(data)) ||
-     all(colnames(data) == paste0("V",1:ncol(data)))){
-    nam <- paste(as.character(mpt.res$cat.names), collapse = ", ")
-    warning("No column names in 'data'. Default order of categories is assumed:\n",
-            nam)
-    colnames(data) <- as.character(mpt.res$cat.names)
-  }else{
-    data <- data[,as.character(mpt.res$cat.names)]
-  }
+  data <- readData(data, mpt = mpt.res)
   N <- nrow(data)
   covData <- covDataRead(covData, N)
 

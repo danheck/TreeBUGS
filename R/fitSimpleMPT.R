@@ -1,7 +1,7 @@
 
-#' C++ Sampler for Standard MPT Model
+#' C++ Sampler for Standard (Nonhierarchical) MPT Models
 #'
-#' Fast Gibbs sampler in C++ that is tailored to the standard MPT model (i.e., non-hierarchical MPT: assumes separate parameters if multiple data sets are supplied).
+#' Fast Gibbs sampler in C++ that is tailored to the standard MPT model (i.e., fixed-effects, non-hierarchical MPT: assumes separate parameters if multiple data sets are supplied).
 #'
 #' @inheritParams betaMPT
 #' @param alpha first shape parameter(s) for the beta prior-distribution of the MPT parameters \eqn{\theta_s} (can be a named vector to use a different prior for each MPT parameter)

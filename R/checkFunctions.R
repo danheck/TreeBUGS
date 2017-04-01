@@ -25,8 +25,10 @@ checkModelfilename <- function(modelfilename){
 }
 
 
-
-readData  <- function(data){
+# data: path, matrix etc.
+# mpt: parsed MPT model structure
+readData  <- function(data,
+                      mpt = NULL){
   if(is.matrix(data) | is.data.frame(data)){
     data <- as.data.frame(data)
   }else{
@@ -36,6 +38,18 @@ readData  <- function(data){
     stop("Missings in the data file!")
   }
   colnames(data) <- gsub(" ", "", colnames(data), fixed=TRUE)
+
+  if(!missing(mpt) && !is.null(mpt)){
+    if(is.null(colnames(data)) ||
+       all(colnames(data) == paste0("V",1:ncol(data)))){
+      nam <- paste(as.character(mpt$cat.names), collapse = ", ")
+      warning("No column names in 'data'. Default order of categories is assumed:\n",
+              nam)
+      colnames(data) <- as.character(mpt$cat.names)
+    }else{
+      data <- data[,as.character(mpt$cat.names)]
+    }
+  }
   data
 }
 

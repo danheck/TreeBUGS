@@ -6,23 +6,6 @@
 
 using namespace Rcpp;
 
-// sliceAB
-double sliceAB(double x, double fixed, NumericVector theta, double shape, double rate, double eps, int steps);
-RcppExport SEXP TreeBUGS_sliceAB(SEXP xSEXP, SEXP fixedSEXP, SEXP thetaSEXP, SEXP shapeSEXP, SEXP rateSEXP, SEXP epsSEXP, SEXP stepsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type x(xSEXP);
-    Rcpp::traits::input_parameter< double >::type fixed(fixedSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< double >::type shape(shapeSEXP);
-    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
-    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
-    Rcpp::traits::input_parameter< int >::type steps(stepsSEXP);
-    rcpp_result_gen = Rcpp::wrap(sliceAB(x, fixed, theta, shape, rate, eps, steps));
-    return rcpp_result_gen;
-END_RCPP
-}
 // betampt
 List betampt(int M, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec shape, arma::vec rate);
 RcppExport SEXP TreeBUGS_betampt(SEXP MSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP shapeSEXP, SEXP rateSEXP) {
@@ -56,6 +39,22 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
     rcpp_result_gen = Rcpp::wrap(simplempt(M, H, a, b, c, map, alpha, beta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// loglikMPT
+arma::vec loglikMPT(arma::mat theta, arma::vec h, arma::mat a, arma::mat b, arma::vec c, arma::vec map);
+RcppExport SEXP TreeBUGS_loglikMPT(SEXP thetaSEXP, SEXP hSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type h(hSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type a(aSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type c(cSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type map(mapSEXP);
+    rcpp_result_gen = Rcpp::wrap(loglikMPT(theta, h, a, b, c, map));
     return rcpp_result_gen;
 END_RCPP
 }

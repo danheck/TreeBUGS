@@ -42,7 +42,11 @@
 #' @author Daniel Heck, Denis Arnold, Nina Arnold
 #' @references Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
 #' @export
-readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
+readEQN <- function(file,
+                    restrictions=NULL,
+                    paramOrder = FALSE,
+                    parse=FALSE){
+  if(missing(restrictions)) restrictions <- NULL
 
   isPath <- !grepl("\n", x=file, ignore.case = TRUE)
   if(!isPath){

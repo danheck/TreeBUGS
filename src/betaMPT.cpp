@@ -33,7 +33,7 @@ double postAB(double x,
 // theta: vector of individual theta-parameters
 // shape, rate: hyperprior for alpha, beta ~ Gamma(shape, rate)
 // eps, steps: precision/maximum number of steps to find upper/lower bound of slice
-// [[Rcpp::export]]
+// **[[Rcpp::export]]
 double sliceAB(double x,
                double fixed,
                NumericVector theta,

@@ -47,10 +47,9 @@ getParam(fittedModel, parameter = "theta")
 getParam(fittedModel, parameter = "theta",
          stat = "summary", file= "ind_summ.csv")}
 }
-\author{
-Daniel Heck
-}
 \seealso{
 \code{\link{getGroupMeans}} mean group estimates
 }
-
+\author{
+Daniel Heck
+}

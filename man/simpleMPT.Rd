@@ -2,7 +2,7 @@
 % Please edit documentation in R/fitSimpleMPT.R
 \name{simpleMPT}
 \alias{simpleMPT}
-\title{C++ Sampler for Standard MPT Model}
+\title{C++ Sampler for Standard (Nonhierarchical) MPT Models}
 \usage{
 simpleMPT(eqnfile, data, restrictions, n.iter = 20000, n.burnin = 2000,
   n.thin = 5, n.chains = 3, ppp = 0, alpha = 1, beta = 1, parEstFile,
@@ -34,7 +34,7 @@ simpleMPT(eqnfile, data, restrictions, n.iter = 20000, n.burnin = 2000,
 \item{posteriorFile}{path to RData-file where to save the model including MCMC posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile="mcmc.RData"})}
 }
 \description{
-Fast Gibbs sampler in C++ that is tailored to the standard MPT model (i.e., non-hierarchical MPT: assumes separate parameters if multiple data sets are supplied).
+Fast Gibbs sampler in C++ that is tailored to the standard MPT model (i.e., fixed-effects, non-hierarchical MPT: assumes separate parameters if multiple data sets are supplied).
 }
 \details{
 Beta distributions with fixed shape parameters \eqn{\alpha} and \eqn{\beta} are used. The default \eqn{\alpha=1} and \eqn{\beta=1} assumes uniform priors for all MPT parameters.

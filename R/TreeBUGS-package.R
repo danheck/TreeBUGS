@@ -17,7 +17,7 @@
 #' @importFrom parallel parSapply
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @importFrom MASS fitdistr
-#' @useDynLib TreeBUGS
+#' @useDynLib "TreeBUGS", .registration=TRUE
 #'
 #' @references
 #' Heck*, D. W., Arnold*, N. R., & Arnold, D. (2017). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. Behavior Research Methods, in press.

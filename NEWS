@@ -1,3 +1,10 @@
+TreeBUGS 1.1.0 (April 2017)
+===========
+
+* Functions to compute Bayes factors for simple (nonhierarchical, fixed-effects) MPT models: BayesFactorMPT() and marginalMPT()
+* Registration of C++ routines
+
+
 TreeBUGS 1.0.3 (January 2017)
 ===========
 
