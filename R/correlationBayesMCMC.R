@@ -36,6 +36,9 @@ correlationPosterior <- function(fittedModel,
     M.fit <- nrow(fittedModel$runjags$mcmc[[1]])
 
     sel.idx <- grep("cor_", varnames(fittedModel$runjags$mcmc))
+    if (length(sel.idx) == 0){
+      stop("No correlations were sampled in fitted MPT model!")
+    }
     # if(class(fittedModel) == "betaMPT")
     #   sel.idx <- c(sel.idx, grep("rho", varnames(fittedModel$runjags$mcmc)))
     r <- do.call("rbind",
