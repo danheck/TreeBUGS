@@ -48,7 +48,7 @@ sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 
 If you use TreeBUGS, please cite the software as follows:
 
-Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (in press). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. *Behavior Research Methods*. Retrieved from https://github.com/denis-arnold/TreeBUGS
+Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (in press). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. *Behavior Research Methods*. https://doi.org/10.3758/s13428-017-0869-7
 
 
 ### References
