@@ -4,7 +4,8 @@
 \alias{plotParam}
 \title{Plot Parameter Estimates}
 \usage{
-plotParam(x, includeIndividual = TRUE, estimate = "mean", ...)
+plotParam(x, includeIndividual = TRUE, estimate = "mean", select = "all",
+  ...)
 }
 \arguments{
 \item{x}{a fitted Beta or latent-trait MPT model}
@@ -13,10 +14,12 @@ plotParam(x, includeIndividual = TRUE, estimate = "mean", ...)
 
 \item{estimate}{type of point estimates for group-level and individual parameters (either \code{"mean"} or \code{"median"})}
 
+\item{select}{character vector of parameters to be plotted (e.g., \code{select = c("d", "g")}. Can be used to plot subsets of parameters and change the order of parameters.}
+
 \item{...}{further arguments passed to the standard \code{\link{plot}} function}
 }
 \description{
-Plot parameter estimates for hierarchical MPT models
+Plot parameter estimates for hierarchical MPT models.
 }
 \seealso{
 \code{\link{betaMPT}}, \code{\link{traitMPT}}, \code{\link{plotDistribution}}
