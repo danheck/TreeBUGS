@@ -20,7 +20,7 @@
 #' @useDynLib "TreeBUGS", .registration=TRUE
 #'
 #' @references
-#' Heck*, D. W., Arnold*, N. R., & Arnold, D. (2017). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. Behavior Research Methods, in press.
+#' Heck*, D. W., Arnold*, N. R., & Arnold, D. (in press). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. Behavior Research Methods.
 #'
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
 #'
