@@ -2,14 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 betampt <- function(M, H, a, b, c, map, shape, rate) {
-    .Call('TreeBUGS_betampt', PACKAGE = 'TreeBUGS', M, H, a, b, c, map, shape, rate)
+    .Call(TreeBUGS_betampt, M, H, a, b, c, map, shape, rate)
 }
 
 simplempt <- function(M, H, a, b, c, map, alpha, beta) {
-    .Call('TreeBUGS_simplempt', PACKAGE = 'TreeBUGS', M, H, a, b, c, map, alpha, beta)
+    .Call(TreeBUGS_simplempt, M, H, a, b, c, map, alpha, beta)
 }
 
 loglikMPT <- function(theta, h, a, b, c, map) {
-    .Call('TreeBUGS_loglikMPT', PACKAGE = 'TreeBUGS', theta, h, a, b, c, map)
+    .Call(TreeBUGS_loglikMPT, theta, h, a, b, c, map)
 }
 
