@@ -35,12 +35,12 @@ resampling <- function(mod,
   if(resample > C*R){
     warning("Fitted models have less samples than required for resampling.",
             "Posterior samples will be reused!")
-    rr <- lapply(mod$runjags$mcmc[,sel],
-                 function(mm) mm[sample(1:R, r, replace=TRUE),])
+    rr <- lapply(mod$runjags$mcmc[,sel, drop=FALSE],
+                 function(mm) mm[sample(1:R, r, replace=TRUE),,drop=FALSE])
   }else{
-    rr <- lapply(mod$runjags$mcmc[,sel],
-                 function(mm) mm[sample(1:R, r),])
+    rr <- lapply(mod$runjags$mcmc[,sel, drop=FALSE],
+                 function(mm) mm[sample(1:R, r),,drop=FALSE])
   }
-  do.call("rbind", rr)[1:resample,]
+  do.call("rbind", rr)[1:resample,,drop=FALSE]
 }
 
