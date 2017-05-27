@@ -108,7 +108,7 @@ BayesFactorMPT <- function(models,
   #### 5. Rao-Blackwell Estimate: Average probabilities
   ####    Left eigenvector with eigenvalue = 1
   P.mean <- apply(P, 1:2, mean)
-  ev2 <- eigen(t(P.mean))$vec[,1]
+  ev2 <- Re(eigen(t(P.mean))$vec[,1])
   p.est <- ev2/sum(ev2)
 
   # batch estimate + SE
@@ -118,7 +118,7 @@ BayesFactorMPT <- function(models,
   tmp <- matrix(NA, batches, M)
   for(b in 1:batches){
     P.mean <- apply(P[,,idx == b], 1:2, mean)
-    ev2 <- eigen(t(P.mean))$vec[,1]
+    ev2 <- Re(eigen(t(P.mean))$vec[,1])
     tmp[b,] <- ev2/sum(ev2)
   }
   batchSE <- apply(tmp, 2, sd)/sqrt(batches)
