@@ -8,7 +8,7 @@
 #'
 #' @param models list of models fitted with \code{\link{simpleMPT}}, e.g., \code{list(mod1, mod2)}
 #' @param resample how much parameter posterior samples should be resampled per model
-#' @param scale scaling factor for the posterior approximation of the posterior samples
+# @param scale scaling factor for the posterior approximation of the posterior samples
 #' @inheritParams marginalMPT
 #' @param store whether to save parameter samples
 #' @details
@@ -24,7 +24,7 @@
 BayesFactorMPT <- function(models,
                            #method="custom",
                            resample = 10000,
-                           scale=.1,
+                           # scale=.1,
                            batches = 10,
                            store=FALSE,
                            nCPU = 1){
@@ -45,7 +45,7 @@ BayesFactorMPT <- function(models,
   betapars <- shape.prior <- list()
   for(m in 1:M){
     ab <- approximatePosterior(models[[m]], sample=2000)
-    betapars[[m]] <- pmax(ab*scale, 1)
+    betapars[[m]] <- pmax(ab, 1) #pmax(ab*scale, 1)
 
     shape.prior[[m]] <- do.call("cbind", models[[m]]$mpt$hyperprior)
   }
