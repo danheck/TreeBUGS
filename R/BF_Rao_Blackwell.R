@@ -59,35 +59,48 @@ BayesFactorMPT <- function(models,
 
   # m = row of P (FROM which model to start jumping)
   row.P <- function(m){
-    theta <- list()
-    loglik <- prior.pseudo <- prior.current <- posterior <-
-      matrix(0, resample, M)
+    # sample proposal parameters
+    theta <- vector("list", M)
+    theta[[m]] <- resampling(models[[m]], resample=resample)
+    theta[-m] <- lapply(betapars[-m],
+                        function(bp) apply(bp, 1,
+                                           function(s) rbeta(resample, s[1], s[2])))
+    # loglik <- prior.pseudo <- prior.current <-
+    posterior <- matrix(0, resample, M)
 
     # columns of P (TO which model to go)
-    for(m2 in 1:M){
-      # sample proposal vector:
-      if(m == m2){
-        theta[[m]] <- resampling(models[[m]], resample=resample)
-      }else{
-        theta[[m2]] <- apply(betapars[[m2]], 1,
-                             function(s) rbeta(resample, s[1], s[2]))
-      }
-      loglik[,m2] <- llMPT(theta[[m2]], mod = models[[m2]], id = 1)
-      prior.pseudo[,m2] <- dProductBeta(x = theta[[m2]],
-                                        shapes = betapars[[m2]])
-      prior.current[,m2] <-
-        dProductBeta(theta[[m2]], shapes = shape.prior[[m2]])
-    }
+    # for(m2 in 1:M){
+    #   # sample proposal vector:
+    #   if(m == m2){
+    #     theta[[m]] <- resampling(models[[m]], resample=resample)
+    #   }else{
+    #     theta[[m2]] <- apply(betapars[[m2]], 1,
+    #                          function(s) rbeta(resample, s[1], s[2]))
+    #   }
+    #   loglik[,m2] <- llMPT(theta[[m2]], mod = models[[m2]], id = 1)
+    #   prior.pseudo[,m2] <- dProductBeta(x = theta[[m2]],
+    #                                     shapes = betapars[[m2]])
+    #   prior.current[,m2] <-
+    #     dProductBeta(theta[[m2]], shapes = shape.prior[[m2]])
+    # }
+
+    loglik <- mapply(llMPT, pars = theta, mod = models, MoreArgs = list(id = 1))
+    prior.pseudo <- mapply(dProductBeta, x = theta, shapes = betapars)
+    prior.current <- mapply(dProductBeta, x = theta, shapes = shape.prior)
 
     ### 4. Loop 2 (entries in row k): Compute transition probabilities
     ###     => P(i|k) = P(y|tk,Mk) * P(tk|Mk) * prod(P(ti|Mk)) * P(Mk)
     # prior for full palette vector:
-    for(m3 in 1:M){
-      posterior[,m3] <-
-        exp(loglik[,m3] +                                 # y | theta_k, M_k
-              prior.current[,m3] +                        # theta_k | M_k
-              rowSums(prior.pseudo[,-c(m3),drop=FALSE]))  # theta_i | M_k
-    }
+    posterior <-
+      exp(loglik +                               # y | theta_k, M_k
+            prior.current +                      # theta_k | M_k
+            rowSums(prior.pseudo)-prior.pseudo)  # theta_i | M_k
+    # for(m3 in 1:M){
+    #   posterior[,m3] <-
+    #     exp(loglik[,m3] +                                 # y | theta_k, M_k
+    #           prior.current[,m3] +                        # theta_k | M_k
+    #           rowSums(prior.pseudo[,-c(m3),drop=FALSE]))  # theta_i | M_k
+    # }
     # P[m,,] <- t(posterior/rowSums(posterior))
     posterior/rowSums(posterior)
   }
