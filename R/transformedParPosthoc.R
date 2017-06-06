@@ -29,18 +29,18 @@ transformedParameters <- function (fittedModel,
 
   samp <- list()
   #### for a single MCMC chain:
-  getTrans <- function(mm){
-    if(level == "group"){
-      if(S==1){
+  getTrans <- function (mm){
+    if (level == "group"){
+      if (S == 1){
         sel.mean <- "mean"
-      }else{
+      } else {
         sel.mean <- paste0("mean[",1:S,"]")
       }
       samp <- mm[,rep(1,P), drop=FALSE]
       colnames(samp) <- parsed$transformedParameters
       for(i in 1:P){
         samp[,i] <- apply(mm[,sel.mean,drop=FALSE], 1,
-                          function(xx) eval(parse(text=parsed$modelstring[1]),
+                          function(xx) eval(parse(text=parsed$modelstring[i]),
                                             list(mean=unlist(xx))))
       }
     }else{
