@@ -7,6 +7,7 @@
 #' Computes Bayes factors for simple (fixed-effects, nonhierarchical) MPT models with beta distributions as priors on the parameters.
 #'
 #' @param models list of models fitted with \code{\link{simpleMPT}}, e.g., \code{list(mod1, mod2)}
+#' @param dataset for which data set should Bayes factors be computed?
 #' @param resample how much parameter posterior samples should be resampled per model
 # @param scale scaling factor for the posterior approximation of the posterior samples
 #' @inheritParams marginalMPT
@@ -22,6 +23,7 @@
 #' @export
 #' @seealso \code{\link{marginalMPT}}
 BayesFactorMPT <- function(models,
+                           dataset = 1,
                            #method="custom",
                            resample = 10000,
                            # scale=.1,
@@ -38,13 +40,13 @@ BayesFactorMPT <- function(models,
   for (i in 2:M)
     if (any(datas[[1]] != datas[[i]]) )
       stop ("each model must have one vector of frequencies that must be identical for all ")
-  if (nrow(datas[[1]]) != 1)
-    warning("Only the first data set is used!")
+  # if (nrow(datas[[1]]) != 1)
+  #   warning("Only the first data set is used!")
 
   # 2. Approximate posteriors by beta densities
   betapars <- shape.prior <- list()
   for(m in 1:M){
-    ab <- approximatePosterior(models[[m]], sample=2000)
+    ab <- approximatePosterior(models[[m]], dataset = dataset, sample=2000)
     betapars[[m]] <- pmax(ab, 1) #pmax(ab*scale, 1)
 
     shape.prior[[m]] <- do.call("cbind", models[[m]]$mpt$hyperprior)
@@ -61,12 +63,12 @@ BayesFactorMPT <- function(models,
   row.P <- function(m){
     # sample proposal parameters
     theta <- vector("list", M)
-    theta[[m]] <- resampling(models[[m]], resample=resample)
+    theta[[m]] <- resampling(models[[m]], dataset = dataset, resample=resample)
     theta[-m] <- lapply(betapars[-m],
                         function(bp) apply(bp, 1,
                                            function(s) rbeta(resample, s[1], s[2])))
     # loglik <- prior.pseudo <- prior.current <-
-    posterior <- matrix(0, resample, M)
+    # posterior <- matrix(0, resample, M)
 
     # columns of P (TO which model to go)
     # for(m2 in 1:M){
@@ -84,7 +86,7 @@ BayesFactorMPT <- function(models,
     #     dProductBeta(theta[[m2]], shapes = shape.prior[[m2]])
     # }
 
-    loglik <- mapply(llMPT, pars = theta, mod = models, MoreArgs = list(id = 1))
+    loglik <- mapply(llMPT, pars = theta, mod = models, MoreArgs = list(dataset = dataset))
     prior.pseudo <- mapply(dProductBeta, x = theta, shapes = betapars)
     prior.current <- mapply(dProductBeta, x = theta, shapes = shape.prior)
 
@@ -106,7 +108,7 @@ BayesFactorMPT <- function(models,
   }
   if(nCPU>1){
     cl <- makeCluster(nCPU)
-    clusterExport(cl, c("resample", "M", "models", "betapars", "shape.prior"),
+    clusterExport(cl, c("resample", "M", "models", "betapars", "shape.prior", "dataset"),
                   envir = environment())
     # tmp <- clusterEvalQ(cl, library(TreeBUGS))
     P.tmp <- parSapply(cl, 1:M, row.P, simplify = FALSE)

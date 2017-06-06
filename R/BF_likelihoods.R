@@ -2,22 +2,22 @@
 # full log-likelihood of simple MPT models
 llMPT <- function (pars,
                    mod,
-                   id = 1){
+                   dataset = 1){
   if (is.vector(pars)) pars <- t(pars)
   pars <- as.matrix(pars)
   loglikMPT(pars,
-            unlist(mod$mptInfo$data[id,]),
+            unlist(mod$mptInfo$data[dataset,]),
             mod$mptInfo$MPT$a,
             mod$mptInfo$MPT$b,
             mod$mptInfo$MPT$c,
             mod$mptInfo$MPT$map) +
-    logMultinomCoefficient(mod)
+    logMultinomCoefficient(mod, dataset = dataset)
 }
 
 # product-multinomial constant for density
-logMultinomCoefficient <- function (mod){
+logMultinomCoefficient <- function (mod, dataset = 1){
   tree <- mod$mptInfo$MPT$tree.idx
-  data <- mod$mptInfo$data
+  data <- mod$mptInfo$data[dataset,]
   logCoef <- tapply(t(data), list(tree), function(n)
     lgamma(sum(n) + 1)  - sum(lgamma(n + 1)))
   sum(logCoef)

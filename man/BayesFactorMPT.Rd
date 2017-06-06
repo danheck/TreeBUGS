@@ -4,15 +4,15 @@
 \alias{BayesFactorMPT}
 \title{Bayes Factors for Simple (Nonhierarchical) MPT Models}
 \usage{
-BayesFactorMPT(models, resample = 10000, scale = 0.1, batches = 10,
+BayesFactorMPT(models, dataset = 1, resample = 10000, batches = 10,
   store = FALSE, nCPU = 1)
 }
 \arguments{
 \item{models}{list of models fitted with \code{\link{simpleMPT}}, e.g., \code{list(mod1, mod2)}}
 
-\item{resample}{how much parameter posterior samples should be resampled per model}
+\item{dataset}{for which data set should Bayes factors be computed?}
 
-\item{scale}{scaling factor for the posterior approximation of the posterior samples}
+\item{resample}{how much parameter posterior samples should be resampled per model}
 
 \item{batches}{number of batches to compute standard error}
 
