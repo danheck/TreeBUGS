@@ -118,7 +118,7 @@ marginalMPT <- function (eqnfile,
       for(s in 1:S)
         px <- px + dbeta(xx[,s], log = TRUE,
                          shape1 = mod$mptInfo$hyperprior$alpha[s],
-                         shape2 = mod$mptInfo$hyperprior$alpha[s])
+                         shape2 = mod$mptInfo$hyperprior$beta[s])
     } else if (method == "prior"){
       xx <- matrix(NA, sample, S)
       for (s in 1:S)
