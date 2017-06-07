@@ -4,8 +4,8 @@
 \alias{simpleMPT}
 \title{C++ Sampler for Standard (Nonhierarchical) MPT Models}
 \usage{
-simpleMPT(eqnfile, data, restrictions, n.iter = 20000, n.burnin = 2000,
-  n.thin = 5, n.chains = 3, ppp = 0, alpha = 1, beta = 1, parEstFile,
+simpleMPT(eqnfile, data, restrictions, n.iter = 2000, n.burnin = 500,
+  n.thin = 3, n.chains = 3, ppp = 0, alpha = 1, beta = 1, parEstFile,
   posteriorFile)
 }
 \arguments{
