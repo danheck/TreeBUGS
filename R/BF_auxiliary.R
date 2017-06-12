@@ -3,7 +3,7 @@
 # Curently, only distribution="beta" is implemented
 approximatePosterior <- function(mod,
                                  dataset = 1,
-                                 sample=2000,
+                                 sample=1000,
                                  distribution="beta",
                                  lower=.1,
                                  upper=1000){
@@ -15,10 +15,16 @@ approximatePosterior <- function(mod,
     sel <- paste0("theta[",i,",",dataset,"]")
     ss <- unlist(mod$runjags$mcmc[,sel])
     ss <- sample(ss, min(sample, length(ss)))
-    suppressWarnings(betapar[i,] <- fitdistr(ss,"beta",
-                                             list(shape1=1,shape2=1),
-                                             lower=lower,
-                                             upper=upper)$estimate)
+    m <- mean(ss)
+    v <- var(ss)
+    betapar[i,1] <- m * (m * (1-m) / v - 1)
+    betapar[i,2] <- (1-m) * (m * (1-m) / v - 1)
+    try(betapar[i,] <- fitdistr(ss,"beta",
+                                list(shape1=betapar[i,1],
+                                     shape2=betapar[i,2]),
+                                lower=lower,
+                                upper=upper)$estimate,
+        silent = TRUE)
   }
   betapar
 }

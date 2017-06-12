@@ -25,7 +25,8 @@ fitModelCpp <- function(type,
                         parEstFile,
                         posteriorFile,
                         autojags=NULL,
-                        call = NULL){
+                        call = NULL,
+                        cores = 1){
 
   if(missing(restrictions)) restrictions <- NULL
   if(missing(covData)) covData <- NULL
@@ -62,7 +63,7 @@ fitModelCpp <- function(type,
 
 
   time0 <- Sys.time()
-  cat("MCMC sampling started at ", format(time0), "\n")
+  # cat("MCMC sampling started at ", format(time0), "\n")
 
   mcmc.list <- list()
 
@@ -114,25 +115,33 @@ fitModelCpp <- function(type,
   }
 
 
-  ncpu <- min(detectCores(), n.chains)
-  cl <- makeCluster(ncpu)
-  clusterExport(cl, c("simBetaMPT", "simSimpleMPT",
-                      "n.iter","data","mpt.res", "S",
-                      "N","n.burnin","n.thin"), envir = environment())
-  if(type == "betaMPT"){
-    clusterExport(cl, c("shape","rate"), envir = environment())
-    mcmc.list <- parLapply(cl, 1:n.chains, simBetaMPT)
-  }else if (type == "simpleMPT"){
-    clusterExport(cl, c("alpha","beta"), envir = environment())
-    mcmc.list <- parLapply(cl, 1:n.chains, simSimpleMPT)
+  if (cores > 1){
+    ncpu <- min(detectCores(), n.chains)
+    cl <- makeCluster(ncpu)
+    clusterExport(cl, c("simBetaMPT", "simSimpleMPT",
+                        "n.iter","data","mpt.res", "S",
+                        "N","n.burnin","n.thin"), envir = environment())
+    if(type == "betaMPT"){
+      clusterExport(cl, c("shape","rate"), envir = environment())
+      mcmc.list <- parLapply(cl, 1:n.chains, simBetaMPT)
+    }else if (type == "simpleMPT"){
+      clusterExport(cl, c("alpha","beta"), envir = environment())
+      mcmc.list <- parLapply(cl, 1:n.chains, simSimpleMPT)
+    }
+    stopCluster(cl)
+  } else {
+    if(type == "betaMPT"){
+      mcmc.list <- lapply(1:n.chains, simBetaMPT)
+    }else if (type == "simpleMPT"){
+      mcmc.list <- lapply(1:n.chains, simSimpleMPT)
+    }
   }
-  stopCluster(cl)
   mcmc.list <- as.mcmc.list(mcmc.list)
 
 
   time1 <- Sys.time()
-  cat("MCMC sampling finished at", format(time1), "\n  ")
-  print(time1-time0)
+  # cat("MCMC sampling finished at", format(time1), "\n  ")
+  # print(time1-time0)
 
   # store details about model:
   mptInfo <- list(model=type,

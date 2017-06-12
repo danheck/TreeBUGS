@@ -6,6 +6,7 @@
 #' @inheritParams betaMPT
 #' @param shape shape parameter(s) of Gamma-hyperdistribution for the hierarchical beta-parameters \eqn{\alpha_s} and \eqn{\beta_s} (can be a named vector to provide different hyperpriors for each parameter)
 #' @param rate rate parameter(s) of Gamma-hyperdistribution
+#' @param cores number of CPUs to be used
 #' @author Daniel Heck
 #' @importFrom parallel parLapply stopCluster detectCores
 #' @examples
@@ -24,7 +25,8 @@ betaMPTcpp <- function(eqnfile, data, restrictions,
                        covData, corProbit=FALSE,
                        n.iter=20000, n.burnin = 2000,
                        n.thin = 5,  n.chains=3, ppp = 0,
-                       shape = 1, rate = .1, parEstFile, posteriorFile){
+                       shape = 1, rate = .1, parEstFile, posteriorFile,
+                       cores = 1){
 
   hyperprior <- list(shape = shape, rate = rate)
 
@@ -41,6 +43,7 @@ betaMPTcpp <- function(eqnfile, data, restrictions,
                              ppp = ppp,
                              parEstFile=parEstFile,
                              posteriorFile=posteriorFile,
-                             call = match.call())
+                             call = match.call(),
+                             cores = cores)
   fittedModel
 }

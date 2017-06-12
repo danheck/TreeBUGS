@@ -6,7 +6,7 @@
 \usage{
 marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1,
   method = "importance", posterior = 500, mix = 0.01, scale = 0.9,
-  sample = 50000, batches = 10, show = TRUE, nCPU = 4)
+  sample = 50000, batches = 10, show = TRUE, cores = 4)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
@@ -33,7 +33,7 @@ marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1,
 
 \item{show}{whether to show progress}
 
-\item{nCPU}{number of CPUs used}
+\item{cores}{number of CPUs used}
 }
 \description{
 Computes the marginal likelihood for simple (fixed-effects, nonhierarchical) MPT models.
@@ -69,12 +69,12 @@ curve(dbeta(x, aa["g"], bb["g"]))
 htm <- marginalMPT(eqn, data,
                    alpha = aa, beta = bb,
                    posterior = 200,
-                   sample = 500, nCPU = 1)
+                   sample = 500, cores = 1)
 # second model: g=.50
 htm.g50 <- marginalMPT(eqn, data, list("g=.5"),
                        alpha = aa, beta = bb,
                        posterior = 200,
-                       sample = 500, nCPU = 1)
+                       sample = 500, cores = 1)
 
 # Bayes factor
 # (per batch to get estimation error)

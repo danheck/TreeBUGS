@@ -11,7 +11,7 @@
 #' @param sample number of paramter samples
 #' @param batches number of batches to compute standard error
 #' @param show whether to show progress
-#' @param nCPU number of CPUs used
+#' @param cores number of CPUs used
 #'
 #' @details
 #' Currently, this is only implemented for a single data set!
@@ -44,12 +44,12 @@
 #' htm <- marginalMPT(eqn, data,
 #'                    alpha = aa, beta = bb,
 #'                    posterior = 200,
-#'                    sample = 500, nCPU = 1)
+#'                    sample = 500, cores = 1)
 #' # second model: g=.50
 #' htm.g50 <- marginalMPT(eqn, data, list("g=.5"),
 #'                        alpha = aa, beta = bb,
 #'                        posterior = 200,
-#'                        sample = 500, nCPU = 1)
+#'                        sample = 500, cores = 1)
 #'
 #' # Bayes factor
 #' # (per batch to get estimation error)
@@ -74,7 +74,7 @@ marginalMPT <- function (eqnfile,
                          sample = 50000,
                          batches = 10,
                          show = TRUE,
-                         nCPU = 4){
+                         cores = 4){
   t0 <- Sys.time()
   if (mix<0 | mix>1 | scale<0 | scale>1)
     stop ("The tuning parameters 'mix' and 'scale' must be in the interval [0,1].")
@@ -96,7 +96,7 @@ marginalMPT <- function (eqnfile,
 
   if (show) cat("Sampling parameters to estimate marginal likelihood...\n")
   marginal <- rep(NA, batches)
-  cl <- makeCluster(nCPU)
+  if (cores > 1) cl <- makeCluster(cores)
   samp <- matrix(NA, sample, batches)
   const <- logMultinomCoefficient(mod)
   for (b in 1:batches){
@@ -107,12 +107,19 @@ marginalMPT <- function (eqnfile,
       rmix <- function (i, sample, betapar, mix) ifelse(runif(sample)<mix,
                                                        runif(sample),
                                                        rbeta(sample, betapar[i,1], betapar[i,2]))
-      xx <- parSapply(cl, 1:nrow(betapar), rmix,
+      if (cores > 1)
+        xx <- parSapply(cl, 1:nrow(betapar), rmix,
                       sample=sample, betapar=betapar, mix=mix)
+      else
+        xx <- sapply(1:nrow(betapar), rmix,
+                     sample=sample, betapar=betapar, mix=mix)
       # sampling density:
       dmix <- function (x, betapar, mix)
         sum(log(mix + (1-mix)*dbeta(x, betapar[,1], betapar[,2])))
-      gx <- parApply(cl, xx, 1, dmix, betapar=betapar, mix=mix)
+      if (cores > 1)
+        gx <- parApply(cl, xx, 1, dmix, betapar=betapar, mix=mix)
+      else
+        gx <- apply(xx, 1, dmix, betapar=betapar, mix=mix)
       # prior:
       px <- rep(0, sample)
       for(s in 1:S)
@@ -144,7 +151,7 @@ marginalMPT <- function (eqnfile,
       samp[,b] <- exp(fx + const)
     }
   }
-  stopCluster(cl)
+  if (cores > 1) stopCluster(cl)
   t1 <- Sys.time()
 
   ############### 4. Aproximate integral + batch SE

@@ -25,11 +25,10 @@
 BayesFactorMPT <- function(models,
                            dataset = 1,
                            #method="custom",
-                           resample = 10000,
-                           # scale=.1,
+                           resample,
                            batches = 10,
-                           store=FALSE,
-                           nCPU = 1){
+                           store = FALSE,
+                           cores = 1){
 
   if (!is.list(models) || any(sapply(models, class) != "simpleMPT"))
     stop("'models' must be a list models with fitted simpleMPT!")
@@ -40,8 +39,8 @@ BayesFactorMPT <- function(models,
   for (i in 2:M)
     if (any(datas[[1]] != datas[[i]]) )
       stop ("each model must have one vector of frequencies that must be identical for all ")
-  # if (nrow(datas[[1]]) != 1)
-  #   warning("Only the first data set is used!")
+  if (missing(resample))
+    resample <- min(sapply(models, function(x) length(x$runjags$mcmc)*nrow(x$runjags$mcmc[[1]])))
 
   # 2. Approximate posteriors by beta densities
   betapars <- shape.prior <- list()
@@ -106,8 +105,8 @@ BayesFactorMPT <- function(models,
     # P[m,,] <- t(posterior/rowSums(posterior))
     posterior/rowSums(posterior)
   }
-  if(nCPU>1){
-    cl <- makeCluster(nCPU)
+  if(cores>1){
+    cl <- makeCluster(cores)
     clusterExport(cl, c("resample", "M", "models", "betapars", "shape.prior", "dataset"),
                   envir = environment())
     # tmp <- clusterEvalQ(cl, library(TreeBUGS))

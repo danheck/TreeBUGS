@@ -4,8 +4,8 @@
 \alias{BayesFactorMPT}
 \title{Bayes Factors for Simple (Nonhierarchical) MPT Models}
 \usage{
-BayesFactorMPT(models, dataset = 1, resample = 10000, batches = 10,
-  store = FALSE, nCPU = 1)
+BayesFactorMPT(models, dataset = 1, resample, batches = 10, store = FALSE,
+  cores = 1)
 }
 \arguments{
 \item{models}{list of models fitted with \code{\link{simpleMPT}}, e.g., \code{list(mod1, mod2)}}
@@ -18,7 +18,7 @@ BayesFactorMPT(models, dataset = 1, resample = 10000, batches = 10,
 
 \item{store}{whether to save parameter samples}
 
-\item{nCPU}{number of CPUs used}
+\item{cores}{number of CPUs used}
 }
 \description{
 Computes Bayes factors for simple (fixed-effects, nonhierarchical) MPT models with beta distributions as priors on the parameters.
