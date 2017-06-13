@@ -4,8 +4,8 @@
 \alias{BayesFactorMPT}
 \title{Bayes Factors for Simple (Nonhierarchical) MPT Models}
 \usage{
-BayesFactorMPT(models, dataset = 1, resample, batches = 10, store = FALSE,
-  cores = 1)
+BayesFactorMPT(models, dataset = 1, resample, batches = 5, scale = 1,
+  store = FALSE, cores = 1)
 }
 \arguments{
 \item{models}{list of models fitted with \code{\link{simpleMPT}}, e.g., \code{list(mod1, mod2)}}
@@ -15,6 +15,8 @@ BayesFactorMPT(models, dataset = 1, resample, batches = 10, store = FALSE,
 \item{resample}{how much parameter posterior samples should be resampled per model}
 
 \item{batches}{number of batches to compute standard error}
+
+\item{scale}{how much should posterior-beta approximations be downscaled to get fatter importance-sampling density}
 
 \item{store}{whether to save parameter samples}
 

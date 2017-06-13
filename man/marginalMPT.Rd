@@ -5,8 +5,8 @@
 \title{Marginal Likelihood for Simple MPT}
 \usage{
 marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1,
-  method = "importance", posterior = 500, mix = 0.01, scale = 0.9,
-  sample = 50000, batches = 10, show = TRUE, cores = 4)
+  method = "importance", posterior = 500, mix = 0.2, scale = 0.95,
+  sample = 10000, batches = 10, show = TRUE, cores = 1)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}

@@ -9,7 +9,6 @@
 #' @param models list of models fitted with \code{\link{simpleMPT}}, e.g., \code{list(mod1, mod2)}
 #' @param dataset for which data set should Bayes factors be computed?
 #' @param resample how much parameter posterior samples should be resampled per model
-# @param scale scaling factor for the posterior approximation of the posterior samples
 #' @inheritParams marginalMPT
 #' @param store whether to save parameter samples
 #' @details
@@ -22,31 +21,27 @@
 #' Carlin, B. P., & Chib, S. (1995). Bayesian model choice via Markov chain Monte Carlo methods. Journal of the Royal Statistical Society. Series B (Methodological), 57(3), 473-484.
 #' @export
 #' @seealso \code{\link{marginalMPT}}
-BayesFactorMPT <- function(models,
-                           dataset = 1,
-                           #method="custom",
-                           resample,
-                           batches = 10,
-                           store = FALSE,
-                           cores = 1){
+BayesFactorMPT <- function(models, dataset = 1, resample, batches = 5,
+                           scale = 1, store = FALSE, cores = 1){
 
   if (!is.list(models) || any(sapply(models, class) != "simpleMPT"))
     stop("'models' must be a list models with fitted simpleMPT!")
   datas <- lapply(models, function(m) m$mptInfo$data)
   M <- length(models)
-  if (M<2)
+  if (M < 2)
     stop("At least two models must be provided.")
   for (i in 2:M)
     if (any(datas[[1]] != datas[[i]]) )
       stop ("each model must have one vector of frequencies that must be identical for all ")
   if (missing(resample))
-    resample <- min(sapply(models, function(x) length(x$runjags$mcmc)*nrow(x$runjags$mcmc[[1]])))
+    resample <- min(sapply(models, function(x)
+      length(x$runjags$mcmc)*nrow(x$runjags$mcmc[[1]])))
 
   # 2. Approximate posteriors by beta densities
   betapars <- shape.prior <- list()
   for(m in 1:M){
-    ab <- approximatePosterior(models[[m]], dataset = dataset, sample=2000)
-    betapars[[m]] <- pmax(ab, 1) #pmax(ab*scale, 1)
+    ab <- approximatePosterior(models[[m]], dataset = dataset, sample = 500)
+    betapars[[m]] <- pmax(scale * ab, .1)
 
     shape.prior[[m]] <- do.call("cbind", models[[m]]$mpt$hyperprior)
   }
@@ -60,34 +55,26 @@ BayesFactorMPT <- function(models,
 
   # m = row of P (FROM which model to start jumping)
   row.P <- function(m){
-    # sample proposal parameters
-    theta <- vector("list", M)
-    theta[[m]] <- resampling(models[[m]], dataset = dataset, resample=resample)
-    theta[-m] <- lapply(betapars[-m],
-                        function(bp) apply(bp, 1,
-                                           function(s) rbeta(resample, s[1], s[2])))
-    # loglik <- prior.pseudo <- prior.current <-
-    # posterior <- matrix(0, resample, M)
-
-    # columns of P (TO which model to go)
-    # for(m2 in 1:M){
-    #   # sample proposal vector:
-    #   if(m == m2){
-    #     theta[[m]] <- resampling(models[[m]], resample=resample)
-    #   }else{
-    #     theta[[m2]] <- apply(betapars[[m2]], 1,
-    #                          function(s) rbeta(resample, s[1], s[2]))
-    #   }
-    #   loglik[,m2] <- llMPT(theta[[m2]], mod = models[[m2]], id = 1)
-    #   prior.pseudo[,m2] <- dProductBeta(x = theta[[m2]],
-    #                                     shapes = betapars[[m2]])
-    #   prior.current[,m2] <-
-    #     dProductBeta(theta[[m2]], shapes = shape.prior[[m2]])
-    # }
-
-    loglik <- mapply(llMPT, pars = theta, mod = models, MoreArgs = list(dataset = dataset))
-    prior.pseudo <- mapply(dProductBeta, x = theta, shapes = betapars)
-    prior.current <- mapply(dProductBeta, x = theta, shapes = shape.prior)
+    # theta <- vector("list", M)
+    # theta[[m]] <- resampling(models[[m]], dataset = dataset, resample=resample)
+    # theta[-m] <- lapply(betapars[-m],
+    #                     function(bp) apply(bp, 1,
+    #                                        function(s) rbeta(resample, s[1], s[2])))
+    # loglik <- mapply(llMPT, pars = theta, mod = models, MoreArgs = list(dataset = dataset))
+    # prior.pseudo <- mapply(dProductBeta, x = theta, shapes = betapars)
+    # prior.current <- mapply(dProductBeta, x = theta, shapes = shape.prior)
+    loglik <- prior.pseudo <- prior.current <- matrix(NA, resample, M)
+    for (i in 1:M){
+      if (i == m){
+        theta <- resampling(models[[m]], dataset = dataset, resample=resample)
+      } else {
+        theta <- rProductBeta(resample, betapars[[i]])
+      }
+      loglik[,i] <- llMPT(pars = theta, mod = models[[i]],
+                          dataset = dataset)
+      prior.pseudo[,i] <- dProductBeta(x = theta, shapes = betapars[[i]])
+      prior.current[,i] <- dProductBeta(x = theta, shapes = shape.prior[[i]])
+    }
 
     ### 4. Loop 2 (entries in row k): Compute transition probabilities
     ###     => P(i|k) = P(y|tk,Mk) * P(tk|Mk) * prod(P(ti|Mk)) * P(Mk)
@@ -96,20 +83,12 @@ BayesFactorMPT <- function(models,
       exp(loglik +                               # y | theta_k, M_k
             prior.current +                      # theta_k | M_k
             rowSums(prior.pseudo)-prior.pseudo)  # theta_i | M_k
-    # for(m3 in 1:M){
-    #   posterior[,m3] <-
-    #     exp(loglik[,m3] +                                 # y | theta_k, M_k
-    #           prior.current[,m3] +                        # theta_k | M_k
-    #           rowSums(prior.pseudo[,-c(m3),drop=FALSE]))  # theta_i | M_k
-    # }
-    # P[m,,] <- t(posterior/rowSums(posterior))
     posterior/rowSums(posterior)
   }
-  if(cores>1){
+  if(cores > 1){
     cl <- makeCluster(cores)
     clusterExport(cl, c("resample", "M", "models", "betapars", "shape.prior", "dataset"),
                   envir = environment())
-    # tmp <- clusterEvalQ(cl, library(TreeBUGS))
     P.tmp <- parSapply(cl, 1:M, row.P, simplify = FALSE)
     stopCluster(cl)
   }else{
@@ -117,13 +96,14 @@ BayesFactorMPT <- function(models,
   }
   for(m in 1:M)
     P[m,,] <- t(P.tmp[[m]])
-  rm(P.tmp) ; gc()
+  rm(P.tmp) #; gc()
 
   #### 5. Rao-Blackwell Estimate: Average probabilities
   ####    Left eigenvector with eigenvalue = 1
   P.mean <- apply(P, 1:2, mean)
-  ev2 <- Re(eigen(t(P.mean))$vec[,1])
-  p.est <- ev2/sum(ev2)
+  ev2 <- rb.estimate(P.mean)
+  # Re(eigen(t(P.mean))$vec[,1])
+  p.est <- rb.estimate(P.mean) #ev2/sum(ev2)
 
   # batch estimate + SE
   idx <- rep(1:batches, each=round(resample/batches))
@@ -132,15 +112,14 @@ BayesFactorMPT <- function(models,
   tmp <- matrix(NA, batches, M)
   for(b in 1:batches){
     P.mean <- apply(P[,,idx == b], 1:2, mean)
-    ev2 <- Re(eigen(t(P.mean))$vec[,1])
-    tmp[b,] <- ev2/sum(ev2)
+    # ev2 <- Re(eigen(t(P.mean))$vec[,1])
+    tmp[b,] <- rb.estimate(P.mean)  #ev2/sum(ev2)
   }
   batchSE <- apply(tmp, 2, sd)/sqrt(batches)
   p.batch <- matrix(c(colMeans(tmp), batchSE), nrow=2, ncol=M,byrow = TRUE,
                     dimnames=list(c("Mean","SE"), Model=names(models)))
 
-  dimnames(P.mean) <- list("from" = names(models),
-                           "to" = names(models))
+  dimnames(P.mean) <- list("from" = names(models), "to" = names(models))
   names(p.est) <- names(models)
   res <- list("posterior" = p.est,
               "p.batch" = p.batch,
@@ -150,28 +129,7 @@ BayesFactorMPT <- function(models,
   res
 }
 
-
-# compute priors for proposal probabilities (conditional on m3)
-# sapply(theta, function(xx) xx[1,]) #### FIXED PROPOSAL!
-# loglik[1,]    ###### conditionally independent
-#
-# #### conditonal:  psi | M_1
-# pr1 <- (dProductBeta(theta[[1]], do.call("cbind", models[[1]]$mpt$hyperprior))[1]+
-#           dProductBeta(x = theta[[2]], shapes = betapars[[2]])+
-#           dProductBeta(x = theta[[3]], shapes = betapars[[3]]))[1]
-# #### conditonal:  psi | M_2
-# pr2 <- (dProductBeta(x = theta[[1]], shapes = betapars[[1]])+
-#           dProductBeta(theta[[2]], do.call("cbind", models[[2]]$mpt$hyperprior))[1]+
-#           dProductBeta(x = theta[[3]], shapes = betapars[[3]]))[1]
-# #### conditonal:  psi | M_2
-# pr3 <- (dProductBeta(x = theta[[1]], shapes = betapars[[1]])+
-#           dProductBeta(x = theta[[2]], shapes = betapars[[2]]))[1]+
-#   dProductBeta(theta[[3]], do.call("cbind", models[[3]]$mpt$hyperprior))[1]
-# c(pr1, pr2, pr3) ########### prior conditional on each model
-# posterior <- loglik[1] * c(pr1, pr2, pr3)
-# posterior/sum(posterior)
-
-
-# pp <- t(apply(P, 3, function(p)
-#   Re(eigen(t(p))$vectors[,1])))
-# pp <- pp/rowSums(pp)
+rb.estimate <- function (P){
+  ev <- Re(eigen(t(P))$vec[,1])
+  ev/sum(ev)
+}

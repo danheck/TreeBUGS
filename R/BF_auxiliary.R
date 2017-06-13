@@ -1,12 +1,9 @@
 
 # Approximate posterior distribution of MPT parameters by a well-known, simple density
 # Curently, only distribution="beta" is implemented
-approximatePosterior <- function(mod,
-                                 dataset = 1,
-                                 sample=1000,
-                                 distribution="beta",
-                                 lower=.1,
-                                 upper=1000){
+approximatePosterior <- function(mod, dataset = 1,
+                                 sample = 500, distribution = "beta",
+                                 lower = .1, upper = 1e4){
   # estimate alpha/beta parameters of beta approximation
   S <- length(mod$mptInfo$thetaUnique)
   betapar <- matrix(1, S, 2, dimnames=list(mod$mptInfo$thetaUnique,
@@ -31,9 +28,7 @@ approximatePosterior <- function(mod,
 
 
 # resample MCMC iterations from simpleMPT object
-resampling <- function(mod,
-                       dataset = 1,
-                       resample=1000){
+resampling <- function(mod, dataset = 1, resample = 1000){
   S <- length(mod$mptInfo$thetaUnique)
 
   sel <- paste0("theta[",1:S, ",",dataset,"]")

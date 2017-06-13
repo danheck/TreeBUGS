@@ -62,21 +62,12 @@
 #' @references
 #' Vandekerckhove, J. S., Matzke, D., & Wagenmakers, E. (2015). Model comparison and the principle of parsimony. In Oxford Handbook of Computational and Mathematical Psychology (pp. 300-319). New York, NY: Oxford University Press.
 #' @export
-marginalMPT <- function (eqnfile,
-                         data,
-                         restrictions,
-                         alpha = 1,
-                         beta = 1,
-                         method = "importance",
-                         posterior = 500,
-                         mix = .01,
-                         scale = .9,
-                         sample = 50000,
-                         batches = 10,
-                         show = TRUE,
-                         cores = 4){
+marginalMPT <- function (eqnfile, data, restrictions, alpha = 1, beta = 1,
+                         method = "importance", posterior = 500,
+                         mix = .2, scale = .95, sample = 10000, batches = 10,
+                         show = TRUE, cores = 1){
   t0 <- Sys.time()
-  if (mix<0 | mix>1 | scale<0 | scale>1)
+  if (mix < 0 | mix > 1 | scale < 0 | scale > 1)
     stop ("The tuning parameters 'mix' and 'scale' must be in the interval [0,1].")
   if (is.character(data)) data <- readData(data)
   if (!is.vector(data) && nrow(data) > 1)
@@ -104,9 +95,11 @@ marginalMPT <- function (eqnfile,
 
     if (method == "importance"){
       # sample from mixture: mix*U(0,1) + (1-mix)*Beta(a,b)
-      rmix <- function (i, sample, betapar, mix) ifelse(runif(sample)<mix,
-                                                       runif(sample),
-                                                       rbeta(sample, betapar[i,1], betapar[i,2]))
+      rmix <- function (i, sample, betapar, mix){
+        n.unif <- rbinom(1, sample, mix)
+        c(runif(n.unif),
+          rbeta(sample - n.unif, betapar[i,1], betapar[i,2]))
+      }
       if (cores > 1)
         xx <- parSapply(cl, 1:nrow(betapar), rmix,
                       sample=sample, betapar=betapar, mix=mix)
@@ -117,9 +110,9 @@ marginalMPT <- function (eqnfile,
       dmix <- function (x, betapar, mix)
         sum(log(mix + (1-mix)*dbeta(x, betapar[,1], betapar[,2])))
       if (cores > 1)
-        gx <- parApply(cl, xx, 1, dmix, betapar=betapar, mix=mix)
+        gx <- parApply(cl, xx, 1, dmix, betapar = betapar, mix = mix)
       else
-        gx <- apply(xx, 1, dmix, betapar=betapar, mix=mix)
+        gx <- apply(xx, 1, dmix, betapar = betapar, mix = mix)
       # prior:
       px <- rep(0, sample)
       for(s in 1:S)
@@ -135,14 +128,12 @@ marginalMPT <- function (eqnfile,
     }
 
     # likelihood:
-    # fx <- parapply(cl, xx, 1, )
-    fx <- #apply(xx, 1,
-      c(loglikMPT(xx,
-                  h=unlist(mod$mptInfo$data),
-                  a = mod$mptInfo$MPT$a,
-                  b = mod$mptInfo$MPT$b,
-                  c = mod$mptInfo$MPT$c,
-                  map = mod$mptInfo$MPT$map))
+    fx <- c(loglikMPT(xx,
+                      h=unlist(mod$mptInfo$data),
+                      a = mod$mptInfo$MPT$a,
+                      b = mod$mptInfo$MPT$b,
+                      c = mod$mptInfo$MPT$c,
+                      map = mod$mptInfo$MPT$map))
 
     # importance weights wx <- px-gx
     if (method == "importance"){
@@ -155,7 +146,7 @@ marginalMPT <- function (eqnfile,
   t1 <- Sys.time()
 
   ############### 4. Aproximate integral + batch SE
-  p <- c(mean = mean(c(samp)), SE=sd(c(samp))/sqrt(sample*batches))
+  p <- c(mean = mean(c(samp)), SE=sd(c(samp)) / sqrt(sample * batches))
   p.batch <- colMeans(samp)
   p.batch <- c("p" = mean(p.batch),
                "SE_p" = sd(p.batch)/sqrt(batches),
