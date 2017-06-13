@@ -14,7 +14,7 @@ BayesFactorMPT(models, dataset = 1, resample, batches = 5, scale = 1,
 
 \item{resample}{how much parameter posterior samples should be resampled per model}
 
-\item{batches}{number of batches to compute standard error}
+\item{batches}{number of batches. Used to compute a standard error of the estimate.}
 
 \item{scale}{how much should posterior-beta approximations be downscaled to get fatter importance-sampling density}
 

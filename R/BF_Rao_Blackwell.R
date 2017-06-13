@@ -7,7 +7,6 @@
 #' Computes Bayes factors for simple (fixed-effects, nonhierarchical) MPT models with beta distributions as priors on the parameters.
 #'
 #' @param models list of models fitted with \code{\link{simpleMPT}}, e.g., \code{list(mod1, mod2)}
-#' @param dataset for which data set should Bayes factors be computed?
 #' @param resample how much parameter posterior samples should be resampled per model
 #' @inheritParams marginalMPT
 #' @param store whether to save parameter samples

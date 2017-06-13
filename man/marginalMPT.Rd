@@ -4,9 +4,9 @@
 \alias{marginalMPT}
 \title{Marginal Likelihood for Simple MPT}
 \usage{
-marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1,
-  method = "importance", posterior = 500, mix = 0.2, scale = 0.95,
-  sample = 10000, batches = 10, show = TRUE, cores = 1)
+marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1, dataset = 1,
+  method = "importance", posterior = 500, mix = 0.05, scale = 0.9,
+  samples = 10000, batches = 10, show = TRUE, cores = 1)
 }
 \arguments{
 \item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
@@ -19,6 +19,8 @@ marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1,
 
 \item{beta}{second shape parameter(s)}
 
+\item{dataset}{for which data set should Bayes factors be computed?}
+
 \item{method}{either \code{"importance"} (importance sampling using a mixture of uniform and beta-aproximation of the posterior) or \code{"prior"} (brute force Monte Carlo sampling from prior)}
 
 \item{posterior}{number of posterior samples used to approximate importance-sampling densities (i.e., beta distributions)}
@@ -27,9 +29,9 @@ marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1,
 
 \item{scale}{how much should posterior-beta approximations be downscaled to get fatter importance-sampling density}
 
-\item{sample}{number of paramter samples}
+\item{samples}{total number of samples from parameter space}
 
-\item{batches}{number of batches to compute standard error}
+\item{batches}{number of batches. Used to compute a standard error of the estimate.}
 
 \item{show}{whether to show progress}
 
@@ -48,7 +50,6 @@ Alternatively, an importance sampler is used if \code{method = "importance"}, an
 \eqn{mix*U(0,1) + (1-mix)*Beta(scale*a_s, scale*b_s)}
 }
 \examples{
-\dontrun{
 # 2-High-Threshold Model
 eqn <- "## 2HTM ##
    Target  Hit  d
@@ -60,7 +61,7 @@ eqn <- "## 2HTM ##
 data <- c(Hit = 46, Miss = 14,
           FA = 14, CR = 46)
 
-# informative priors for guessing
+# weakly informative prior for guessing
 aa <- c(d = 1, g = 2)
 bb <- c(d = 1, g = 2)
 curve(dbeta(x, aa["g"], bb["g"]))
@@ -68,20 +69,17 @@ curve(dbeta(x, aa["g"], bb["g"]))
 # compute marginal likelihood
 htm <- marginalMPT(eqn, data,
                    alpha = aa, beta = bb,
-                   posterior = 200,
-                   sample = 500, cores = 1)
+                   posterior = 200, samples = 1000)
 # second model: g=.50
 htm.g50 <- marginalMPT(eqn, data, list("g=.5"),
                        alpha = aa, beta = bb,
-                       posterior = 200,
-                       sample = 500, cores = 1)
+                       posterior = 200, samples = 1000)
 
 # Bayes factor
 # (per batch to get estimation error)
 bf <- htm.g50$p.per.batch / htm$p.per.batch
 mean(bf)                 # BF
-sd(bf)/sqrt(length(bf))  # standard error
-}
+sd(bf)/sqrt(length(bf))  # standard error of BF estimate
 
 }
 \references{
