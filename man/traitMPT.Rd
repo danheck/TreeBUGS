@@ -12,11 +12,11 @@ traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
   autojags = NULL, ...)
 }
 \arguments{
-\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
+\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file is reserved for comments and always ignored.}
 
 \item{data}{The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)}
 
-\item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}}
+\item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}. Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly interpreted as equality constraints.}
 
 \item{covData}{Data that contains covariates, for which correlations with individual MPT parameters will be sampled. Either the path to a .csv file (comma-separated: rows=individuals in the same order as \code{data}; first row must contain covariate labels); or alternatively: a data frame or matrix (rows=individuals, columns = variables; covariate labels as column names). Note that in \code{betaMPT}, correlatios are computed for discrete variables that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})}
 

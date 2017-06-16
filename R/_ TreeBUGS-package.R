@@ -13,7 +13,7 @@
 #' @importFrom utils read.csv write.table write.csv capture.output
 #' @importFrom graphics axis plot points  segments abline boxplot curve hist lines par
 #' @importFrom grDevices rainbow adjustcolor
-#' @importFrom stats pnorm rnorm runif sd qnorm dnorm dbeta quantile rWishart ave pchisq window
+#' @importFrom stats pnorm rnorm runif sd qnorm dnorm dbeta quantile rWishart ave pchisq window rbinom var
 #' @importFrom parallel parSapply
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @importFrom MASS fitdistr

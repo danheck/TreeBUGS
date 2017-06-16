@@ -7,7 +7,7 @@
 withinSubjectEQN(eqnfile, labels, constant, save)
 }
 \arguments{
-\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}})}
+\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file is reserved for comments and always ignored.}
 
 \item{labels}{a character vector defining the labels that are added to the parameters in each within-subject condition}
 
