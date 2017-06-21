@@ -7,6 +7,7 @@
 #'
 #' @param x a fitted Beta or latent-trait MPT model
 #' @param includeIndividual whether to plot individual estimates
+#' @param addLines whether to connect individual parameter estimates by lines
 #' @param estimate type of point estimates for group-level and individual parameters (either \code{"mean"} or \code{"median"})
 #' @param select character vector of parameters to be plotted (e.g., \code{select = c("d", "g")}. Can be used to plot subsets of parameters and change the order of parameters.
 #' @param ... further arguments passed to the standard \code{\link{plot}} function
@@ -16,6 +17,7 @@
 #' @export
 plotParam <- function(x,
                       includeIndividual = TRUE,
+                      addLines = FALSE,
                       estimate = "mean",
                       select = "all",
                       ...){
@@ -46,16 +48,23 @@ plotParam <- function(x,
                           paste0(" and individual ",estimate,"s (gray)"),
                           "")), ...)
   axis(side = 1, at = 1:S, labels=select)
-  segments(x0=1:S, y0=par.group[,3],
-           y1=par.group[,5], lwd=2, col=2)
   if(includeIndividual){
     for(i in 1:N){
-      points(1:S + seq(-.2,.2, length.out = N)[i],
-             col = adjustcolor(col = "black", alpha.f = .5), #col=rainbow(N, alpha=.4)[i],
-             pch = 16,
-             par.ind[select,i,stat], cex=.9)
+      if (addLines){
+        lines(1:S, par.ind[select,i,stat],
+              col = adjustcolor(col = "black", alpha.f = .5))
+        points(1:S, par.ind[select,i,stat], cex=.9, pch=16,
+              col = adjustcolor(col = "black", alpha.f = .5))
+      } else {
+        points(1:S + seq(-.2,.2, length.out = N)[i],
+               col = adjustcolor(col = "black", alpha.f = .5), #col=rainbow(N, alpha=.4)[i],
+               pch = 16,
+               par.ind[select,i,stat], cex=.9)
+      }
     }
     points(1:S, means, cex=1.3,  col=2,pch=19)
   }
+  segments(x0=1:S, y0=par.group[,3],
+           y1=par.group[,5], lwd=2, col=2)
 
 }
