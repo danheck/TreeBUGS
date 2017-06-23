@@ -34,8 +34,13 @@ getParameter<-function(TreeData){
 
   Parameter <- unique(unlist(strsplit(TreeData$Equation,
                                       split="\\*|\\(|\\)|\\-|\\+")))
-  r <- c(which(nchar(Parameter)==0), grep("^[0-9]+$|^[0-9]+\\.[0-9]+", Parameter))
+  r <- c(which(nchar(Parameter) == 0),
+         grep("^[0-9]+$|^[0-9]+\\.[0-9]+", Parameter))
   Parameter <- Parameter[-r]
+
+  suppressWarnings(par.free <- is.na(as.numeric(Parameter)))
+  Parameter <- Parameter[par.free]
+
   #   Parameter=c(sort(Parameter[grepl("[A-Z]",Parameter)]),
   #               sort(Parameter[!grepl("[A-Z]",Parameter)]))
   # returns errors if model does not contain uppercase parameters
