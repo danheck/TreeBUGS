@@ -55,7 +55,7 @@ readEQN <- function(file,
     cat(paste0(model,"\n"), file=file)
   }
   # read first line if it contains model equations
-  multiTreeDefinition <- read.csv(file, header=F,
+  multiTreeDefinition <- read.csv(file, header=F, comment.char = "#",
                                   blank.lines.skip = TRUE, sep= "",
                                   stringsAsFactors=F, skip = 1)
 
