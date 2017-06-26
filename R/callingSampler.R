@@ -36,6 +36,7 @@ callingSampler <- function(model,
                            n.thin=5,
                            n.chains=3,
                            autojags=NULL,
+                           seed = sample.int(1e10, 1),
                            # savetable = NULL,
                            ...){
 
@@ -151,11 +152,13 @@ callingSampler <- function(model,
     ini
   }
   inits.list <- replicate(n.chains, inits(), simplify=FALSE)
-  for(i in 1:length(inits.list))
+  for(i in 1:length(inits.list)){
     inits.list[[i]]$.RNG.name <- c("base::Wichmann-Hill",
                                    "base::Marsaglia-Multicarry",
                                    "base::Super-Duper",
                                    "base::Mersenne-Twister")[1+ (i-1)%% 4]
+    inits.list[[i]]$.RNG.seed <- seed + i
+  }
   n.samples <- ceiling((n.iter-n.burnin)/n.thin)
   choice <- ""
   if(n.samples > 10000){
