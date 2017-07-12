@@ -23,6 +23,13 @@ plotParam(x, includeIndividual = TRUE, addLines = FALSE,
 \description{
 Plot parameter estimates for hierarchical MPT models.
 }
+\examples{
+\dontrun{
+plotParam(fit, addLines = TRUE,
+          estimate = "median",
+          select = c("d1", "d2"))
+}
+}
 \seealso{
 \code{\link{betaMPT}}, \code{\link{traitMPT}}, \code{\link{plotDistribution}}
 }

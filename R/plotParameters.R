@@ -14,6 +14,12 @@
 #'
 #' @author Daniel Heck
 #' @seealso \code{\link{betaMPT}}, \code{\link{traitMPT}}, \code{\link{plotDistribution}}
+#' @examples
+#' \dontrun{
+#' plotParam(fit, addLines = TRUE,
+#'           estimate = "median",
+#'           select = c("d1", "d2"))
+#' }
 #' @export
 plotParam <- function(x,
                       includeIndividual = TRUE,

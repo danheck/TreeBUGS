@@ -35,9 +35,7 @@ printSummary <- function(x, model, ...){
 
   if(model == "traitMPT" &&
      nrow(x$groupParameters$rho.matrix) != 1){
-    cat("\nCorrelations of latent-trait values on probit scale",
-        "\n (only quantifies the uncertainty with respect to parameter estimation",
-        "\n  not with respect to sample size! See ?correlationPosterior):\n")
+    cat("\nCorrelations of latent-trait values on probit scale")
     print(round(x$groupParameters$rho, x$round))
     cat("\nCorrelations (posterior mean estimates) in matrix form:\n")
     print(round(x$groupParameters$rho.matrix, x$round))
@@ -75,7 +73,9 @@ printSummary <- function(x, model, ...){
   }
 
   if(!is.null(x$groupParameters$correlation) && !nrow(x$groupParameters$correlation) == 0){
-    cat("\nSampled correlations of MPT parameters with covariates:\n")
+    cat("\nSampled correlations of MPT parameters with covariates:\n",
+        "\n (only quantifies the uncertainty with respect to parameter estimation",
+        "\n  not with respect to sample size! See ?correlationPosterior):\n")
     print(round(x$groupParameters$correlation, x$round))
   }
 
