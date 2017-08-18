@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // betampt
 List betampt(int M, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec shape, arma::vec rate);
-RcppExport SEXP TreeBUGS_betampt(SEXP MSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP shapeSEXP, SEXP rateSEXP) {
+RcppExport SEXP _TreeBUGS_betampt(SEXP MSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP shapeSEXP, SEXP rateSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -26,7 +26,7 @@ END_RCPP
 }
 // simplempt
 List simplempt(int M, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec alpha, arma::vec beta);
-RcppExport SEXP TreeBUGS_simplempt(SEXP MSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
+RcppExport SEXP _TreeBUGS_simplempt(SEXP MSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -44,7 +44,7 @@ END_RCPP
 }
 // loglikMPT
 arma::vec loglikMPT(arma::mat theta, arma::vec h, arma::mat a, arma::mat b, arma::vec c, arma::vec map);
-RcppExport SEXP TreeBUGS_loglikMPT(SEXP thetaSEXP, SEXP hSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP) {
+RcppExport SEXP _TreeBUGS_loglikMPT(SEXP thetaSEXP, SEXP hSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
