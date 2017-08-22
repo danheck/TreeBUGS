@@ -36,14 +36,10 @@
 #'
 #' @importFrom parallel clusterExport makeCluster stopCluster parLapply parApply
 #' @importFrom  stats cor cov2cor density rmultinom
-priorPredictive <- function(prior,
-                            eqnfile,
-                            restrictions,
-                            numItems,
-                            level = "data",
-                            N=1,
-                            M=100,
-                            nCPU=4){
+priorPredictive <- function(prior, eqnfile, restrictions,
+                            numItems, level = "data", N=1, M=100, nCPU=4){
+
+  if (missing(restrictions)) restrictions <- NULL
   # 1. get MPT model
   mpt <- readEQN(eqnfile, restrictions = restrictions)
   merged <- thetaHandling(mpt, restrictions)

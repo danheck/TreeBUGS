@@ -160,35 +160,17 @@ callingSampler <- function(model,
     inits.list[[i]]$.RNG.seed <- seed + i
   }
   n.samples <- ceiling((n.iter-n.burnin)/n.thin)
-  choice <- ""
-  if(n.samples > 10000){
-    choice <- readline(prompt =
-                         paste0("\n############ Warning ################\n",
-                                "Your present MCMC settings for n.burnin/n.iter/n.thin\n",
-                                "imply that more than 10,000 samples are stored per parameter per chain.\n",
-                                "This might result in problems due to an overload of your computers memory (RAM).\n",
-                                "If you are sure you want to continue, press <RETURN>."))
-  }
-  if(choice != "")
-    stop("Model fitting terminated by user.")
-
+  if(n.samples > 30000)
+    warning("Note: Your present MCMC settings for n.burnin/n.iter/n.thin\n",
+            "      imply that more than 30,000 samples are stored per parameter per chain.\n",
+            "      This might result in problems due to an overload of your computers memory (RAM).")
 
   data.list <-  lapply(data, get, envir=environment())
   names(data.list) <- data
-  samples <- run.jags(model = modelfile,
-                      monitor=c(parametervector, "deviance"),
-                      data=data.list,
-                      n.chains=n.chains,
-                      inits=inits.list,
-                      burnin=n.burnin,
-                      adapt=n.adapt,
-                      sample=n.samples,
-                      thin=n.thin,
-                      modules=c("dic","glm"),
-                      summarise=FALSE,
-                      method="parallel",
-                      ...)
-
+  samples <- run.jags(model = modelfile, monitor=c(parametervector, "deviance"),
+                      data=data.list, inits=inits.list, n.chains=n.chains,
+                      burnin=n.burnin, adapt=n.adapt,  sample=n.samples, thin=n.thin,
+                      modules=c("dic","glm"), summarise=FALSE, method="parallel", ...)
 
   if(!is.null(autojags)){
     cat("#####################################\n

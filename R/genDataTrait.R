@@ -34,6 +34,7 @@
 genTraitMPT <- function(N, numItems, eqnfile, restrictions,
                         mean=NULL, sigma=NULL, rho=NULL,
                         warning=TRUE){
+
   if(missing(restrictions))
     restrictions <- NULL
   Tree <- readEQN(eqnfile)
@@ -77,8 +78,9 @@ genTraitMPT <- function(N, numItems, eqnfile, restrictions,
     # thetaLatent <- matrix(qnorm(mean), N, S, byrow = TRUE) + iidNormal %*% cholesky
     thetaLatent <- mvrnorm(N, qnorm(mean), covMatrix)
   }else{
-    thetaLatent <- matrix(rnorm(N, qnorm(mean), sigma), N, S)
+    thetaLatent <- rnorm(N, qnorm(mean), sigma)
   }
+  dim(thetaLatent) <- c(N, S)
   colnames(thetaLatent) <- thetaNames
   theta <- pnorm(thetaLatent)
 
