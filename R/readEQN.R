@@ -42,10 +42,8 @@
 #' @author Daniel Heck, Denis Arnold, Nina Arnold
 #' @references Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
 #' @export
-readEQN <- function(file,
-                    restrictions=NULL,
-                    paramOrder = FALSE,
-                    parse=FALSE){
+readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
+
   if(missing(restrictions)) restrictions <- NULL
 
   isPath <- !grepl("\n", x=file, ignore.case = TRUE)
@@ -55,17 +53,18 @@ readEQN <- function(file,
     cat(paste0(model,"\n"), file=file)
   }
   # read first line if it contains model equations
-  multiTreeDefinition <- read.csv(file, header=F, comment.char = "#",
-                                  blank.lines.skip = TRUE, sep= "",
-                                  stringsAsFactors=F, skip = 1)
-
+  nvars <- max(count.fields(file, sep = "", skip = 1))
+  multiTreeDefinition <- read.csv(file, header = FALSE, comment.char = "#",
+                                  blank.lines.skip = TRUE, sep= "", strip.white = TRUE,
+                                  stringsAsFactors = FALSE, skip = 1,
+                                  col.names = paste0("V",seq(nvars)))
 
   # number of branches implied by number of rows in model file:
   numberOfBranches <- nrow(multiTreeDefinition)
   cols <- ncol(multiTreeDefinition)
   Tree <- data.frame(Tree = paste0("T_",multiTreeDefinition$V1),
                      Category = multiTreeDefinition$V2,
-                     Equation = multiTreeDefinition$V3)
+                     Equation = NA_character_)
   Tree$Equation <- apply(multiTreeDefinition[,3:cols, drop=FALSE], 1, paste0, collapse="")
 
   TreeRestr <- thetaHandling(Tree, restrictions)
