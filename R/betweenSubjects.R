@@ -68,8 +68,9 @@ betweenSubjectMPT <- function(model1, model2,
     warning("Different numbers of iterations for both models. Some iterations are dropped!")
     nn <- min(nrow(pp1[[1]]), nrow(pp2[[1]]))
     for(mm in 1:length(pp1)){
-      pp1[[mm]] <- pp1[[mm]][,1:nn]
-      pp2[[mm]] <- pp2[[mm]][,1:nn]
+      round(seq(1, nrow(pp1[[mm]]), length.out = nn))
+      pp1[[mm]] <- pp1[[mm]][round(seq(1, nrow(pp1[[mm]]), length.out = nn)),,drop = FALSE]
+      pp2[[mm]] <- pp2[[mm]][round(seq(1, nrow(pp2[[mm]]), length.out = nn)),,drop = FALSE]
     }
   }
 

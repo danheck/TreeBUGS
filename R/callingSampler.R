@@ -159,6 +159,7 @@ callingSampler <- function(model,
                                    "base::Mersenne-Twister")[1+ (i-1)%% 4]
     inits.list[[i]]$.RNG.seed <- seed + i
   }
+
   n.samples <- ceiling((n.iter-n.burnin)/n.thin)
   if(n.samples > 30000)
     warning("Note: Your present MCMC settings for n.burnin/n.iter/n.thin\n",
@@ -167,10 +168,17 @@ callingSampler <- function(model,
 
   data.list <-  lapply(data, get, envir=environment())
   names(data.list) <- data
-  samples <- run.jags(model = modelfile, monitor=c(parametervector, "deviance"),
-                      data=data.list, inits=inits.list, n.chains=n.chains,
-                      burnin=n.burnin, adapt=n.adapt,  sample=n.samples, thin=n.thin,
-                      modules=c("dic","glm"), summarise=FALSE, method="parallel", ...)
+  if (any(c("initlist", "inits", "init") %in% names(list(...)))){
+    samples <- run.jags(model = modelfile, monitor=c(parametervector, "deviance"),
+                        data=data.list, n.chains=n.chains,
+                        burnin=n.burnin, adapt=n.adapt,  sample=n.samples, thin=n.thin,
+                        modules=c("dic","glm"), summarise=FALSE, method="parallel", ...)
+  } else {
+    samples <- run.jags(model = modelfile, monitor=c(parametervector, "deviance"),
+                        data=data.list, inits=inits.list, n.chains=n.chains,
+                        burnin=n.burnin, adapt=n.adapt,  sample=n.samples, thin=n.thin,
+                        modules=c("dic","glm"), summarise=FALSE, method="parallel", ...)
+  }
 
   if(!is.null(autojags)){
     cat("#####################################\n
