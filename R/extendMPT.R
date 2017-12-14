@@ -3,7 +3,7 @@
 #'
 #' @param fittedModel a fitted \code{\link{traitMPT}} or \code{\link{betaMPT}}
 #' @inheritParams betaMPT
-#' @param ... further arguments passed to \link[runjags]{extend.jags}
+#' @param ... further arguments passed to \link[runjags]{run.jags}
 #' @export
 extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,  ...){
 

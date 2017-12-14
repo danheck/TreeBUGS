@@ -17,7 +17,7 @@
 
 \item{parameter}{which parameter to plot (e.g., \code{"theta"}, \code{"mean"}, \code{"rho"}, \code{"slope"}). Parameters are matched partially, in order to plot all entries of vector valued parameters (see \code{\link{getParam}} to get a list of parameters). Moreover, parameter labels can be used, e.g., \code{"theta[D]"} or \code{"rho[D,g]"}}
 
-\item{type}{type of convergence plot. Can be one of \code{"default"} (trace+density), \code{"acf"} (auto-correlation function), \code{"trace"}, \code{"autocorr"}, \code{"crosscorr"},\code{"density"},   \code{"gelman"}. See, e.g., \code{\link[coda]{plot.mcmc.list}}}
+\item{type}{type of convergence plot. Can be one of \code{"default"} (trace+density), \code{"acf"} (auto-correlation function), \code{"trace"}, \code{"autocorr"}, \code{"crosscorr"},\code{"density"},   \code{"gelman"}. See, e.g., \code{\link[coda]{mcmc.list}}}
 
 \item{...}{further arguments passed to the plotting functions in coda}
 }

@@ -15,7 +15,7 @@ extendMPT(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0, ...)
 
 \item{n.burnin}{Number of samples for burnin (samples will not be stored and removed from n.iter)}
 
-\item{...}{further arguments passed to \link[runjags]{extend.jags}}
+\item{...}{further arguments passed to \link[runjags]{run.jags}}
 }
 \description{
 Extend MCMC Sampling for MPT Model

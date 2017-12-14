@@ -48,7 +48,7 @@ traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
 
 \item{n.chains}{number of MCMC chains (sampled in parallel).}
 
-\item{dic}{whether to compute DIC using \code{\link[runjags]{extract}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
+\item{dic}{whether to compute DIC using \code{\link[runjags]{extract.runjags}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
 
 \item{ppp}{number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})}
 
@@ -59,7 +59,7 @@ Default is to write this information to the tempdir as required by CRAN standard
 
 \item{posteriorFile}{path to RData-file where to save the model including MCMC posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile="mcmc.RData"})}
 
-\item{autojags}{if provided (as an empty list or with arguments passed to \link[runjags]{autoextend.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)}
+\item{autojags}{if provided (as an empty list or with arguments passed to \link[runjags]{autorun.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)}
 
 \item{...}{Arguments to be passed to the JAGS sampling function (i.e., to \code{\link[runjags]{run.jags}}.}
 }
