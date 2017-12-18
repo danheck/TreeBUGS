@@ -4,12 +4,14 @@
 \alias{summarizeMCMC}
 \title{MCMC Summary}
 \usage{
-summarizeMCMC(mcmc, batchSize = 100)
+summarizeMCMC(mcmc, batchSize = 100, probs = c(0.025, 0.5, 0.975))
 }
 \arguments{
 \item{mcmc}{a \code{\link[coda]{mcmc.list}} object}
 
 \item{batchSize}{size of batches of parameters used to reduce memory load when computing (univariate) Rhat statistics}
+
+\item{probs}{quantile probabilities used to compute credibility intervals}
 }
 \description{
 TreeBUGS-specific summary for \code{mcmc.list}-objects.

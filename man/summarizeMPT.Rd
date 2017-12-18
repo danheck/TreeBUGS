@@ -4,12 +4,14 @@
 \alias{summarizeMPT}
 \title{Summarize JAGS Output for Hierarchical MPT Models}
 \usage{
-summarizeMPT(mcmc, mptInfo, summ = NULL)
+summarizeMPT(mcmc, mptInfo, probs = c(0.025, 0.5, 0.975), summ = NULL)
 }
 \arguments{
 \item{mcmc}{the actual mcmc.list output of the sampler of a fitted MPT model (accesible via \code{fittedModel$runjags$mcmc})}
 
 \item{mptInfo}{the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})}
+
+\item{probs}{quantile probabilities used to compute credibility intervals}
 
 \item{summ}{optional argument for internal use}
 }

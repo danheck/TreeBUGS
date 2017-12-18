@@ -3,6 +3,7 @@
 #' Provide clean and readable summary statistics tailored to MPT models based on the JAGS output.
 #'
 # @param model either \code{"betaMPT"} or \code{"traitMPT"}
+#' @inheritParams summarizeMCMC
 #' @param mcmc the actual mcmc.list output of the sampler of a fitted MPT model (accesible via \code{fittedModel$runjags$mcmc})
 #' @param mptInfo the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})
 # @param dic whether to compute DIC statistic for model selection (requires additional sampling!)
@@ -20,13 +21,9 @@
 #' }
 #' @export
 #' @import rjags
-summarizeMPT <- function(mcmc,
-                         mptInfo,
-                         # M=2000,
-                         summ = NULL
-){
-  if(is.null(summ))
-    summ <- summarizeMCMC(mcmc)
+summarizeMPT <- function(mcmc, mptInfo, probs = c(.025,.50,.975), summ = NULL){
+  if(is.null(summ) | !all(paste0(probs*100, "%") %in% colnames(summ)))
+    summ <- summarizeMCMC(mcmc, probs = probs)
 
   predFactorLevels <- mptInfo$predFactorLevels
   transformedParameters <- mptInfo$transformedParameters
