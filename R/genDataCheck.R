@@ -49,23 +49,23 @@ checkNamingMatrix <- function(S, thetaNames, matrix,
   return(matrix)
 }
 
-checkNaming <- function(S, thetaNames, vector, vectorName, warning=TRUE){
+checkNaming <- function(S, thetaNames, vector, vectorName,
+                        interval = c(0, Inf), warning=TRUE){
   if(S != length(vector))
     stop("Length of '",vectorName,"' not correct, should be ", S)
   if(is.null(names(vector))){
     if(warning)
-      warning("Vector '",vectorName,"' not named. Internal order of parameters is used, see ?readMultiTree and check parameters by generatedData$parameters")
+      warning("Vector '",vectorName,"' not named. Internal order of parameters",
+              " is used, see ?readMultiTree and check parameters by generatedData$parameters")
     names(vector) <- thetaNames
-    #     cat(vectorName, ":\n")
-    #     print(vector)
   }else if(any(sort(thetaNames) != sort(names(vector)))){
     stop("Parameter names of vector '",vectorName,"' do not match parameter labels in eqn file.")
   }else{
     vector <- vector[thetaNames]
   }
 
-  if(any(vector<0))
-    stop("'",vectorName,"' cannot be negative!")
+  if(any(vector < interval[1] | vector > interval[2]))
+    stop("'",vectorName,"' cannot be below ", interval[1], " or above ", interval[2],".")
 
   return(vector)
 }

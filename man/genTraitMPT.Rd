@@ -2,10 +2,10 @@
 % Please edit documentation in R/genDataTrait.R
 \name{genTraitMPT}
 \alias{genTraitMPT}
-\title{Generate Data for Trait MPT Models}
+\title{Generate Data for Latent-Trait MPT Models}
 \usage{
-genTraitMPT(N, numItems, eqnfile, restrictions, mean = NULL, sigma = NULL,
-  rho = NULL, warning = TRUE)
+genTraitMPT(N, numItems, eqnfile, restrictions, mean, mu, sigma, rho,
+  warning = TRUE)
 }
 \arguments{
 \item{N}{number of participants}
@@ -16,21 +16,46 @@ genTraitMPT(N, numItems, eqnfile, restrictions, mean = NULL, sigma = NULL,
 
 \item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}. Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly interpreted as equality constraints.}
 
-\item{mean}{Named vector of true group means of individual MPT parameters (probabilities in the interval [0,1]). If the vector is not named, the internal order of parameters is used (can be obtained using \code{\link{readEQN}}).}
+\item{mean}{named vector of data-generating group means of the individual MPT parameters
+on the probability scale.
+If the vector is not named, the internal order of parameters is used
+(can be obtained using \code{\link{readEQN}}).}
 
-\item{sigma}{(named) vector of group standard deviations of latent (!) individual MPT parameters. Default is zero (no person heterogeneity).}
+\item{mu}{an alternative way to define the group-level means on the latent-probit scale
+(i.e., \code{mu = qnorm(mean)} or equivalently, \code{mean = pnorm(mu)}).}
 
-\item{rho}{(named) correlation matrix for latent (!) individual MPT parameters. Must be symmetric and positive definite (e.g., no correlations of 1 or -1 allowed). Default: a diagonal matrix (i.e., zero correlations)
+\item{sigma}{(named) vector of group standard deviations of
+individual MPT parameters on the latent probit scale.
+Default is zero (no person heterogeneity).}
 
-Data are generated independently from the JAGS model files used for fitting the Trait-MPT model. If data for an equality-constrained version of the MPT model are required, the restrictions need to be hard-coded into the EQN-model file. Note that equal means still result in nonidentical MPT parameters on the individual level!}
+\item{rho}{(named) correlation matrix for individual MPT parameters on the
+latent probit scale. Must be symmetric and positive definite (e.g., no
+correlations of 1 or -1 allowed).
+Default: a diagonal matrix (i.e., zero correlations).}
 
-\item{warning}{whether to show warning in case the naming of arguments does not match}
+\item{warning}{whether to show warning in case the naming of data-generating
+parameters are unnamed or do not match}
 }
 \value{
-a list including the generated frequencies (\code{data}) and the true, underlying parameters (\code{parameters})
+a list including the generated frequencies per person (\code{data})
+    and the sampled individual parameters (\code{parameters}) on the probit
+    and probability scale (\code{thetaLatent} and \code{theta}, respectively).
 }
 \description{
-Generating a data file with known parameter structure using the Trait-MPT. Useful for simulations and robustness checks.
+Generating a data set with known parameter structure using the Trait-MPT.
+Useful for simulations and robustness checks.
+}
+\details{
+This functions implements a two-step sampling procedure. First, the person
+parameters on the latent probit-scale are sampled from the multivariate normal
+distribution (based on the mean \code{mu = qnorm(mean)}, the standard deviations
+\code{sigma}, and the correlation matrix \code{rho}).
+These person parameters are then transformed to the probability scale using
+the probit-link.
+In a last step, observed frequencies are sampled for each person using the MPT equations.
+
+Note that the user can generate more complex structures for the latent person parameters,
+and then supply these person parameters to the function \code{\link{genMPT}}.
 }
 \examples{
 # Example: Standard Two-High-Threshold Model (2HTM)

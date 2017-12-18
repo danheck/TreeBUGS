@@ -16,23 +16,32 @@ genBetaMPT(N, numItems, eqnfile, restrictions, mean = NULL, sd = NULL,
 
 \item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}. Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly interpreted as equality constraints.}
 
-\item{mean}{Named vector of true group means of individual MPT parameters. If the vector is not named, the internal order of parameters is used (can be obtained using \code{\link{readEQN}}).}
+\item{mean}{Named vector of true group means of individual MPT parameters.
+If the vector is not named, the internal order of parameters is used
+(can be obtained using \code{\link{readEQN}}).}
 
 \item{sd}{named vector of group standard deviations of individual MPT parameters.}
 
-\item{alpha}{Alternative specification of the group-level distribution using the shape parameters of the beta distribution (see \link{dbeta}).}
+\item{alpha}{Alternative specification of the group-level distribution using
+the shape parameters of the beta distribution (see \link{dbeta}).}
 
-\item{beta}{see \code{alpha}
+\item{beta}{see \code{alpha}}
 
-Data are generated independently from the JAGS model files used for fitting the Beta-MPT model. If data for an equality-constrained version of the MPT model are required, the restrictions need to be hard-coded into the EQN-model file. Note that equal means still result in nonidentical MPT parameters on the individual level!}
-
-\item{warning}{whether to show warning in case the naming of arguments does not match}
+\item{warning}{whether to show warning in case the naming of data-generating
+parameters are unnamed or do not match}
 }
 \value{
-a list including the generated frequencies (\code{data}) and the true, underlying parameters (\code{parameters})
+a list including the generated frequencies (\code{data}) and the true,
+underlying parameters (\code{parameters}) on the group and individual level.
 }
 \description{
 Generating a data file with known parameter structure using the Beta-MPT. Useful for simulations and robustness checks.
+}
+\details{
+Data are generated in a two-step procedure. First, person parameters are sampled
+from the specified beta distributions for each paramter (either based on mean/sd
+or based on alpha/beta). In a second step, response frequencies are sampled
+for each person using \code{\link{genMPT}}.
 }
 \examples{
 # Example: Standard Two-High-Threshold Model (2HTM)

@@ -4,7 +4,8 @@
 #' @param theta matrix of MPT parameters (rows: individuals; columns: parameters). Parameters are assigned by column names of the matrix. all of the parameters in the model file need to be included.
 #' @param numItems number of responses per tree (a named vector with tree labels)
 #' @inheritParams betaMPT
-#' @param warning whether to show warning in case the naming of arguments does not match
+#' @param warning whether to show warning in case the naming of data-generating
+#'    parameters are unnamed or do not match
 #' @seealso \code{\link{genTraitMPT}} and \code{\link{genBetaMPT}} to generate data for latent normal/beta hierarchical distributions.
 #' @examples
 #' # Example: Standard Two-High-Threshold Model (2HTM)
@@ -30,23 +31,23 @@ genMPT <- function(theta, numItems, eqnfile, restrictions, warning=TRUE){
 
   # get number of parmaeters/number of participants
   S <- length(thetaNames)
-  if(is.vector(theta))
+  if (is.vector(theta))
     theta <- matrix(theta, 1, dimnames=list(NULL, names(theta)))
   N <- nrow(theta)
 
   ################### check input + default values
-  if(is.null(colnames(theta))){
-    if(warning)
+  if (is.null(colnames(theta))){
+    if (warning)
       warning("Colnames for theta are missing. Parameters are assigned by default as:\n  ",
               paste(thetaNames, collapse=", "))
     colnames(theta) <- thetaNames
   }
-  if(is.null(names(numItems))){
-    if(warning)
+  if (is.null(names(numItems))){
+    if (warning)
       warning("Tree labels for numitems are missing. Tree labels are assigned by default as:\n  ",
               paste(treeLabels, collapse=", "))
     names(numItems) <- treeLabels
-  }else{
+  } else {
     names(numItems) <- paste0("T_", names(numItems))
   }
   theta <- checkThetaNames(theta, thetaNames)
@@ -61,7 +62,7 @@ genMPT <- function(theta, numItems, eqnfile, restrictions, warning=TRUE){
   #   names(consts) <- Tree.restr$constants$Parameter
   colnames(theta) <- paste0("theta[",1:S,"]")
   eq <- gsub(",n","", Tree.restr$mergedTree$Equation, fixed=TRUE)
-  for(n in 1:N){
+  for (n in 1:N){
     mergedTree$prob <- sapply(eq, function(ff) eval(parse(text=ff),
                                                     list(theta=theta[n,])))
 

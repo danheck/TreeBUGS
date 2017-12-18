@@ -5,15 +5,23 @@
 #' @inheritParams betaMPT
 #' @inheritParams genMPT
 #' @param N number of participants
-#' @param mean Named vector of true group means of individual MPT parameters. If the vector is not named, the internal order of parameters is used (can be obtained using \code{\link{readEQN}}).
+#' @param mean Named vector of true group means of individual MPT parameters.
+#'     If the vector is not named, the internal order of parameters is used
+#'     (can be obtained using \code{\link{readEQN}}).
 #' @param sd named vector of group standard deviations of individual MPT parameters.
-#' @param alpha Alternative specification of the group-level distribution using the shape parameters of the beta distribution (see \link{dbeta}).
+#' @param alpha Alternative specification of the group-level distribution using
+#'     the shape parameters of the beta distribution (see \link{dbeta}).
 #' @param beta see \code{alpha}
 #'
-#' Data are generated independently from the JAGS model files used for fitting the Beta-MPT model. If data for an equality-constrained version of the MPT model are required, the restrictions need to be hard-coded into the EQN-model file. Note that equal means still result in nonidentical MPT parameters on the individual level!
+#' @details
+#' Data are generated in a two-step procedure. First, person parameters are sampled
+#' from the specified beta distributions for each paramter (either based on mean/sd
+#' or based on alpha/beta). In a second step, response frequencies are sampled
+#' for each person using \code{\link{genMPT}}.
 #'
 #' @seealso \code{\link{genMPT}}
-#' @return a list including the generated frequencies (\code{data}) and the true, underlying parameters (\code{parameters})
+#' @return a list including the generated frequencies (\code{data}) and the true,
+#' underlying parameters (\code{parameters}) on the group and individual level.
 #'
 #' @examples
 #' # Example: Standard Two-High-Threshold Model (2HTM)
@@ -32,7 +40,7 @@ genBetaMPT <- function(N, numItems, eqnfile, restrictions,
                        mean=NULL, sd=NULL,
                        alpha=NULL, beta=NULL,
                        warning=TRUE){
-  if(missing(restrictions))
+  if (missing(restrictions))
     restrictions <- NULL
   Tree <- readEQN(eqnfile)
   mergedTree <- mergeBranches(Tree)
@@ -40,38 +48,36 @@ genBetaMPT <- function(N, numItems, eqnfile, restrictions,
   thetaNames <-  Tree.restr$SubPar[,1:2]
   thetaNames <- thetaNames[rownames(unique(thetaNames[2])),]$Parameter
   treeLabels <- unique(mergedTree$Tree)
-
-  # mergedTree <- mergeBranches(Tree)
-  # thetaNames <- getParameter(mergedTree)
   S <- length(thetaNames)
 
 
-  if(!is.null(mean) && !is.null(sd)){
-    mean <- checkNaming(S, thetaNames, mean, "mean", warning=warning)
-    sd <- checkNaming(S, thetaNames, sd, "sd", warning=warning)
+  if (!is.null(mean) && !is.null(sd)){
+    mean <- checkNaming(S, thetaNames, mean, "mean",
+                        interval = c(0,1), warning=warning)
+    sd <- checkNaming(S, thetaNames, sd, "sd",
+                      interval = c(0,Inf), warning=warning)
 
     alpha <- ((1 - mean) / sd^2 - 1 / mean) * mean ^ 2
     beta <- alpha * (1 / mean - 1)
-
-    #     alpha <- -(mean*(mean^2-mean+sd^2))/sd^2
-    #     beta <- ((mean-1)*(mean^2-mean+sd^2))/sd^2
-    if(any(alpha<=0) | any(beta<=0))
+    if (any(alpha<=0) | any(beta<=0))
       stop("Check numerical values for mean and sd, result in negative alpha/beta\n",
            "parameters of beta-hyperprior distribution.")
-  }else if(!is.null(alpha) && !is.null(beta)){
-    alpha <- checkNaming(S, thetaNames, alpha, "alpha", warning=warning)
-    beta <- checkNaming(S, thetaNames, beta, "beta", warning=warning)
+  } else if (!is.null(alpha) && !is.null(beta)){
+    alpha <- checkNaming(S, thetaNames, alpha, "alpha",
+                         interval = c(0,Inf), warning=warning)
+    beta <- checkNaming(S, thetaNames, beta, "beta",
+                        interval = c(0,Inf), warning=warning)
 
-  }else{
-    stop("Either 'mean' and 'sd' or 'alpha' and 'beta' must be provided.")
+  } else {
+    stop ("Either 'mean'/'sd' or 'alpha'/'beta' must be provided.")
   }
 
   # individual parameters, drawn from hierarchical distribution:
   theta <- c()
-  for(s in 1:S){
-    if(!is.null(sd) && sd[s] == 0){
+  for (s in 1:S){
+    if (!is.null(sd) && sd[s] == 0){
       theta <- cbind(theta,rep(mean[s],N))
-    }else{
+    } else {
       theta <- cbind(theta, rbeta(N, shape1 = alpha[s], shape2 = beta[s]))
     }
   }
@@ -79,8 +85,6 @@ genBetaMPT <- function(N, numItems, eqnfile, restrictions,
 
   # response frequencies:
   freq <- genMPT(theta, numItems, eqnfile, restrictions, warning=warning)
-
-  res <- list(data = freq, parameters = list(theta=theta, mean=mean,
-                                             sd=sd, alpha=alpha, beta=beta))
-  return(res)
+  list(data = freq,
+       parameters = list(theta=theta, mean=mean, sd=sd, alpha=alpha, beta=beta))
 }

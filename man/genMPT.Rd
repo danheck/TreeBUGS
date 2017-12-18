@@ -15,7 +15,8 @@ genMPT(theta, numItems, eqnfile, restrictions, warning = TRUE)
 
 \item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}. Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly interpreted as equality constraints.}
 
-\item{warning}{whether to show warning in case the naming of arguments does not match}
+\item{warning}{whether to show warning in case the naming of data-generating
+parameters are unnamed or do not match}
 }
 \description{
 Uses a matrix of individual MPT parameters to generate MPT frequencies.
