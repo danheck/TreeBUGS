@@ -4,7 +4,7 @@
 \alias{PPP}
 \title{Compute Posterior Predictive P-Values}
 \usage{
-PPP(fittedModel, M = 1000, nCPU = 4, T2 = TRUE)
+PPP(fittedModel, M = 1000, nCPU = 4, T2 = TRUE, type = "X2")
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
@@ -14,6 +14,8 @@ PPP(fittedModel, M = 1000, nCPU = 4, T2 = TRUE)
 \item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires considerable computer-memory resources (as a remedy, use \code{nCPU=1}).}
 
 \item{T2}{whether to compute T2 statistic to check coveriance structure (can take a lot of time)}
+
+\item{type}{whether the T1 statistic of expected means is computed using Person's \code{"X2"} or the likelihood-ratio statistic \code{"G2"}}
 }
 \description{
 Computes posterior predictive p-values to test model fit.

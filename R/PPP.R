@@ -5,6 +5,7 @@
 #' Computes posterior predictive p-values to test model fit.
 #' @inheritParams posteriorPredictive
 #' @param T2 whether to compute T2 statistic to check coveriance structure (can take a lot of time)
+#' @param type whether the T1 statistic of expected means is computed using Person's \code{"X2"} or the likelihood-ratio statistic \code{"G2"}
 #' @author Daniel Heck
 #' @references
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
@@ -12,7 +13,7 @@
 #' @importFrom  stats cov
 #' @importFrom  utils combn
 #' @importFrom parallel clusterMap
-PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE){
+PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE, type = "X2"){
 
   cats <- fittedModel$mptInfo$MPT$Category
   tree <- fittedModel$mptInfo$MPT$Tree
@@ -29,14 +30,16 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE){
 
 
 
-  # sample conditional on expected probabilities:
-  freq.pred <- lapply(freq.exp, function(fe){
+  # sample conditional on expected probabilities: (TODO: Cpp sampling; cf. mpt2irt)
+  freq.pred <- freq.exp
+  for (r in 1:length(freq.pred)){
     for(k in 1:length(TreeNames)){
-      fe[,sel[[k]]] <- t(apply(fe[,sel[[k]]], 1,
-                               function(x) rmultinom(1, size=sum(x), prob=x/sum(x))))
+      for(i in 1:nrow(freq.pred[[r]])){
+        nn <- freq.exp[[r]][i,sel[[k]]]
+        freq.pred[[r]][i,sel[[k]]] <- rmultinom(1, round(sum(nn)), nn)
+      }
     }
-    fe
-  })
+  }
 
   freq.obs <- fittedModel$mptInfo$data[,colnames(freq.pred[[1]])]
 
@@ -47,31 +50,35 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE){
 
   cl <- makeCluster(nCPU)
   clusterExport(cl, c("TreeNames", "T1stat", "mean.obs", "mean.pred","mean.exp",
-                      "freq.exp","freq.obs","freq.pred"),
+                      "freq.exp","freq.obs","freq.pred", "type"),
                 envir=environment())
 
   # statistics:
-  T1.obs <- T1.pred <-T2.obs <- T2.pred <- NULL
+  T1.obs <- T1.pred <- T2.obs <- T2.pred <- NULL
   ind.T1.obs <- ind.T1.pred <- matrix(NA, M, nrow(freq.obs))
   try({
 
 
-    T1.obs <- parApply(cl, mean.exp, 1, T1stat, n=mean.obs)
+    T1.obs <- parApply(cl, mean.exp, 1, T1stat, n=mean.obs, type = type)
     # T1stat(mean.exp[10,], mean.obs) ; T1.obs[10]
     T1.pred <- clusterMap(cl, T1stat,
-                          n.exp=matAsList(mean.exp),
-                          n=matAsList(mean.pred), SIMPLIFY=TRUE)
+                          n.exp = matAsList(mean.exp),
+                          n = matAsList(mean.pred),
+                          MoreArgs = list(type = type),
+                          SIMPLIFY=TRUE)
     # T1stat(mean.exp[1,], mean.pred[1,]) ; T1.pred[1]
 
     # individual T1:
-    ind.T1.pred <- t(mapply(T1stat.mat, n.exp = freq.exp,  n = freq.pred ))
-    ind.T1.obs <- t(mapply(T1stat.mat, n.exp=freq.exp, n = list(freq.obs)[rep(1,M)] ))
+    ind.T1.pred <- t(mapply(T1stat.mat, n.exp = freq.exp,  n = freq.pred,
+                            MoreArgs = list(type = type)))
+    ind.T1.obs <- t(mapply(T1stat.mat, n.exp=freq.exp, n = list(freq.obs)[rep(1,M)],
+                           MoreArgs = list(type = type) ))
     # ind.T1.obs <- t(sapply(freq.exp, T1stat, n = list(freq.obs)[rep(1,M)] ))
     # mm <- 15; i <- 16
     # T1stat(n.exp = freq.exp[[mm]][i,], n = freq.pred[[mm]][i,]) ; ind.T1.pred[mm,i]
     # T1stat(n.exp = freq.exp[[mm]][i,], n = freq.obs[i,]) ; ind.T1.obs[mm,i]
 
-    if(T2){
+    if (T2){
       T2.obs <- parSapply(cl, freq.exp, T2stat, n.ind=freq.obs, tree=tree)
       # T2stat(freq.exp[[1]], n.ind=freq.obs, tree) ; T2.obs[1]
       T2.pred <- clusterMap(cl, T2stat,
@@ -131,14 +138,14 @@ print.postPredP <- function(x, ...){
   cat(" ## Mean structure (T1):\n",
       "Observed = ", mean(x$T1.obs),
       "; Predicted = ", mean(x$T1.pred),
-      "; p-value = ", mean(x$T1.p),"\n",
+      "; p-value = ", mean(x$T1.p),"\n")
+  if(!is.null(x$T2.obs))
+    cat("\n## Covariance structure (T2):\n",
+        "Observed = ", mean(x$T2.obs),
+        "; Predicted = ", mean(x$T2.pred),
+        "; p-value = ", mean(x$T2.p),"\n")
 
-      "\n## Covariance structure (T2):\n",
-      "Observed = ", mean(x$T2.obs),
-      "; Predicted = ", mean(x$T2.pred),
-      "; p-value = ", mean(x$T2.p),"\n",
-
-      "\n## Individual fit (T1):\n")
+  cat("\n## Individual fit (T1):\n")
   print(round(x$ind.T1.p,3))
 }
 
@@ -147,15 +154,25 @@ matAsList <- function(matrix){
 }
 
 
-T1stat.mat <- function(n.exp, n){
-  n.exp[n.exp==0] <- 1e-5
-  dev <- (t(n)-t(n.exp))^2/t(n.exp)
+T1stat.mat <- function(n.exp, n, type = "X2", const = 1e-8){
+  n.exp[n.exp==0] <- const
+  if (type == "X2"){
+    dev <- (t(n) - t(n.exp))^2 / t(n.exp)
+  } else if (type == "G2"){
+    dev <- 2 * t(n) * log(t(n) / t(n.exp))
+    dev[t(n) == 0] <- 0
+  }
   colSums(dev)
 }
 
-T1stat <- function(n.exp, n){
-  n.exp[n.exp==0] <- 1e-5
-  dev <- (n-n.exp)^2/n.exp
+T1stat <- function(n.exp, n, type = "X2", const = 1e-8){
+  n.exp[n.exp == 0] <- const
+  if (type == "X2"){
+    dev <- (n-n.exp)^2/n.exp
+  } else if (type == "G2"){
+    dev <- 2 * n*log(n / n.exp)
+    dev[n == 0] <- 0
+  }
   sum(dev)
 }
 
