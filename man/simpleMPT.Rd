@@ -25,7 +25,9 @@ simpleMPT(eqnfile, data, restrictions, n.iter = 2000, n.burnin = 500,
 
 \item{ppp}{number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})}
 
-\item{alpha}{first shape parameter(s) for the beta prior-distribution of the MPT parameters \eqn{\theta_s} (can be a named vector to use a different prior for each MPT parameter)}
+\item{alpha}{first shape parameter(s) for the beta prior-distribution of the
+MPT parameters \eqn{\theta_s} (can be a named vector to use a different
+prior for each MPT parameter)}
 
 \item{beta}{second shape parameter(s)}
 
@@ -36,10 +38,14 @@ simpleMPT(eqnfile, data, restrictions, n.iter = 2000, n.burnin = 500,
 \item{cores}{number of CPUs to be used}
 }
 \description{
-Fast Gibbs sampler in C++ that is tailored to the standard MPT model (i.e., fixed-effects, non-hierarchical MPT: assumes separate parameters if multiple data sets are supplied).
+Fast Gibbs sampler in C++ that is tailored to the standard fixed-effects MPT model
+(i.e., fixed-effects, non-hierarchical MPT).
+Assumes independent parameters per person if a matrix of frequencies per person is supplied.
 }
 \details{
-Beta distributions with fixed shape parameters \eqn{\alpha} and \eqn{\beta} are used. The default \eqn{\alpha=1} and \eqn{\beta=1} assumes uniform priors for all MPT parameters.
+Beta distributions with fixed shape parameters \eqn{\alpha} and
+    \eqn{\beta} are used. The default \eqn{\alpha=1} and \eqn{\beta=1} assumes
+    uniform priors for all MPT parameters.
 }
 \examples{
 \dontrun{

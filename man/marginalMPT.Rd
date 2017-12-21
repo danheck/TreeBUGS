@@ -15,7 +15,9 @@ marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1, dataset = 1,
 
 \item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}. Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly interpreted as equality constraints.}
 
-\item{alpha}{first shape parameter(s) for the beta prior-distribution of the MPT parameters \eqn{\theta_s} (can be a named vector to use a different prior for each MPT parameter)}
+\item{alpha}{first shape parameter(s) for the beta prior-distribution of the
+MPT parameters \eqn{\theta_s} (can be a named vector to use a different
+prior for each MPT parameter)}
 
 \item{beta}{second shape parameter(s)}
 
