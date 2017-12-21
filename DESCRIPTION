@@ -24,7 +24,8 @@ Imports:
     parallel,
     rjags,
     MASS,
-    hypergeo
+    hypergeo,
+    logspline
 Suggests:
     knitr,
     testthat
