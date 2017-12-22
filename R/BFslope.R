@@ -33,6 +33,7 @@
 BayesFactorSlope <- function (fittedModel, parameter, direction = "<", plot = TRUE){
   if (any(fittedModel$mptInfo$hyperprior$IVprec != "dchisq(1)"))
     stop("BayesFactorSlope requires that default priors are used for the slope parameter!")
+
   tmp <- strsplit(parameter, "_")
   tmp[[1]][3] <- paste(tmp[[1]][-c(1:2)], collapse = "_")
   tmp <- tmp[[1]][1:3]
@@ -67,8 +68,8 @@ BayesFactorSlope <- function (fittedModel, parameter, direction = "<", plot = TR
   prior0 <- dcauchy(0) * ifelse(direction == "!=", 1, 2)  # one-sided
 
   # BF in favor of effect:
-  bf <- c(post0/prior0, prior0/post0)
-  names(bf) <- paste0("BF_", c(0, direction),  c(direction, 0))
+  bf <- data.frame(post0/prior0, prior0/post0)
+  colnames(bf) <- paste0("BF_", c(0, direction),  c(direction, 0))
 
   # illustration of Savage-Dickey method:
   dcauchy_trunc <- function(x){
