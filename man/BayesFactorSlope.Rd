@@ -4,7 +4,7 @@
 \alias{BayesFactorSlope}
 \title{Bayes Factor for Slope Parameters in Latent-Trait MPT}
 \usage{
-BayesFactorSlope(fittedModel, parameter, direction = "<", plot = TRUE)
+BayesFactorSlope(fittedModel, parameter, direction = "<", plot = TRUE, ...)
 }
 \arguments{
 \item{fittedModel}{a fitted latent-trait model with predictor variables that have
@@ -16,10 +16,13 @@ been defined via \code{predStructure}.}
 or unequal to zero (\code{"!="})}
 
 \item{plot}{if \code{TRUE}, the prior and posterior densities and the ratio at slope=0 are plotted.}
+
+\item{...}{further arguments passed to \code{\link[logspline]{logspline}}, which is used to
+approximate the density of the posterior distribution.}
 }
 \description{
 Uses the Savage-Dickey method to compute the Bayes factor that the slope
-parameter is zero vs. positive/negative/unequal to zero.
+parameter of a continuous covariate is zero vs. positive/negative/unequal to zero.
 }
 \examples{
 \dontrun{
