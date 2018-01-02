@@ -1,3 +1,12 @@
+TreeBUGS 1.2.0 (January 2018)
+===========
+
+* new function BayesFactorSlope() to get Bayes factor for continuous predictors in traitMPT()
+* G^2 in PPP()
+* option to use mu instead of mean in genTraitMPT()
+* Various bugfixes
+
+
 TreeBUGS 1.1.1 (August 2017)
 ===========
 
