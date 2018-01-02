@@ -90,7 +90,7 @@ genTraitMPT <- function(N, numItems, eqnfile, restrictions,
       stop ("Only one of 'mean' and 'mu' can be defined.")
     mu <- checkNaming(S, thetaNames, mu, "mu",
                       interval = c(-Inf, Inf), warning=warning)
-
+    mean <- pnorm(mu)
   } else if (!missing(mean) && !is.null(mean)){
     mean <- checkNaming(S, thetaNames, mean, "mean",
                         interval = c(0, 1), warning=warning)
