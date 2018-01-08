@@ -16,7 +16,7 @@
 ###############################################################################
 
 # require("hypergeo")
-#' @importFrom hypergeo hypergeo
+#' @importFrom hypergeo hypergeo genhypergeo
 
 ## Auxilary functions ------------------------------------------------------------
 # 0. Prior specification
@@ -31,21 +31,21 @@
 }
 
 # 1.0. Built-up for likelihood functions
-.aFunction <- function(n, r, rho) {
-  hyper.term <- Re(hypergeo::genhypergeo(U=c((n-1)/2, (n-1)/2), L=(1/2), z=(r*rho)^2))
+.aFunction <- function(n, r, rho, maxiter = 2000){
+  hyper.term <- Re(genhypergeo(U=c((n-1)/2, (n-1)/2), L=(1/2), z=(r*rho)^2, maxiter = maxiter))
   result <- (1-rho^2)^((n-1)/2)*hyper.term
   return(result)
 }
 
-.bFunction <- function(n, r, rho) {
-  hyper.term <- Re(hypergeo::genhypergeo(U=c(n/2, n/2), L=(3/2), z=(r*rho)^2))
+.bFunction <- function(n, r, rho, maxiter = 2000){
+  hyper.term <- Re(genhypergeo(U=c(n/2, n/2), L=(3/2), z=(r*rho)^2, maxiter = maxiter))
   log.term <- 2*(lgamma(n/2)-lgamma((n-1)/2))+((n-1)/2)*log(1-rho^2)
   result <- 2*r*rho*exp(log.term)*hyper.term
   return(result)
 }
 
-.hFunction <- function(n, r, rho) {
-  result <- .aFunction(n, r, rho) + .bFunction(n, r, rho)
+.hFunction <- function(n, r, rho, maxiter = 2000){
+  result <- .aFunction(n, r, rho, maxiter = maxiter) + .bFunction(n, r, rho, maxiter = maxiter)
   return(result)
 }
 
@@ -57,7 +57,7 @@
 
 #
 # 2.1 Two-sided main Bayes factor ----------------------------------------------
-.bf10Exact <- function(n, r, kappa=1) {
+.bf10Exact <- function(n, r, kappa=1, maxiter = 2000){
   # Ly et al 2015
   # This is the exact result with symmetric beta prior on rho
   # with parameter alpha. If kappa = 1 then uniform prior on rho
@@ -73,8 +73,8 @@
   if (kappa >= 1 && n > 2 && check.r) {
     return(Inf)
   }
-  #log.hyper.term <- log(hypergeo::hypergeo(((n-1)/2), ((n-1)/2), ((n+2/kappa)/2), r^2))
-  log.hyper.term <- log(hypergeo::genhypergeo(U=c((n-1)/2, (n-1)/2), L=((n+2/kappa)/2), z=r^2))
+  #log.hyper.term <- log(hypergeo(((n-1)/2), ((n-1)/2), ((n+2/kappa)/2), r^2))
+  log.hyper.term <- log(genhypergeo(U=c((n-1)/2, (n-1)/2), L=((n+2/kappa)/2), z=r^2, maxiter = maxiter))
   log.result <- log(2^(1-2/kappa))+0.5*log(pi)-lbeta(1/kappa, 1/kappa)+
     lgamma((n+2/kappa-1)/2)-lgamma((n+2/kappa)/2)+log.hyper.term
   real.result <- exp(Re(log.result))
@@ -83,7 +83,7 @@
 }
 
 # 2.2 Two-sided secondairy Bayes factor
-.bf10JeffreysIntegrate <- function(n, r, kappa=1) {
+.bf10JeffreysIntegrate <- function(n, r, kappa=1, maxiter = 2000){
   # Jeffreys' test for whether a correlation is zero or not
   # Jeffreys (1961), pp. 289-292
   # This is the exact result, see EJ
@@ -98,7 +98,7 @@
   if (n > 2 && abs(r)==1) {
     return(Inf)
   }
-  hyper.term <- Re(hypergeo::genhypergeo(U=c((2*n-3)/4, (2*n-1)/4), L=(n+2/kappa)/2, z=r^2))
+  hyper.term <- Re(genhypergeo(U=c((2*n-3)/4, (2*n-1)/4), L=(n+2/kappa)/2, z=r^2, maxiter = maxiter))
   log.term <- lgamma((n+2/kappa-1)/2)-lgamma((n+2/kappa)/2)-lbeta(1/kappa, 1/kappa)
   result <- sqrt(pi)*2^(1-2/kappa)*exp(log.term)*hyper.term
   return(result)
@@ -106,10 +106,10 @@
 
 
 # 4.1 Two-sided
-.posteriorRho <- function(n, r, rho, kappa=1){
+.posteriorRho <- function(n, r, rho, kappa=1, maxiter = 2000){
   if (!is.na(r) && !r==0){
-    return(1/.bf10Exact(n, r, kappa)*.hFunction(n, r, rho)*.priorRho(rho, kappa))
+    return(1/.bf10Exact(n, r, kappa)*.hFunction(n, r, rho, maxiter = maxiter)*.priorRho(rho, kappa))
   } else if (!is.na(r) && r==0){
-    return(1/.bf10JeffreysIntegrate(n, r, kappa)*.jeffreysApproxH(n, r, rho)*.priorRho(rho, kappa))
+    return(1/.bf10JeffreysIntegrate(n, r, kappa, maxiter = maxiter)*.jeffreysApproxH(n, r, rho)*.priorRho(rho, kappa))
   }
 }

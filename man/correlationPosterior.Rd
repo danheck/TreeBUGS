@@ -5,7 +5,7 @@
 \title{Posterior Distribution for Correlations}
 \usage{
 correlationPosterior(fittedModel, r, N, kappa = 1, ci = 0.95, M = 1000,
-  precision = 0.005, plot = TRUE, nCPU = 4)
+  precision = 0.005, maxiter = 10000, plot = TRUE, nCPU = 4)
 }
 \arguments{
 \item{fittedModel}{a fitted \link{betaMPT} or \link{traitMPT} model with covariates (added during fitting by the argument \code{covData})}
@@ -22,6 +22,9 @@ correlationPosterior(fittedModel, r, N, kappa = 1, ci = 0.95, M = 1000,
 
 \item{precision}{precision on the interval [-1,1] to approximate the posterior density}
 
+\item{maxiter}{maximum number of iterations in \code{\link[hypergeo]{genhypergeo}}.
+Higher values might be necessary to increase numerical stability for large correlations (r>.95).}
+
 \item{plot}{whether to plot (a) the unadjusted posterior correlations (gray histogram) and (b) the corrected posterior (black line with red credibility intervals)}
 
 \item{nCPU}{number of CPUs used for parallel computation of posterior distribution}
@@ -37,10 +40,10 @@ This function (1) uses all posterior samples of a correlation to (2) derive the 
 cors <- rbeta(50, 100, 70)
 correlationPosterior(r=cors, N=10, nCPU=1)
 correlationPosterior(r=cors, N=100, nCPU=1)
+
 }
 \references{
 Ly, A., Marsman, M., Wagenmakers, E.-J. (2015). Analytic Posteriors for Pearson's Correlation Coefficient. Manuscript submitted for publication. https://arxiv.org/abs/1510.01188
-
 Ly, A., Boehm, U., Heathcote, A., Turner, B. M. , Forstmann, B., Marsman, M., and Matzke, D. (2016). A flexible and efficient hierarchical Bayesian approach to the exploration of individual differences in cognitive-model-based neuroscience. https://osf.io/evsyv/
 }
 \author{
