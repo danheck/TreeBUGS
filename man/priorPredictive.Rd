@@ -10,9 +10,21 @@ priorPredictive(prior, eqnfile, restrictions, numItems, level = "data",
 \arguments{
 \item{prior}{a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}. Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and precision (= 1/variance).}
 
-\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file is reserved for comments and always ignored.}
+\item{eqnfile}{The (relative or full) path to the file that specifies the MPT model
+(standard .eqn syntax). Note that category labels must start with a letter
+(different to multiTree) and match the column names of \code{data}.
+Alternatively, the EQN-equations can be provided within R as a character
+value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file
+is reserved for comments and always ignored.}
 
-\item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}. Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly interpreted as equality constraints.}
+\item{restrictions}{Specifies which parameters should be
+(a) constant (e.g., \code{"a=b=.5"}) or
+(b) constrained to be identical (e.g., \code{"Do=Dn"}) or
+(c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}).
+Either given as the path to a text file with restrictions per row or
+as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}.
+Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly
+interpreted as equality constraints.}
 
 \item{numItems}{vector with the number of items per MPT tree (either named or assigned to alphabetically ordered tree labels)}
 

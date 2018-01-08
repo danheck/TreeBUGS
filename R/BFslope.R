@@ -6,8 +6,8 @@
 #' @param fittedModel a fitted latent-trait model with predictor variables that have
 #'     been defined via \code{predStructure}.
 #' @param parameter name of the slope parameter (e.g., \code{"slope_d_covariate"})
-#' @param direction alternative hypothesis: whether slope is smaller or larger than zero (\code{"<"} or \code{">"})
-#'     or unequal to zero (\code{"!="})
+#' @param direction alternative hypothesis: whether slope is smaller or larger
+#'     than zero (\code{"<"} or \code{">"}) or unequal to zero (\code{"!="})
 #' @param plot if \code{TRUE}, the prior and posterior densities and the ratio at slope=0 are plotted.
 #' @param ... further arguments passed to \code{\link[logspline]{logspline}}, which is used to
 #'     approximate the density of the posterior distribution.
@@ -35,6 +35,7 @@
 ## H1: slope beta < 0   (i.e., beta ~ Cauchy)
 BayesFactorSlope <- function (fittedModel, parameter,
                               direction = "<", plot = TRUE, ...){
+
   if (any(fittedModel$mptInfo$hyperprior$IVprec != "dchisq(1)"))
     stop("BayesFactorSlope requires that default priors are used for the slope parameter!")
 

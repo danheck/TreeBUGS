@@ -47,7 +47,7 @@ readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
   if(missing(restrictions)) restrictions <- NULL
 
   isPath <- !grepl("\n", x=file, ignore.case = TRUE)
-  if(!isPath){
+  if (!isPath){
     model <- file
     file <- tempfile(pattern = "MPTmodel", tmpdir = tempdir(), fileext = ".eqn")
     cat(paste0(model,"\n"), file=file)
@@ -118,7 +118,7 @@ readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
     warning(error)
   }
 
-  if(parse){
+  if (parse){
     tmp <- Tree
     mpt <- parseEQN(Tree)
     Tree <- parseRestrictions(mpt, restrictions)

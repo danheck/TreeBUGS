@@ -2,7 +2,7 @@
 % Please edit documentation in R/fitTraitMPT.R
 \name{traitMPT}
 \alias{traitMPT}
-\title{Fit a Hierarchical Latent-trait MPT Model}
+\title{Fit a Hierarchical Latent-Trait MPT Model}
 \usage{
 traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
   transformedParameters, corProbit = TRUE, mu = "dnorm(0,1)",
@@ -12,35 +12,92 @@ traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
   autojags = NULL, ...)
 }
 \arguments{
-\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file is reserved for comments and always ignored.}
+\item{eqnfile}{The (relative or full) path to the file that specifies the MPT model
+(standard .eqn syntax). Note that category labels must start with a letter
+(different to multiTree) and match the column names of \code{data}.
+Alternatively, the EQN-equations can be provided within R as a character
+value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file
+is reserved for comments and always ignored.}
 
-\item{data}{The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)}
+\item{data}{The (relative or full) path to the .csv file with the data
+(comma separated; category labels in first row).
+Alternatively: a data frame or matrix (rows=individuals,
+columns = individual category frequencies, category labels as column names)}
 
-\item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}. Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly interpreted as equality constraints.}
+\item{restrictions}{Specifies which parameters should be
+(a) constant (e.g., \code{"a=b=.5"}) or
+(b) constrained to be identical (e.g., \code{"Do=Dn"}) or
+(c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}).
+Either given as the path to a text file with restrictions per row or
+as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}.
+Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly
+interpreted as equality constraints.}
 
-\item{covData}{Data that contains covariates, for which correlations with individual MPT parameters will be sampled. Either the path to a .csv file (comma-separated: rows=individuals in the same order as \code{data}; first row must contain covariate labels); or alternatively: a data frame or matrix (rows=individuals, columns = variables; covariate labels as column names). Note that in \code{betaMPT}, correlatios are computed for discrete variables that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})}
+\item{covData}{Data that contains covariates, for which correlations with
+individual MPT parameters will be sampled. Either the path to a .csv file
+(comma-separated: rows=individuals in the same order as \code{data};
+first row must contain covariate labels).
+Alternatively: a data frame or matrix (rows=individuals, columns = variables;
+covariate labels as column names).
+Note that in \code{betaMPT}, correlatios are computed for discrete variables
+that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})}
 
-\item{predStructure}{Defines which variables in \code{covData} are included as predictors for which MPT parameters. Either the path to the file that specifies the assigment of MPT parameters to covariates (that is, each row assigns one or more MPT parameters to one or more covariates, separated by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}). Note that no correlations of MPT parameters and predictors are computed.}
+\item{predStructure}{Defines which variables in \code{covData} are included
+as predictors for which MPT parameters. Either the path to the file that
+specifies the assigment of MPT parameters to covariates (that is, each row
+assigns one or more MPT parameters to one or more covariates, separated
+by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided
+as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}).
+Note that no correlations of MPT parameters and predictors are computed.}
 
-\item{predType}{a character vector specifying the type of continuous or discrete predictors in each column of \code{covData}: \code{"c"} = continuous covariate (which are centered to have a mean of zero); \code{"f"} = discrete predictor, fixed effect (default for character/factor variables); \code{"r"} = discrete predictor, random effect.}
+\item{predType}{a character vector specifying the type of continuous or
+discrete predictors in each column of \code{covData}:
+\code{"c"} = continuous covariate (which are centered to have a mean of zero);
+\code{"f"} = discrete predictor, fixed effect (default for character/factor variables);
+\code{"r"} = discrete predictor, random effect.}
 
-\item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples of the group-level means (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")}), or path to a text file containing one transformation per line. Transformations of individual-levelparameter can be performed after fitting a model by \code{\link{transformedParameters}}.}
+\item{transformedParameters}{list with parameter transformations that should
+be computed based on the posterior samples of the group-level means
+(e.g., for testing parameter differences: \code{list("diffD=Do-Dn")}),
+or path to a text file containing one transformation per line.
+Transformations of individual-level parameters can also be performed after
+fitting a model using \code{\link{transformedParameters}}.}
 
-\item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations (probit-values of \code{+Inf} are truncated to \code{max(5,max(probit))}; similarly for \code{-Inf}). Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
+\item{corProbit}{whether to use probit-transformed MPT parameters to compute
+correlations (probit-values of \code{+Inf} are truncated to
+\code{max(5,max(probit))}; similarly for \code{-Inf}).
+Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
 
-\item{mu}{hyperprior for group means of probit-transformed parameters in JAGS syntax. Default is a standard normal distribution, which implies a uniform distribution on the MPT probability parameters. A vector can be used to specify separate hyperpriors for each MPT parameter (the order of parameters is determined by the names of the vector or by the default order as shown in \code{\link{readEQN}} with \code{paramOrder = TRUE}).}
+\item{mu}{hyperprior for group means of probit-transformed parameters in JAGS syntax.
+Default is a standard normal distribution, which implies a uniform
+distribution on the MPT probability parameters. A named vector can be used to
+specify separate hyperpriors for each MPT parameter (the order of parameters
+is determined by the names of the vector or by the default order as shown
+in \code{\link{readEQN}} with \code{paramOrder = TRUE}).}
 
-\item{xi}{hyperprior for scaling parameters of the group-level parameter variances. Default is a uniform distribution on the interval [0,10]. Similarly as for \code{mu}, a vector of different priors can be used. Less informative priors can be used (e.g., \code{"dunif(0,100)")}) but might result in reduced stability.}
+\item{xi}{hyperprior for scaling parameters of the group-level parameter variances.
+Default is a uniform distribution on the interval [0,10].
+Similarly as for \code{mu}, a vector of different priors can be used.
+Less informative priors can be used (e.g., \code{"dunif(0,100)")}) but
+might result in reduced stability.}
 
-\item{V}{S x S matrix used as a hyperprior for the inverse-Wishart hyperprior parameters with as many rows and columns as there are core MPT parameters. Default is a diagonal matrix.}
+\item{V}{S x S matrix used as a hyperprior for the inverse-Wishart hyperprior
+parameters with as many rows and columns as there are core MPT parameters.
+Default is a diagonal matrix.}
 
-\item{df}{degrees of freedom for the inverse-Wishart hyperprior for the individual parameters. Minimum is S+1, where S gives the number of core MPT parameters.}
+\item{df}{degrees of freedom for the inverse-Wishart hyperprior for the individual
+parameters. Minimum is S+1, where S gives the number of core MPT parameters.}
 
-\item{IVprec}{hyperprior on the precision (i.e., the inverse of the variance) of the slope parameters for the z-standardized continuous predictors. For ease of interpretation, TreeBUGS reports unstandardized regression coefficients. See details below.}
+\item{IVprec}{hyperprior on the precision (i.e., the inverse of the variance)
+of the slope parameters for the z-standardized continuous predictors.
+For ease of interpretation, TreeBUGS reports unstandardized regression coefficients.
+See details below.}
 
-\item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.}
+\item{n.iter}{Number of iterations per chain (including burnin samples).
+See \code{\link[runjags]{run.jags}} for details.}
 
-\item{n.adapt}{number of adaption samples to adjust MCMC sampler in JAGS. The sampler will be more efficient if it is tuned well.}
+\item{n.adapt}{number of adaption samples to adjust MCMC sampler in JAGS.
+The sampler will be more efficient if it is tuned well.}
 
 \item{n.burnin}{Number of samples for burnin (samples will not be stored and removed from n.iter)}
 
@@ -48,7 +105,9 @@ traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
 
 \item{n.chains}{number of MCMC chains (sampled in parallel).}
 
-\item{dic}{whether to compute DIC using \code{\link[runjags]{extract.runjags}}, which requires additional sampling. Can also be computed and added after fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
+\item{dic}{whether to compute DIC using \code{\link[runjags]{extract.runjags}},
+which requires additional sampling. Can also be computed and added after
+fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
 
 \item{ppp}{number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})}
 
@@ -57,9 +116,13 @@ Default is to write this information to the tempdir as required by CRAN standard
 
 \item{parEstFile}{Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")}
 
-\item{posteriorFile}{path to RData-file where to save the model including MCMC posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile="mcmc.RData"})}
+\item{posteriorFile}{path to RData-file where to save the model including MCMC
+posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile="mcmc.RData"})}
 
-\item{autojags}{if provided (as an empty list or with arguments passed to \link[runjags]{autorun.jags}), JAGS runs repeatedly until the MCMC chains converges . E.g., use \code{list(max.time="30m")} to restrict sampling to 30 minutes (similarly for hours, days, and weeks)}
+\item{autojags}{if provided (as an empty list or with arguments passed to
+\link[runjags]{autorun.jags}), JAGS runs repeatedly until the MCMC chains
+converges . E.g., use \code{list(max.time="30m")} to restrict sampling
+to 30 minutes (similarly for hours, days, and weeks)}
 
 \item{...}{Arguments to be passed to the JAGS sampling function (i.e., to \code{\link[runjags]{run.jags}}.}
 }
@@ -68,16 +131,33 @@ a list of the class \code{traitMPT} with the objects:
 \itemize{
  \item \code{summary}: MPT tailored summary. Use \code{summary(fittedModel)}
  \item \code{mptInfo}: info about MPT model (eqn and data file etc.)
- \item \code{mcmc}: the object returned from the MCMC sampler. Note that the object \code{fittedModel$mcmc} is an \link[runjags]{runjags} object, whereas \code{fittedModel$mcmc$mcmc} is a mcmc.list as used by the coda package (\link[coda]{mcmc})
+ \item \code{mcmc}: the object returned from the MCMC sampler.
+                    Note that the object \code{fittedModel$mcmc} is an
+                    \link[runjags]{runjags} object, whereas
+                    \code{fittedModel$mcmc$mcmc} is an \code{mcmc.list} as used by
+                    the coda package (\link[coda]{mcmc})
 }
 }
 \description{
-Fits a latent-trait MPT model (Klauer, 2010) based on a standard MPT model file (.eqn) and individual data table (.csv).
+Fits a latent-trait MPT model (Klauer, 2010) based on a standard MPT model file
+(.eqn) and individual data table (.csv).
 }
 \details{
-Continuous (discrete) predictors are added on the latent-probit scale via: \deqn{\theta = \Phi(\mu + X \beta +\delta ),} where X is a design matrix with continuous (dummy) predictor values. TreeBUGS reports unstandardized regression coefficients, but uses z-standardized variables with mean zero and SD=1 internally (note that the coeeficients are not standardized with respect to the 'depend variable' as in Rouder & Morey, 2012).
+Continuous (discrete) predictors are added on the latent-probit scale via:
+\deqn{\theta = \Phi(\mu + X \beta +\delta ),}
+where X is a design matrix with centered (!) continuous covariates and recoded factor
+variables (using an orthogonal contrast coding scheme; cf. Rouder et al., 2012).
+TreeBUGS reports unstandardized regression coefficients that correspond to the
+scale/SD of the predictor variables. However, since the regression is on the latent
+probit scale, the coefficients are not standardized with respect to the 'depend variable'
+as in the standard linear regression as in Rouder & Morey (2012).
 
-For continuous predictors, the default prior \code{IVprec = "dchisq(1)"} implies a Cauchy prior on each standardized \eqn{\beta} (similar to the Zellner-Siow prior with scale parameter \eqn{s=1}; for details, see: Rouder et. al, 2012; Rouder & Morey, 2012). If small effects are expected, smaller scale values \eqn{s} can be used by \code{IVprec = 'dgamma(1/2,(s^2)/2)'}. To use a more-informative standard-normal prior on the standardized slopes, use \code{IVprec = 'dcat(1)'}.
+For continuous predictors, the default prior \code{IVprec = "dchisq(1)"} implies
+a Cauchy prior on each standardized \eqn{\beta} (similar to the Jeffreys-Zellner-Siow prior
+with scale parameter \eqn{s=1}; for details, see: Rouder et. al, 2012; Rouder & Morey, 2012).
+If small effects are expected, smaller scale values \eqn{s} can be used by changing the default to
+\code{IVprec = 'dgamma(1/2,(s^2)/2)'}.
+To use a standard-normal priors on the standardized slopes, use \code{IVprec = 'dcat(1)'}.
 }
 \examples{
 \dontrun{

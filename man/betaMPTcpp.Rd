@@ -9,17 +9,43 @@ betaMPTcpp(eqnfile, data, restrictions, covData, corProbit = FALSE,
   shape = 1, rate = 0.1, parEstFile, posteriorFile, cores = 1)
 }
 \arguments{
-\item{eqnfile}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file is reserved for comments and always ignored.}
+\item{eqnfile}{The (relative or full) path to the file that specifies the MPT model
+(standard .eqn syntax). Note that category labels must start with a letter
+(different to multiTree) and match the column names of \code{data}.
+Alternatively, the EQN-equations can be provided within R as a character
+value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file
+is reserved for comments and always ignored.}
 
-\item{data}{The (full path to the) csv file with the data (comma separated; category labels in first row). Alternatively: a data frame or matrix (rows=individuals, columns = individual category frequencies, category labels as column names)}
+\item{data}{The (relative or full) path to the .csv file with the data
+(comma separated; category labels in first row).
+Alternatively: a data frame or matrix (rows=individuals,
+columns = individual category frequencies, category labels as column names)}
 
-\item{restrictions}{Specifies which parameters should be (a) constant (e.g., \code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"}) or (c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}). Either given as the path to a text file with restrictions per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}. Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly interpreted as equality constraints.}
+\item{restrictions}{Specifies which parameters should be
+(a) constant (e.g., \code{"a=b=.5"}) or
+(b) constrained to be identical (e.g., \code{"Do=Dn"}) or
+(c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}).
+Either given as the path to a text file with restrictions per row or
+as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}.
+Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly
+interpreted as equality constraints.}
 
-\item{covData}{Data that contains covariates, for which correlations with individual MPT parameters will be sampled. Either the path to a .csv file (comma-separated: rows=individuals in the same order as \code{data}; first row must contain covariate labels); or alternatively: a data frame or matrix (rows=individuals, columns = variables; covariate labels as column names). Note that in \code{betaMPT}, correlatios are computed for discrete variables that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})}
+\item{covData}{Data that contains covariates, for which correlations with
+individual MPT parameters will be sampled. Either the path to a .csv file
+(comma-separated: rows=individuals in the same order as \code{data};
+first row must contain covariate labels).
+Alternatively: a data frame or matrix (rows=individuals, columns = variables;
+covariate labels as column names).
+Note that in \code{betaMPT}, correlatios are computed for discrete variables
+that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})}
 
-\item{corProbit}{whether to use probit-transformed MPT parameters to compute correlations (probit-values of \code{+Inf} are truncated to \code{max(5,max(probit))}; similarly for \code{-Inf}). Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
+\item{corProbit}{whether to use probit-transformed MPT parameters to compute
+correlations (probit-values of \code{+Inf} are truncated to
+\code{max(5,max(probit))}; similarly for \code{-Inf}).
+Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
 
-\item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.}
+\item{n.iter}{Number of iterations per chain (including burnin samples).
+See \code{\link[runjags]{run.jags}} for details.}
 
 \item{n.burnin}{Number of samples for burnin (samples will not be stored and removed from n.iter)}
 
@@ -35,7 +61,8 @@ betaMPTcpp(eqnfile, data, restrictions, covData, corProbit = FALSE,
 
 \item{parEstFile}{Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")}
 
-\item{posteriorFile}{path to RData-file where to save the model including MCMC posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile="mcmc.RData"})}
+\item{posteriorFile}{path to RData-file where to save the model including MCMC
+posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile="mcmc.RData"})}
 
 \item{cores}{number of CPUs to be used}
 }

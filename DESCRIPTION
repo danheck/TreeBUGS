@@ -1,6 +1,6 @@
 Package: TreeBUGS
 Version: 1.2.0
-Date: 2018-01-03
+Date: 2018-01-08
 Title: Hierarchical Multinomial Processing Tree Modeling
 Authors@R: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut","cre")),
              person("Nina", "Arnold", email="arnold@uni-mannheim.de", role = c("aut","dtc")),

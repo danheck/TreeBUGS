@@ -9,9 +9,11 @@ extendMPT(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0, ...)
 \arguments{
 \item{fittedModel}{a fitted \code{\link{traitMPT}} or \code{\link{betaMPT}}}
 
-\item{n.iter}{Number of iterations per chain (including burnin samples). See \code{\link[runjags]{run.jags}} for details.}
+\item{n.iter}{Number of iterations per chain (including burnin samples).
+See \code{\link[runjags]{run.jags}} for details.}
 
-\item{n.adapt}{number of adaption samples to adjust MCMC sampler in JAGS. The sampler will be more efficient if it is tuned well.}
+\item{n.adapt}{number of adaption samples to adjust MCMC sampler in JAGS.
+The sampler will be more efficient if it is tuned well.}
 
 \item{n.burnin}{Number of samples for burnin (samples will not be stored and removed from n.iter)}
 
