@@ -69,15 +69,18 @@ plotFreq <- function(x, freq=TRUE, select="all", boxplot=TRUE, eqn,...){
             xlab="", main=ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"), las=1, ...)
     lines(1:K, means, col="red", lwd=2)
   }else{
-    plot(1:K, means, ylim=c(0, max(dat)), col=1, lwd=3, pch=16, xaxt="n", las=1, ...,
+    plot(1:K, rep(NA, K), ylim=c(0, max(dat)), col=1, lwd=3, pch=16, xaxt="n", las=1, ...,
          ylab=ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"),
          xlab="", main=ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"))
     axis(1, 1:K, colnames(dat))
-    for(i in 1:N){
-      lines(1:K, dat[i,], col=rainbow(N, alpha=.5)[i])
-      points(1:K, dat[i,], col=rainbow(N, alpha=.6)[i], pch=16)
+    for(treelab in treeLabels){
+      sel <- treeNames == treelab
+      for(i in 1:N){
+        lines((1:K)[sel], dat[i,sel], col=rainbow(N, alpha=.4)[i])
+        points((1:K)[sel], dat[i,sel], col=rainbow(N, alpha=.6)[i], pch=16)
+      }
+      lines((1:K)[sel], means[sel], col=1, lwd=3)
     }
-    lines(1:K, means, col=1, lwd=3)
 
   }
 
