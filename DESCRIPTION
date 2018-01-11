@@ -1,16 +1,16 @@
 Package: TreeBUGS
 Version: 1.2.0
-Date: 2018-01-08
+Date: 2018-01-11
 Title: Hierarchical Multinomial Processing Tree Modeling
-Authors@R: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut","cre")),
-             person("Nina", "Arnold", email="arnold@uni-mannheim.de", role = c("aut","dtc")),
+Authors@R: c(person("Daniel W.", "Heck", email="heck@uni-mannheim.de", role=c("aut","cre")),
+             person("Nina R.", "Arnold", email="arnold@uni-mannheim.de", role = c("aut","dtc")),
              person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut")),
              person("Alexander", "Ly", email="a.ly@uva.nl", role = c("ctb")))
-Author: Daniel Heck [aut, cre],
-        Nina Arnold [aut, dtc],
+Author: Daniel W. Heck [aut, cre] (<https://orcid.org/0000-0002-6302-9252>),
+        Nina R. Arnold [aut, dtc],
         Denis Arnold [aut],
         Alexander Ly [ctb]
-Maintainer: Daniel Heck <heck@uni-mannheim.de>
+Maintainer: Daniel W. Heck <heck@uni-mannheim.de>
 Depends:
     R (>= 3.0.0)
 Imports:
@@ -33,6 +33,7 @@ LinkingTo:
     Rcpp,
     RcppArmadillo
 VignetteBuilder: knitr
+NeedsCompilation: yes
 SystemRequirements: JAGS (http://mcmc-jags.sourceforge.net)
 Description: User-friendly analysis of hierarchical multinomial processing tree (MPT) 
     models that are often used in cognitive psychology. Implements the latent-trait 
@@ -43,7 +44,8 @@ Description: User-friendly analysis of hierarchical multinomial processing tree 
     or directly in R. Models are either fitted by calling JAGS or by an MPT-tailored 
     Gibbs sampler in C++ (only for nonhierarchical and beta MPT models). Provides 
     tests of heterogeneity and MPT-tailored summaries and plotting functions.
-License: GPL-2
+License: GPL (>= 2)
+Encoding: UTF-8
 URL: https://github.com/denis-arnold/TreeBUGS
 RoxygenNote: 6.0.1
 LazyData: TRUE
