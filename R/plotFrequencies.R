@@ -29,6 +29,19 @@ plotFreq <- function(x, freq=TRUE, select="all", boxplot=TRUE, eqn,...){
     try(dat <- as.data.frame(x))
   }
 
+  if(class(x) %in% c("betaMPT", "traitMPT")){
+    treeNames <- x$mptInfo$MPT$Tree
+    treeLabels <- unique(treeNames)
+  }else if(!missing(eqn)){
+    tmp <- unique(readEQN(eqn)[,1:2])
+    treeNames <- tmp$Tree
+    treeLabels <- unique(treeNames)
+    try(dat <- dat[,colnames(dat) %in% tmp$Category])
+  }else{
+    treeNames <- rep("", ncol(dat))
+    treeLabels <- ""
+  }
+
   K <- ncol(dat)
   N <- nrow(dat)
 
@@ -39,18 +52,6 @@ plotFreq <- function(x, freq=TRUE, select="all", boxplot=TRUE, eqn,...){
       stop("Please use an integer vector to select participants.")
     dat <- dat[select, ,drop=FALSE]
     N <- nrow(dat)
-  }
-
-  if(class(x) %in% c("betaMPT", "traitMPT")){
-    treeNames <- x$mptInfo$MPT$Tree
-    treeLabels <- unique(treeNames)
-  }else if(!missing(eqn)){
-    tmp <- unique(readEQN(eqn)[,1:2])
-    treeNames <- tmp$Tree
-    treeLabels <- unique(treeNames)
-  }else{
-    treeNames <- rep("", ncol(dat))
-    treeLabels <- ""
   }
 
   # absolute frequencies
