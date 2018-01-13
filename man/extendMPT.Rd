@@ -4,7 +4,8 @@
 \alias{extendMPT}
 \title{Extend MCMC Sampling for MPT Model}
 \usage{
-extendMPT(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0, ...)
+extendMPT(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
+  n.thin = 5, ...)
 }
 \arguments{
 \item{fittedModel}{a fitted \code{\link{traitMPT}} or \code{\link{betaMPT}}}
@@ -16,6 +17,8 @@ See \code{\link[runjags]{run.jags}} for details.}
 The sampler will be more efficient if it is tuned well.}
 
 \item{n.burnin}{Number of samples for burnin (samples will not be stored and removed from n.iter)}
+
+\item{n.thin}{Thinning rate.}
 
 \item{...}{further arguments passed to \link[runjags]{run.jags}}
 }

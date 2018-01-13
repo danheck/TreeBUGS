@@ -5,7 +5,8 @@
 #' @inheritParams betaMPT
 #' @param ... further arguments passed to \link[runjags]{run.jags}
 #' @export
-extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,  ...){
+extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000,
+                      n.burnin = 0, n.thin = 5, ...){
 
   # remove correlations (otherwise, extension not possible)
   sel.cor <- grep("cor_", varnames(fittedModel$runjags$mcmc), fixed=TRUE)
@@ -15,10 +16,11 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
     fittedModel$runjags$mcmc <- fittedModel$runjags$mcmc[,- sel.cor]
   tmp <- extend.jags(fittedModel$runjags,
                      burnin = n.burnin,
-                     sample = ceiling((n.iter-n.burnin)/fittedModel$runjags$thin),
+                     sample = ceiling((n.iter-n.burnin)/n.thin),
                      adapt = n.adapt,
-                     # thin=n.thin,
+                     thin=n.thin,
                      summarise = FALSE, ...)
+  fittedModel$runjags <- tmp
 
   # add correlations
   covData <- fittedModel$mptInfo$covData
