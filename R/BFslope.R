@@ -35,22 +35,35 @@
 ## H1: slope beta < 0   (i.e., beta ~ Cauchy)
 BayesFactorSlope <- function (fittedModel, parameter,
                               direction = "<", plot = TRUE, ...){
+  parlabels <- rownames(fittedModel$mcmc.summ)
 
-  if (any(fittedModel$mptInfo$hyperprior$IVprec != "dchisq(1)"))
-    stop("BayesFactorSlope requires that default priors are used for the slope parameter!")
+  IVprec <- fittedModel$mptInfo$hyperprior$IVprec
+  IVparsed <- sapply(strsplit(IVprec, "[\\(\\)]"), "[[", 1)
+  IVscale <- as.numeric(sapply(strsplit(IVprec, "[\\(\\)]"), "[[", 2))
+  if (any(IVparsed != "dchisq"))
+    stop("BayesFactorSlope requires that default JZS priors are used for the slope parameter!\n",
+         "  Example:   traitMPT(..., IVprec='dchisq(s)')    ## with s=scale parameter")
 
-  if (length(parameter)!= 1 || !parameter %in% rownames(fittedModel$mcmc.summ))
+  if (length(parameter)!= 1 || !parameter %in% parlabels)
     stop("'parameter' not in model or not of length=1.")
+
   tmp <- strsplit(parameter, "_")
   tmp[[1]][3] <- paste(tmp[[1]][-c(1:2)], collapse = "_")
   tmp <- tmp[[1]][1:3]
   if (length(tmp) != 3)
-    stop("Parameter must be of the form 'slope_MPTparam_cov' .")
+    stop("Parameter must be of the form 'slope_MPTparam_cov' (avoid '_' in parameters!).")
   if (tmp[[1]][1] != "slope")
     stop("Only valid for slope parameters.")
+
   cov <- tmp[3]
+  if(!cov %in% colnames(fittedModel$mptInfo$covData))
+    stop("Covariate", cov, "not in covariate data.")
+  if (sum(grepl(paste0(tmp[1],"_", tmp[2]), parlabels)) > 1)
+    stop("Savage-Dickey provides incorrect Bayes factors for more than one predictor.")
+
+  # slope parameters are not standardized wrt covariate! => standardization
   s <- apply(fittedModel$mptInfo$covData, 2, sd)[cov]
-  samples <- unlist(fittedModel$runjags$mcmc[,parameter]) * s   # slope parameters are not standardized wrt covariate!
+  samples <- unlist(fittedModel$runjags$mcmc[,parameter]) * s
 
   # approximation of posterior density
   if (direction == "<"){
@@ -72,7 +85,7 @@ BayesFactorSlope <- function (fittedModel, parameter,
 
   # posterior and prior density for beta=0:
   post0 <- dlogspline(0, posterior)
-  prior0 <- dcauchy(0) * ifelse(direction == "!=", 1, 2)  # one-sided
+  prior0 <- dcauchy(0, 0, IVscale) * ifelse(direction == "!=", 1, 2)  # one-sided
 
   # BF in favor of effect:
   bf <- data.frame(post0/prior0, prior0/post0)
@@ -81,11 +94,11 @@ BayesFactorSlope <- function (fittedModel, parameter,
   # illustration of Savage-Dickey method:
   dcauchy_trunc <- function(x){
     if (direction == ">"){
-      dx <- 2*dcauchy(x)*ifelse(x > 0, 1, 0)
+      dx <- 2*dcauchy(x, 0, IVscale)*ifelse(x > 0, 1, 0)
     } else if (direction == "<"){
-      dx <- 2*dcauchy(x)*ifelse(x < 0, 1, 0)
+      dx <- 2*dcauchy(x, 0, IVscale)*ifelse(x < 0, 1, 0)
     } else if (direction == "!="){
-      dx <- dcauchy(x)
+      dx <- dcauchy(x, 0, IVscale)
     }
     dx
   }
