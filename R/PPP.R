@@ -69,10 +69,10 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE, type = "X2"){
     # T1stat(mean.exp[1,], mean.pred[1,]) ; T1.pred[1]
 
     # individual T1:
-    ind.T1.pred <- t(mapply(T1stat.mat, n.exp = freq.exp,  n = freq.pred,
-                            MoreArgs = list(type = type)))
-    ind.T1.obs <- t(mapply(T1stat.mat, n.exp=freq.exp, n = list(freq.obs)[rep(1,M)],
-                           MoreArgs = list(type = type) ))
+    ind.T1.pred <- do.call("rbind", mapply(T1stat.mat, n.exp = freq.exp,  n = freq.pred,
+                            MoreArgs = list(type = type), SIMPLIFY = FALSE))
+    ind.T1.obs <- do.call("rbind", mapply(T1stat.mat, n.exp=freq.exp, n = list(freq.obs)[rep(1,M)],
+                           MoreArgs = list(type = type), SIMPLIFY = FALSE))
     # ind.T1.obs <- t(sapply(freq.exp, T1stat, n = list(freq.obs)[rep(1,M)] ))
     # mm <- 15; i <- 16
     # T1stat(n.exp = freq.exp[[mm]][i,], n = freq.pred[[mm]][i,]) ; ind.T1.pred[mm,i]
@@ -88,7 +88,7 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE, type = "X2"){
       # T2stat(freq.exp[[1]], n.ind=freq.pred[[1]], tree); T2.pred[1]
     }
 
-  })
+  }, silent = TRUE)
 
   stopCluster(cl)
 
