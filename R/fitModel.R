@@ -71,11 +71,19 @@ fitModel <- function(type,
   predType <- predTypeDefault(covData, predType=predType)
 
   if(type == "traitMPT"){
-    # collect hyperpriors in list
-    if(is.null(hyperprior$V))
+
+    # inverse Wishart prior
+    if (is.null(hyperprior$V)){
       hyperprior$V <- diag(S)
-    if(is.null(hyperprior$df))
-      hyperprior$df <- S+1
+      if(is.null(hyperprior$df))
+        hyperprior$df <- S+1
+
+    # independent chi-square
+    } else if (is.na(hyperprior$V)){
+      if(is.null(hyperprior$df))
+        hyperprior$df <- 1
+      # hyperprior$V <- NULL
+    }
     hyperprior$mu <- check.hyperprior(hyperprior$mu, thetaUnique, label="mu")
 
     ##################### TRAIT MPT
@@ -107,16 +115,9 @@ fitModel <- function(type,
     predTable <- predFactorLevels <- NULL
   }
 
-
-  makeModelFile(model = type,
-                filename = modelfilename,
-                mergedTree = mergedTree ,
-                S = S,
-                hyperprior = hyperprior,
-                predString = predString,
-                # corString = corString,
-                parString=transformedPar$modelstring,
-                fixedPar=fixedPar)
+  makeModelFile(model = type, filename = modelfilename, mergedTree = mergedTree ,
+                S = S, hyperprior = hyperprior, predString = predString,
+                parString=transformedPar$modelstring, fixedPar=fixedPar)
 
   time0 <- Sys.time()
   cat("MCMC sampling started at ", format(time0), "\n")
@@ -202,26 +203,7 @@ fitModel <- function(type,
                       time=time1-time0)
   class(fittedModel) <- type
 
-  # if(ppp>0){
-  #   cat("\nComputing posterior-predictive p-values....\n")
-  #   postPred <- PPP(fittedModel, M=ppp,
-  #                   nCPU=min(detectCores(), length(runjags$mcmc)))
-  #   fittedModel$postpred <- postPred[c("freq.exp", "freq.pred", "freq.obs")]
-  #   try(
-  #     fittedModel$summary$fitStatistics <- list(
-  #       "overall"=c(
-  #         "T1.observed"=mean(postPred$T1.obs),
-  #         "T1.predicted"=mean(postPred$T1.pred),
-  #         "p.T1"=postPred$T1.p,
-  #         "T2.observed"=mean(postPred$T2.obs),
-  #         "T2.predicted"=mean(postPred$T2.pred),
-  #         "p.T2"=postPred$T2.p,
-  #         "ind.T1.obs"=postPred$ind.T1.obs,
-  #         "ind.T1.pred"=postPred$ind.T1.pred,
-  #         "ind.T1.p"=postPred$ind.T1.p
-  #       ))
-  #   )
-  # }
+
   fittedModel <- addPPP(fittedModel, M=ppp)
 
   # write results to file

@@ -142,7 +142,8 @@ a list of the class \code{traitMPT} with the objects:
 Fits a latent-trait MPT model (Klauer, 2010) based on a standard MPT model file
 (.eqn) and individual data table (.csv).
 }
-\details{
+\section{Regression Extensions}{
+
 Continuous (discrete) predictors are added on the latent-probit scale via:
 \deqn{\theta = \Phi(\mu + X \beta +\delta ),}
 where X is a design matrix with centered (!) continuous covariates and recoded factor
@@ -159,6 +160,32 @@ If small effects are expected, smaller scale values \eqn{s} can be used by chang
 \code{IVprec = 'dgamma(1/2,(s^2)/2)'}.
 To use a standard-normal priors on the standardized slopes, use \code{IVprec = 'dcat(1)'}.
 }
+
+\section{Uncorrelated Latent-Trait Values}{
+
+The standard latent-trait MPT model assumes a multivariate normal distribution
+of the latent-trait values, where the covariance matrix follows a scaled-inverse
+Wishart distribution. As an alternative, the parameters can be assumed to be
+independent (this is equivalent to a diagonal covariance matrix).
+If the assumption of uncorrelated parameters is justified, such a simplified model
+has less parameters and is more parsimonious, which in turn might result in more
+robust estimation and more precise parameter estimates.
+
+This alternative method can be fitted in TreeBUGS (but not all of the features
+of TreeBUGS might be compatible with this alternative model structure).
+To fit the model, the scale matrix \code{V} is set to \code{NA}
+(V is only relevant for the multivariate Wishart prior) and the prior
+on \code{xi} is changed: \code{traitMPT(..., V=NA, xi="dnorm(0,1)")}.
+The model assumes that the latent-trait values \eqn{\delta[i]} (=random-intercepts)
+are decomposed by the scaling parameter \eqn{\xi} and the raw deviation \eqn{\epsilon[i]}
+(cf. Gelman, 2006):
+     \deqn{\delta[i] = \xi * \epsilon[i]}
+     \deqn{\epsilon[i] ~ Normal(0,\sigma^2)}
+     \deqn{\sigma^2 ~ Inverse_Chisquare(df)}
+Note that the default prior for \eqn{\xi} should be changed to \code{xi="dnorm(0,1)"}, which
+results in a half-Cauchy prior (Gelman, 2006).
+}
+
 \examples{
 \dontrun{
 # fit beta-MPT model for encoding condition (see ?arnold2013):
@@ -172,13 +199,24 @@ summary(fit)
 }
 }
 \references{
-Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
+Gelman, A. (2006). Prior distributions for variance parameters in hierarchical models
+(comment on article by Browne and Draper). Bayesian Analysis, 1(3), 515-534.
 
-Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205-235.
+Klauer, K. C. (2010).
+Hierarchical multinomial processing tree models: A latent-trait approach.
+Psychometrika, 75, 70-98.
 
-Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56, 356-374.
+Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015).
+Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items.
+Psychometrika, 80, 205-235.
 
-Rouder, J. N., & Morey, R. D. (2012). Default Bayes Factors for Model Selection in Regression. Multivariate Behavioral Research, 47, 877-903.
+Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012).
+Default Bayes factors for ANOVA designs.
+Journal of Mathematical Psychology, 56, 356-374.
+
+Rouder, J. N., & Morey, R. D. (2012).
+Default Bayes Factors for Model Selection in Regression.
+Multivariate Behavioral Research, 47, 877-903.
 }
 \author{
 Daniel Heck, Denis Arnold, Nina R. Arnold

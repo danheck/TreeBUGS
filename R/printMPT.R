@@ -33,13 +33,15 @@ printSummary <- function(x, model, ...){
     print(round(x$groupParameters$thetaFE, x$round))
   }
 
-  if(model == "traitMPT" &&
-     nrow(x$groupParameters$rho.matrix) != 1){
-    cat("\nCorrelations of latent-trait values on probit scale")
-    print(round(x$groupParameters$rho, x$round))
-    cat("\nCorrelations (posterior mean estimates) in matrix form:\n")
-    print(round(x$groupParameters$rho.matrix, x$round))
-  }
+  if(model == "traitMPT")
+    if(any(abs(x$groupParameters$rho.matrix) > 1)){
+      cat("\n[note: latent-trait version without explicit correlation parameters]\n")
+    }else if (nrow(x$groupParameters$rho.matrix) != 1){
+      cat("\nCorrelations of latent-trait values on probit scale:\n")
+      print(round(x$groupParameters$rho, x$round))
+      cat("\nCorrelations (posterior mean estimates) in matrix form:\n")
+      print(round(x$groupParameters$rho.matrix, x$round))
+    }
 
   cat("\n\n##############\n",
       "Model fit statistics (posterior predictive p-values):\n")

@@ -9,16 +9,14 @@
 # #' @author Daniel Heck
 # #' @export
 makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
-                         filename,
-                         mergedTree,
-                         S,
+                         filename, mergedTree, S,
                          hyperprior,       # list (either with alpha+beta or with mu+xi)
                          corString=NULL,   # model string to compute correlations
                          predString=NULL,  # model string to include predictors (in traitMPT)
                          parString="",
                          groupMatT1=NULL,    # a G x 2 matrix that contains the grouping indices for T1 per group (column 1:2 = from:to)
                          fixedPar=NULL
-                         ){
+){
 
   treeNames <- as.character(sort(unique(mergedTree$Tree)))
   NOT=length(treeNames)
@@ -31,61 +29,58 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
   cat(ifelse(model=="traitMPT",
              "####### Hierarchical latent-trait MPT with TreeBGUS #####\n\n",
              "####### Hierarchical beta MPT with TreeBGUS #####\n\n"),
-             "data{\nfor(s in 1:S){\n  zeros[s] <- 0\n}\n}\n\n",     # for zeros-trick and dmnorm(zeros, Tau.prec)
+      "data{\nfor(s in 1:S){\n  zeros[s] <- 0\n}\n}\n\n",     # for zeros-trick and dmnorm(zeros, Tau.prec)
       "model{\n\n",
       "for (n in 1: subjs){\n\n### MPT model equations:\n",
       file=filename)
 
-	for(i in 1:NOT){
-		for(j in 1:ncatPerTree[i]){
-		cat(treeNames[i],"[n,",j,"] <- ",mergedTree$Equation[count],
-		    "\n",sep="",file=filename,append=T)
-		count=count+1
-		}
-	  cat("\n",file=filename,append=T)
-	}
+  for(i in 1:NOT){
+    for(j in 1:ncatPerTree[i]){
+      cat(treeNames[i],"[n,",j,"] <- ",mergedTree$Equation[count],
+          "\n",sep="",file=filename,append=T)
+      count=count+1
+    }
+    cat("\n",file=filename,append=T)
+  }
 
   cat("\n### Multinomial likelihood:\n",file=filename,append=T)
 
-	for(i in 1:NOT){
-		cat("response.",treeNames[i],"[n,1:",ncatPerTree[i],"] ~ dmulti(",
-			treeNames[i],"[n,1:",ncatPerTree[i],"],items.",treeNames[i],
-			"[n])\n",sep="",file=filename,append=T)
-	}
+  for(i in 1:NOT){
+    cat("response.",treeNames[i],"[n,1:",ncatPerTree[i],"] ~ dmulti(",
+        treeNames[i],"[n,1:",ncatPerTree[i],"],items.",treeNames[i],
+        "[n])\n",sep="",file=filename,append=T)
+  }
 
-	cat("}\n",file=filename,append=T)
+  cat("}\n",file=filename,append=T)
 
-	######################################### MODEL SPECIFIC HYPERPRIOR PART ###########
+  ######################################### MODEL SPECIFIC HYPERPRIOR PART ###########
 
-	hyperprior <- switch(model,
-	                     "betaMPT" = makeBetaHyperprior(S =S ,
-	                                                    alpha = hyperprior$alpha,
-	                                                    beta = hyperprior$beta),
-	                     "traitMPT" = makeTraitHyperprior(S = S,
-	                                                      predString = predString,
-	                                                     mu = hyperprior$mu,
-	                                                     xi = hyperprior$xi)
-	)
+  hyperprior <- switch(model,
+                       "betaMPT" = makeBetaHyperprior(S =S ,
+                                                      alpha = hyperprior$alpha,
+                                                      beta = hyperprior$beta),
+                       "traitMPT" = makeTraitHyperprior(S = S,
+                                                        predString = predString,
+                                                        mu = hyperprior$mu,
+                                                        xi = hyperprior$xi,
+                                                        wishart = !is.na(hyperprior$V))
+  )
 
-	cat("\n\n### Hierarchical structure:",
-	    hyperprior, file=filename, append=TRUE)
-	if(! is.null(fixedPar)){
-	  S.fixed <- length(unique(fixedPar$theta))
-	  cat("\nfor(i in 1:", S.fixed,"){\n",
-	      "      thetaFE[i] ~ dunif(0,1)\n}\n", file=filename, append=TRUE)
-	}
+  cat("\n\n### Hierarchical structure:",
+      hyperprior, file=filename, append=TRUE)
+  if(! is.null(fixedPar)){
+    S.fixed <- length(unique(fixedPar$theta))
+    cat("\nfor(i in 1:", S.fixed,"){\n",
+        "      thetaFE[i] ~ dunif(0,1)\n}\n", file=filename, append=TRUE)
+  }
 
-	######################################### END OF MODEL SPECIFIC HYPERPRIOR PART #####
+  ######################################### END OF MODEL SPECIFIC HYPERPRIOR PART #####
 
+  if( !is.null(corString)){
+    cat(corString, file=filename, append=T)
+  }
 
-	# if(model == "betaMPT" & !is.null(covString)){
-	 if( !is.null(corString)){
-	   cat(corString, file=filename, append=T)
-	}
-
-
-
-	### Transformed parameters:
+  ### Transformed parameters:
   cat(parString, file=filename, append = TRUE)
 
   cat("}\n",file=filename,append=T)
@@ -94,9 +89,7 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 
 
 ################### Beta-MPT specific hyperprior part
-makeBetaHyperprior <-function(S,
-                              alpha = "dunif(1,5000)",
-                              beta = "dunif(1,5000)"){
+makeBetaHyperprior <- function(S, alpha = "dunif(1,5000)", beta = "dunif(1,5000)"){
 
   if(class(alpha) != "character" || !length(alpha) %in% c(1,S)){
     stop("Hyperprior for 'alpha' must be a character vector of length 1
@@ -144,10 +137,8 @@ for(s in 1:S){
 
 
 ################### latent-trait-MPT specific hyperprior part
-makeTraitHyperprior <-function(S,
-                               predString,
-                               mu = "dnorm(0,1)",
-                               xi = "dunif(0,100)"){
+makeTraitHyperprior <- function(S, predString, mu = "dnorm(0,1)",
+                                xi = "dunif(0,100)", wishart = TRUE){
 
   if(class(mu) != "character" || !length(mu) %in% c(1,S)){
     stop("Hyperprior for 'mu' must be a character vector of length 1
@@ -162,45 +153,60 @@ makeTraitHyperprior <-function(S,
      check the order see ?readEQN).")
   }
 
-  modelString <- paste0(predString, "
+  if (wishart){
 
-# hyperpriors
-for(i in 1:subjs) {
-  delta.part.raw[1:S,i] ~ dmnorm(zeros,T.prec.part[1:S,1:S])
-}
+    modelString <- paste0(predString, "
 
-",
-######################## special case if S=1:
-ifelse(S>1,"
-T.prec.part[1:S,1:S] ~ dwish(V, df)",
-       "
-T.prec.part[1,1] ~ dchisq(df)"),
+    # hyperpriors
+    for(i in 1:subjs) {
+      delta.part.raw[1:S,i] ~ dmnorm(zeros,T.prec.part[1:S,1:S])
+    }
 
-"
-Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
-for(s in 1:S){
-  mean[s] <- phi(mu[s])
-  for(q in 1:S){
-    Sigma[s,q] <- Sigma.raw[q,s]*xi[s]*xi[q]
+    ",
+                          ######################## special case if S=1:
+                          ifelse(S > 1,"
+    T.prec.part[1:S,1:S] ~ dwish(V, df)",
+                                 "
+    T.prec.part[1,1] ~ dchisq(df)"),
+
+                          "
+    Sigma.raw[1:S,1:S] <- inverse(T.prec.part[,])
+    for(s in 1:S){
+      mean[s] <- phi(mu[s])
+      for(q in 1:S){
+        Sigma[s,q] <- Sigma.raw[q,s]*xi[s]*xi[q]
+      }
+    }
+
+    for(s in 1:S){
+      for(q in 1:S){
+        # Off-diagonal elements of S (correlations not affected by xi)
+        rho[s,q] <- Sigma[s,q]/sqrt(Sigma[s,s]*Sigma[q,q])
+      }
+      # Diagonal elements of S (rescale sigma)
+      sigma[s] <- sqrt(Sigma[s,s])
+    }")
+  } else {
+    modelString <- paste0(predString, "
+
+    # hyperpriors
+    for(s in 1:S) {
+      for(i in 1:subjs) {
+        delta.part.raw[s,i] ~ dnorm(0,tau[s])
+      }
+
+      mean[s] <- phi(mu[s])
+      tau[s] ~ dgamma(.5, df / 2)  # = chi-square
+      sigma[s] <- abs(xi[s]) / sqrt(tau[s])
+      for(s2 in 1:S){
+        rho[s,s2] <- -99
+      }
+    }")
   }
-}
 
-for(s in 1:S){
-  for(q in 1:S){
-    # Off-diagonal elements of S (correlations not affected by xi)
-    rho[s,q] <- Sigma[s,q]/sqrt(Sigma[s,s]*Sigma[q,q])
-  }
-  # Diagonal elements of S (rescale sigma)
-  sigma[s] <- sqrt(Sigma[s,s])
-}
-",
-paste0("\nmu[", 1:S, "] ~ ", mu, collapse = ""),
-paste0("\nxi[", 1:S, "] ~ ", xi, collapse = ""),"
-
-")
-
-
-  return(modelString)
+  paste0(modelString, "\n\n",
+         paste0("\nmu[", 1:S, "] ~ ", mu, collapse = ""),
+         paste0("\nxi[", 1:S, "] ~ ", xi, collapse = ""),"\n\n")
 }
 
 

@@ -85,33 +85,32 @@ callingSampler <- function(model,
 
     index=index+NresponsesTree[i]
 
-    data <- c(data,
-              name.response, name.items)
+    data <- c(data, name.response, name.items)
   }
 
 
-  if(model == "traitMPT"){
+  if (model == "traitMPT"){
     df <- hyperpriors$df
     V <- hyperpriors$V
     data <- c(data, "V", "df")
 
-    if(length(X_list) != 0){
-      for(pp in 1:length(X_list))
+    if (length(X_list) != 0){
+      for (pp in 1:length(X_list))
         assign(names(X_list)[pp], X_list[[pp]])
       data <- c(data, names(X_list))
     }
   }
 
-  if(!is.null(covData) & !any(dim(covData) == 0)){
+  if (!is.null(covData) & !any(dim(covData) == 0)){
 
     covData <- as.matrix(covData)
-    if(any(is.na(covData))){
+    if (any(is.na(covData))){
       warning("Data frame with covariates contains missing values (NA).",
               "\n  This is likely to cause problems for JAGS.")
     }
 
     # covData only required for predictors/discrete factors:
-    if(!is.null(covPars)){
+    if (!is.null(covPars)){
       # standardization:
       covVar <- diag(cov(covData))
       # covData <- as.matrix(scale(covData))
@@ -123,9 +122,9 @@ callingSampler <- function(model,
 
   ############################## starting values
   inits <- function() {
-    if(model == "betaMPT"){
+    if (model == "betaMPT"){
       ini <- list("theta"=matrix(runif(subjs*S), S, subjs))
-    }else{
+    } else {
       # draw appropriate random starting values:
       mu <- xi <- rep(NA, S)
       for(s in 1:S){
@@ -139,12 +138,16 @@ callingSampler <- function(model,
           xi[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
         }
       }
-
-      ini <- list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
-                  "xi"=xi,  "mu" = mu,
-                  "T.prec.part" = as.matrix(rWishart(1,df+30,V)[,,1])
-                  # starts with small correlations and scaling parameters close to 1
-      )
+      if (!is.na(hyperpriors$V)){
+        ini <- list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
+                    "xi"=xi,  "mu" = mu,
+                    "T.prec.part" = as.matrix(rWishart(1,df+30,V)[,,1])
+                    # starts with small correlations and scaling parameters close to 1
+        )
+      } else {
+        ini <- list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
+                    "xi"=xi,"mu" = mu)
+      }
       # check starting values:
       # hist(replicate(1000,cov2cor(solve(rWishart(1,4+1+30,diag(2))[,,1]))[1,2]))
       # hist(replicate(5000,runif(1,.2,1)*sqrt(solve(rWishart(1,4+1+30,diag(2))[,,1])[1,1])))
@@ -196,3 +199,7 @@ callingSampler <- function(model,
   return(samples)   # own summary
 }
 
+# data generation for categorical point-mass distribution
+rcat <- function(n, const){
+  rep(const, n)
+}
