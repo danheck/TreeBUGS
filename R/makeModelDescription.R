@@ -63,7 +63,7 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
                                                         predString = predString,
                                                         mu = hyperprior$mu,
                                                         xi = hyperprior$xi,
-                                                        wishart = !is.na(hyperprior$V))
+                                                        wishart = !anyNA(hyperprior$V))
   )
 
   cat("\n\n### Hierarchical structure:",

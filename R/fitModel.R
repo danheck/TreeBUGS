@@ -72,18 +72,16 @@ fitModel <- function(type,
 
   if(type == "traitMPT"){
 
-    # inverse Wishart prior
-    if (is.null(hyperprior$V)){
+    # random-effect structure: inverse Wishart prior
+    if (is.null(hyperprior$V))
       hyperprior$V <- diag(S)
-      if(is.null(hyperprior$df))
-        hyperprior$df <- S+1
+    if(!anyNA(hyperprior$V) && is.null(hyperprior$df))
+      hyperprior$df <- S+1
 
-    # independent chi-square
-    } else if (is.na(hyperprior$V)){
-      if(is.null(hyperprior$df))
-        hyperprior$df <- 1
-      # hyperprior$V <- NULL
-    }
+    # random-effect structure: independent chi-square
+    if (anyNA(hyperprior$V) && is.null(hyperprior$df))
+      hyperprior$df <- 1
+
     hyperprior$mu <- check.hyperprior(hyperprior$mu, thetaUnique, label="mu")
 
     ##################### TRAIT MPT

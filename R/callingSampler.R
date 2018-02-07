@@ -104,7 +104,7 @@ callingSampler <- function(model,
   if (!is.null(covData) & !any(dim(covData) == 0)){
 
     covData <- as.matrix(covData)
-    if (any(is.na(covData))){
+    if (anyNA(covData)){
       warning("Data frame with covariates contains missing values (NA).",
               "\n  This is likely to cause problems for JAGS.")
     }
@@ -138,16 +138,13 @@ callingSampler <- function(model,
           xi[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
         }
       }
-      if (!is.na(hyperpriors$V)){
-        ini <- list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
-                    "xi"=xi,  "mu" = mu,
-                    "T.prec.part" = as.matrix(rWishart(1,df+30,V)[,,1])
-                    # starts with small correlations and scaling parameters close to 1
-        )
-      } else {
-        ini <- list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
-                    "xi"=xi,"mu" = mu)
-      }
+      ini <- list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
+                  "xi"=xi,"mu" = mu)
+
+      # starts with small correlations and scaling parameters close to 1
+      if (!anyNA(hyperpriors$V))
+        ini$T.prec.part <- as.matrix(rWishart(1,df+30,V)[,,1])
+
       # check starting values:
       # hist(replicate(1000,cov2cor(solve(rWishart(1,4+1+30,diag(2))[,,1]))[1,2]))
       # hist(replicate(5000,runif(1,.2,1)*sqrt(solve(rWishart(1,4+1+30,diag(2))[,,1])[1,1])))
