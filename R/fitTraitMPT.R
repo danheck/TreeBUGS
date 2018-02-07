@@ -32,26 +32,35 @@
 #'     Default is a diagonal matrix.
 #' @param df degrees of freedom for the inverse-Wishart hyperprior for the individual
 #'     parameters. Minimum is S+1, where S gives the number of core MPT parameters.
-#' @param IVprec hyperprior on the precision (i.e., the inverse of the variance)
-#'     of the slope parameters for the z-standardized continuous predictors.
+#' @param IVprec hyperprior on the precision parameter \eqn{g} (= the inverse of the variance)
+#'     of the standardized slope parameters of continuous covariates.
+#'     The default \code{IVprec=dgamma(.5,.5)} defines a mixture of \eqn{g}-priors
+#'     (also known as JZS or Cauchy) wit the scale parameter \eqn{s=1}. Different
+#'     scales \eqn{s} can be used via: \code{IVprec=dgamma(.5,.5*s^2)}.
+#'     A numeric constant \code{IVprec=1} implies a \eqn{g}-prior (a normal distribution).
 #'     For ease of interpretation, TreeBUGS reports unstandardized regression coefficients.
 #'     See details below.
 #'
 #' @section Regression Extensions:
-#' Continuous (discrete) predictors are added on the latent-probit scale via:
-#' \deqn{\theta = \Phi(\mu + X \beta +\delta ),}
-#' where X is a design matrix with centered (!) continuous covariates and recoded factor
-#' variables (using an orthogonal contrast coding scheme; cf. Rouder et al., 2012).
-#' TreeBUGS reports unstandardized regression coefficients that correspond to the
-#' scale/SD of the predictor variables. However, since the regression is on the latent
-#' probit scale, the coefficients are not standardized with respect to the 'depend variable'
-#' as in the standard linear regression as in Rouder & Morey (2012).
+#' Continuous and discrete predictors are added on the latent-probit scale via:
+#'     \deqn{\theta = \Phi(\mu + X \beta +\delta ),}
+#' where \eqn{X} is a design matrix includes centered continuous covariates
+#' and recoded factor variables (using the orthogonal contrast coding scheme by Rouder et al., 2012).
+#' Note that both centering and recoding is done internally.
+#' TreeBUGS reports unstandardized regression coefficients \eqn{\beta} that correspond to the
+#' scale/SD of the predictor variables. Hence, slope estimates will be very small if the
+#' covariate has a large variance.
 #'
-#' For continuous predictors, the default prior \code{IVprec = "dchisq(1)"} implies
-#' a Cauchy prior on each standardized \eqn{\beta} (similar to the Jeffreys-Zellner-Siow prior
-#' with scale parameter \eqn{s=1}; for details, see: Rouder et. al, 2012; Rouder & Morey, 2012).
+#' For continuous predictors, the default prior \code{IVprec = "dgamma(.5,.5)"} implies
+#' a Cauchy prior on each standardized \eqn{\beta}. This prior is similar to the
+#' Jeffreys-Zellner-Siow (JZS) prior with scale parameter \eqn{s=1}
+#' (for details, see: Rouder et. al, 2012; Rouder & Morey, 2012).
+#' In contrast to the JZS prior for standard linear regression as in Rouder & Morey (2012),
+#' TreeBUGS implements a latent-probit regression where the prior on the coefficients
+#' \eqn{\beta} is only scaled with respect to the
+#' covariates but not with respect to the residual variance (since this is not a parameter in probit regression).
 #' If small effects are expected, smaller scale values \eqn{s} can be used by changing the default to
-#' \code{IVprec = 'dgamma(1/2,(s^2)/2)'}.
+#' \code{IVprec = 'dgamma(.5, .5*s^2)'}.
 #' To use a standard-normal priors on the standardized slopes, use \code{IVprec = 'dcat(1)'}.
 #'
 #' @section Uncorrelated Latent-Trait Values:
@@ -126,7 +135,7 @@ traitMPT <- function(eqnfile, data, restrictions, covData, predStructure,
 
                      # hyperpriors:
                      mu = "dnorm(0,1)", xi = "dunif(0,10)",
-                     V, df, IVprec = "dchisq(1)",  # change to "dcat(1)" to set beta ~ dnorm(0,1)
+                     V, df, IVprec = "dgamma(.5,.5)",  # IVprec=1(=g)   => beta ~ dnorm(0,1/sqrt(g))
 
                      # MCMC stuff:
                      n.iter=20000, n.adapt = 2000, n.burnin=2000,  n.thin=5,

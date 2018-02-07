@@ -5,7 +5,7 @@
 # S: number of free parameters
 # predFactorLevels: list with factor levels for discrete covariates
 
-covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dchisq(1)"){
+covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dgamma(.5,.5)"){
   modelString <- "\n## Probit Transformation and Covariate Handling ##\n"
 
   ##### no predictors/ covariates: simple probit transformation as before
@@ -13,9 +13,9 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dchis
     covPars <- c() ; X_list <- list()
     modelString <- "
     for(i in 1:subjs) {
-    for(s in 1:S){
-    theta[s,i] <- phi(mu[s] + xi[s]*delta.part.raw[s,i])
-    }
+      for(s in 1:S){
+        theta[s,i] <- phi(mu[s] + xi[s]*delta.part.raw[s,i])
+      }
     }
     "
 
@@ -72,7 +72,8 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dchis
       parWithPred <- unique(subset(covTable, covTable$predType == "c")$Parameter)
       for(pp in seq_along(parWithPred)){
         modelString <- paste0(modelString, "\n",
-                              "ginv_",parWithPred[pp], " ~ ",IVprec )
+                              "ginv_",parWithPred[pp],
+                              ifelse(is.numeric(IVprec), " <- " , " ~ "), IVprec )
       }
     }
 
@@ -94,9 +95,9 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dchis
         modelString <- paste0(modelString,
                               "\nfor(level in 1:", numLevel,"){\n  ",
                               covPars[pp], "[level] ~ dnorm(0, tau_",covPars[pp],") \n}\n",
-                              "tau_", covPars[pp], " ~ dchisq(1)\n",
+                              "tau_", covPars[pp], " ~ dgamma(.5, .5)\n",
                               "SD_", covPars[pp], " <- sqrt(inverse(tau_",covPars[pp] ,"))"
-                              )
+        )
 
         covPars <- c(covPars, paste0("SD_", covPars[pp]))
       }else{
@@ -122,7 +123,7 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dchis
                               "s",covPars[pp],", X_",covPars[pp],"[level,])\n} \n",
 
                               # hyperpriors:
-                              "tau_", covPars[pp], " ~ dchisq(1)\n",
+                              "tau_", covPars[pp], " ~ dgamma(.5, .5)\n",
                               "SD_", covPars[pp], " <- sqrt(inverse(tau_", covPars[pp],"))")
         # before calling sampler:        assign(paste0("X_",names(X_list)[pp]), X_list[[pp]])
 
@@ -136,5 +137,5 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dchis
   # additionally monitored variable: covPars <- paste0("cor_", sapply(covList, function(ll, ll$Par) ))
   ###################  ###################   ###################
 
-  return(list(modelString = modelString, covPars =  covPars, X_list=X_list))
-  }
+  list(modelString = modelString, covPars =  covPars, X_list=X_list)
+}

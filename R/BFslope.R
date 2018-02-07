@@ -1,30 +1,39 @@
 #' Bayes Factor for Slope Parameters in Latent-Trait MPT
 #'
 #' Uses the Savage-Dickey method to compute the Bayes factor that the slope
-#' parameter of a continuous covariate is zero vs. positive/negative/unequal to zero.
+#' parameter of a continuous covariate in \code{\link{traitMPT}} is
+#' zero vs. positive/negative/unequal to zero.
 #'
-#' @param fittedModel a fitted latent-trait model with predictor variables that have
-#'     been defined via \code{predStructure}.
-#' @param parameter name of the slope parameter (e.g., \code{"slope_d_covariate"})
+#' @param fittedModel a fitted latent-trait model fitted with \code{\link{traitMPT}}
+#'     with predictor variables that have been defined via \code{predStructure}.
+#' @param parameter name of the slope parameter (e.g., \code{"slope_d_covariate"}).
 #' @param direction alternative hypothesis: whether slope is smaller or larger
-#'     than zero (\code{"<"} or \code{">"}) or unequal to zero (\code{"!="})
+#'     than zero (\code{"<"} or \code{">"}) or unequal to zero (\code{"!="}).
 #' @param plot if \code{TRUE}, the prior and posterior densities and the ratio at slope=0 are plotted.
 #' @param ... further arguments passed to \code{\link[logspline]{logspline}}, which is used to
 #'     approximate the density of the posterior distribution.
 #'
+#' @details
+#' The Bayes factor is computed with the Savage-Dickey method, which is defined as the ratio of the
+#' density of the posterior and the density of the prior evalauted at \code{slope=0}.
+#' Note that this method cannot be used with default JZS priors (\code{IVprec="dgamma(.5,.5)"})
+#' if more than one predictor is added for an MPT parameter. As a remedy, a g-prior (normal distribution)
+#' can be used on the slopes by setting the hyperprior parameter \eqn{g} to a
+#' fixed constant when fitting the model: \code{traitMPT(..., IVprec = 1)}.
+#'
 #' @examples
 #' \dontrun{
-#' # fit beta-MPT model for encoding condition (see ?arnold2013):
+#' # latent-trait MPT model for the encoding condition (see ?arnold2013):
 #' EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+#' d.enc <- subset(arnold2013, group == "encoding")
 #'
-#' d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
-#' d.cov <- subset(arnold2013, group == "encoding", select = "age")
-#' fit <- traitMPT(EQNfile, d.encoding, n.thin=5,
+#' fit <- traitMPT(EQNfile, data = d.enc[, -(1:4)], n.thin=5,
 #'                 restrictions=list("D1=D2=D3","d1=d2","a=g"),
-#'                 covData = d.cov, predStructure = list("D1 ; age"))
-#' # convergence
+#'                 covData = d.enc[,c("age", "pc")],
+#'                 predStructure = list("D1 ; age"))
 #' plot(fit, parameter = "slope", type = "default")
 #' summary(fit)
+#'
 #' BayesFactorSlope(fit, "slope_D1_age", direction = "<")
 #' }
 #' @export
@@ -34,32 +43,46 @@
 ## H0: slope beta = 0
 ## H1: slope beta < 0   (i.e., beta ~ Cauchy)
 BayesFactorSlope <- function (fittedModel, parameter,
-                              direction = "<", plot = TRUE, ...){
-  parlabels <- rownames(fittedModel$mcmc.summ)
+                              direction = "!=", plot = TRUE, ...){
 
+  # hyperprior for "g" (numeric: g-prior; dgamma: JZS)
   IVprec <- fittedModel$mptInfo$hyperprior$IVprec
-  IVparsed <- sapply(strsplit(IVprec, "[\\(\\)]"), "[[", 1)
-  IVscale <- as.numeric(sapply(strsplit(IVprec, "[\\(\\)]"), "[[", 2))
-  if (any(IVparsed != "dchisq"))
-    stop("BayesFactorSlope requires that default JZS priors are used for the slope parameter!\n",
-         "  Example:   traitMPT(..., IVprec='dchisq(s)')    ## with s=scale parameter")
+  if (length(IVprec) != 1)
+    stop("Fitted model must use the same 'IVprec' for all slope parameters.")
+  if (is.numeric(IVprec)){
+    IVfamily <- "constant"
+  } else {
+    IVsplit <- strsplit(IVprec, "[\\(,\\)]")[[1]]
+    IVfamily <- IVsplit[[1]]
+    IVpars <- as.numeric(sapply(IVsplit[- 1],
+                                function(g) eval(as.expression(g))))
+  }
 
-  if (length(parameter)!= 1 || !parameter %in% parlabels)
+  parlabels <- rownames(fittedModel$mcmc.summ)
+  if (length(parameter) != 1 || !parameter %in% parlabels)
     stop("'parameter' not in model or not of length=1.")
 
-  tmp <- strsplit(parameter, "_")
-  tmp[[1]][3] <- paste(tmp[[1]][-c(1:2)], collapse = "_")
-  tmp <- tmp[[1]][1:3]
-  if (length(tmp) != 3)
-    stop("Parameter must be of the form 'slope_MPTparam_cov' (avoid '_' in parameters!).")
-  if (tmp[[1]][1] != "slope")
+  if (substr(parameter, 1, 6) != "slope_")
     stop("Only valid for slope parameters.")
 
-  cov <- tmp[3]
+  thetas <- fittedModel$mptInfo$thetaUnique
+  theta <- thetas[sapply(paste0("_", thetas, "_"), grepl, parameter)]
+  if (length(theta) != 1)
+    stop("Check that slope parameter includes the correct label of the MPT parameters:\n",
+         "  theta:     ", paste(thetas, collapse = ", "), "  \n  parameter: ", parameter)
+  cov <- substr(parameter, 7 + nchar(theta) + 1, 999)
   if(!cov %in% colnames(fittedModel$mptInfo$covData))
     stop("Covariate", cov, "not in covariate data.")
-  if (sum(grepl(paste0(tmp[1],"_", tmp[2]), parlabels)) > 1)
-    stop("Savage-Dickey provides incorrect Bayes factors for more than one predictor.")
+
+  if (IVfamily == "dgamma" && sum(grepl(paste0("slope_", theta), parlabels)) > 1)
+    stop("The Savage-Dickey method provides incorrect Bayes factors if:\n",
+         "     (A) one of the MPT parameters has more than one predictors AND \n",
+         "     (B) the slope parameters have the default prior (known as JZS or Cauchy prior).\n",
+         "     (cf. Heck (2018): Computing Bayes factors for regression models: \n",
+         "                       A caveat on the Savage-Dickey density ratio)\n\n",
+         "  As a remedy, refit the model \n",
+         "      (1) with a maximum of one predictor per MPT parameter OR\n",
+         "      (2) with standard-normal priors (g-prior) on the regression slopes: traitMPT(..., IVprec = 1)\n")
 
   # slope parameters are not standardized wrt covariate! => standardization
   s <- apply(fittedModel$mptInfo$covData, 2, sd)[cov]
@@ -85,31 +108,58 @@ BayesFactorSlope <- function (fittedModel, parameter,
 
   # posterior and prior density for beta=0:
   post0 <- dlogspline(0, posterior)
-  prior0 <- dcauchy(0, 0, IVscale) * ifelse(direction == "!=", 1, 2)  # one-sided
+  if (IVfamily == "dgamma"){
+    if (IVpars[[1]] != .5)
+      stop("First parameter in 'IVprec' must be equal to .5, that is: 'IVprec=dgamma(.5,.5*s^2)'.")
+    scale <- sqrt(IVpars[[2]]*2)
+    prior0 <- dcauchy(0, 0, scale) * ifelse(direction == "!=", 1, 2)  # one-sided
+
+    # illustration of Savage-Dickey method:
+    dprior <- function(x){
+      if (direction == ">"){
+        dx <- dcauchy(x, 0, scale)*ifelse(x > 0, 2, 0)
+      } else if (direction == "<"){
+        dx <- dcauchy(x, 0, scale)*ifelse(x < 0, 2, 0)
+      } else if (direction == "!="){
+        dx <- dcauchy(x, 0, scale)
+      }
+      dx
+    }
+
+  } else if (IVfamily == "constant") {
+    prior0 <- dnorm(0, 0, 1/sqrt(IVprec)) * ifelse(direction == "!=", 1, 2)  # one-sided
+
+    dprior <- function(x){
+      if (direction == ">"){
+        dx <- dnorm(x, 0, 1/sqrt(IVprec))*ifelse(x > 0, 2, 0)
+      } else if (direction == "<"){
+        dx <- dnorm(x, 0, 1/sqrt(IVprec))*ifelse(x < 0, 2, 0)
+      } else if (direction == "!="){
+        dx <- dnorm(x, 0, 1/sqrt(IVprec))
+      }
+      dx
+    }
+  } else {
+    stop("Either a JZS prior 'IVprec=dgamma(.5,.5*s^2)' or g-prior 'IVprec=g' must be used.\n
+         (where s and g are numeric constants).")
+  }
 
   # BF in favor of effect:
   bf <- data.frame(post0/prior0, prior0/post0)
   colnames(bf) <- paste0("BF_", c(0, direction),  c(direction, 0))
 
-  # illustration of Savage-Dickey method:
-  dcauchy_trunc <- function(x){
-    if (direction == ">"){
-      dx <- 2*dcauchy(x, 0, IVscale)*ifelse(x > 0, 1, 0)
-    } else if (direction == "<"){
-      dx <- 2*dcauchy(x, 0, IVscale)*ifelse(x < 0, 1, 0)
-    } else if (direction == "!="){
-      dx <- dcauchy(x, 0, IVscale)
-    }
-    dx
-  }
+
   if (plot){
-    hist(samples[sel], col = adjustcolor("gray", alpha.f =.3), 100,
+    hist(samples[sel], col = adjustcolor("gray", alpha.f =.3), 70,
          freq = FALSE, xlim = xlim,
-         main = "Bayes factor: Prior (red) vs. posterior (blue)",
-         xlab = paste0("Standardized slope parameter: ", tmp[2], " ~ ", tmp[3]))
+         main = paste0("Bayes factor B_10=", round(bf[1,2], 3),
+                       " (prior red; posterior blue)"),
+         xlab = paste0("Standardized slope parameter: ", theta, " ~ ", cov))
     plot(posterior, add = TRUE, col = 4, lwd = 2, n = 1000)
-    curve(dcauchy_trunc, col=2, add=TRUE, n= 1001, lwd = 2)
+    curve(dprior, col=2, add=TRUE, n= 1001, lwd = 2)
     points(c(0,0), c(post0, prior0), col=c(4,2), pch=16, lwd = 2, cex = 2)
+    # text(xlim[1]+.1, 3, col = 2,
+    #      label = paste("Prior:\n", ifelse(IVfamily == "dgamma", "JZS (Cauchy)", "g-prior (normal)")))
   }
 
   bf

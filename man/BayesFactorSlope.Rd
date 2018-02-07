@@ -4,16 +4,16 @@
 \alias{BayesFactorSlope}
 \title{Bayes Factor for Slope Parameters in Latent-Trait MPT}
 \usage{
-BayesFactorSlope(fittedModel, parameter, direction = "<", plot = TRUE, ...)
+BayesFactorSlope(fittedModel, parameter, direction = "!=", plot = TRUE, ...)
 }
 \arguments{
-\item{fittedModel}{a fitted latent-trait model with predictor variables that have
-been defined via \code{predStructure}.}
+\item{fittedModel}{a fitted latent-trait model fitted with \code{\link{traitMPT}}
+with predictor variables that have been defined via \code{predStructure}.}
 
-\item{parameter}{name of the slope parameter (e.g., \code{"slope_d_covariate"})}
+\item{parameter}{name of the slope parameter (e.g., \code{"slope_d_covariate"}).}
 
 \item{direction}{alternative hypothesis: whether slope is smaller or larger
-than zero (\code{"<"} or \code{">"}) or unequal to zero (\code{"!="})}
+than zero (\code{"<"} or \code{">"}) or unequal to zero (\code{"!="}).}
 
 \item{plot}{if \code{TRUE}, the prior and posterior densities and the ratio at slope=0 are plotted.}
 
@@ -22,21 +22,30 @@ approximate the density of the posterior distribution.}
 }
 \description{
 Uses the Savage-Dickey method to compute the Bayes factor that the slope
-parameter of a continuous covariate is zero vs. positive/negative/unequal to zero.
+parameter of a continuous covariate in \code{\link{traitMPT}} is
+zero vs. positive/negative/unequal to zero.
+}
+\details{
+The Bayes factor is computed with the Savage-Dickey method, which is defined as the ratio of the
+density of the posterior and the density of the prior evalauted at \code{slope=0}.
+Note that this method cannot be used with default JZS priors (\code{IVprec="dgamma(.5,.5)"})
+if more than one predictor is added for an MPT parameter. As a remedy, a g-prior (normal distribution)
+can be used on the slopes by setting the hyperprior parameter \eqn{g} to a
+fixed constant when fitting the model: \code{traitMPT(..., IVprec = 1)}.
 }
 \examples{
 \dontrun{
-# fit beta-MPT model for encoding condition (see ?arnold2013):
+# latent-trait MPT model for the encoding condition (see ?arnold2013):
 EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+d.enc <- subset(arnold2013, group == "encoding")
 
-d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
-d.cov <- subset(arnold2013, group == "encoding", select = "age")
-fit <- traitMPT(EQNfile, d.encoding, n.thin=5,
+fit <- traitMPT(EQNfile, data = d.enc[, -(1:4)], n.thin=5,
                 restrictions=list("D1=D2=D3","d1=d2","a=g"),
-                covData = d.cov, predStructure = list("D1 ; age"))
-# convergence
+                covData = d.enc[,c("age", "pc")],
+                predStructure = list("D1 ; age"))
 plot(fit, parameter = "slope", type = "default")
 summary(fit)
+
 BayesFactorSlope(fit, "slope_D1_age", direction = "<")
 }
 }
