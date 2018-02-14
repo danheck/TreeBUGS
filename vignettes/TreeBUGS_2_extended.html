@@ -12,7 +12,7 @@
 
 <meta name="author" content="Daniel W. Heck, Nina R. Arnold, &amp; Denis Arnold" />
 
-<meta name="date" content="2017-04-01" />
+<meta name="date" content="2018-02-14" />
 
 <title>TreeBUGS: Extended Modeling Possibilities</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">TreeBUGS: Extended Modeling Possibilities</h1>
 <h4 class="author"><em>Daniel W. Heck, Nina R. Arnold, &amp; Denis Arnold</em></h4>
-<h4 class="date"><em>2017-04-01</em></h4>
+<h4 class="date"><em>2018-02-14</em></h4>
 
 
 
@@ -107,7 +107,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h3>B) Including Discrete Factors in a Latent-Trait MPT Model</h3>
 <p>In the latent-trait model, it is possible to include discrete factors as predictor variables, similar as in the general linear model formulation of an ANOVA. Compared to continuous covariates only the following changes:</p>
 <ul>
-<li>New argument <code>predType</code>, which is a character vector that assignes each column in <code>covData</code> a specific tyoe (i.e., how it is used in <code>predStructure</code>). Specifically, predictor variables can be set as</li>
+<li>New argument <code>predType</code>, which is a character vector that assignes each column in <code>covData</code> a specific type (i.e., how it is used in <code>predStructure</code>). Specifically, predictor variables can be set as</li>
 <li>continuous (<code>&quot;c&quot;</code>)</li>
 <li>discrete fixed effect (<code>&quot;f&quot;</code>)</li>
 <li>discrete random effect (<code>&quot;r&quot;</code>)</li>
@@ -161,7 +161,7 @@ genTrait &lt;-<span class="st"> </span><span class="kw">genTraitMPT</span>(
               <span class="dt">mean =</span> <span class="kw">c</span>(<span class="dt">Do=</span>.<span class="dv">7</span>, <span class="dt">Dn=</span>.<span class="dv">7</span>, <span class="dt">g=</span>.<span class="dv">5</span>),        <span class="co"># true group-level parameters</span>
               <span class="dt">sigma =</span>   <span class="kw">c</span>(<span class="dt">Do=</span>.<span class="dv">25</span>, <span class="dt">Dn=</span>.<span class="dv">25</span>, <span class="dt">g=</span>.<span class="dv">05</span>),  <span class="co"># SD of latent (!) individual parameters</span>
               <span class="dt">rho =</span> <span class="kw">diag</span>(<span class="dv">3</span>))                       <span class="co"># correlation matrix. here: no correlation</span></code></pre></div>
-<p>The resulting data sets contain both the generated frequencies (<code>genTrait$data</code>) and the data-generating group and individual parameters (<code>genTrait$parameters</code> )</p>
+<p>The resulting data sets contain both the generated frequencies (<code>genTrait$data</code>) and the data-generating group and individual parameters (<code>genTrait$parameters</code>)</p>
 </div>
 </div>
 
@@ -172,7 +172,7 @@ genTrait &lt;-<span class="st"> </span><span class="kw">genTraitMPT</span>(
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>
