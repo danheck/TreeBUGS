@@ -115,7 +115,7 @@ BayesFactorSlope <- function (fittedModel, parameter,
   }
 
   # posterior and prior density for beta=0:
-  post0 <- 0
+  post0 <- NA
   if (approx == "logspline"){
     try({
       posterior <- switch(direction,
@@ -128,7 +128,7 @@ BayesFactorSlope <- function (fittedModel, parameter,
     mm <- mean(samples)
     ss <- sd(samples)
     posterior <- function(x)
-      ifelse(x < ubnd & x > lbnd, 1, 0) * dnorm(x, mm, ss) /
+      ifelse(x <= ubnd & x >= lbnd, 1, 0) * dnorm(x, mm, ss) /
       (pnorm(ubnd, mm, ss) - pnorm(lbnd, mm, ss))
     post0 <- posterior(0)
   }
