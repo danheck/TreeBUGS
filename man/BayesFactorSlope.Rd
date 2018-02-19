@@ -4,7 +4,8 @@
 \alias{BayesFactorSlope}
 \title{Bayes Factor for Slope Parameters in Latent-Trait MPT}
 \usage{
-BayesFactorSlope(fittedModel, parameter, direction = "!=", plot = TRUE, ...)
+BayesFactorSlope(fittedModel, parameter, direction = "!=",
+  approx = "normal", plot = TRUE, ...)
 }
 \arguments{
 \item{fittedModel}{a fitted latent-trait model fitted with \code{\link{traitMPT}}
@@ -14,6 +15,11 @@ with predictor variables that have been defined via \code{predStructure}.}
 
 \item{direction}{alternative hypothesis: whether slope is smaller or larger
 than zero (\code{"<"} or \code{">"}) or unequal to zero (\code{"!="}).}
+
+\item{approx}{how to approximate the posterior density of the slope parameter at zero:
+\code{approx="normal"} uses a normal approximation to all samples and \code{approx="logspline"}
+uses a nonparametric density estimate of the package \link[logspline]{logspline}.
+Usually, both methods provide similar results.}
 
 \item{plot}{if \code{TRUE}, the prior and posterior densities and the ratio at slope=0 are plotted.}
 

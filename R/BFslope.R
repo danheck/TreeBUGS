@@ -9,6 +9,10 @@
 #' @param parameter name of the slope parameter (e.g., \code{"slope_d_covariate"}).
 #' @param direction alternative hypothesis: whether slope is smaller or larger
 #'     than zero (\code{"<"} or \code{">"}) or unequal to zero (\code{"!="}).
+#' @param approx how to approximate the posterior density of the slope parameter at zero:
+#'     \code{approx="normal"} uses a normal approximation to all samples and \code{approx="logspline"}
+#'     uses a nonparametric density estimate of the package \link[logspline]{logspline}.
+#'     Usually, both methods provide similar results.
 #' @param plot if \code{TRUE}, the prior and posterior densities and the ratio at slope=0 are plotted.
 #' @param ... further arguments passed to \code{\link[logspline]{logspline}}, which is used to
 #'     approximate the density of the posterior distribution.
@@ -43,7 +47,9 @@
 ## H0: slope beta = 0
 ## H1: slope beta < 0   (i.e., beta ~ Cauchy)
 BayesFactorSlope <- function (fittedModel, parameter,
-                              direction = "!=", plot = TRUE, ...){
+                              direction = "!=", approx = "normal",
+                              plot = TRUE, ...){
+  approx <- match.arg(approx, c("normal", "logspline"))
 
   # hyperprior for "g" (numeric: g-prior; dgamma: JZS)
   IVprec <- fittedModel$mptInfo$hyperprior$IVprec
@@ -89,25 +95,44 @@ BayesFactorSlope <- function (fittedModel, parameter,
   samples <- unlist(fittedModel$runjags$mcmc[,parameter]) * s
 
   # approximation of posterior density
-  if (direction == "<"){
-    sel <- samples < 0
-    xlim <- c(min(samples[sel], -.05), 0)
-    posterior <- logspline(samples[sel], ubound = 0, ...)
-  } else if (direction == ">"){
-    sel <- samples > 0
-    xlim <- c( 0, max(samples[sel], .05))
-    # knots <- seq(0, 3, .5)
-    posterior <- logspline(samples[sel], lbound = 0, ...)
-  } else if (direction == "!="){
-    sel <- rep(TRUE, length(samples))
-    xlim <- c(min(samples[sel], -.05), max(samples[sel], .05))
-    posterior <- logspline(samples[sel], ...)
-  } else {
-    stop("'direction' must be '>', '<', or '!=' ")
+  lbnd <- switch(direction, "<" = -Inf, ">" = 0, "!=" = -Inf, NA)
+  ubnd <- switch(direction, "<" = 0, ">" = Inf, "!=" = Inf, NA)
+  if (is.na(lbnd)) stop("'direction' must be one of: '>', '<', or '!=' ")
+  sel <- samples > lbnd & samples < ubnd
+
+  xlim <- switch(direction,
+                 "<" = c(min(samples[sel], -.05), 0),
+                 ">" = c( 0, max(samples[sel], .05)),
+                 "!="= c(min(samples[sel], -.05), max(samples[sel], .05)))
+
+  if (sum(sel) == 0){
+    warning("No posterior samples are in line with the predicted direction of the effect!",
+            "\n   Bayes factor can only be approximated with approx='normal'.")
+    approx <- "normal"
+  } else if (sum(sel) < 1000){
+    warning("Less than 1000 posterior samples are in line with the predicted direction of the effect!",
+            "\n    This might result in imprecise estimates of the Bayes factor")
   }
 
   # posterior and prior density for beta=0:
-  post0 <- dlogspline(0, posterior)
+  post0 <- 0
+  if (approx == "logspline"){
+    try({
+      posterior <- switch(direction,
+                          "<" = logspline(samples[sel], ubound = 0, ...),
+                          ">" = logspline(samples[sel], lbound = 0, ...),
+                          "!=" = logspline(samples[sel], ...))
+      post0 <- dlogspline(0, posterior)
+    })
+  } else if(approx == "normal"){
+    mm <- mean(samples)
+    ss <- sd(samples)
+    posterior <- function(x)
+      ifelse(x < ubnd & x > lbnd, 1, 0) * dnorm(x, mm, ss) /
+      (pnorm(ubnd, mm, ss) - pnorm(lbnd, mm, ss))
+    post0 <- posterior(0)
+  }
+
   if (IVfamily == "dgamma"){
     if (IVpars[[1]] != .5)
       stop("First parameter in 'IVprec' must be equal to .5, that is: 'IVprec=dgamma(.5,.5*s^2)'.")
@@ -155,7 +180,10 @@ BayesFactorSlope <- function (fittedModel, parameter,
          main = paste0("Bayes factor B_10=", round(bf[1,2], 3),
                        " (prior red; posterior blue)"),
          xlab = paste0("Standardized slope parameter: ", theta, " ~ ", cov))
-    plot(posterior, add = TRUE, col = 4, lwd = 2, n = 1000)
+    if(is.function(posterior))
+      curve(posterior, add = TRUE, col = 4, lwd = 2, n = 1000)
+    else
+      try(plot(posterior, add = TRUE, col = 4, lwd = 2, n = 1000))
     curve(dprior, col=2, add=TRUE, n= 1001, lwd = 2)
     points(c(0,0), c(post0, prior0), col=c(4,2), pch=16, lwd = 2, cex = 2)
     # text(xlim[1]+.1, 3, col = 2,
