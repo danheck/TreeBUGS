@@ -34,8 +34,7 @@ To install the latest developer version of TreeBUGS from GitHub, run:
 ### Dependencies:
 install.packages(c("devtools", "runjags", "hypergeo",
                    "rjags", "RcppArmadillo", "logspline"))
-library("devtools")
-install_github("denis-arnold/TreeBUGS", build_vignettes = TRUE)
+devtools::install_github("denis-arnold/TreeBUGS", build_vignettes = TRUE)
 ```
 
 To compile C++ code, Windows and Mac require [Rtools](https://cran.r-project.org/bin/windows/Rtools/) and [Xcode Command Line Tools](https://www.maketecheasier.com/install-command-line-tools-without-xcode/), respectively. Moreover, on Mac, it might be necessary to install the library `gfortran` manually by typing the following into the console ([required to compile the package `RcppArmadillo`](http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/)):
@@ -49,7 +48,7 @@ sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 
 If you use TreeBUGS, please cite the software as follows:
 
-Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (in press). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. *Behavior Research Methods*. https://doi.org/10.3758/s13428-017-0869-7
+Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (2018). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. *Behavior Research Methods, 50*, 264-284. https://doi.org/10.3758/s13428-017-0869-7
 
 
 ### References
