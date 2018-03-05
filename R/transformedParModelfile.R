@@ -23,13 +23,13 @@ getTransformed <- function (thetaNames,
   selCriticalName <- pars %in% c(thetaNames,
                                  "mu", "sd","mu", "sigma",
                                  "beta","alpha", "rho","theta","xi")
-  if(any(selCriticalName)){
+  if (any(selCriticalName)){
     error <- paste0("Use different label for transformed parameters:\n  ",
                     paste(pars[selCriticalName], collapse=", "))
     stop(error)
   }
 
-  if(length(unique(pars)) != S){
+  if (length(unique(pars)) != S){
     stop("The argument 'transformedParameters' does not specifcy unique names for the transformed parameters")
   }
 
@@ -37,10 +37,8 @@ getTransformed <- function (thetaNames,
   for(i in 1:S){
     replacedString <- splitEqual[[i]][2]
     for(k in 1:nrow(thetaNames)){
-      replacedString <- gsub(pattern = thetaNames[k,1],
-                             replacement = paste0(
-                               "XXXXXXXXXXXXXX[",
-                               thetaNames[k,2],"]"),
+      replacedString <- gsub(pattern = paste0("\\b",thetaNames[k,1],"\\b"),
+                             replacement = paste0("XXXXXXXXXXXXXX[",thetaNames[k,2],"]"),
                              x = replacedString)
     }
     # test whether transformed parameters are proper function: (not working at the moment)
@@ -63,7 +61,9 @@ getTransformed <- function (thetaNames,
   if(mergeString)
     modelstring <- paste(modelstring, "\n")
   modelstring <- gsub("XXXXXXXXXXXXXX","mean", modelstring)
-  return(list(transformedParameters=pars, modelstring=modelstring))
+
+  list(transformedParameters=pars,
+       modelstring=modelstring)
 }
 
 
