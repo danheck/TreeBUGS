@@ -196,7 +196,7 @@ T2stat <- function(n.ind.exp, n.ind, tree){
     for(c in 1:ncol(combs)){
       mean.ind.cov[combs[1,c],combs[2,c]] <- mean(-tmp[,combs[1,c]]*tmp[,combs[2,c]]/n)
     }
-    mean.ind.cov[lower.tri(mean.ind.cov)] <- mean.ind.cov[upper.tri(mean.ind.cov)]
+    mean.ind.cov[lower.tri(mean.ind.cov)] <- t(mean.ind.cov)[lower.tri(mean.ind.cov)]
 
     # add to covariance of expected frequencies:
     sigma[sel,sel] <-  sigma[sel,sel] + (N-1)/N*mean.ind.cov
