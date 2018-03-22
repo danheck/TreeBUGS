@@ -33,12 +33,13 @@ getTransformed <- function (thetaNames,
     stop("The argument 'transformedParameters' does not specifcy unique names for the transformed parameters")
   }
 
+  index_by_length <- order(sapply(thetaNames$Parameter, nchar), decreasing = TRUE)
   modelstring <- ifelse(mergeString, "### Transformed Parameters (on group level) ###\n", "")
   for(i in 1:S){
     replacedString <- splitEqual[[i]][2]
     for(k in 1:nrow(thetaNames)){
-      replacedString <- gsub(pattern = paste0("\\b",thetaNames[k,1],"\\b"),
-                             replacement = paste0("XXXXXXXXXXXXXX[",thetaNames[k,2],"]"),
+      replacedString <- gsub(pattern = paste0("\\b",thetaNames[index_by_length[k],1],"\\b"),
+                             replacement = paste0("XXXXXXXXXXXXXX[",thetaNames[index_by_length[k],2],"]"),
                              x = replacedString)
     }
     # test whether transformed parameters are proper function: (not working at the moment)
