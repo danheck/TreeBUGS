@@ -73,7 +73,9 @@
 #'     \link[runjags]{autorun.jags}), JAGS runs repeatedly until the MCMC chains
 #'     converges . E.g., use \code{list(max.time="30m")} to restrict sampling
 #'     to 30 minutes (similarly for hours, days, and weeks)
-#' @param ... Arguments to be passed to the JAGS sampling function (i.e., to \code{\link[runjags]{run.jags}}.
+#' @param ... further rguments to be passed to the JAGS sampling function
+#'     (i.e., to \code{\link[runjags]{run.jags}}. Note that reproducible results are obtained
+#'     by setting a random seed before fitting a model (i.e., \code{set.seed(12345)} ).
 #'
 #'
 #' @details

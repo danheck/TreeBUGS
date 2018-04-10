@@ -36,7 +36,6 @@ callingSampler <- function(model,
                            n.thin=5,
                            n.chains=3,
                            autojags=NULL,
-                           seed = sample.int(1e10, 1),
                            # savetable = NULL,
                            ...){
 
@@ -157,7 +156,7 @@ callingSampler <- function(model,
                                    "base::Marsaglia-Multicarry",
                                    "base::Super-Duper",
                                    "base::Mersenne-Twister")[1+ (i-1)%% 4]
-    inits.list[[i]]$.RNG.seed <- seed + i
+    inits.list[[i]]$.RNG.seed <-  sample.int(1e4, 1)
   }
 
   n.samples <- ceiling((n.iter-n.burnin)/n.thin)

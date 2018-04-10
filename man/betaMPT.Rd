@@ -97,7 +97,9 @@ posterior samples (an object named \code{fittedModel}; e.g., \code{posteriorFile
 converges . E.g., use \code{list(max.time="30m")} to restrict sampling
 to 30 minutes (similarly for hours, days, and weeks)}
 
-\item{...}{Arguments to be passed to the JAGS sampling function (i.e., to \code{\link[runjags]{run.jags}}.}
+\item{...}{further rguments to be passed to the JAGS sampling function
+(i.e., to \code{\link[runjags]{run.jags}}. Note that reproducible results are obtained
+by setting a random seed before fitting a model (i.e., \code{set.seed(12345)} ).}
 }
 \value{
 a list of the class \code{betaMPT} with the objects:
