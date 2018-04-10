@@ -48,8 +48,15 @@ betweenSubjectMPT <- function(model1, model2,
   ################ get MCMC samples of both models
   idx1 <- match(par1, model1$mptInfo$thetaUnique)
   idx2 <- match(par2, model2$mptInfo$thetaUnique)
-  nam1 <- paste0("mean[", idx1,"]")
-  nam2 <- paste0("mean[", idx2,"]")
+  if (length(model1$mptInfo$thetaUnique) > 1)
+    nam1 <- paste0("mean[", idx1,"]")
+  else
+    nam1 <- "mean"
+  if (length(model2$mptInfo$thetaUnique) > 1)
+    nam2 <- paste0("mean[", idx2,"]")
+  else
+    nam2 <- "mean"
+
   pp1 <- model1$runjags$mcmc[,nam1, drop=FALSE]
   pp2 <- model2$runjags$mcmc[,nam2, drop=FALSE]
 

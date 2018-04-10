@@ -58,7 +58,7 @@ summarizeMPT <- function(mcmc, mptInfo, probs = c(.025,.50,.975), summ = NULL){
 
   rho <- rhoNames <- c()
   cnt <- 1
-  while(cnt<S){
+  while(cnt < S){
     rho <- rbind(rho, summ[paste0("rho[",cnt,",",(cnt+1):S,"]"),, drop=FALSE])
     rhoNames <- c(rhoNames,
                   paste0("rho[",uniqueNames[cnt],",",uniqueNames[(cnt+1):S],"]"))

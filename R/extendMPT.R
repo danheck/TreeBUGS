@@ -14,13 +14,12 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000,
     sel.cor <- c(sel.cor, grep("rho", varnames(fittedModel$runjags$mcmc), fixed=TRUE))
   if(length(sel.cor)>0)
     fittedModel$runjags$mcmc <- fittedModel$runjags$mcmc[,- sel.cor]
-  tmp <- extend.jags(fittedModel$runjags,
-                     burnin = n.burnin,
-                     sample = ceiling((n.iter-n.burnin)/n.thin),
-                     adapt = n.adapt,
-                     thin=n.thin,
-                     summarise = FALSE, ...)
-  fittedModel$runjags <- tmp
+  fittedModel$runjags <- extend.jags(fittedModel$runjags,
+                                     burnin = n.burnin,
+                                     sample = ceiling((n.iter-n.burnin)/n.thin),
+                                     adapt = n.adapt,
+                                     thin=n.thin,
+                                     summarise = FALSE, ...)
 
   # add correlations
   covData <- fittedModel$mptInfo$covData
@@ -35,7 +34,7 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000,
     sel <- fittedModel$mptInfo$predType == "c" & !isPred
     if(any(sel) | class(fittedModel) == "betaMPT"){
       cdat <- covData[,sel,drop = FALSE]
-      tmp <- as.mcmc.list(
+      fittedModel$runjags$mcmc <- as.mcmc.list(
         lapply(fittedModel$runjags$mcmc, corSamples,
                covData=cdat,
                thetaUnique=fittedModel$mptInfo$thetaUnique,
@@ -44,8 +43,8 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000,
     }
   }
 
-  fittedModel$mcmc.summ <- summarizeMCMC(tmp)
-  fittedModel$summary <- summarizeMPT(mcmc = tmp,
+  fittedModel$mcmc.summ <- summarizeMCMC(fittedModel$runjags$mcmc)
+  fittedModel$summary <- summarizeMPT(mcmc = fittedModel$runjags$mcmc,
                                       summ = fittedModel$mcmc.summ,
                                       mptInfo = fittedModel$mptInfo)
   fittedModel$call <- c(fittedModel$call, match.call())
