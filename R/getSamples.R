@@ -9,7 +9,7 @@
 #'     \code{label} (MPT label from EQN file such as \code{"d"}), or
 #'     \code{par_name} (concatenation of both such as \code{"mu[1]_d"}).
 #'
-#' @importFrom coda varnames niter nvar nchain
+#' @importFrom coda varnames niter nvar nchain mcmc.list
 #' @examples
 #' \dontrun{
 #' getSamples(fittedModel, "mu", select = c("d", "g"))

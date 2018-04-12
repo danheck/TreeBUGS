@@ -29,6 +29,7 @@ transformedParameters <- function (fittedModel, transformedParameters,
 
   if (class(fittedModel) %in% c("mcmc", "mcmc.list")){
     mcmc <- fittedModel
+    if (class(fittedModel) == "mcmc") mcmc <- mcmc.list(mcmc)
     S <- N <- P <- parsed <- level <- NA  # only for cpu > 1
 
     # mm <- fittedModel[[1]]
