@@ -8,7 +8,8 @@ transformedParameters(fittedModel, transformedParameters, level = "group",
   nCPU = 4)
 }
 \arguments{
-\item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
+\item{fittedModel}{either a fitted latent-trait or beta MPT model
+(\code{\link{traitMPT}}, \code{\link{betaMPT}}) or an \code{\link[coda]{mcmc.list}}.}
 
 \item{transformedParameters}{list with parameter transformations that should
 be computed based on the posterior samples (e.g., for testing parameter
