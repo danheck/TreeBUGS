@@ -8,7 +8,8 @@
 #' @param x a fitted Beta or latent-trait MPT model
 #' @param includeIndividual whether to plot individual estimates
 #' @param addLines whether to connect individual parameter estimates by lines
-#' @param estimate type of point estimates for group-level and individual parameters (either \code{"mean"} or \code{"median"})
+#' @param estimate type of point estimates for group-level and individual parameters
+#'     (either \code{"mean"} or \code{"median"})
 #' @param select character vector of parameters to be plotted (e.g., \code{select = c("d", "g")}. Can be used to plot subsets of parameters and change the order of parameters.
 #' @param ... further arguments passed to the standard \code{\link{plot}} function
 #'
@@ -21,12 +22,8 @@
 #'           select = c("d1", "d2"))
 #' }
 #' @export
-plotParam <- function(x,
-                      includeIndividual = TRUE,
-                      addLines = FALSE,
-                      estimate = "mean",
-                      select = "all",
-                      ...){
+plotParam <- function(x, includeIndividual = TRUE, addLines = FALSE,
+                      estimate = "mean", select = "all", ...){
 
   stat <- ifelse(estimate == "median", "50%", "Mean")
   par.group <- x$summary$groupParameters$mean

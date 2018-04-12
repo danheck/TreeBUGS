@@ -14,7 +14,8 @@ plotParam(x, includeIndividual = TRUE, addLines = FALSE,
 
 \item{addLines}{whether to connect individual parameter estimates by lines}
 
-\item{estimate}{type of point estimates for group-level and individual parameters (either \code{"mean"} or \code{"median"})}
+\item{estimate}{type of point estimates for group-level and individual parameters
+(either \code{"mean"} or \code{"median"})}
 
 \item{select}{character vector of parameters to be plotted (e.g., \code{select = c("d", "g")}. Can be used to plot subsets of parameters and change the order of parameters.}
 

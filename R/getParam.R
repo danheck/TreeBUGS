@@ -2,9 +2,12 @@
 #'
 #' Returns posterior statistics (e.g., mean, median) for the parameters of a hierarchical MPT model.
 #'
-#' @param fittedModel a fitted latent-trait MPT model (see \code{\link{traitMPT}}) or beta MPT model (see \code{\link{betaMPT}})
-#' @param parameter which parameter(s) should be returned? (see below for details)
-#' @param stat whether to get the posterior \code{"mean"}, \code{"median"}, \code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility interval)
+#' @param fittedModel a fitted latent-trait MPT model (see \code{\link{traitMPT}})
+#'     or beta MPT model (see \code{\link{betaMPT}})
+#' @param parameter which parameter(s) of the (hierarchical) MPT model should be returned?
+#'    (see details in \code{\link{getParam}}).
+#' @param stat whether to get the posterior \code{"mean"}, \code{"median"},
+#'     \code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility interval)
 #' @param file filename to export results in .csv format (e.g., \code{file="est_param.csv"})
 #'
 #' @details This function is a convenient way to get the information stored in \code{fittedModel$mcmc.summ}.
@@ -34,13 +37,11 @@
 #' # save summary of individual estimates:
 #' getParam(fittedModel, parameter = "theta",
 #'          stat = "summary", file= "ind_summ.csv")}
+#'
 #' @author Daniel Heck
 #' @seealso \code{\link{getGroupMeans}} mean group estimates
 #' @export
-getParam <- function(fittedModel,
-                     parameter="mean",
-                     stat="mean",
-                     file = NULL){
+getParam <- function(fittedModel, parameter="mean", stat="mean", file = NULL){
 
   if(! class(fittedModel) %in% c("betaMPT", "traitMPT"))
     stop("Only for hierarchical MPT models (see ?traitMPT & ?betaMPT).")
@@ -64,16 +65,19 @@ getParam <- function(fittedModel,
 
   if(stat != "summary"){
     if(length(par) == S){
-      names(par) <- paste0(names(par), "_", thetaUnique)
+      rownames(par) <- paste0(grep(parameter,allnam, value = TRUE),
+                              names(par), "_", thetaUnique)
     }else if(parameter == "theta"){
       par <- matrix(par, ncol=S, byrow=TRUE)
       colnames(par) <- thetaUnique
+      rownames(par) <- rownames(fittedModel$mptInfo$data)
     }else if(parameter == "rho"){
       par <- getRhoMatrix (thetaUnique, par)
     }
   }else{
     if(length(select) == S){
-      rownames(par) <- paste0(rownames(par), "_", thetaUnique)
+      rownames(par) <- paste0(grep(parameter,allnam, value = TRUE),
+                              rownames(par), "_", thetaUnique)
     }else if(parameter == "theta"){
       par <- matrix(t(par), ncol=S*4, byrow=TRUE)
       colnames(par) <- paste0( rep(thetaUnique, each=4), "_" , label)

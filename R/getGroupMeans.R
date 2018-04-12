@@ -1,12 +1,15 @@
-
-#' Get Mean Group Estimates
+#' Get Mean Parameters per Group
 #'
-#' For hierarchical latent-trait MPT models with discrete predictor variables.
+#' For hierarchical latent-trait MPT models with discrete predictor variables
+#' as fitted with \code{traitMPT(..., predStructure = list("f"))}.
+#'
 #' @param traitMPT a fitted \code{\link{traitMPT}} model
-#' @param factor whether to get group estimates for all combinations of factor levels (default) or only for specific factors (requires the names of the covariates in covData)
-# @param computeT1 whether to compute posterior predictive checks per group by using the T1 statistic (similar to chi square)
+#' @param factor whether to get group estimates for all combinations of factor
+#'     levels (default) or only for specific factors (requires the names of the covariates in covData)
 #' @param probit whether to use probit scale or probability scale
 #' @param file filename to export results in .csv format (e.g., \code{file="fit_group.csv"})
+#' @param mcmc if \code{TRUE}, the raw MCMC samples for the group means are returned.
+#'    This allows pairwise tests of group means.
 #'
 #' @examples
 #' \dontrun{
@@ -16,7 +19,8 @@
 #' @seealso \code{\link{getParam}} for parameter estimates
 #' @author Daniel Heck
 #' @export
-getGroupMeans <- function(traitMPT, factor="all", probit=FALSE, file = NULL){
+getGroupMeans <- function(traitMPT, factor="all", probit=FALSE,
+                          file = NULL, mcmc = FALSE){
 
   if(is.null(traitMPT$mptInfo$predTable))
     stop("Model does not contain discrete predictors.")
@@ -41,7 +45,7 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE, file = NULL){
     # parameter s of S
     select <- grep(paste0("mu",ifelse(S==1, "",paste0("[",s,"]"))),
                    varnames(traitMPT$runjags$mcmc), fixed=TRUE)
-    muPosterior <- do.call("rbind", traitMPT$runjags$mcmc[,select]) #traitMPT$mcmc$BUGSoutput$sims.list[["mu"]][,s,drop=FALSE]
+    muPosterior <- do.call("rbind", traitMPT$runjags$mcmc[,select])
 
     # select only relevant predictors
     predTable <- traitMPT$mptInfo$predTable
@@ -61,9 +65,8 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE, file = NULL){
         parnam <- as.character(subset(predTable, predTable$Covariate == factors[j])[,"covPar"])
         if(length(facLevelNames[[factors[j]]]) >1)
            grep.est <- setdiff(grep(parnam, varnames(traitMPT$runjags$mcmc)),
-                               grep("SD_", varnames(traitMPT$runjags$mcmc)))#paste0(parnam, "[",1:length(facLevelNames[[factors[j]]]),"]")
+                               grep("SD_", varnames(traitMPT$runjags$mcmc)))
         facPosterior[[j]] <- do.call("rbind", traitMPT$runjags$mcmc[,grep.est])
-        #traitMPT$mcmc$BUGSoutput$sims.list[[parnam, drop=FALSE]]
         colnames(facPosterior[[j]]) <-  facLevelNames[[factors[j]]]
       }
 
@@ -100,3 +103,4 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE, file = NULL){
 
   summaryMat
 }
+

@@ -10,9 +10,12 @@ transformedParameters(fittedModel, transformedParameters, level = "group",
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
-\item{transformedParameters}{list with parameter transformations that should be computed based on the posterior samples (e.g., for testing parameter differences: \code{list("diffD=Do-Dn")})}
+\item{transformedParameters}{list with parameter transformations that should
+be computed based on the posterior samples (e.g., for testing parameter
+differences: \code{list("diffD=Do-Dn")}).}
 
-\item{level}{whether to compute transformations of \code{"group"} or \code{"individual"} estimates}
+\item{level}{whether to compute transformations of \code{"group"} or
+\code{"individual"} estimates}
 
 \item{nCPU}{number of CPU cores across which the MCMC chains are distributed}
 }
@@ -20,7 +23,8 @@ transformedParameters(fittedModel, transformedParameters, level = "group",
 an \link[coda]{mcmc.list} of posterior samples for the transformed parameters
 }
 \description{
-Computes transformations of MPT parameters based on the MCMC posterior samples (e.g., differences of parameters)
+Computes transformations of MPT parameters based on the MCMC posterior samples
+(e.g., differences of parameters).
 }
 \examples{
 \dontrun{

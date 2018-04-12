@@ -7,11 +7,14 @@
 getParam(fittedModel, parameter = "mean", stat = "mean", file = NULL)
 }
 \arguments{
-\item{fittedModel}{a fitted latent-trait MPT model (see \code{\link{traitMPT}}) or beta MPT model (see \code{\link{betaMPT}})}
+\item{fittedModel}{a fitted latent-trait MPT model (see \code{\link{traitMPT}})
+or beta MPT model (see \code{\link{betaMPT}})}
 
-\item{parameter}{which parameter(s) should be returned? (see below for details)}
+\item{parameter}{which parameter(s) of the (hierarchical) MPT model should be returned?
+(see details in \code{\link{getParam}}).}
 
-\item{stat}{whether to get the posterior \code{"mean"}, \code{"median"}, \code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility interval)}
+\item{stat}{whether to get the posterior \code{"mean"}, \code{"median"},
+\code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility interval)}
 
 \item{file}{filename to export results in .csv format (e.g., \code{file="est_param.csv"})}
 }
@@ -46,6 +49,7 @@ getParam(fittedModel, parameter = "theta")
 # save summary of individual estimates:
 getParam(fittedModel, parameter = "theta",
          stat = "summary", file= "ind_summ.csv")}
+
 }
 \seealso{
 \code{\link{getGroupMeans}} mean group estimates
