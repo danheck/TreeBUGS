@@ -17,8 +17,9 @@ levels (default) or only for specific factors (requires the names of the covaria
 
 \item{file}{filename to export results in .csv format (e.g., \code{file="fit_group.csv"})}
 
-\item{mcmc}{if \code{TRUE}, the raw MCMC samples for the group means are returned.
-This allows pairwise tests of group means.}
+\item{mcmc}{if \code{TRUE}, the raw MCMC samples for the group means are returned
+as an \code{\link[coda]{mcmc.list}} object. This allows pairwise tests of group means
+(see \code{\link{transformedParameters}}).}
 }
 \description{
 For hierarchical latent-trait MPT models with discrete predictor variables

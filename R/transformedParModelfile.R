@@ -7,8 +7,7 @@
 ##### deprecated: model: either "betaMPT" or "traitMPT"
 # thetaNames: matrix which assigns parameter labels (first column) to the parameter index (second column)
 # transformedParameters: either string with file location or list with transformed parameters
-getTransformed <- function (thetaNames,
-                            transformedParameters=NULL,
+getTransformed <- function (thetaNames, transformedParameters=NULL,
                             mergeString=TRUE){
 
   if(is.null(transformedParameters)){

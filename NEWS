@@ -3,6 +3,7 @@ TreeBUGS 1.3.2 (April 2018)
 
 * Bugfix: extendMPT() for betaMPT
 * New function to extract MCMC samples: getSamples(...)
+* Possibility to extract MCMC samples for getGroupMeans(...)
 
 TreeBUGS 1.3.1 (February 2018)
 ===========

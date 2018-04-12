@@ -8,8 +8,9 @@
 #'     levels (default) or only for specific factors (requires the names of the covariates in covData)
 #' @param probit whether to use probit scale or probability scale
 #' @param file filename to export results in .csv format (e.g., \code{file="fit_group.csv"})
-#' @param mcmc if \code{TRUE}, the raw MCMC samples for the group means are returned.
-#'    This allows pairwise tests of group means.
+#' @param mcmc if \code{TRUE}, the raw MCMC samples for the group means are returned
+#'    as an \code{\link[coda]{mcmc.list}} object. This allows pairwise tests of group means
+#'    (see \code{\link{transformedParameters}}).
 #'
 #' @examples
 #' \dontrun{
@@ -39,8 +40,9 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE,
   S <- length(uniqueNames)
 
   summaryMat <- matrix(NA,0, 6)
-  cnt <- 0
 
+  mcmc.list <- mcmc.list(lapply(traitMPT$runjags$mcmc,
+                                function(x) mcmc(matrix(NA, niter(x), 0))))
   for(s in 1:S){
     # parameter s of S
     select <- grep(paste0("mu",ifelse(S==1, "",paste0("[",s,"]"))),
@@ -54,7 +56,7 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE,
                           predTable$theta == s &
                           predTable$Covariate %in% includeFactors)
 
-    if(nrow(predTable) >0){
+    if(nrow(predTable) > 0){
       factors <- unique(as.character(predTable$Covariate))
       combinations <-  expand.grid(facLevelNames[factors])
       combNames <- sapply(combinations, as.character)
@@ -85,13 +87,17 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE,
           samples <- pnorm(samples)
         }
 
+        label <- paste0(uniqueNames[[s]],"_", paste0(paste0(colnames(combinations),
+                                                          "[",combNames[i,], "]"), collapse="_"))
+        newMat <- rbind(c(Mean = mean(samples), SD = sd(samples),
+                          quantile(samples, c(.025,.5,.975)),
+                          "p(one-sided vs. overall)"= pval))
+        rownames(newMat) <- label
+        summaryMat <- rbind(summaryMat, newMat)
 
-        summaryMat <- rbind(summaryMat, c(Mean = mean(samples), SD = sd(samples),
-                                          quantile(samples, c(.025,.5,.975)),
-                                          "p(one-sided vs. overall)"= pval))
-        rownames(summaryMat)[cnt <- cnt+1] <- paste0(uniqueNames[s],"_", paste0(paste0(
-                                         colnames(combinations), "[",combNames[i,], "]"), collapse="_"))
-
+        rownames(samples) <- rep(label, nrow(samples))
+        for (c in 1:nchain(mcmc.list))
+          mcmc.list[[c]] <- cbind(mcmc.list[[c]] , t(samples)[,c,drop = FALSE])
       }
     }
 
@@ -101,6 +107,10 @@ getGroupMeans <- function(traitMPT, factor="all", probit=FALSE,
     write.csv(summaryMat, file = file)
   }
 
-  summaryMat
+  mcmc.list <- mcmc.list(lapply(mcmc.list, mcmc))
+  if (mcmc)
+    return(mcmc.list)
+  else
+    summaryMat
 }
 
