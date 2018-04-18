@@ -1,9 +1,10 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TreeBUGS)](http://cran.r-project.org/package=TreeBUGS)
 [![Licence](https://img.shields.io/badge/licence-GPL--2-green.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+<!--
 [![monthly downloads](http://cranlogs.r-pkg.org/badges/TreeBUGS)](http://cranlogs.r-pkg.org/badges/TreeBUGS)
 [![total downloads](http://cranlogs.r-pkg.org/badges/grand-total/TreeBUGS)](http://cranlogs.r-pkg.org/badges/grand-total/TreeBUGS)
 [![Research software impact](http://depsy.org/api/package/cran/TreeBUGS/badge.svg)](http://depsy.org/package/r/TreeBUGS)
-
+-->
 
 
 # TreeBUGS
