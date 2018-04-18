@@ -32,8 +32,8 @@ install.packages("TreeBUGS")
 To install the latest developer version of TreeBUGS from GitHub, run:
 ```r
 ### Dependencies:
-install.packages(c("devtools", "runjags", "hypergeo",
-                   "rjags", "RcppArmadillo", "logspline"))
+install.packages(c("devtools", "coda", "runjags", "hypergeo", "testthat",
+                   "rjags", "Rcpp", "RcppArmadillo", "logspline"))
 devtools::install_github("denis-arnold/TreeBUGS", build_vignettes = TRUE)
 ```
 
