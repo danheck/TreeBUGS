@@ -44,6 +44,8 @@ Description: User-friendly analysis of hierarchical multinomial processing tree 
     or directly in R. Models are either fitted by calling JAGS or by an MPT-tailored 
     Gibbs sampler in C++ (only for nonhierarchical and beta MPT models). Provides 
     tests of heterogeneity and MPT-tailored summaries and plotting functions.
+    A detailed documentation is available in Heck, Arnold, & Arnold (2018) 
+    <DOI:10.3758/s13428-017-0869-7>.
 License: GPL (>= 2)
 Encoding: UTF-8
 URL: https://github.com/denis-arnold/TreeBUGS
