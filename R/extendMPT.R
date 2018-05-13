@@ -1,12 +1,23 @@
-
 #' Extend MCMC Sampling for MPT Model
+#'
+#' Adds more MCMC samples to the fitted MPT model.
 #'
 #' @param fittedModel a fitted \code{\link{traitMPT}} or \code{\link{betaMPT}}
 #' @inheritParams betaMPT
-#' @param ... further arguments passed to \link[runjags]{run.jags}
+#' @param ... further arguments passed to \code{extend.jags} (see arguments listed in: \link[runjags]{run.jags}).
+#'
+#' When drawing more samples, JAGS requires an additional adaptation phase, in which the MCMC
+#' sampling procedure is adjusted. Note that the MCMC sampling will still
+#' give correct results even if the warning appears: "Adaptation incomplete."
+#' (this just means that sampling efficiency is not optimal).
+#'
 #' @export
-extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000,
-                      n.burnin = 0, n.thin = 5, ...){
+extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0, ...){
+
+  args <- list(...)
+  if ("n.thin" %in% names(args))
+    warning("Thinnning interval cannot be changed and is ignored!")
+  args$n.thin <- args$burnin <- args$adapt <- args$sample <- args$summarise <- args$model <- NULL
 
   # remove correlations (otherwise, extension not possible)
   sel.cor <- grep("cor_", varnames(fittedModel$runjags$mcmc), fixed=TRUE)
@@ -14,12 +25,14 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000,
     sel.cor <- c(sel.cor, grep("rho", varnames(fittedModel$runjags$mcmc), fixed=TRUE))
   if(length(sel.cor)>0)
     fittedModel$runjags$mcmc <- fittedModel$runjags$mcmc[,- sel.cor]
-  fittedModel$runjags <- extend.jags(fittedModel$runjags,
-                                     burnin = n.burnin,
-                                     sample = ceiling((n.iter-n.burnin)/n.thin),
-                                     adapt = n.adapt,
-                                     thin=n.thin,
-                                     summarise = FALSE, ...)
+
+  args_extend <- c(list(runjags.object = fittedModel$runjags,
+                        burnin = n.burnin,
+                        sample = ceiling((n.iter-n.burnin)/fit$runjags$thin),
+                        adapt = n.adapt,
+                        summarise = FALSE),
+                   args)
+  fittedModel$runjags <- do.call("extend.jags", args_extend)
 
   # add correlations
   covData <- fittedModel$mptInfo$covData

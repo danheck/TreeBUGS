@@ -180,12 +180,21 @@ callingSampler <- function(model,
   }
 
   if(!is.null(autojags)){
+    stopifnot(is.list(autojags))
+
     cat("#####################################\n
         #### Autojags started. Might require some time
         #### (use max.time to adjust maximum time for updating). See ?autoextend.jags\n
         #####################################\n")
     #       recompile(samples, n.iter=n.iter)
     #       samples <- autojags(samples, n.update = n.update)
+    if (any(c("n.iter") %in% names(autojags)))
+      warning("The arguments in 'autojags' are passed to the function: \n",
+              "   runjags::autoextend.jags, which uses different labels for sampling argument than TreeBUGS.\n",
+              "   Instead of 'n.iter', 'startsamples' may be used (see ?runjags::autoextend.jags). ")
+    if ("n.adapt" %in% names(autojags))  names(autojags)["n.adapt"] <- "adapt"
+    if ("n.burnin" %in% names(autojags))  names(autojags)["n.adapt"] <- "startburnin"
+    if ("n.thin" %in% names(autojags))  names(autojags)["n.adapt"] <- "thin"
     samples <- do.call(autoextend.jags,
                        c(list(runjags.object = samples,
                               summarise=FALSE),
