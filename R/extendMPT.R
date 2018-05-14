@@ -28,7 +28,7 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
 
   args_extend <- c(list(runjags.object = fittedModel$runjags,
                         burnin = n.burnin,
-                        sample = ceiling((n.iter-n.burnin)/fit$runjags$thin),
+                        sample = ceiling((n.iter-n.burnin)/fittedModel$runjags$thin),
                         adapt = n.adapt,
                         summarise = FALSE),
                    args)
