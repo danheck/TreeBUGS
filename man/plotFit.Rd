@@ -16,10 +16,12 @@ plotFit(fittedModel, M = 1000, stat = "mean", ...)
 \item{...}{arguments passed to \code{\link{boxplot}}}
 }
 \description{
-Plots observed mean frequencies and boxplot of mean frequencies sampled from posterior distribution (posterior predictive).
+Plots observed means/covariances of individual frequencies against the means/covariances sampled from the posterior distribution (posterior predictive distribution).
 }
 \details{
-If posterior predictive p-values were computed when fitting the model (e.g., by adding the argument \code{traitMPT(...,ppp=1000)} ), the stored posterior samples are re-used for plotting. Moreover, posterior samples can be added to a model after fitting as shown in the examples.
+If posterior predictive p-values were computed when fitting the model
+(e.g., by adding the argument \code{traitMPT(...,ppp=1000)} ), the stored posterior samples are re-used for plotting.
+Note that the last category in each MPT tree is dropped, because one category per multinomial distribution is fixed.
 }
 \examples{
 \dontrun{
