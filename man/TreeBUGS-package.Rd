@@ -6,25 +6,45 @@
 \alias{TreeBUGS-package}
 \title{TreeBUGS: Hierarchical Multinomial Processing Tree Modeling}
 \description{
-Uses standard MPT files in the .eqn-format (Moshagen, 2010) to fit hierarchical Bayesian MPT models. Note that the software JAGS is required (\url{http://mcmc-jags.sourceforge.net}).
+Uses standard MPT files in the .eqn-format (Moshagen, 2010) to fit hierarchical Bayesian MPT models.
+Note that the software JAGS is required (\url{http://mcmc-jags.sourceforge.net}).
 }
 \details{
-The core functions either fit a Beta-MPT model (\code{\link{betaMPT}};Smith & Batchelder, 2010) or a latent-trait MPT model (\code{\link{traitMPT}}; Klauer, 2010). A fitted model can be inspected using convenient summary and plot functions tailored to hierarchical MPT models.
+The core functions either fit a Beta-MPT model (\code{\link{betaMPT}};Smith & Batchelder, 2010)
+or a latent-trait MPT model (\code{\link{traitMPT}}; Klauer, 2010).
+A fitted model can be inspected using convenient summary and plot functions tailored to hierarchical MPT models.
 
 Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("TreeBUGS")}
 }
+\section{Citation}{
+
+
+If you use TreeBUGS, please cite the software as follows:
+
+Heck, D. W., Arnold, N. R., & Arnold, D. (2018).
+TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
+\emph{Behavior Research Methods, 50}, 264–284.
+}
+
 \references{
-Heck*, D. W., Arnold*, N. R., & Arnold, D. (in press). TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. Behavior Research Methods.
+Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach.
+\emph{Psychometrika, 75}, 70-98.
 
-Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
+Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015).
+Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items.
+\emph{Psychometrika, 80}, 205-235.
 
-Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205-235.
+Moshagen, M. (2010).
+multiTree: A computer program for the analysis of multinomial processing tree models.
+\emph{Behavior Research Methods, 42}, 42-54.
 
-Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
+Smith, J. B., & Batchelder, W. H. (2008).
+Assessing individual differences in categorical data.
+\emph{Psychonomic Bulletin & Review, 15}, 713-731.
 
-Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731.
-
-Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.
+Smith, J. B., & Batchelder, W. H. (2010).
+Beta-MPT: Multinomial processing tree models for addressing individual differences.
+\emph{Journal of Mathematical Psychology, 54}, 167-183.
 }
 \seealso{
 Useful links:
@@ -34,5 +54,5 @@ Useful links:
 
 }
 \author{
-Daniel Heck, Denis Arnold, & Nina Arnold
+Daniel W. Heck, Denis Arnold, & Nina Arnold
 }

@@ -7,17 +7,26 @@
 #' Computes Bayes factors for simple (fixed-effects, nonhierarchical) MPT models with beta distributions as priors on the parameters.
 #'
 #' @param models list of models fitted with \code{\link{simpleMPT}}, e.g., \code{list(mod1, mod2)}
-#' @param resample how much parameter posterior samples should be resampled per model
+#' @param resample how many of the posterior samples of the MPT parameters should be resampled per model
 #' @inheritParams marginalMPT
 #' @param store whether to save parameter samples
 #' @details
 #' Currently, this is only implemented for a single data set!
 #'
-#' Uses a Rao-Blackwellized version of the product-space method (Carlin & Chib, 1995) as proposed by Barker and Link (2013). First, posterior distributions of the MPT parameters are approximated by independent beta distributions. Second, for one a selected model, parameters are sampled from these proposal distributions. Third, the conditional probabilities to switch to a different model are computed and stored. Finally, the eigenvector with eigenvalue one of the matrix of switching probabilities provides an estimate of the posterior model probabilities.
-#' @references
-#' Barker, R. J., & Link, W. A. (2013). Bayesian multimodel inference by RJMCMC: A Gibbs sampling approach. The American Statistician, 67(3), 150-156.
+#' Uses a Rao-Blackwellized version of the product-space method (Carlin & Chib, 1995) as proposed by Barker and Link (2013).
+#' First, posterior distributions of the MPT parameters are approximated by independent beta distributions.
+#' Second, for one a selected model, parameters are sampled from these proposal distributions.
+#' Third, the conditional probabilities to switch to a different model are computed and stored.
+#' Finally, the eigenvector with eigenvalue one of the matrix of switching probabilities provides an estimate of the posterior model probabilities.
 #'
-#' Carlin, B. P., & Chib, S. (1995). Bayesian model choice via Markov chain Monte Carlo methods. Journal of the Royal Statistical Society. Series B (Methodological), 57(3), 473-484.
+#' @references
+#' Barker, R. J., & Link, W. A. (2013).
+#' Bayesian multimodel inference by RJMCMC: A Gibbs sampling approach.
+#' The American Statistician, 67(3), 150-156.
+#'
+#' Carlin, B. P., & Chib, S. (1995).
+#' Bayesian model choice via Markov chain Monte Carlo methods.
+#' Journal of the Royal Statistical Society. Series B (Methodological), 57(3), 473-484.
 #' @export
 #' @seealso \code{\link{marginalMPT}}
 BayesFactorMPT <- function(models, dataset = 1, resample, batches = 5,

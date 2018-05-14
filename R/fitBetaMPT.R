@@ -102,11 +102,16 @@
 #'                        \code{fittedModel$runjags$mcmc} is a \code{mcmc.list}
 #'                        as used by the coda package (\link[coda]{mcmc})
 #' }
-#' @author Daniel Heck, Nina R. Arnold, Denis Arnold,
+#' @author Daniel W. Heck, Nina R. Arnold, Denis Arnold
+#'
 #' @references
-#' Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing
-#' tree models for addressing individual differences.
-#' Journal of Mathematical Psychology, 54, 167-183.
+#' Heck, D. W., Arnold, N. R., & Arnold, D. (2018).
+#' TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
+#' \emph{Behavior Research Methods, 50}, 264–284.
+#'
+#' Smith, J. B., & Batchelder, W. H. (2010).
+#' Beta-MPT: Multinomial processing tree models for addressing individual differences.
+#' \emph{Journal of Mathematical Psychology, 54}, 167-183.
 #'
 #' @examples
 #' \dontrun{

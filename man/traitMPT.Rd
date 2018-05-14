@@ -216,25 +216,33 @@ summary(fit)
 }
 }
 \references{
-Gelman, A. (2006). Prior distributions for variance parameters in hierarchical models
-(comment on article by Browne and Draper). Bayesian Analysis, 1(3), 515-534.
+Heck, D. W., Arnold, N. R., & Arnold, D. (2018).
+TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
+\emph{Behavior Research Methods, 50}, 264–284.
 
-Klauer, K. C. (2010).
-Hierarchical multinomial processing tree models: A latent-trait approach.
-Psychometrika, 75, 70-98.
+Gelman, A. (2006). Prior distributions for variance parameters in hierarchical models
+(comment on article by Browne and Draper).
+\emph{Bayesian Analysis, 1}, 515-534.
+
+Heck, D. W., Arnold, N. R., & Arnold, D. (2018).
+TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
+\emph{Behavior Research Methods, 50}, 264–284.
+
+Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach.
+\emph{Psychometrika, 75}, 70-98.
 
 Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015).
 Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items.
-Psychometrika, 80, 205-235.
+\emph{Psychometrika, 80}, 205-235.
 
 Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012).
 Default Bayes factors for ANOVA designs.
-Journal of Mathematical Psychology, 56, 356-374.
+\emph{Journal of Mathematical Psychology, 56}, 356-374.
 
 Rouder, J. N., & Morey, R. D. (2012).
 Default Bayes Factors for Model Selection in Regression.
-Multivariate Behavioral Research, 47, 877-903.
+\emph{Multivariate Behavioral Research, 47}, 877-903.
 }
 \author{
-Daniel Heck, Denis Arnold, Nina R. Arnold
+Daniel W. Heck, Denis Arnold, Nina R. Arnold
 }

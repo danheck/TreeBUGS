@@ -54,9 +54,9 @@ plotParam <- function(x, includeIndividual = TRUE, addLines = FALSE,
   if(includeIndividual){
     for(i in 1:N){
       if (addLines){
-        lines(1:S, par.ind[select,i,stat],
+        lines(1:S + .05, par.ind[select,i,stat],
               col = adjustcolor(col = "black", alpha.f = .5))
-        points(1:S, par.ind[select,i,stat], cex=.9, pch=16,
+        points(1:S + .05, par.ind[select,i,stat], cex=.9, pch=16,
               col = adjustcolor(col = "black", alpha.f = .5))
       } else {
         points(1:S + seq(-.2,.2, length.out = N)[i],

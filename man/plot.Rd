@@ -15,9 +15,24 @@
 \arguments{
 \item{x}{fitted hierarchical MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
-\item{parameter}{which parameter to plot (e.g., \code{"theta"}, \code{"mean"}, \code{"rho"}, \code{"slope"}). Parameters are matched partially, in order to plot all entries of vector valued parameters (see \code{\link{getParam}} to get a list of parameters). Moreover, parameter labels can be used, e.g., \code{"theta[D]"} or \code{"rho[D,g]"}}
+\item{parameter}{which parameter to plot (e.g., \code{"theta"},
+\code{"mean"}, \code{"rho"}, \code{"slope"}).
+Parameters are matched partially, in order to plot all entries of vector
+valued parameters (see \code{\link{getParam}} to get a list of parameters).
+Moreover, parameter labels can be used, e.g., \code{"theta[D]"} or \code{"rho[D,g]"}}
 
-\item{type}{type of convergence plot. Can be one of \code{"default"} (trace+density), \code{"acf"} (auto-correlation function), \code{"trace"}, \code{"autocorr"}, \code{"crosscorr"},\code{"density"},   \code{"gelman"}. See, e.g., \code{\link[coda]{mcmc.list}}}
+\item{type}{type of convergence plot. Can be one of \code{"default"}
+(trace+density), \code{"acf"} (auto-correlation function),
+\code{"trace"}, \code{"autocorr"}, \code{"crosscorr"},\code{"density"},
+\code{"gelman"}. See plotting functions in the \code{coda} package
+(\code{\link[coda]{plot.mcmc.list}},
+ \code{\link[coda]{acfplot}},
+ \code{\link[coda]{traceplot}},
+ \code{\link[coda]{autocorr.plot}},
+ \code{\link[coda]{crosscorr.plot}},
+ \code{\link[coda]{densplot}},
+ \code{\link[coda]{gelman.plot}}
+).}
 
 \item{...}{further arguments passed to the plotting functions in coda}
 }
