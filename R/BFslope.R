@@ -172,7 +172,7 @@ BayesFactorSlope <- function (fittedModel, parameter,
   # BF in favor of effect:
   bf <- data.frame(post0/prior0, prior0/post0)
   colnames(bf) <- paste0("BF_", c(0, direction),  c(direction, 0))
-
+  rownames(bf) <- parameter
 
   if (plot){
     hist(samples[sel], col = adjustcolor("gray", alpha.f =.3), 70,
