@@ -8,13 +8,17 @@ correlationPosterior(fittedModel, r, N, kappa = 1, ci = 0.95, M = 1000,
   precision = 0.005, maxiter = 10000, plot = TRUE, nCPU = 4)
 }
 \arguments{
-\item{fittedModel}{a fitted \link{betaMPT} or \link{traitMPT} model with covariates (added during fitting by the argument \code{covData})}
+\item{fittedModel}{a fitted \link{betaMPT} or \link{traitMPT} model with covariates
+(added during fitting by the argument \code{covData})}
 
 \item{r}{optional: a vector of posterior correlations (instead of \code{fittedModel})}
 
 \item{N}{only if \code{r} is used: the number of participants the correlation is based on}
 
-\item{kappa}{parameter for the prior of the correlation, that is, a scaled beta distribution: Beta(1/kappa, 1/kappa). The default \code{kappa=1} defines a uniform distribution on [-1,1], whereas \code{kappa<1} defines a unimodal prior centered around zero.}
+\item{kappa}{parameter for the prior of the correlation, that is, a scaled beta distribution:
+Beta(1/kappa, 1/kappa).
+The default \code{kappa=1} defines a uniform distribution on [-1,1],
+whereas \code{kappa<1} defines a unimodal prior centered around zero.}
 
 \item{ci}{credibility interval}
 
@@ -25,15 +29,25 @@ correlationPosterior(fittedModel, r, N, kappa = 1, ci = 0.95, M = 1000,
 \item{maxiter}{maximum number of iterations in \code{\link[hypergeo]{genhypergeo}}.
 Higher values might be necessary to increase numerical stability for large correlations (r>.95).}
 
-\item{plot}{whether to plot (a) the unadjusted posterior correlations (gray histogram) and (b) the corrected posterior (black line with red credibility intervals)}
+\item{plot}{whether to plot (a) the unadjusted posterior correlations (gray histogram)
+and (b) the corrected posterior (black line with red credibility intervals)}
 
 \item{nCPU}{number of CPUs used for parallel computation of posterior distribution}
 }
 \description{
-Adjusts the posterior distribution of correlations for the sampling error of a population correlation according to the sample size (i.e., the number of participants; Ly, Marsman, & Wagenmakers, 2016).
+Adjusts the posterior distribution of correlations for the sampling error of
+a population correlation according to the sample size
+(i.e., the number of participants; Ly, Marsman, & Wagenmakers, 2018).
 }
 \details{
-This function (1) uses all posterior samples of a correlation to (2) derive the posterior of the correlation corrected for sampling error and (3) averages these densities across the posterior samples. Thereby, the method accounts for estimation uncertainty of the MPT model (due to the use of the posterior samples) and also for sampling error of the population correlation due to sample size (cf. Ly, Boehm, Heathcote, Turner, Forstmann, Marsman, & Matzke, 2016).
+This function
+(1) uses all posterior samples of a correlation to
+(2) derive the posterior of the correlation corrected for sampling error and
+(3) averages these densities across the posterior samples.
+Thereby, the method accounts for estimation uncertainty of the MPT model
+(due to the use of the posterior samples) and also for sampling error of the
+population correlation due to sample size
+(cf. Ly, Boehm, Heathcote, Turner, Forstmann, Marsman, & Matzke, 2016).
 }
 \examples{
 # test effect of number of participants:
@@ -43,8 +57,14 @@ correlationPosterior(r=cors, N=100, nCPU=1)
 
 }
 \references{
-Ly, A., Marsman, M., Wagenmakers, E.-J. (2015). Analytic Posteriors for Pearson's Correlation Coefficient. Manuscript submitted for publication. https://arxiv.org/abs/1510.01188
-Ly, A., Boehm, U., Heathcote, A., Turner, B. M. , Forstmann, B., Marsman, M., and Matzke, D. (2016). A flexible and efficient hierarchical Bayesian approach to the exploration of individual differences in cognitive-model-based neuroscience. https://osf.io/evsyv/
+Ly, A., Marsman, M., & Wagenmakers, E.-J. (2018).
+Analytic posteriors for Pearson’s correlation coefficient.
+\emph{Statistica Neerlandica, 72}, 4–13.
+https://doi.org/10.1111%2Fstan.12111
+
+Ly, A., Boehm, U., Heathcote, A., Turner, B. M. , Forstmann, B., Marsman, M., and Matzke, D. (2016).
+A flexible and efficient hierarchical Bayesian approach to the exploration of
+individual differences in cognitive-model-based neuroscience. https://osf.io/evsyv/
 }
 \author{
 Daniel W. Heck, Alexander Ly

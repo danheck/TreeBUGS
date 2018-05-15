@@ -5,20 +5,24 @@
 #'
 #' Plot observed individual and mean frequencies.
 #'
-#' @param x either a fitted hierarchical MPT model (see \code{\link{traitMPT}}, \code{\link{betaMPT}}); or a matrix/data frame of response frequencies (can be provided as a path to a .csv-file with individual frequencies).
-#' @param freq whether to plot absolute frequencies or relative frequencies (which sum up to one within each tree; only if \code{x} is a hierarchical model or if \code{eqn} is provided)
-#' @param select a numeric vector with participant indices to select which raw frequencies to plot (default: \code{"all"})
+#' @param x either a fitted hierarchical MPT model (see \code{\link{traitMPT}}, \code{\link{betaMPT}});
+#'     or a matrix/data frame of response frequencies (can be provided as a path to a .csv-file with individual frequencies).
+#' @param freq whether to plot absolute frequencies or relative frequencies
+#'     (which sum up to one within each tree; only if \code{x} is a hierarchical model or if \code{eqnfile} is provided)
+#' @param select a numeric vector with participant indices to select which raw frequencies to plot
+#'     (default: \code{"all"})
 #' @param boxplot if \code{FALSE}, lines and points are drawn instead of boxplots
-#' @param eqn optional: EQN description of an MPT model, that is, either the path to an EQN file or as a character string (only used if \code{x} refers to a matrix/data frame or .csv-file)
+#' @param eqnfile optional: EQN description of an MPT model, that is, either the path to an EQN file or as a character string
+#'     (only used if \code{x} refers to a matrix/data frame or .csv-file)
 #' @param ... further arguments passed to \code{boxplot} and \code{plot}
 #' @export
 #' @examples
 #' # get frequency data and EQN file
 #' freq <- subset(arnold2013, group == "encoding", select = -(1:4))
-#' eqn <- EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
-#' plotFreq(freq, eqn = eqn)
-#' plotFreq(freq, freq = FALSE, eqn = eqn)
-plotFreq <- function(x, freq=TRUE, select="all", boxplot=TRUE, eqn,...){
+#' eqn <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+#' plotFreq(freq, eqnfile = eqn)
+#' plotFreq(freq, freq = FALSE, eqnfile = eqn)
+plotFreq <- function(x, freq=TRUE, select="all", boxplot=TRUE, eqnfile,...){
 
 
   if(class(x) %in% c("betaMPT", "traitMPT")){
@@ -32,8 +36,8 @@ plotFreq <- function(x, freq=TRUE, select="all", boxplot=TRUE, eqn,...){
   if(class(x) %in% c("betaMPT", "traitMPT")){
     treeNames <- x$mptInfo$MPT$Tree
     treeLabels <- unique(treeNames)
-  }else if(!missing(eqn)){
-    tmp <- unique(readEQN(eqn)[,1:2])
+  }else if(!missing(eqnfile)){
+    tmp <- unique(readEQN(eqnfile)[,1:2])
     treeNames <- tmp$Tree
     treeLabels <- unique(treeNames)
     try(dat <- dat[,colnames(dat) %in% tmp$Category])
