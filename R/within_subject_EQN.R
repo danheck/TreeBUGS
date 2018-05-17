@@ -27,18 +27,26 @@ withinSubjectEQN <- function(eqnfile, labels, constant, save){
     tree.list[[w]]$Category <- paste0(labels[w],"_",tree$Category)
     for(b in 1:nrow(tree)){
       for(p in 1:length(param)){
-        tree.list[[w]]$Equation[b] <- ifelse(tree.list[[w]]$Equation[b] == param[p],
-                                             paste0(param[p],"_",labels[w]),
-                                             tree.list[[w]]$Equation[b])
-        tree.list[[w]]$Equation[b] <- gsub(paste0("1-",param[p]),
-                                           paste0("1-",param[p],"_",labels[w]),
-                                           tree.list[[w]]$Equation[b],fixed=TRUE)
-        tree.list[[w]]$Equation[b] <- gsub(paste0("+",param[p]),
-                                           paste0("+",param[p],"_",labels[w]),
-                                           tree.list[[w]]$Equation[b],fixed=TRUE)
-        tree.list[[w]]$Equation[b] <- gsub(paste0("*",param[p]),
-                                           paste0("*",param[p],"_",labels[w]),
-                                           tree.list[[w]]$Equation[b],fixed=TRUE)
+        # look behind mechanism: check for dots in parameter labels via  (?!\\.)
+        # https://stackoverflow.com/questions/23094532/java-regular-expression-word-without-ending-with-dot
+        # requires perl=TRUE
+
+        tree.list[[w]]$Equation[b] <- gsub(paste0("\\b", param[p], "\\b(?!\\.)"),
+                                           paste0(param[p],"_",labels[w]),
+                                           tree.list[[w]]$Equation[b],perl=TRUE)
+
+        # tree.list[[w]]$Equation[b] <- ifelse(tree.list[[w]]$Equation[b] == param[p],
+        #                                      paste0(param[p],"_",labels[w]),
+        #                                      tree.list[[w]]$Equation[b])
+        # tree.list[[w]]$Equation[b] <- gsub(paste0("1-",param[p]),
+        #                                    paste0("1-",param[p],"_",labels[w]),
+        #                                    tree.list[[w]]$Equation[b],fixed=TRUE)
+        # tree.list[[w]]$Equation[b] <- gsub(paste0("+",param[p]),
+        #                                    paste0("+",param[p],"_",labels[w]),
+        #                                    tree.list[[w]]$Equation[b],fixed=TRUE)
+        # tree.list[[w]]$Equation[b] <- gsub(paste0("*",param[p]),
+        #                                    paste0("*",param[p],"_",labels[w]),
+        #                                    tree.list[[w]]$Equation[b],fixed=TRUE)
       }
     }
   }
