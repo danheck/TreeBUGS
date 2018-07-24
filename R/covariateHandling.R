@@ -53,9 +53,10 @@ covHandling <- function(covData,
       # set up table and iterate across all combinations of parameters and covariates
       covTable <- data.frame()
       for(i in 1:length(covStructure)){
+        covStructure[[i]] <- gsub("\\,", " ", covStructure[[i]])
         sss <- strsplit(covStructure[[i]], ";")[[1]]
-        if(length(sss) <2)
-          stop("Check predStructure (in one argument, a semicolon seems to be missing):\n",
+        if(length(sss)  != 2)
+          stop("Check predStructure (in each argument, exactly one semicolon is required to separate parameters (left hand) and predictors (right hand)):\n",
                covStructure[[i]])
         pars <- strsplit(sss[1], " +")[[1]]
         covs <- strsplit(sss[2], " +")[[1]]
