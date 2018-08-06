@@ -4,7 +4,9 @@
 #'
 #' Computes posterior predictive p-values to test model fit.
 #' @inheritParams posteriorPredictive
-#' @param T2 whether to compute T2 statistic to check coveriance structure (can take a lot of time)
+#' @param T2 whether to compute T2 statistic to check coveriance structure (can take a lot of time).
+#'   If some participants do not have responses for some trees, (co)variances are
+#'   computed by pairwise deletion of the corresponding persons.
 #' @param type whether the T1 statistic of expected means is computed using Person's \code{"X2"} or the likelihood-ratio statistic \code{"G2"}
 #' @author Daniel Heck
 #' @references
@@ -36,7 +38,10 @@ PPP <- function(fittedModel, M=1000, nCPU=4, T2=TRUE, type = "X2"){
     for(k in 1:length(TreeNames)){
       for(i in 1:nrow(freq.pred[[r]])){
         nn <- freq.exp[[r]][i,sel[[k]]]
-        freq.pred[[r]][i,sel[[k]]] <- rmultinom(1, round(sum(nn)), nn)
+        if (sum(nn) > 0)
+          freq.pred[[r]][i,sel[[k]]] <- rmultinom(1, round(sum(nn)), nn)
+        else
+          freq.pred[[r]][i,sel[[k]]] <- 0
       }
     }
   }
@@ -189,12 +194,14 @@ T2stat <- function(n.ind.exp, n.ind, tree){
     n <- rowSums(tmp)  #*(N-1)/N
 
     # variance for multinomial: n*p1*(1-p1)
-    mean.ind.cov <-  diag(colMeans(tmp*(1-tmp/n)  ))
+    varmat <- tmp*(1-tmp/n)
+    # varmat[tmp == 0] <- 0
+    mean.ind.cov <-  diag(colMeans(varmat, na.rm = TRUE))
 
     # covariance for multinomial: -n*p1*p2
     combs <- combn(1:sum(sel),2)
     for(c in 1:ncol(combs)){
-      mean.ind.cov[combs[1,c],combs[2,c]] <- mean(-tmp[,combs[1,c]]*tmp[,combs[2,c]]/n)
+      mean.ind.cov[combs[1,c],combs[2,c]] <- mean(-tmp[,combs[1,c]]*tmp[,combs[2,c]]/n, na.rm = TRUE)
     }
     mean.ind.cov[lower.tri(mean.ind.cov)] <- t(mean.ind.cov)[lower.tri(mean.ind.cov)]
 

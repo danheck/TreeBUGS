@@ -149,10 +149,16 @@ posteriorPredictive <- function(fittedModel,
 
     if(!expected){
       # multinomial sampling:
+      rmultinom_stable <- function(x){
+        if (sum(x) > 0)
+          rand <- rmultinom(1, size=round(sum(x)), prob=x/sum(x))
+        else
+          rand <- matrix(rep(0, length(x)))
+        rand
+      }
       for(k in 1:length(TreeNames)){
         freq.exp[,sel.cat[[k]]] <- t(apply(freq.exp[,sel.cat[[k]],drop=FALSE], 1,
-                                           function(x)
-                                             rmultinom(1, size=round(sum(x)), prob=x/sum(x))))
+                                           rmultinom_stable))
       }
     }
     colnames(freq.exp) <- mptInfo$MPT$Category
