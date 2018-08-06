@@ -4,8 +4,8 @@
 \alias{plotPriorPost}
 \title{Plot Prior vs. Posterior Distribution}
 \usage{
-plotPriorPost(fittedModel, probitInverse = "mean", M = 2e+05, ci = 0.95,
-  nCPU = 3, ...)
+plotPriorPost(fittedModel, probitInverse = "mean", M = 2e+05,
+  ci = 0.95, nCPU = 3, ...)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}

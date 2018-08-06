@@ -13,7 +13,9 @@ PPP(fittedModel, M = 1000, nCPU = 4, T2 = TRUE, type = "X2")
 
 \item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this requires considerable computer-memory resources (as a remedy, use \code{nCPU=1}).}
 
-\item{T2}{whether to compute T2 statistic to check coveriance structure (can take a lot of time)}
+\item{T2}{whether to compute T2 statistic to check coveriance structure (can take a lot of time).
+If some participants do not have responses for some trees, (co)variances are
+computed by pairwise deletion of the corresponding persons.}
 
 \item{type}{whether the T1 statistic of expected means is computed using Person's \code{"X2"} or the likelihood-ratio statistic \code{"G2"}}
 }

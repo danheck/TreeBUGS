@@ -4,8 +4,8 @@
 \alias{betweenSubjectMPT}
 \title{Between-Subject Comparison of Parameters}
 \usage{
-betweenSubjectMPT(model1, model2, par1, par2 = par1, stat = c("x-y", "x<y"),
-  plot = FALSE)
+betweenSubjectMPT(model1, model2, par1, par2 = par1, stat = c("x-y",
+  "x<y"), plot = FALSE)
 }
 \arguments{
 \item{model1}{fitted hierarchical MPT model for first between-subjects condition}

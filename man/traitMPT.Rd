@@ -6,10 +6,10 @@
 \usage{
 traitMPT(eqnfile, data, restrictions, covData, predStructure, predType,
   transformedParameters, corProbit = TRUE, mu = "dnorm(0,1)",
-  xi = "dunif(0,10)", V, df, IVprec = "dgamma(.5,.5)", n.iter = 20000,
-  n.adapt = 2000, n.burnin = 2000, n.thin = 5, n.chains = 3,
-  dic = FALSE, ppp = 0, modelfilename, parEstFile, posteriorFile,
-  autojags = NULL, ...)
+  xi = "dunif(0,10)", V, df, IVprec = "dgamma(.5,.5)",
+  n.iter = 20000, n.adapt = 2000, n.burnin = 2000, n.thin = 5,
+  n.chains = 3, dic = FALSE, ppp = 0, modelfilename, parEstFile,
+  posteriorFile, autojags = NULL, ...)
 }
 \arguments{
 \item{eqnfile}{The (relative or full) path to the file that specifies the MPT model

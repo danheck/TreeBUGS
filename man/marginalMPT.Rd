@@ -4,9 +4,10 @@
 \alias{marginalMPT}
 \title{Marginal Likelihood for Simple MPT}
 \usage{
-marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1, dataset = 1,
-  method = "importance", posterior = 500, mix = 0.05, scale = 0.9,
-  samples = 10000, batches = 10, show = TRUE, cores = 1)
+marginalMPT(eqnfile, data, restrictions, alpha = 1, beta = 1,
+  dataset = 1, method = "importance", posterior = 500, mix = 0.05,
+  scale = 0.9, samples = 10000, batches = 10, show = TRUE,
+  cores = 1)
 }
 \arguments{
 \item{eqnfile}{The (relative or full) path to the file that specifies the MPT model

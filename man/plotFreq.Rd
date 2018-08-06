@@ -4,7 +4,8 @@
 \alias{plotFreq}
 \title{Plot Raw Frequencies}
 \usage{
-plotFreq(x, freq = TRUE, select = "all", boxplot = TRUE, eqnfile, ...)
+plotFreq(x, freq = TRUE, select = "all", boxplot = TRUE, eqnfile,
+  ...)
 }
 \arguments{
 \item{x}{either a fitted hierarchical MPT model (see \code{\link{traitMPT}}, \code{\link{betaMPT}});
