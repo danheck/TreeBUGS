@@ -1,6 +1,6 @@
 Package: TreeBUGS
-Version: 1.4.0
-Date: 2018-05-14
+Version: 1.4.1
+Date: 2018-08-10
 Title: Hierarchical Multinomial Processing Tree Modeling
 Authors@R: c(person("Daniel W.", "Heck", email="heck@uni-mannheim.de", role=c("aut","cre")),
              person("Nina R.", "Arnold", email="arnold@uni-mannheim.de", role = c("aut","dtc")),
@@ -28,11 +28,14 @@ Imports:
     logspline
 Suggests:
     knitr,
-    testthat
+    testthat,
+	R.rsp
 LinkingTo:
     Rcpp,
     RcppArmadillo
-VignetteBuilder: knitr
+VignetteBuilder: 
+	knitr,
+	R.rsp
 NeedsCompilation: yes
 SystemRequirements: JAGS (http://mcmc-jags.sourceforge.net)
 Description: User-friendly analysis of hierarchical multinomial processing tree (MPT) 
