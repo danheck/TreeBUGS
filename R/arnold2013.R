@@ -19,7 +19,11 @@
 #'   \item{\code{NU}}{Frequency of "Source U" responses to new items}
 #'   \item{\code{NN}}{Frequency of "New" responses to new items}
 #' }
-#' @references Arnold, N. R., Bayen, U. J., Kuhlmann, B. G., & Vaterrodt, B. (2013). Hierarchical modeling of contingency-based source monitoring: A test of the probability-matching account. Psychonomic Bulletin & Review, 20, 326-333.
+#' @references Arnold, N. R., Bayen, U. J., Kuhlmann, B. G., & Vaterrodt, B. (2013).
+#' Hierarchical modeling of contingency-based source monitoring:
+#' A test of the probability-matching account.
+#' Psychonomic Bulletin & Review, 20, 326-333.
+#'
 #' @examples
 #' head(arnold2013)
 #'
