@@ -83,11 +83,11 @@ transformedParameters <- function (fittedModel, transformedParameters,
       }else{
         samp <- mm[,rep(1,P*N),drop=FALSE]
         for(i in 1:P){
-          if(S==1){
-            sel.theta <- paste0("theta[")
-          }else{
-            sel.theta <- paste0("theta[",1:S,",")
-          }
+          # if(S==1){
+          #   sel.theta <- paste0("theta[")
+          # }else{
+          sel.theta <- paste0("theta[",1:S,",")
+          # }
           idx <- (i-1)*N+1:N
           colnames(samp)[idx] <- paste0(parsed$transformedParameters[i],"[", 1:N,"]")
           for(n in 1:N){

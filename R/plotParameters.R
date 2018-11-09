@@ -42,7 +42,6 @@ plotParam <- function(x, includeIndividual = TRUE, addLines = FALSE,
   N <- dims[2]          # persons
   means <- par.group[,stat]
 
-  par(mfrow=c(1,1))
   plot(1:S, means, ylim=0:1, xlim=c(.5, S+.5),pch=19, xaxt="n", #size=3,
        xlab = "MPT Parameters",
        ylab=paste0("Estimate (",estimate ,"s)"), col=2,
