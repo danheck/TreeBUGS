@@ -41,7 +41,7 @@ WAIC <- function(fittedModel, n.adapt = 1000, n.chains = 3, n.iter = 10000, n.th
   M <- nrow(mcmc[[1]])
   init <- mcmc[M,]
   cc <- length(init)
-  initvec <- c(init, init[sample(cc, n.chains - cc, replace = TRUE)])[1:n.chains]
+  initvec <- c(init, init[sample(cc, max(0, n.chains - cc), replace = TRUE)])[1:n.chains]
   inits <- list()
   for(i in seq_along(initvec)){
     inits[[i]] <- list("mu" = initvec[[i]][grep("mu", names(initvec[[i]]))])
