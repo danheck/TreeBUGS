@@ -56,7 +56,7 @@ extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
     }
   }
 
-  fittedModel$mcmc.summ <- summarizeMCMC(fittedModel$runjags$mcmc)
+  fittedModel$mcmc.summ <- summarizeMCMC(fittedModel$runjags$mcmc, batchSize = 10)
   fittedModel$summary <- summarizeMPT(mcmc = fittedModel$runjags$mcmc,
                                       summ = fittedModel$mcmc.summ,
                                       mptInfo = fittedModel$mptInfo)
