@@ -60,7 +60,7 @@ readSubjectData<-function(data,Category){
 
   sel <- Category %in% names(data)
   sel2 <- names(data) %in% Category
-  if(sum(sel)!=length(Category)){
+  if(sum(sel) != length(Category)){
     if(dim(data)[2]!=length(Category)){
       stop("Number of categories (",length(Category),") in EQN differs from number of columns in data/csv file (",dim(data)[2], ").")
     }else{

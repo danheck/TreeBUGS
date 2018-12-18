@@ -1,58 +1,75 @@
-
 #' MCMC Summary
 #'
-#' TreeBUGS-specific summary for \code{mcmc.list}-objects.
+#' TreeBUGS-specific MCMC summary for \code{mcmc.list}-objects.
+#'
 #' @param mcmc a \code{\link[coda]{mcmc.list}} object
-#' @param batchSize size of batches of parameters used to reduce memory load when computing (univariate) Rhat statistics
+#' @param batchSize size of batches of parameters used to reduce memory load when
+#'     computing posterior summary statistics (including Rhat and effective sample size).
 #' @param probs quantile probabilities used to compute credibility intervals
+#'
 #' @export
-summarizeMCMC <- function(mcmc, batchSize=100, probs = c(.025,.50,.975)){
-  if(class(mcmc) %in% c("traitMPT", "betaMPT","simpleMPT"))
+#' @importFrom coda varnames
+summarizeMCMC <- function(mcmc, batchSize = 50, probs = c(.025, .50, .975)){
+
+  if (class(mcmc) %in% c("traitMPT", "betaMPT", "simpleMPT"))
     mcmc <- mcmc$runjags$mcmc
-  if(class(mcmc) == "runjags")
+  if (class(mcmc) == "runjags")
     mcmc <- mcmc$mcmc
 
-  mcmc.mat <- do.call("rbind", mcmc)
-  summTab <- cbind("Mean"=apply(mcmc.mat,2,mean, na.rm = TRUE),
-                   "SD"=apply(mcmc.mat,2,sd, na.rm = TRUE),
-                   t(apply(mcmc.mat, 2, quantile, probs, na.rm = TRUE)),
-                   "Time-series SE"=NA, "n.eff" = NA ,
-                   "Rhat" = NA, "R_95%"=NA)
-  #     summ[[1]][,1:2], summ[[2]], "Time-series SE"=summ[[1]][,4]
-  rm(mcmc.mat)
-  gc(verbose=FALSE)
-  rn <- rownames(summTab)
-  # sel.notT1 <- setdiff(1:nrow(summTab), union(grep("T1", rn), grep(".pred.mean", rn)))
-  try({
-    summTab[,"n.eff"] <- round(effectiveSize(mcmc))
-    summTab[,"Time-series SE"] <- summTab[,"SD"] / sqrt(summTab[,"n.eff"]  )
-  }, silent = TRUE)
-  gc(verbose=FALSE)
-  if(is.list(mcmc) && length(mcmc) > 1){
+  # initialize matrix with summary statistics
+  vnames <- varnames(mcmc)
+  npar <- length(vnames)
+  snames <- c("Mean", "SD", names(quantile(1, probs)),
+              "Time-series SE", "n.eff", "Rhat", "R_95%")
+  summTab <- matrix(NA, npar, length(snames),
+                    dimnames = list(vnames, snames))
+
+  # summarize in batches (to avoid RAM issues)
+  n_batches <- (npar %/% batchSize) + 1
+  for(ii in seq(n_batches)){
+    if (n_batches == 1){
+      idx <- seq(npar)
+    } else if (ii < n_batches){
+      idx <- (ii-1)*batchSize + 1:batchSize  # complete batches
+    } else if ((ii - 1)*batchSize+1 <= npar){
+      idx <- ((ii - 1)*batchSize+1):npar
+    } else {
+      break()
+    }
+
     try({
-      # batchSize <- 200
-      # split for 100 variables per batch
-      n.summ <- nrow(summTab)
-      if(n.summ >batchSize){
-        for(ii in 1:(n.summ %/% batchSize)){
-          idx <- (ii-1)*batchSize + 1:batchSize
-          # summ.idx <- sel.notT1[idx]
-          summTab[idx,c("Rhat", "R_95%")] <- gelman.diag(mcmc[,idx], multivariate=FALSE)[[1]]
-          gc(verbose=FALSE)
-        }
-        if((ii*batchSize+1) < n.summ){
-          # summ.idx <- sel.notT1[(ii*batchSize+1):n.summ]
-          idx <- (ii*batchSize+1):n.summ
-          summTab[idx,c("Rhat", "R_95%")] <- gelman.diag(mcmc[,idx], multivariate=FALSE)[[1]]
-        }
-      }else{
-        summTab[,c("Rhat", "R_95%")] <- gelman.diag(mcmc, multivariate=FALSE)[[1]]
-      }
-    })}
-  #   if(any(is.na(summTab[,"Rhat"])))
-  #     warning("Gelman-Rubin convergence diagnostic Rhat could not be computed.")
-  # n.eff <-
-  gc(verbose=FALSE)
+      mcmc.mat <- do.call("rbind", mcmc[,idx, drop =FALSE])
+      summTab[idx,"Mean"] <- apply(mcmc.mat, 2, mean, na.rm = TRUE)
+      summTab[idx,"SD" ]  <- apply(mcmc.mat, 2, sd, na.rm = TRUE)
+      summTab[idx, 2 + seq(length(probs))] <-
+        t(apply(mcmc.mat, 2, quantile, probs, na.rm = TRUE))
+      rm(mcmc.mat)
+      gc(verbose=FALSE)
+    })
+
+    try({
+      summTab[idx,"n.eff"] <- round(effectiveSize(mcmc[,idx]))
+      summTab[idx,"Time-series SE"] <- summTab[idx,"SD"] / sqrt(summTab[idx,"n.eff"]  )
+    }, silent = TRUE)
+
+    try(summTab[idx,c("Rhat", "R_95%")] <-
+          gelman.diag(mcmc[,idx], multivariate=FALSE)[[1]])
+  }
+
+  if (all(is.na(summTab))){
+    cat("summarizeMCMC: posterior summary in baches failed. trying coda::summary instead.\n")
+    try({
+      summ <- summary(mcmc)
+      summTab <- cbind(summ[[1]][,c("Mean", "SD")],
+                       summ[[2]],
+                       "Time-series SE" = summ[[1]][,"Time-series SE"],
+                       "n.eff" = (summ[[1]][,"SD"] / summ[[1]][,"Time-series SE"])^2,
+                       "Rhat" = NA, "R_95%"=NA)
+      ###### MCMC effective N:
+      # "Time-series SE" = "SD" / sqrt("Effective N")
+      # "Effective N"    = ("SD" / "Time-series SE")^2
+    })
+  }
 
   summTab
 }

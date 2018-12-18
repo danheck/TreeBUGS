@@ -160,9 +160,9 @@ callingSampler <- function(model,
   }
 
   n.samples <- ceiling((n.iter-n.burnin)/n.thin)
-  if(n.samples > 30000)
+  if(n.samples > 20000)
     warning("Note: Your present MCMC settings for n.burnin/n.iter/n.thin\n",
-            "      imply that more than 30,000 samples are stored per parameter per chain.\n",
+            "      imply that more than 20,000 samples are stored per parameter per chain.\n",
             "      This might result in problems due to an overload of your computers memory (RAM).")
 
   data.list <-  lapply(data, get, envir=environment())
