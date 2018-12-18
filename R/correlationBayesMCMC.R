@@ -44,9 +44,10 @@
 #' @author Daniel W. Heck, Alexander Ly
 #' @examples
 #' # test effect of number of participants:
+#' set.seed(123)
 #' cors <- rbeta(50, 100, 70)
-#' correlationPosterior(r=cors, N=10, nCPU=1)
-#' correlationPosterior(r=cors, N=100, nCPU=1)
+#' correlationPosterior(r = cors, N = 10, nCPU = 1)
+#' correlationPosterior(r = cors, N = 100, nCPU = 1)
 #'
 #' @importFrom parallel clusterEvalQ clusterSplit
 #' @export
@@ -70,9 +71,9 @@ correlationPosterior <- function(fittedModel, r, N, kappa = 1, ci = .95,
                  fittedModel$runjags$mcmc[sample(M.fit, min(M.fit, ceiling(M/chains))),
                                           sel.idx])
   } else {
-    if (missing(N) || is.na(N) || N != round(N))
+    if (missing(N) || anyNA(N) || length(N) != 1 || N != round(N))
       stop("Number of participants 'N' missing or not an integer!")
-    if (missing(r) || is.na(r) || is.null(r))
+    if (missing(r) || is.null(r))
       stop("Correlation posterior samples 'r' missing!")
 
     r <- as.matrix(r)
