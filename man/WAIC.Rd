@@ -2,10 +2,10 @@
 % Please edit documentation in R/WAIC.R
 \name{WAIC}
 \alias{WAIC}
-\title{Widely Applicable Information Criterion}
+\title{WAIC: Widely Applicable Information Criterion}
 \usage{
 WAIC(fittedModel, n.adapt = 1000, n.chains = 3, n.iter = 10000,
-  n.thin = 1)
+  n.thin = 1, summarize = TRUE)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
@@ -17,25 +17,54 @@ WAIC(fittedModel, n.adapt = 1000, n.chains = 3, n.iter = 10000,
 \item{n.iter}{number of iterations after burnin.}
 
 \item{n.thin}{Thinning rate.}
+
+\item{summarize}{whether to summarize the WAIC values which are computed separately
+for each observed node.}
 }
 \value{
-a vector with the WAIC penalty \code{"p_waic"}, deviance \code{"deviance"}, and the WAIC \code{"waic"}.
+If \code{summarize=TRUE} (default), a vector containing the WAIC penalty term
+\code{"p_waic"}, \code{"deviance"}, \code{"waic"}, and the corresponding
+standard error \code{"se_waic"}.
+
+If \code{summarize=FALSE}, a list containing three vectors \code{p_waic},
+\code{deviance}, and \code{waic} with separate values for each observed node
+ (i.e., for all combinations of persons and free categories).
 }
 \description{
-Experimental implementation of the WAIC.
+Implementation of the WAIC for model comparison.
 }
 \details{
-Please note that the implementation uses an experimental feature of the JAGS version
-4.3.0. It might be a good idea to fit each model and compute WAIC twice to
-assess the stability of the WAIC values. See the following discussion for
-details:
+WAIC provides an approximation of predictive accuracy with respect to out-of-sample deviance.
+The uncertainty of the WAIC for the given number of observed nodes
+(i.e., number of free categories times the number of participants)
+is quantified by the standard error of WAIC \code{"se_waic"} (cf. Vehtari et al., 2017).
+In contrast, to assess whether the approximation uncertainty due to MCMC sampling
+(not sample size) is sufficiently low, it is a good idea to fit each model twice and compute WAIC
+again to assess the stability of the WAIC values.
+
+For more details, see Vehtari et al. (2017) and the following discussion about
+the JAGS implementation (which is currently an experimental feature of JAGS 4.3.0):
 
 \url{https://sourceforge.net/p/mcmc-jags/discussion/610036/thread/8211df61/}
 }
 \examples{
 \dontrun{
+
+#### WAIC for a latent-trait MPT model:
 fit <- traitMPT(...)
 WAIC(fit)
+
+
+#### pairwise comparison of two models:
+# (1) compute WAIC per model
+waic1 <- WAIC(fit1, summarize = FALSE)
+waic2 <- WAIC(fit2, summarize = FALSE)
+# (2) WAIC differences (per observation!)
+waic_diff <- waic1$waic - waic2$waic
+# (3) standard error of the WAIC differences:
+n_obs <- length(waic_diff)
+c(diff = sum(waic_diff),
+  se_diff = sqrt(n_obs) * sd(waic_diff))
 }
 
 }
