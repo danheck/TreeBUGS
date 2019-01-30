@@ -13,6 +13,8 @@ vignette: >
   
 ## General Procedure of Using TreeBUGS
   
+<img src="../man/figures/TreeBUGS.png" width="150" align="right" hspace="20" style="border:0px">
+
 In the most simple scenario, the following steps are required:
 
 1. Define path to existing MPT model file in .eqn format (cf. multiTree; Moshagen, 2010)

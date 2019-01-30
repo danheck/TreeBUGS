@@ -6,11 +6,15 @@
 \alias{TreeBUGS-package}
 \title{TreeBUGS: Hierarchical Multinomial Processing Tree Modeling}
 \description{
+{
+\if{html}{\figure{TreeBUGS.png}{options: width=120 alt ="TreeBUGS" align="right" hspace="20"}}
+\if{latex}{\figure{TreeBUGS.png}{options: width=0.5in}}
+
 Uses standard MPT files in the .eqn-format (Moshagen, 2010) to fit hierarchical Bayesian MPT models.
 Note that the software JAGS is required (\url{http://mcmc-jags.sourceforge.net}).
 }
-\details{
-The core functions either fit a Beta-MPT model (\code{\link{betaMPT}};Smith & Batchelder, 2010)
+
+The core functions either fit a Beta-MPT model (\code{\link{betaMPT}}; Smith & Batchelder, 2010)
 or a latent-trait MPT model (\code{\link{traitMPT}}; Klauer, 2010).
 A fitted model can be inspected using convenient summary and plot functions tailored to hierarchical MPT models.
 

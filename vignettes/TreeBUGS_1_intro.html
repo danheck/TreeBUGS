@@ -12,54 +12,284 @@
 
 <meta name="author" content="Daniel W. Heck, Nina R. Arnold, &amp; Denis Arnold" />
 
-<meta name="date" content="2017-04-01" />
+<meta name="date" content="2019-01-30" />
 
 <title>TreeBUGS: Introduction to Hierarchical MPT Modeling</title>
 
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 </head>
 
@@ -70,12 +300,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">TreeBUGS: Introduction to Hierarchical MPT Modeling</h1>
 <h4 class="author"><em>Daniel W. Heck, Nina R. Arnold, &amp; Denis Arnold</em></h4>
-<h4 class="date"><em>2017-04-01</em></h4>
+<h4 class="date"><em>2019-01-30</em></h4>
 
 
 
 <div id="general-procedure-of-using-treebugs" class="section level2">
 <h2>General Procedure of Using TreeBUGS</h2>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgYAAAJYCAMAAAAuZd4VAAACfFBMVEX9/v0AAAAAAIsBAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkJCY8KCgoLCwsMDAwNDQ0ODg4PDw8QEBAREREREZMSEhITExMUFBQVFRUWFhYXFxcYGBgZGRkaGhoaGpcbGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkqKiorKyssLCwtLS0uLi4vLy8wMDAxMTEyMjIzMzM0NDQ1NTU2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+AgICBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLAACLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnOzs7R0dHU1NT9/v0fnCamAAAA1HRSTlP/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////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" width="150" align="right" hspace="20" style="border:0px"></p>
 <p>In the most simple scenario, the following steps are required:</p>
 <ol style="list-style-type: decimal">
 <li>Define path to existing MPT model file in .eqn format (cf. multiTree; Moshagen, 2010)</li>
@@ -96,11 +327,11 @@ Lure      FA     (1-Dn)*g
 Lure      CR     (1-Dn)*(1-g)
 Lure      CR     Dn</code></pre>
 <p>Note that category labels (e.g., hit, miss,…) must start with a letter (different to multiTree or HMMTree) and match the column names of . The model equations require the multiplication sign <code>*</code> and parameters should not be summarized, e.g., by <code>a^2*(1-a)</code>. As an input for TreeBUGS, the model file (e.g., <code>&quot;2htm.txt&quot;</code>) needs to be saved in the current working directory. Otherwise, the relative or absolute path to the file must be specified (e.g., <code>models/2htm.txt</code>). To check how TreeBUGS interprets a given .eqn-file, use:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">readEQN</span>(<span class="dt">file =</span> <span class="st">&quot;pathToFile.eqn&quot;</span>,       <span class="co"># relative or absolute path </span>
-        <span class="dt">restrictions =</span> <span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>),  <span class="co"># equality constraints</span>
-        <span class="dt">paramOrder =</span> <span class="ot">TRUE</span>)             <span class="co"># show parameter order</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">readEQN</span>(<span class="dt">file =</span> <span class="st">&quot;pathToFile.eqn&quot;</span>,       <span class="co"># relative or absolute path </span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">        <span class="dt">restrictions =</span> <span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>),  <span class="co"># equality constraints</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">        <span class="dt">paramOrder =</span> <span class="ot">TRUE</span>)             <span class="co"># show parameter order</span></a></code></pre></div>
 <p>Equality restrictions on the MPT parameters can either be provided in a list:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">restrictions =<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>, <span class="st">&quot;g=0.5&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">restrictions =<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>, <span class="st">&quot;g=0.5&quot;</span>)</a></code></pre></div>
 <p>or by a path to a text file on the hard drive (e.g., <code>restrictions=&quot;pathToFile.txt&quot;</code>) that contains the equality constraints, one per row:</p>
 <pre><code>Dn=Do
 g=0.5</code></pre>
@@ -120,37 +351,37 @@ g=0.5</code></pre>
 <div id="step-fit-hierarchical-mpt-model" class="section level3">
 <h3>3. Step: Fit Hierarchical MPT Model</h3>
 <p>An hierarchical <strong>Beta-MPT model</strong> is fitted with the following code:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load the package:</span>
-<span class="kw">library</span>(TreeBUGS)
-
-<span class="co"># fit the model:</span>
-fitHierarchicalMPT &lt;-<span class="st"> </span><span class="kw">betaMPT</span>(
-      <span class="dt">eqnfile=</span><span class="st">&quot;2htm.txt&quot;</span>,         <span class="co"># .eqn file</span>
-      <span class="dt">data=</span><span class="st">&quot;data_ind.csv&quot;</span>,        <span class="co"># individual data</span>
-      <span class="dt">restrictions=</span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>), <span class="co"># parameter restrictions (or path to file)</span>
-      
-      ### optional MCMC input:            
-      <span class="dt">n.iter =</span> <span class="dv">20000</span>,             <span class="co"># number of iterations</span>
-      <span class="dt">n.burnin =</span> <span class="dv">5000</span>,            <span class="co"># number of burnin samples that are removed</span>
-      <span class="dt">n.thin =</span> <span class="dv">5</span>,                 <span class="co"># thinning rate of removing samples</span>
-      <span class="dt">n.chains =</span> <span class="dv">3</span>                <span class="co"># number of MCMC chains (run in parallel)</span>
-)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># load the package:</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw">library</span>(TreeBUGS)</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co"># fit the model:</span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">fitHierarchicalMPT &lt;-<span class="st"> </span><span class="kw">betaMPT</span>(</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6">      <span class="dt">eqnfile=</span><span class="st">&quot;2htm.txt&quot;</span>,         <span class="co"># .eqn file</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7">      <span class="dt">data=</span><span class="st">&quot;data_ind.csv&quot;</span>,        <span class="co"># individual data</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8">      <span class="dt">restrictions=</span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>), <span class="co"># parameter restrictions (or path to file)</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9">      </a>
+<a class="sourceLine" id="cb6-10" data-line-number="10">      <span class="co">### optional MCMC input:            </span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11">      <span class="dt">n.iter =</span> <span class="dv">20000</span>,             <span class="co"># number of iterations</span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12">      <span class="dt">n.burnin =</span> <span class="dv">5000</span>,            <span class="co"># number of burnin samples that are removed</span></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13">      <span class="dt">n.thin =</span> <span class="dv">5</span>,                 <span class="co"># thinning rate of removing samples</span></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14">      <span class="dt">n.chains =</span> <span class="dv">3</span>                <span class="co"># number of MCMC chains (run in parallel)</span></a>
+<a class="sourceLine" id="cb6-15" data-line-number="15">)</a></code></pre></div>
 <p>A latent-trait model is fitted similarly by replacing <code>betaMPT</code> by <code>traitMPT</code>.</p>
 </div>
 <div id="step-check-convergence-of-mcmc-chains" class="section level3">
 <h3>4. Step: Check convergence of MCMC chains</h3>
 <p>The functions <code>betaMPT</code> and <code>traitMPT</code> return a list that includes the original samples from the MCMC sampler for convergence checks. The MCMC samples are stored in <code>fittedModel$runjags$mcmc</code> as an <code>mcmc.list</code> object (see the package  for an overview of convergence diagniostics). TreeBUGS provides a handy wrapper to access the most important plotting functions:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Default: Traceplot and density</span>
-<span class="kw">plot</span>(fitHierarchicalMPT,    <span class="co"># fitted model</span>
-     <span class="dt">parameter =</span><span class="st">&quot;mean&quot;</span>      <span class="co"># which parameter to plot</span>
-)
-<span class="co"># further arguments are passed to ?plot.mcmc.list</span>
-
-<span class="co"># Auto-correlation plots:</span>
-<span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;acf&quot;</span>)
-
-<span class="co"># Gelman-Rubin plots:</span>
-<span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;gelman&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># Default: Traceplot and density</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw">plot</span>(fitHierarchicalMPT,    <span class="co"># fitted model</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">     <span class="dt">parameter =</span><span class="st">&quot;mean&quot;</span>      <span class="co"># which parameter to plot</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">)</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co"># further arguments are passed to ?plot.mcmc.list</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co"># Auto-correlation plots:</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;acf&quot;</span>)</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co"># Gelman-Rubin plots:</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;gelman&quot;</span>)</a></code></pre></div>
 <p>See  and  for further convergence statistics and plots. Note that inferences from the model can be invalid if the Markov-Chain Monte-Carlo (MCMC) sampler did not converge!</p>
 </div>
 <div id="step-summarize-and-plot-results" class="section level3">
@@ -161,25 +392,25 @@ fitHierarchicalMPT &lt;-<span class="st"> </span><span class="kw">betaMPT</span>
 <li>Convergence: <span class="math inline">\(\hat R\)</span>-Statistic (should be close to 1.00 for all parameters, e.g., <span class="math inline">\(\hat R &lt; 1.05\)</span>) and number of effective samples when accounting for auto-correlation (should be large)</li>
 </ul>
 <p>To obtain the summary after fitting the model, simply use:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(fitHierarchicalMPT)</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">summary</span>(fitHierarchicalMPT)</a></code></pre></div>
 <p>The following functions allow to plot parameter estimates, distributions, goodness of fit, and raw frequencies:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotParam</span>(fitHierarchicalMPT,     <span class="co"># estimated parameters</span>
-          <span class="dt">includeIndividual=</span><span class="ot">TRUE</span>  <span class="co"># whether to plot individual estimates</span>
-)
-<span class="kw">plotDistribution</span>(fitHierarchicalMPT)      <span class="co"># estimated hierarchical parameter distribution</span>
-<span class="kw">plotFit</span>(fitHierarchicalMPT)               <span class="co"># observed vs. predicted mean frequencies</span>
-<span class="kw">plotFit</span>(fitHierarchicalMPT, <span class="dt">stat =</span> <span class="st">&quot;cov&quot;</span>) <span class="co"># observed vs. predicted covariance</span>
-<span class="kw">plotFreq</span>(fitHierarchicalMPT)              <span class="co"># individual and mean raw frequencies per tree</span>
-<span class="kw">plotPriorPost</span>(fitHierarchicalMPT)         <span class="co"># comparison of prior/posterior (group level parameters)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">plotParam</span>(fitHierarchicalMPT,     <span class="co"># estimated parameters</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">          <span class="dt">includeIndividual=</span><span class="ot">TRUE</span>  <span class="co"># whether to plot individual estimates</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3">)</a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="kw">plotDistribution</span>(fitHierarchicalMPT)      <span class="co"># estimated hierarchical parameter distribution</span></a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="kw">plotFit</span>(fitHierarchicalMPT)               <span class="co"># observed vs. predicted mean frequencies</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="kw">plotFit</span>(fitHierarchicalMPT, <span class="dt">stat =</span> <span class="st">&quot;cov&quot;</span>) <span class="co"># observed vs. predicted covariance</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="kw">plotFreq</span>(fitHierarchicalMPT)              <span class="co"># individual and mean raw frequencies per tree</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="kw">plotPriorPost</span>(fitHierarchicalMPT)         <span class="co"># comparison of prior/posterior (group level parameters)</span></a></code></pre></div>
 <p>Parameter estimates (posterior mean, median, SD) can be extracted and saved to a file by using:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># matrix for further use within R:</span>
-tt &lt;-<span class="st"> </span><span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter=</span><span class="st">&quot;theta&quot;</span>, 
-               <span class="dt">stat=</span><span class="st">&quot;mean&quot;</span>)
-tt
-
-<span class="co"># save complete summary of individual estimates to file:</span>
-<span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter =</span> <span class="st">&quot;theta&quot;</span>, 
-         <span class="dt">stat =</span> <span class="st">&quot;summary&quot;</span>, <span class="dt">file =</span> <span class="st">&quot;parameter.csv&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># matrix for further use within R:</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">tt &lt;-<span class="st"> </span><span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter=</span><span class="st">&quot;theta&quot;</span>, </a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">               <span class="dt">stat=</span><span class="st">&quot;mean&quot;</span>)</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">tt</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co"># save complete summary of individual estimates to file:</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter =</span> <span class="st">&quot;theta&quot;</span>, </a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">         <span class="dt">stat =</span> <span class="st">&quot;summary&quot;</span>, <span class="dt">file =</span> <span class="st">&quot;parameter.csv&quot;</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="references" class="section level2">
@@ -201,7 +432,7 @@ tt
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>
