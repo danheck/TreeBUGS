@@ -170,7 +170,7 @@ List betampt(int M,
       for(int s=0; s<S; s++){
         tvec = as<Rcpp::NumericVector>(wrap(reshape(theta.slice(s).row(m-1),N,1)));
         alpha(m,s) = sliceAB(alpha(m-1,s), beta(m-1,s), tvec, shape(s), rate(s), .001);
-        beta(m,s) = sliceAB(beta(m-1,s), alpha(m,s), 1-tvec, shape(s), rate(s), .001);
+        beta(m,s) = sliceAB(beta(m-1,s), alpha(m-1,s), 1-tvec, shape(s), rate(s), .001);
       }
     }
 
