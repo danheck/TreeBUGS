@@ -5,10 +5,11 @@
 \title{Fit a Hierarchical Beta-MPT Model}
 \usage{
 betaMPT(eqnfile, data, restrictions, covData, transformedParameters,
-  corProbit = FALSE, alpha = "dgamma(1,.1)", beta = "dgamma(1,.1)",
-  n.iter = 20000, n.adapt = 2000, n.burnin = 2000, n.thin = 5,
-  n.chains = 3, dic = FALSE, ppp = 0, modelfilename, parEstFile,
-  posteriorFile, autojags = NULL, ...)
+  corProbit = FALSE, alpha = "dgamma(1,.1)T(1,)",
+  beta = "dgamma(1,.1)T(1,)", n.iter = 20000, n.adapt = 2000,
+  n.burnin = 2000, n.thin = 5, n.chains = 3, dic = FALSE,
+  ppp = 0, modelfilename, parEstFile, posteriorFile, autojags = NULL,
+  ...)
 }
 \arguments{
 \item{eqnfile}{The (relative or full) path to the file that specifies the MPT model
@@ -54,8 +55,8 @@ correlations (probit-values of \code{+Inf} are truncated to
 Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
 
 \item{alpha}{Hyperprior for the shape parameters \eqn{\alpha} of the group-level
-beta distributions (in JAGS syntax). Default: Gamma distributions for
-\eqn{\alpha} and \eqn{\beta} with shape 1 and rate .1 (see\link{plotPrior}.
+beta distributions (in JAGS syntax). Default: Truncated gamma distributions for
+\eqn{\alpha} and \eqn{\beta} with shape 1 and rate .1 and truncated to be larger than 1 (see\link{plotPrior}.
 A named vector can be used to specify separate hyperpriors for each MPT
 parameter (if unnamed, the order of parameters is determined by the default
 order as shown by \code{\link{readEQN}} with \code{paramOrder = TRUE}).

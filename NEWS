@@ -1,3 +1,10 @@
+TreeBUGS 1.4.3 (March 2019)
+===========
+
+* Thinning within C++ samplers [thanks to Marius Barth]
+* New default priors for alpha and beta in betaMPT: "dgamma(1,.1)T(1,)"
+
+
 TreeBUGS 1.4.2 (January 2019)
 ===========
 
