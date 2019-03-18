@@ -121,8 +121,7 @@ List betampt(int M,
   //  Initialize MCMC matrices
   arma::mat alpha(M, S);
   arma::mat beta(M, S);
-  alpha.row(0).randu();
-  beta.row(0).randu();
+
   arma::mat mu(M,S);
   arma::mat sig(M,S);
   arma::cube theta(M, N, S);
@@ -144,6 +143,9 @@ List betampt(int M,
   arma::vec alpha_m(S);
   arma::vec beta_m(S);
   arma::mat theta_m(N, S);
+
+  alpha_m.randu();
+  beta_m.randu();
 
   theta_m.randu(); // initialize with random numbers from [0, 1]
 
@@ -172,15 +174,14 @@ List betampt(int M,
 
     // thinning loop ----
     for (int thin=0; thin<nthin; thin++) {
-    //  hierarchical part ----
-      if((m>0)|(thin>0)) {
-        for(int s=0; s<S; s++){
-          tvec = as<Rcpp::NumericVector>(wrap(reshape(theta_m.col(s),N,1)));
-          alpha_m(s) = sliceAB(alpha_m(s), beta_m(s), tvec, shape(s), rate(s), .001);
-          beta_m(s) = sliceAB(beta_m(s), alpha_m(s), 1-tvec, shape(s), rate(s), .001);
-        }
-      }
 
+      //  hierarchical part ----
+
+      for(int s=0; s<S; s++){
+        tvec = as<Rcpp::NumericVector>(wrap(reshape(theta_m.col(s),N,1)));
+        alpha_m(s) = sliceAB(alpha_m(s), beta_m(s), tvec, shape(s), rate(s), .001);
+        beta_m(s) = sliceAB(beta_m(s), alpha_m(s), 1-tvec, shape(s), rate(s), .001);
+      }
 
 
       // MPT part ----
@@ -226,14 +227,11 @@ List betampt(int M,
       // Rcout << "\Here, Hfull=\n" << Hfull;
     } // end of thinning loop
 
-    // Some generated quantities that are only computed for stored samples
-    for(int s = 0; s < S; s++){
-      for(int n = 0; n < N; n++){
-        theta(m, n, s) = theta_m(n, s);
-      }
-      alpha(m, s) = alpha_m(s);
-      beta(m, s) = beta_m(s);
-    }
+    // Generated quantities only for stored iterations ----
+    theta.row(m) = theta_m;
+    alpha.row(m) = alpha_m.t();
+    beta.row(m) = beta_m.t();
+
     mu.row(m) = alpha.row(m)/(alpha.row(m) + beta.row(m));
     sig.row(m) = sqrt(mu.row(m) % (1 - mu.row(m)) / (alpha.row(m) + beta.row(m)+1));
   } // end of MCMC loop
@@ -268,9 +266,8 @@ List simplempt(int M,
 
   //  Initialize MCMC array
   arma::cube theta(M, N, S);
-  theta.subcube(0,0,0, 0,N-1,S-1).randu();
-
-  // const int nthin = 100;
+  arma::mat theta_m(N, S);
+  theta_m.randu();
 
   // temporary MCMC objects:
   arma::mat Hfull =  arma::zeros<arma::mat>(N, B);
@@ -305,15 +302,15 @@ List simplempt(int M,
 
   // ################################ MCMC loop
   for(int m=0; m<M; m++){
-
-    // ################################ MPT part
     for(int thin=0; thin<nthin; thin++) {
+
+      // ################################ MPT part
       // # 3. Sample θ from θ|σ, µ, Hfull
       for(int s=0; s<S; s++){
         for(int n=0; n<N; n++){
           p(n,s) = dot(a.col(s), Hfull.row(n) );
           q(n,s) = dot(b.col(s), Hfull.row(n) );
-          theta(m,n,s) = R::rbeta(p(n,s)+alpha(s), q(n,s) + beta(s)) ;
+          theta_m(n,s) = R::rbeta(p(n,s)+alpha(s), q(n,s) + beta(s)) ;
         }
       }
 
@@ -323,7 +320,7 @@ List simplempt(int M,
         br = c;
         for(int bb=0; bb<B; bb++){
           for(int s=0; s<S; s++){
-            br(bb) = br(bb)* pow(theta(m,n,s), a(bb,s))*pow(1-theta(m,n,s), b(bb,s)) ;
+            br(bb) = br(bb)* pow(theta_m(n,s), a(bb,s))*pow(1-theta_m(n,s), b(bb,s)) ;
           }
         }
         // Rcout << "theta=" << theta(span(m,m),span(n,n),span(0,S-1)) << "\nbr=" << br;
@@ -348,6 +345,7 @@ List simplempt(int M,
         // Rcout << "\Here, Hfull=\n" << Hfull;
       }
     }
+    theta.row(m) = theta_m;
   }
 
   return Rcpp::List::create(Rcpp::Named("theta") = theta,

@@ -71,7 +71,7 @@ fitModelCpp <- function(type,
 
   simBetaMPT <- function(idx){
 
-    sim <- betampt(M = floor(n.iter/n.thin),
+    sim <- betampt(M = ceiling(n.iter/n.thin),
                    nthin = n.thin,
                    H = as.matrix(data),
                    a = mpt.res$a, b = mpt.res$b,
@@ -84,7 +84,7 @@ fitModelCpp <- function(type,
       colnames(sim$bet) <- paste0("bet[",1:S,"]")
     }
     tnames <- outer(1:S,paste0(",",1:N), paste0)
-    tt <- matrix(sim$theta, nrow = floor(n.iter/n.thin), ncol=S*N,
+    tt <- matrix(sim$theta, nrow = ceiling(n.iter/n.thin), ncol=S*N,
                  dimnames=list(NULL, paste0("theta[",c(t(tnames)),"]")))
     tmp <- with(sim, cbind(mean, sd, alph, bet, tt ))
     if(S == 1)
@@ -95,7 +95,7 @@ fitModelCpp <- function(type,
 
   simSimpleMPT <- function(idx){
 
-    sim <- simplempt(M = floor(n.iter/n.thin),
+    sim <- simplempt(M = ceiling(n.iter/n.thin),
                      nthin = n.thin,
                      H = as.matrix(data),
                      a = mpt.res$a, b = mpt.res$b,
@@ -112,7 +112,7 @@ fitModelCpp <- function(type,
     }
 
     tnames <- outer(1:S,paste0(",",1:N), paste0)
-    tt <- matrix(sim$theta, nrow = floor(n.iter/n.thin), ncol = S*N,
+    tt <- matrix(sim$theta, nrow = ceiling(n.iter/n.thin), ncol = S*N,
                  dimnames=list(NULL, paste0("theta[",c(t(tnames)),"]")))
     tmp <- with(sim, cbind(means, sds, tt ))
 
