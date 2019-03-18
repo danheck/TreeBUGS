@@ -118,12 +118,12 @@ List betampt(int M,
   arma::vec cats = unique(map);
   int K = cats.n_elem;  // categories
 
-  //  Initialize MCMC matrices
+  // MCMC matrices:
   arma::mat alpha(M, S);
   arma::mat beta(M, S);
 
-  arma::mat mu(M,S);
-  arma::mat sig(M,S);
+  arma::mat mu(M, S);
+  arma::mat sig(M, S);
   arma::cube theta(M, N, S);
 
   // temporary MCMC objects:
@@ -138,16 +138,15 @@ List betampt(int M,
   arma::mat q(N,S);
   arma::vec br(B);
 
-
-  // more temporary MCMC objects to allow for thinning:
+  arma::mat theta_m(N, S);
   arma::vec alpha_m(S);
   arma::vec beta_m(S);
-  arma::mat theta_m(N, S);
 
+  // initialize temporary MCMC objects with random numbers from [0, 1]:
+  theta_m.randu();
   alpha_m.randu();
   beta_m.randu();
 
-  theta_m.randu(); // initialize with random numbers from [0, 1]
 
   //  initialize full-data matrix Hfull
   for(int n=0; n<N; n++){
@@ -227,7 +226,7 @@ List betampt(int M,
       // Rcout << "\Here, Hfull=\n" << Hfull;
     } // end of thinning loop
 
-    // Generated quantities only for stored iterations ----
+    // Generate quantities only for stored iterations ----
     theta.row(m) = theta_m;
     alpha.row(m) = alpha_m.t();
     beta.row(m) = beta_m.t();
