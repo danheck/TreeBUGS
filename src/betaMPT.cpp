@@ -18,8 +18,8 @@ using namespace Rcpp;
 double postAB(double x,
               double fixed,
               NumericVector theta,
-              double shape=1.,
-              double rate=.05){
+              double shape=1.0,
+              double rate=0.1){
 
   return R::dgamma(x, shape, 1/(rate-sum(log(theta))), 1)- theta.size() * R::lbeta( x, fixed) ;
 }
@@ -37,9 +37,9 @@ double postAB(double x,
 double sliceAB(double x,
                double fixed,
                NumericVector theta,
-               double shape=1.,
-               double rate=.05,
-               double eps =.01,
+               double shape=1.0,
+               double rate=0.1,
+               double eps =0.01,
                int steps=5000){
 
   // get height logfx at x-coordinate:

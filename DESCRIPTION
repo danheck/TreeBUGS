@@ -1,15 +1,12 @@
 Package: TreeBUGS
-Version: 1.4.2
-Date: 2019-01-30
+Version: 1.4.4
+Date: 2019-09-30
 Title: Hierarchical Multinomial Processing Tree Modeling
 Authors@R: c(person("Daniel W.", "Heck", email="heck@uni-mannheim.de", role=c("aut","cre")),
              person("Nina R.", "Arnold", email="arnold@uni-mannheim.de", role = c("aut","dtc")),
              person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut")),
-             person("Alexander", "Ly", email="a.ly@uva.nl", role = c("ctb")))
-Author: Daniel W. Heck [aut, cre],
-        Nina R. Arnold [aut, dtc],
-        Denis Arnold [aut],
-        Alexander Ly [ctb]
+             person("Alexander", "Ly", email="a.ly@uva.nl", role = c("ctb")),
+             person("Marius", "Barth", email="marius.barth@uni-koeln.de", role = c("ctb")))
 Maintainer: Daniel W. Heck <heck@uni-mannheim.de>
 Depends:
     R (>= 3.0.0)
