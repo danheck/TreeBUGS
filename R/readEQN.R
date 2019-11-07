@@ -64,7 +64,7 @@ readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
   cols <- ncol(multiTreeDefinition)
   Tree <- data.frame(Tree = paste0("T_",multiTreeDefinition$V1),
                      Category = multiTreeDefinition$V2,
-                     Equation = NA_character_)
+                     Equation = NA_character_, stringsAsFactors = FALSE)
   Tree$Equation <- apply(multiTreeDefinition[,3:cols, drop=FALSE], 1, paste0, collapse="")
 
   TreeRestr <- thetaHandling(Tree, restrictions)
