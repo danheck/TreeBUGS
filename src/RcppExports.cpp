@@ -26,12 +26,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // simplempt
-List simplempt(int M, int nthin, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec alpha, arma::vec beta);
-RcppExport SEXP _TreeBUGS_simplempt(SEXP MSEXP, SEXP nthinSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
+List simplempt(int M, int L, int nthin, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec alpha, arma::vec beta);
+RcppExport SEXP _TreeBUGS_simplempt(SEXP MSEXP, SEXP LSEXP, SEXP nthinSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type L(LSEXP);
     Rcpp::traits::input_parameter< int >::type nthin(nthinSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type H(HSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type a(aSEXP);
@@ -40,7 +41,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type map(mapSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(simplempt(M, nthin, H, a, b, c, map, alpha, beta));
+    rcpp_result_gen = Rcpp::wrap(simplempt(M, L, nthin, H, a, b, c, map, alpha, beta));
     return rcpp_result_gen;
 END_RCPP
 }

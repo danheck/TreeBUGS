@@ -248,6 +248,7 @@ List betampt(int M,
 
 // [[Rcpp::export]]
 List simplempt(int M,
+               int L,
                int nthin,
                arma::mat H,
                arma::mat a,
@@ -300,7 +301,7 @@ List simplempt(int M,
   }
 
   // ################################ MCMC loop
-  for(int m=0; m<M; m++){
+  for(int m=-L; m<M; m++){ // negative index for burnin, non-negative index for sampling
     for(int thin=0; thin<nthin; thin++) {
 
       // ################################ MPT part
@@ -344,7 +345,9 @@ List simplempt(int M,
         // Rcout << "\Here, Hfull=\n" << Hfull;
       }
     }
-    theta.row(m) = theta_m;
+    if(m >= 0) {
+      theta.row(m) = theta_m;
+    }
   }
 
   return Rcpp::List::create(Rcpp::Named("theta") = theta,

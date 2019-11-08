@@ -5,8 +5,8 @@ betampt <- function(M, nthin, H, a, b, c, map, shape, rate) {
     .Call(`_TreeBUGS_betampt`, M, nthin, H, a, b, c, map, shape, rate)
 }
 
-simplempt <- function(M, nthin, H, a, b, c, map, alpha, beta) {
-    .Call(`_TreeBUGS_simplempt`, M, nthin, H, a, b, c, map, alpha, beta)
+simplempt <- function(M, L, nthin, H, a, b, c, map, alpha, beta) {
+    .Call(`_TreeBUGS_simplempt`, M, L, nthin, H, a, b, c, map, alpha, beta)
 }
 
 loglikMPT <- function(theta, h, a, b, c, map) {

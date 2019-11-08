@@ -95,12 +95,12 @@ fitModelCpp <- function(type,
 
   simSimpleMPT <- function(idx){
 
-    sim <- simplempt(M = ceiling(n.iter/n.thin),
+    sim <- simplempt(M = ceiling((n.iter-n.burnin)/n.thin), L = ceiling(n.burnin/n.thin),
                      nthin = n.thin,
                      H = as.matrix(data),
                      a = mpt.res$a, b = mpt.res$b,
                      c = mpt.res$c, map = mpt.res$map,
-                     alpha = alpha, beta = beta )
+                     alpha = alpha, beta = beta)
     means <- apply(sim$theta, c(1,3), mean)
     sds <- apply(sim$theta, c(1,3), sd)
     if(S == 1){
@@ -112,12 +112,13 @@ fitModelCpp <- function(type,
     }
 
     tnames <- outer(1:S,paste0(",",1:N), paste0)
-    tt <- matrix(sim$theta, nrow = ceiling(n.iter/n.thin), ncol = S*N,
+    tt <- matrix(sim$theta, nrow = ceiling((n.iter-n.burnin)/n.thin), ncol = S*N,
                  dimnames=list(NULL, paste0("theta[",c(t(tnames)),"]")))
     tmp <- with(sim, cbind(means, sds, tt ))
 
     # mcmc(tmp, start = n.burnin+1, end=n.iter, thin = n.thin)
-    window(mcmc(tmp), start = floor(n.burnin/n.thin)+1, thin = 1L)
+    # window(mcmc(tmp), start = floor(n.burnin/n.thin)+1, thin = 1L)
+    mcmc(tmp)
   }
 
 
