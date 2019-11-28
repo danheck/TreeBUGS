@@ -7,12 +7,13 @@
 using namespace Rcpp;
 
 // betampt
-List betampt(int M, int nthin, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec shape, arma::vec rate);
-RcppExport SEXP _TreeBUGS_betampt(SEXP MSEXP, SEXP nthinSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP shapeSEXP, SEXP rateSEXP) {
+List betampt(int M, int L, int nthin, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec shape, arma::vec rate);
+RcppExport SEXP _TreeBUGS_betampt(SEXP MSEXP, SEXP LSEXP, SEXP nthinSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP shapeSEXP, SEXP rateSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type L(LSEXP);
     Rcpp::traits::input_parameter< int >::type nthin(nthinSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type H(HSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type a(aSEXP);
@@ -21,7 +22,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type map(mapSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type shape(shapeSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type rate(rateSEXP);
-    rcpp_result_gen = Rcpp::wrap(betampt(M, nthin, H, a, b, c, map, shape, rate));
+    rcpp_result_gen = Rcpp::wrap(betampt(M, L, nthin, H, a, b, c, map, shape, rate));
     return rcpp_result_gen;
 END_RCPP
 }

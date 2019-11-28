@@ -71,7 +71,8 @@ fitModelCpp <- function(type,
 
   simBetaMPT <- function(idx){
 
-    sim <- betampt(M = ceiling(n.iter/n.thin),
+    sim <- betampt(M = ceiling((n.iter-n.burnin)/n.thin),
+                   L = ceiling(n.burnin/n.thin),
                    nthin = n.thin,
                    H = as.matrix(data),
                    a = mpt.res$a, b = mpt.res$b,
@@ -84,18 +85,24 @@ fitModelCpp <- function(type,
       colnames(sim$bet) <- paste0("bet[",1:S,"]")
     }
     tnames <- outer(1:S,paste0(",",1:N), paste0)
-    tt <- matrix(sim$theta, nrow = ceiling(n.iter/n.thin), ncol=S*N,
-                 dimnames=list(NULL, paste0("theta[",c(t(tnames)),"]")))
+    tt <- matrix(
+      sim$theta,
+      nrow = ceiling((n.iter - n.burnin)/n.thin),
+      ncol = S * N,
+      dimnames = list(NULL, paste0("theta[",c(t(tnames)),"]"))
+    )
     tmp <- with(sim, cbind(mean, sd, alph, bet, tt ))
     if(S == 1)
       colnames(tmp)[1:4] <- c("mean","sd","alph","bet")
-    # mcmc(tmp, start = n.burnin+1, end=n.iter, thin = n.thin)
-    window(mcmc(tmp), start = floor(n.burnin/n.thin) + 1, thin = 1L)
+
+    # return
+    mcmc(tmp, start = n.burnin + 1L, thin = n.thin)
   }
 
   simSimpleMPT <- function(idx){
 
-    sim <- simplempt(M = ceiling((n.iter-n.burnin)/n.thin), L = ceiling(n.burnin/n.thin),
+    sim <- simplempt(M = ceiling((n.iter-n.burnin)/n.thin),
+                     L = ceiling(n.burnin/n.thin),
                      nthin = n.thin,
                      H = as.matrix(data),
                      a = mpt.res$a, b = mpt.res$b,
@@ -111,14 +118,17 @@ fitModelCpp <- function(type,
       colnames(sds) <- paste0("sd[",1:S,"]")
     }
 
-    tnames <- outer(1:S,paste0(",",1:N), paste0)
-    tt <- matrix(sim$theta, nrow = ceiling((n.iter-n.burnin)/n.thin), ncol = S*N,
-                 dimnames=list(NULL, paste0("theta[",c(t(tnames)),"]")))
+    tnames <- outer(1:S, paste0(",", 1:N), paste0)
+    tt <- matrix(
+      sim$theta,
+      nrow = ceiling((n.iter - n.burnin)/n.thin),
+      ncol = S * N,
+      dimnames = list(NULL, paste0("theta[", c(t(tnames)),"]"))
+    )
     tmp <- with(sim, cbind(means, sds, tt ))
 
-    # mcmc(tmp, start = n.burnin+1, end=n.iter, thin = n.thin)
-    # window(mcmc(tmp), start = floor(n.burnin/n.thin)+1, thin = 1L)
-    mcmc(tmp)
+    # return
+    mcmc(tmp, start = n.burnin + 1L, thin = n.thin)
   }
 
 
