@@ -151,8 +151,10 @@ fitModelCpp <- function(type,
 
   # store details about model:
   mptInfo <- list(model=type,
-                  thetaNames = data.frame(Parameter = colnames(mpt.res$a),
-                                          theta=1:ncol(mpt.res$a)),
+                  thetaNames = data.frame(
+                    Parameter = colnames(mpt.res$a),
+                    theta=1:ncol(mpt.res$a),
+                    stringsAsFactors = FALSE),
                   thetaUnique = thetaUnique,
                   thetaFixed = NULL,
                   MPT=c(mpt.res, as.list(mergedTree)),
