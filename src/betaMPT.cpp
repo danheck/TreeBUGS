@@ -103,6 +103,7 @@ double sliceAB(double x,
 
 // [[Rcpp::export]]
 List betampt(int M,
+             int L,
              int nthin,
              arma::mat H,
              arma::mat a,
@@ -169,7 +170,7 @@ List betampt(int M,
   }
 
   // MCMC loop ----
-  for(int m=0; m<M; m++){
+  for(int m=-L; m<M; m++){
 
     // thinning loop ----
     for (int thin=0; thin<nthin; thin++) {
@@ -227,12 +228,14 @@ List betampt(int M,
     } // end of thinning loop
 
     // Generate quantities only for stored iterations ----
-    theta.row(m) = theta_m;
-    alpha.row(m) = alpha_m.t();
-    beta.row(m) = beta_m.t();
+    if(m >= 0) {
+      theta.row(m) = theta_m;
+      alpha.row(m) = alpha_m.t();
+      beta.row(m) = beta_m.t();
 
-    mu.row(m) = alpha.row(m)/(alpha.row(m) + beta.row(m));
-    sig.row(m) = sqrt(mu.row(m) % (1 - mu.row(m)) / (alpha.row(m) + beta.row(m)+1));
+      mu.row(m) = alpha.row(m)/(alpha.row(m) + beta.row(m));
+      sig.row(m) = sqrt(mu.row(m) % (1 - mu.row(m)) / (alpha.row(m) + beta.row(m)+1));
+    }
   } // end of MCMC loop
 
   return Rcpp::List::create(Rcpp::Named("mean") = mu,
@@ -248,6 +251,7 @@ List betampt(int M,
 
 // [[Rcpp::export]]
 List simplempt(int M,
+               int L,
                int nthin,
                arma::mat H,
                arma::mat a,
@@ -300,7 +304,7 @@ List simplempt(int M,
   }
 
   // ################################ MCMC loop
-  for(int m=0; m<M; m++){
+  for(int m=-L; m<M; m++){ // negative index for burnin, non-negative index for sampling
     for(int thin=0; thin<nthin; thin++) {
 
       // ################################ MPT part
@@ -344,7 +348,9 @@ List simplempt(int M,
         // Rcout << "\Here, Hfull=\n" << Hfull;
       }
     }
-    theta.row(m) = theta_m;
+    if(m >= 0) {
+      theta.row(m) = theta_m;
+    }
   }
 
   return Rcpp::List::create(Rcpp::Named("theta") = theta,

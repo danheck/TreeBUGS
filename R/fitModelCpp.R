@@ -71,7 +71,8 @@ fitModelCpp <- function(type,
 
   simBetaMPT <- function(idx){
 
-    sim <- betampt(M = ceiling(n.iter/n.thin),
+    sim <- betampt(M = ceiling((n.iter-n.burnin)/n.thin),
+                   L = ceiling(n.burnin/n.thin),
                    nthin = n.thin,
                    H = as.matrix(data),
                    a = mpt.res$a, b = mpt.res$b,
@@ -84,23 +85,29 @@ fitModelCpp <- function(type,
       colnames(sim$bet) <- paste0("bet[",1:S,"]")
     }
     tnames <- outer(1:S,paste0(",",1:N), paste0)
-    tt <- matrix(sim$theta, nrow = ceiling(n.iter/n.thin), ncol=S*N,
-                 dimnames=list(NULL, paste0("theta[",c(t(tnames)),"]")))
+    tt <- matrix(
+      sim$theta,
+      nrow = ceiling((n.iter - n.burnin)/n.thin),
+      ncol = S * N,
+      dimnames = list(NULL, paste0("theta[",c(t(tnames)),"]"))
+    )
     tmp <- with(sim, cbind(mean, sd, alph, bet, tt ))
     if(S == 1)
       colnames(tmp)[1:4] <- c("mean","sd","alph","bet")
-    # mcmc(tmp, start = n.burnin+1, end=n.iter, thin = n.thin)
-    window(mcmc(tmp), start = floor(n.burnin/n.thin) + 1, thin = 1L)
+
+    # return
+    mcmc(tmp, start = n.burnin + 1L, thin = n.thin)
   }
 
   simSimpleMPT <- function(idx){
 
-    sim <- simplempt(M = ceiling(n.iter/n.thin),
+    sim <- simplempt(M = ceiling((n.iter-n.burnin)/n.thin),
+                     L = ceiling(n.burnin/n.thin),
                      nthin = n.thin,
                      H = as.matrix(data),
                      a = mpt.res$a, b = mpt.res$b,
                      c = mpt.res$c, map = mpt.res$map,
-                     alpha = alpha, beta = beta )
+                     alpha = alpha, beta = beta)
     means <- apply(sim$theta, c(1,3), mean)
     sds <- apply(sim$theta, c(1,3), sd)
     if(S == 1){
@@ -111,13 +118,17 @@ fitModelCpp <- function(type,
       colnames(sds) <- paste0("sd[",1:S,"]")
     }
 
-    tnames <- outer(1:S,paste0(",",1:N), paste0)
-    tt <- matrix(sim$theta, nrow = ceiling(n.iter/n.thin), ncol = S*N,
-                 dimnames=list(NULL, paste0("theta[",c(t(tnames)),"]")))
+    tnames <- outer(1:S, paste0(",", 1:N), paste0)
+    tt <- matrix(
+      sim$theta,
+      nrow = ceiling((n.iter - n.burnin)/n.thin),
+      ncol = S * N,
+      dimnames = list(NULL, paste0("theta[", c(t(tnames)),"]"))
+    )
     tmp <- with(sim, cbind(means, sds, tt ))
 
-    # mcmc(tmp, start = n.burnin+1, end=n.iter, thin = n.thin)
-    window(mcmc(tmp), start = floor(n.burnin/n.thin)+1, thin = 1L)
+    # return
+    mcmc(tmp, start = n.burnin + 1L, thin = n.thin)
   }
 
 
@@ -153,8 +164,9 @@ fitModelCpp <- function(type,
   mptInfo <- list(model=type,
                   thetaNames = data.frame(
                     Parameter = colnames(mpt.res$a),
-                    theta=1:ncol(mpt.res$a),
-                    stringsAsFactors = FALSE),
+                    theta = 1:ncol(mpt.res$a),
+                    stringsAsFactors = FALSE
+                  ),
                   thetaUnique = thetaUnique,
                   thetaFixed = NULL,
                   MPT=c(mpt.res, as.list(mergedTree)),

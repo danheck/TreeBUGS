@@ -64,7 +64,7 @@ readSubjectData<-function(data,Category){
     if(dim(data)[2]!=length(Category)){
       stop("Number of categories (",length(Category),") in EQN differs from number of columns in data/csv file (",dim(data)[2], ").")
     }else{
-      stop("The following category names are mismataching:\n",
+      stop("The following category names are mismatching:\n",
            "   EQN file: ",
            paste( paste0("'",Category[!sel],"'"), collapse = "; "),
            "\n   data column names: ",
@@ -72,7 +72,7 @@ readSubjectData<-function(data,Category){
     }
   }
 
-  data <- data[,Category] #order data columns according to Tree category label order
+  data <- data[, Category, drop = FALSE] #order data columns according to Tree category label order
 
   return(data)
 }

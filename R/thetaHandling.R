@@ -12,7 +12,7 @@ thetaHandling <-function(mergedTree, restrictions){
 
   SubPar <- data.frame(Parameter = Parameter,
                        theta = 1:length(Parameter),
-                       sub="", stringsAsFactors=F)
+                       sub="", stringsAsFactors=FALSE)
 
   ############ only if restrictions are included:
   if(!is.null(restrictions)){
