@@ -4,8 +4,12 @@
 \alias{getSamples}
 \title{Get Posterior Samples from Fitted MPT Model}
 \usage{
-getSamples(fittedModel, parameter = "mean", select = "all",
-  names = "par_label")
+getSamples(
+  fittedModel,
+  parameter = "mean",
+  select = "all",
+  names = "par_label"
+)
 }
 \arguments{
 \item{fittedModel}{a fitted latent-trait MPT model (see \code{\link{traitMPT}})

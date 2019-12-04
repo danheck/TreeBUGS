@@ -4,9 +4,21 @@
 \alias{simpleMPT}
 \title{C++ Sampler for Standard (Nonhierarchical) MPT Models}
 \usage{
-simpleMPT(eqnfile, data, restrictions, n.iter = 2000, n.burnin = 500,
-  n.thin = 3, n.chains = 3, ppp = 0, alpha = 1, beta = 1,
-  parEstFile, posteriorFile, cores = 1)
+simpleMPT(
+  eqnfile,
+  data,
+  restrictions,
+  n.iter = 2000,
+  n.burnin = 500,
+  n.thin = 3,
+  n.chains = 3,
+  ppp = 0,
+  alpha = 1,
+  beta = 1,
+  parEstFile,
+  posteriorFile,
+  cores = 1
+)
 }
 \arguments{
 \item{eqnfile}{The (relative or full) path to the file that specifies the MPT model

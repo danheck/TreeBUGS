@@ -4,8 +4,12 @@
 \alias{transformedParameters}
 \title{Get Transformed Parameters}
 \usage{
-transformedParameters(fittedModel, transformedParameters,
-  level = "group", nCPU = 4)
+transformedParameters(
+  fittedModel,
+  transformedParameters,
+  level = "group",
+  nCPU = 4
+)
 }
 \arguments{
 \item{fittedModel}{either a fitted latent-trait or beta MPT model

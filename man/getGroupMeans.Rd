@@ -4,8 +4,13 @@
 \alias{getGroupMeans}
 \title{Get Mean Parameters per Group}
 \usage{
-getGroupMeans(traitMPT, factor = "all", probit = FALSE, file = NULL,
-  mcmc = FALSE)
+getGroupMeans(
+  traitMPT,
+  factor = "all",
+  probit = FALSE,
+  file = NULL,
+  mcmc = FALSE
+)
 }
 \arguments{
 \item{traitMPT}{a fitted \code{\link{traitMPT}} model}

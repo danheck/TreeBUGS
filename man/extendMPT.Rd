@@ -4,8 +4,7 @@
 \alias{extendMPT}
 \title{Extend MCMC Sampling for MPT Model}
 \usage{
-extendMPT(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0,
-  ...)
+extendMPT(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0, ...)
 }
 \arguments{
 \item{fittedModel}{a fitted \code{\link{traitMPT}} or \code{\link{betaMPT}}}

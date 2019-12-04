@@ -4,8 +4,14 @@
 \alias{BayesFactorSlope}
 \title{Bayes Factor for Slope Parameters in Latent-Trait MPT}
 \usage{
-BayesFactorSlope(fittedModel, parameter, direction = "!=",
-  approx = "normal", plot = TRUE, ...)
+BayesFactorSlope(
+  fittedModel,
+  parameter,
+  direction = "!=",
+  approx = "normal",
+  plot = TRUE,
+  ...
+)
 }
 \arguments{
 \item{fittedModel}{a fitted latent-trait model fitted with \code{\link{traitMPT}}

@@ -4,9 +4,18 @@
 \alias{correlationPosterior}
 \title{Posterior Distribution for Correlations}
 \usage{
-correlationPosterior(fittedModel, r, N, kappa = 1, ci = 0.95,
-  M = 1000, precision = 0.005, maxiter = 10000, plot = TRUE,
-  nCPU = 4)
+correlationPosterior(
+  fittedModel,
+  r,
+  N,
+  kappa = 1,
+  ci = 0.95,
+  M = 1000,
+  precision = 0.005,
+  maxiter = 10000,
+  plot = TRUE,
+  nCPU = 4
+)
 }
 \arguments{
 \item{fittedModel}{a fitted \link{betaMPT} or \link{traitMPT} model with covariates

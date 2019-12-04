@@ -4,8 +4,13 @@
 \alias{posteriorPredictive}
 \title{Get Posterior Predictive Samples}
 \usage{
-posteriorPredictive(fittedModel, M = 100, numItems = NULL,
-  expected = FALSE, nCPU = 4)
+posteriorPredictive(
+  fittedModel,
+  M = 100,
+  numItems = NULL,
+  expected = FALSE,
+  nCPU = 4
+)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}

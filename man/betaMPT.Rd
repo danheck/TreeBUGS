@@ -4,12 +4,28 @@
 \alias{betaMPT}
 \title{Fit a Hierarchical Beta-MPT Model}
 \usage{
-betaMPT(eqnfile, data, restrictions, covData, transformedParameters,
-  corProbit = FALSE, alpha = "dgamma(1,.1)T(1,)",
-  beta = "dgamma(1,.1)T(1,)", n.iter = 20000, n.adapt = 2000,
-  n.burnin = 2000, n.thin = 5, n.chains = 3, dic = FALSE,
-  ppp = 0, modelfilename, parEstFile, posteriorFile, autojags = NULL,
-  ...)
+betaMPT(
+  eqnfile,
+  data,
+  restrictions,
+  covData,
+  transformedParameters,
+  corProbit = FALSE,
+  alpha = "dgamma(1,.1)T(1,)",
+  beta = "dgamma(1,.1)T(1,)",
+  n.iter = 20000,
+  n.adapt = 2000,
+  n.burnin = 2000,
+  n.thin = 5,
+  n.chains = 3,
+  dic = FALSE,
+  ppp = 0,
+  modelfilename,
+  parEstFile,
+  posteriorFile,
+  autojags = NULL,
+  ...
+)
 }
 \arguments{
 \item{eqnfile}{The (relative or full) path to the file that specifies the MPT model

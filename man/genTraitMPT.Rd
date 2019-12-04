@@ -4,8 +4,17 @@
 \alias{genTraitMPT}
 \title{Generate Data for Latent-Trait MPT Models}
 \usage{
-genTraitMPT(N, numItems, eqnfile, restrictions, mean, mu, sigma, rho,
-  warning = TRUE)
+genTraitMPT(
+  N,
+  numItems,
+  eqnfile,
+  restrictions,
+  mean,
+  mu,
+  sigma,
+  rho,
+  warning = TRUE
+)
 }
 \arguments{
 \item{N}{number of participants}

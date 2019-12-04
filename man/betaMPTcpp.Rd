@@ -4,10 +4,23 @@
 \alias{betaMPTcpp}
 \title{C++ Sampler for Hierarchical Beta-MPT Model}
 \usage{
-betaMPTcpp(eqnfile, data, restrictions, covData, corProbit = FALSE,
-  n.iter = 20000, n.burnin = 2000, n.thin = 5, n.chains = 3,
-  ppp = 0, shape = 1, rate = 0.1, parEstFile, posteriorFile,
-  cores = 1)
+betaMPTcpp(
+  eqnfile,
+  data,
+  restrictions,
+  covData,
+  corProbit = FALSE,
+  n.iter = 20000,
+  n.burnin = 2000,
+  n.thin = 5,
+  n.chains = 3,
+  ppp = 0,
+  shape = 1,
+  rate = 0.1,
+  parEstFile,
+  posteriorFile,
+  cores = 1
+)
 }
 \arguments{
 \item{eqnfile}{The (relative or full) path to the file that specifies the MPT model

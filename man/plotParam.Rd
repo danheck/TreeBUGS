@@ -4,8 +4,14 @@
 \alias{plotParam}
 \title{Plot Parameter Estimates}
 \usage{
-plotParam(x, includeIndividual = TRUE, addLines = FALSE,
-  estimate = "mean", select = "all", ...)
+plotParam(
+  x,
+  includeIndividual = TRUE,
+  addLines = FALSE,
+  estimate = "mean",
+  select = "all",
+  ...
+)
 }
 \arguments{
 \item{x}{a fitted Beta or latent-trait MPT model}

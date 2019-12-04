@@ -4,8 +4,17 @@
 \alias{genBetaMPT}
 \title{Generate Data for Beta MPT Models}
 \usage{
-genBetaMPT(N, numItems, eqnfile, restrictions, mean = NULL, sd = NULL,
-  alpha = NULL, beta = NULL, warning = TRUE)
+genBetaMPT(
+  N,
+  numItems,
+  eqnfile,
+  restrictions,
+  mean = NULL,
+  sd = NULL,
+  alpha = NULL,
+  beta = NULL,
+  warning = TRUE
+)
 }
 \arguments{
 \item{N}{number of participants}

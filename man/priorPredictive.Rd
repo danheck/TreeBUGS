@@ -4,8 +4,16 @@
 \alias{priorPredictive}
 \title{Prior Predictive Samples}
 \usage{
-priorPredictive(prior, eqnfile, restrictions, numItems, level = "data",
-  N = 1, M = 100, nCPU = 4)
+priorPredictive(
+  prior,
+  eqnfile,
+  restrictions,
+  numItems,
+  level = "data",
+  N = 1,
+  M = 100,
+  nCPU = 4
+)
 }
 \arguments{
 \item{prior}{a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}. Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and precision (= 1/variance).}

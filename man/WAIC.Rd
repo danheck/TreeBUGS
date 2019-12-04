@@ -4,8 +4,14 @@
 \alias{WAIC}
 \title{WAIC: Widely Applicable Information Criterion}
 \usage{
-WAIC(fittedModel, n.adapt = 1000, n.chains = 3, n.iter = 10000,
-  n.thin = 1, summarize = TRUE)
+WAIC(
+  fittedModel,
+  n.adapt = 1000,
+  n.chains = 3,
+  n.iter = 10000,
+  n.thin = 1,
+  summarize = TRUE
+)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
