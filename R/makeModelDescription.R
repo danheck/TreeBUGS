@@ -91,13 +91,13 @@ makeModelFile <-function(model, # either "betaMPT" or "traitMPT"
 ################### Beta-MPT specific hyperprior part
 makeBetaHyperprior <- function(S, alpha = "dunif(1,5000)", beta = "dunif(1,5000)"){
 
-  if(class(alpha) != "character" || !length(alpha) %in% c(1,S)){
+  if(!inherits(alpha, "character") || !length(alpha) %in% c(1,S)){
     stop("Hyperprior for 'alpha' must be a character vector of length 1
      if the same prior should be used for all MPT parameters (default)
      or a vector of the same length as the number of parameters (=", S, "; to
      check the order see ?readEQN).")
   }
-  if(class(beta) != "character" || !length(beta) %in% c(1,S)){
+  if(!inherits(beta, "character") || !length(beta) %in% c(1,S)){
     stop("Hyperprior for 'beta' must be a character vector of length 1
      if the same prior should be used for all MPT parameters (default)
      or a vector of the same length as the number of parameters (=", S, "; to
@@ -140,13 +140,13 @@ for(s in 1:S){
 makeTraitHyperprior <- function(S, predString, mu = "dnorm(0,1)",
                                 xi = "dunif(0,100)", wishart = TRUE){
 
-  if(class(mu) != "character" || !length(mu) %in% c(1,S)){
+  if(!inherits(mu, "character") || !length(mu) %in% c(1,S)){
     stop("Hyperprior for 'mu' must be a character vector of length 1
      if the same prior should be used for all MPT parameters (default)
      or a vector of the same length as the number of parameters (=", S, "; to
      check the order see ?readEQN).")
   }
-  if(class(xi) != "character" || !length(xi) %in% c(1,S)){
+  if(!inherits(xi, "character") || !length(xi) %in% c(1,S)){
     stop("Hyperprior for 'xi' must be a character vector of length 1
      if the same prior should be used for all MPT parameters (default)
      or a vector of the same length as the number of parameters (=", S, "; to

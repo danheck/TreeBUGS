@@ -1,3 +1,10 @@
+TreeBUGS 1.4.4 (December 2019)
+===========
+
+* Improvements and bugfixes for the C++ MCMC samplers by Marius Barth.
+* Bug fixes for issues concerning class(matrix(...)) in R 4.0.0
+
+
 TreeBUGS 1.4.3 (March 2019)
 ===========
 

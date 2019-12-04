@@ -80,7 +80,7 @@ posteriorPredictive <- function(fittedModel,
       par.tmp <- matrix(NA, max.samp, S,
                         dimnames=list(NULL, paste0("theta[",1:S, ",1]")))
       # sample hierarchical values, then individuals
-      if(class(fittedModel) == "betaMPT"){
+      if(inherits(fittedModel, "betaMPT")){
         if(S==1){
           alpha <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, "alph",drop=FALSE])
           beta <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, "bet",drop=FALSE])
@@ -93,7 +93,7 @@ posteriorPredictive <- function(fittedModel,
         for(i in 1:S){
           par.tmp[,i] <- rbeta(max.samp, alpha[,i], beta[,i])
         }
-      }else if(class(fittedModel) == "traitMPT"){
+      }else if(inherits(fittedModel, "traitMPT")){
        if(S==1){
          mu <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, "mu",drop=FALSE])
          sig <-  as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, "sigma",drop=FALSE])

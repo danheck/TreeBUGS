@@ -30,7 +30,7 @@ plotDistribution <- function(fittedModel, scale="probability", ...){
 
   for(idx in 1:S ){
     indEsts <- fittedModel$summary$individParameters[idx,,1]
-    if(class(fittedModel) == "traitMPT"){
+    if (inherits(fittedModel, "traitMPT")){
       sigma <- fittedModel$summary$groupParameters$sigma[,"Mean"]
       # sigma <- fittedModel$mcmc$BUGSoutput$mean$sigma
 
@@ -50,7 +50,7 @@ plotDistribution <- function(fittedModel, scale="probability", ...){
         lines(xx.p, p.diff/diff(c(xx.p,1)), col=2)
       }
 
-    }else if(class(fittedModel) == "betaMPT"){
+    } else if (inherits(fittedModel, "betaMPT")){
       alpha <- fittedModel$summary$groupParameters$alpha[,1]
       beta <- fittedModel$summary$groupParameters$beta[,1]
 

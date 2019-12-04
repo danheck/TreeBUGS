@@ -20,7 +20,7 @@ covDataRead <- function(covData, N, binaryToNumeric=FALSE){
 
     if(binaryToNumeric){
       for(k in 1:ncol(covData)){
-        if(class(covData[,k]) %in% c("factor","ordered","character")){
+        if(inherits(covData[,k], c("factor","ordered","character"))){
           if(length(unique(covData[,k])) == 2){
             covData[,k] <- as.numeric(as.factor(covData[,k]))
           }

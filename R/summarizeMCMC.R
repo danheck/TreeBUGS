@@ -11,9 +11,9 @@
 #' @importFrom coda varnames
 summarizeMCMC <- function(mcmc, batchSize = 50, probs = c(.025, .50, .975)){
 
-  if (class(mcmc) %in% c("traitMPT", "betaMPT", "simpleMPT"))
+  if (inherits(mcmc, c("traitMPT", "betaMPT", "simpleMPT")))
     mcmc <- mcmc$runjags$mcmc
-  if (class(mcmc) == "runjags")
+  if (inherits(mcmc, "runjags"))
     mcmc <- mcmc$mcmc
 
   # initialize matrix with summary statistics

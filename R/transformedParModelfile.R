@@ -45,7 +45,7 @@ getTransformed <- function (thetaNames, transformedParameters=NULL,
     test <- try(eval(parse(text = replacedString),
                      list("XXXXXXXXXXXXXX"=runif(nrow(thetaNames)))), silent=TRUE
     )
-    if(class(test) == "try-error"){
+    if(inherits(test, "try-error")){
       error <- paste0("Check transformedParameter: ", pars[i],
                       ".\n  Function may contain an invalid equation or unknown model parameters.",
                       "\n  Currently, it is defined as: \n  ",

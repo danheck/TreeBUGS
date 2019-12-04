@@ -54,7 +54,7 @@ probitInverse <- function(mu, sigma, fittedModel=NULL){
     }
     return(res)
   }else{
-    if(!class(fittedModel) == "traitMPT")
+    if(!inherits(fittedModel, "traitMPT"))
       stop("'fittedModel' must be a latent-trait MPT model.")
 
     samp <- fittedModel$runjags$mcmc[,c()]

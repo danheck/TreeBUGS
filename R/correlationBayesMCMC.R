@@ -65,7 +65,7 @@ correlationPosterior <- function(fittedModel, r, N, kappa = 1, ci = .95,
     if (length(sel.idx) == 0){
       stop("No correlations were sampled in fitted MPT model!")
     }
-    # if(class(fittedModel) == "betaMPT")
+    # if(inherits(fittedModel, "betaMPT")
     #   sel.idx <- c(sel.idx, grep("rho", varnames(fittedModel$runjags$mcmc)))
     r <- do.call("rbind",
                  fittedModel$runjags$mcmc[sample(M.fit, min(M.fit, ceiling(M/chains))),

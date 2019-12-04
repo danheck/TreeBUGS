@@ -25,15 +25,15 @@
 plotFreq <- function(x, freq=TRUE, select="all", boxplot=TRUE, eqnfile,...){
 
 
-  if(class(x) %in% c("betaMPT", "traitMPT")){
+  if(inherits(x, c("betaMPT", "traitMPT"))){
     dat <- x$mptInfo$data
-  }else if(class(x) == "character"){
+  }else if(inherits(x, "character")){
     dat <- read.csv(x)
   }else{
     try(dat <- as.data.frame(x))
   }
 
-  if(class(x) %in% c("betaMPT", "traitMPT")){
+  if(inherits(x, c("betaMPT", "traitMPT"))){
     treeNames <- x$mptInfo$MPT$Tree
     treeLabels <- unique(treeNames)
   }else if(!missing(eqnfile)){

@@ -62,7 +62,7 @@
 WAIC <- function(fittedModel, n.adapt = 1000, n.chains = 3, n.iter = 10000, n.thin = 1,
                  summarize = TRUE){
 
-  stopifnot(class(fittedModel) %in% c("traitMPT", "betaMPT"))
+  stopifnot(inherits(fittedModel, c("traitMPT", "betaMPT")))
   load.module("dic")
 
   # use last MCMC samples as initial values

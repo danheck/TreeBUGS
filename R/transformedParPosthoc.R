@@ -27,9 +27,10 @@
 transformedParameters <- function (fittedModel, transformedParameters,
                                    level = "group", nCPU = 4){
 
-  if (class(fittedModel) %in% c("mcmc", "mcmc.list")){
+  if (inherits(fittedModel, c("mcmc", "mcmc.list"))){
     mcmc <- fittedModel
-    if (class(fittedModel) == "mcmc") mcmc <- mcmc.list(mcmc)
+    if (inherits(fittedModel, "mcmc"))
+      mcmc <- mcmc.list(mcmc)
     S <- N <- P <- parsed <- level <- NA  # only for cpu > 1
 
     # mm <- fittedModel[[1]]
