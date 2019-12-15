@@ -48,10 +48,11 @@ plotFit <- function(fittedModel, M=1000, stat = "mean", ...){
     boxplot(pred[,free_cats], xaxt="n", col="gray",
             main="Observed (red) and predicted (boxplot) mean frequencies", las=1, ...)
     axis(1, 1:length(free_cats), labels = free_cats)
-    xx <- by(1:length(tree), tree, mean)
+    xx <- by(seq_along(free_cats), names(free_cats), mean)
     axis(1, xx,  TreeNames, tick=F, line=NA, mgp=c(3, 2.5, 0))
-    points(1:length(free_cats), colMeans(dat)[free_cats], col="red", cex=1.4, pch=17)
-    abline(v=cumsum(table(tree) - 1)[1:(length(TreeNames)-1)]+.5, col="gray")
+    points(1:length(free_cats), colMeans(dat)[free_cats],
+           col="red", cex=1.4, pch=17)
+    abline(v = cumsum(table(tree) - 1)[1:(length(TreeNames)-1)]+.5, col="gray")
 
   } else if (stat == "cov"){
     # Plot covariance of frequencies:
