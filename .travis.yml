@@ -32,8 +32,6 @@ matrix:
         - Rcpp
         - RcppArmadillo
         - runjags
-        - parallel
-        - MASS
         - hypergeo
         - logspline
         - testthat
@@ -47,22 +45,17 @@ matrix:
       r_binary_packages:
         - devtools
         - Rcpp
-        - RcppEigen
-        - mvtnorm
-        - rstan
-        - StanHeaders
-        - LaplacesDemon
+        - RcppArmadillo
+        - runjags
+        - hypergeo
         - logspline
         - testthat
+        - R.rsp
       r_packages:
         - rjags
         - remotes
         - knitr
         - rmarkdown
-        - coda
-        - rstantools
-        - bridgesampling
-        - BH
 
 notifications:
   email:
