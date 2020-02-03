@@ -1,0 +1,75 @@
+language: r
+latex: true
+
+warnings_are_errors: TRUE
+r_check_args: '--ignore-vignettes'
+r_build_args: '--no-build-vignettes'
+
+
+before_install:
+  - sudo add-apt-repository ppa:marutter/rrutter -y
+  - sudo apt-get update
+  - sudo apt-get install r-cran-rjags
+
+env:
+  - WARNINGS_ARE_ERRORS=1
+    _R_CHECK_FORCE_SUGGESTS_=true
+    _R_CHECK_CRAN_INCOMING_=true
+
+cache:
+  - packages
+  - ccache
+
+repos:
+  CRAN: https://cloud.r-project.org
+  ropensci: http://packages.ropensci.org
+
+matrix:
+  include:
+    - r: release
+      r_binary_packages:
+        - devtools
+        - Rcpp
+        - RcppArmadillo
+        - runjags
+        - parallel
+        - MASS
+        - hypergeo
+        - logspline
+        - testthat
+        - R.rsp
+      r_packages:
+        - rjags
+        - remotes
+        - knitr
+        - rmarkdown
+    - r: devel
+      r_binary_packages:
+        - devtools
+        - Rcpp
+        - RcppEigen
+        - mvtnorm
+        - rstan
+        - StanHeaders
+        - LaplacesDemon
+        - logspline
+        - testthat
+      r_packages:
+        - rjags
+        - remotes
+        - knitr
+        - rmarkdown
+        - coda
+        - rstantools
+        - bridgesampling
+        - BH
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+
+# r_github_packages:
+#   - jimhester/covr
+# after_success:
+#   - Rscript -e 'library(covr);coveralls()'
