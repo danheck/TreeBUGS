@@ -4,7 +4,6 @@
 #' Plots histograms of the posterior-means of individual MPT parameters against the group-level distribution given by the posterior-mean of the hierarchical parameters (e.g., the beta distribution in case of the beta-MPT)
 #'
 #' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})
-#' @inheritParams plotFit
 #' @param scale only for latent-trait MPT: should estimates be plotted on the \code{"latent"}
 #'     or the \code{"probability"} scale (i.e., as MPT parameters).
 #'     Can be abbreviated by \code{"l"}  and \code{"p"}.

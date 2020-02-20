@@ -4,6 +4,8 @@
 .Rproj.user
 .RDataTmp
 
+Rplot.png
+
 
 #Rcpp files
 src/*.o

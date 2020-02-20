@@ -7,7 +7,6 @@
 #' @param fittedModel either a fitted latent-trait or beta MPT model
 #'     (\code{\link{traitMPT}}, \code{\link{betaMPT}}) or an \code{\link[coda]{mcmc.list}}.
 
-#' @inheritParams posteriorPredictive
 #' @param transformedParameters list with parameter transformations that should
 #'     be computed based on the posterior samples (e.g., for testing parameter
 #'     differences: \code{list("diffD=Do-Dn")}).
