@@ -69,7 +69,10 @@ specifies the assigment of MPT parameters to covariates (that is, each row
 assigns one or more MPT parameters to one or more covariates, separated
 by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided
 as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}).
-Note that no correlations of MPT parameters and predictors are computed.}
+Note that no correlations of MPT parameters and predictors are computed.
+However, for continuous covariates, the standardized slope parameters
+\code{slope_std_parameter_predictor} can be interpreted as a correlation
+if a single predictor is included for the corresponding MPT parameter.}
 
 \item{predType}{a character vector specifying the type of continuous or
 discrete predictors in each column of \code{covData}:

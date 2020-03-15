@@ -4,7 +4,8 @@
 \name{arnold2013}
 \alias{arnold2013}
 \title{Data of a Source-Monitoring Experiment}
-\format{A data frame 13 variables:
+\format{
+A data frame 13 variables:
 \describe{
   \item{\code{subject}}{Participant code}
   \item{\code{age}}{Age in years}
@@ -19,7 +20,8 @@
   \item{\code{NE}}{Frequency of "Source E" responses to new items}
   \item{\code{NU}}{Frequency of "Source U" responses to new items}
   \item{\code{NN}}{Frequency of "New" responses to new items}
-}}
+}
+}
 \usage{
 arnold2013
 }

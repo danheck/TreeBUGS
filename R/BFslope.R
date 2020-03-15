@@ -90,9 +90,9 @@ BayesFactorSlope <- function (fittedModel, parameter,
          "      (1) with a maximum of one predictor per MPT parameter OR\n",
          "      (2) with standard-normal priors (g-prior) on the regression slopes: traitMPT(..., IVprec = 1)\n")
 
-  # slope parameters are not standardized wrt covariate! => standardization
+  # slope parameters are not standardized wrt covariate!
   s <- apply(fittedModel$mptInfo$covData, 2, sd)[cov]
-  samples <- unlist(fittedModel$runjags$mcmc[,parameter]) * s
+  samples <- unlist(fittedModel$runjags$mcmc[,parameter]) # * s  # => no standardization!
 
   # approximation of posterior density
   lbnd <- switch(direction, "<" = -Inf, ">" = 0, "!=" = -Inf, NA)
@@ -101,9 +101,9 @@ BayesFactorSlope <- function (fittedModel, parameter,
   sel <- samples > lbnd & samples < ubnd
 
   xlim <- switch(direction,
-                 "<" = c(min(samples[sel], -.05), 0),
-                 ">" = c( 0, max(samples[sel], .05)),
-                 "!="= c(min(samples[sel], -.05), max(samples[sel], .05)))
+                 "<" = c(min(samples[sel], -.05/s), 0),
+                 ">" = c( 0, max(samples[sel], .05/s)),
+                 "!="= c(min(samples[sel], -.05/s), max(samples[sel], .05/s)))
 
   if (sum(sel) == 0){
     warning("No posterior samples are in line with the predicted direction of the effect!",
@@ -136,7 +136,7 @@ BayesFactorSlope <- function (fittedModel, parameter,
   if (IVfamily == "dgamma"){
     if (IVpars[[1]] != .5)
       stop("First parameter in 'IVprec' must be equal to .5, that is: 'IVprec=dgamma(.5,.5*s^2)'.")
-    scale <- sqrt(IVpars[[2]]*2)
+    scale <- sqrt(IVpars[[2]]*2) / s
     prior0 <- dcauchy(0, 0, scale) * ifelse(direction == "!=", 1, 2)  # one-sided
 
     # illustration of Savage-Dickey method:
@@ -152,15 +152,16 @@ BayesFactorSlope <- function (fittedModel, parameter,
     }
 
   } else if (IVfamily == "constant") {
-    prior0 <- dnorm(0, 0, 1/sqrt(IVprec)) * ifelse(direction == "!=", 1, 2)  # one-sided
+    scale <- 1/sqrt(IVprec) / s
+    prior0 <- dnorm(0, 0, scale) * ifelse(direction == "!=", 1, 2)  # one-sided
 
     dprior <- function(x){
       if (direction == ">"){
-        dx <- dnorm(x, 0, 1/sqrt(IVprec))*ifelse(x > 0, 2, 0)
+        dx <- dnorm(x, 0, scale)*ifelse(x > 0, 2, 0)
       } else if (direction == "<"){
-        dx <- dnorm(x, 0, 1/sqrt(IVprec))*ifelse(x < 0, 2, 0)
+        dx <- dnorm(x, 0, scale)*ifelse(x < 0, 2, 0)
       } else if (direction == "!="){
-        dx <- dnorm(x, 0, 1/sqrt(IVprec))
+        dx <- dnorm(x, 0, scale)
       }
       dx
     }
@@ -179,7 +180,7 @@ BayesFactorSlope <- function (fittedModel, parameter,
          freq = FALSE, xlim = xlim,
          main = paste0("Bayes factor B_10=", round(bf[1,2], 3),
                        " (prior red; posterior blue)"),
-         xlab = paste0("Standardized slope parameter: ", theta, " ~ ", cov))
+         xlab = paste0("Unstandardized slope parameter: ", theta, " ~ ", cov))
     if(is.function(posterior))
       curve(posterior, add = TRUE, col = 4, lwd = 2, n = 1000)
     else

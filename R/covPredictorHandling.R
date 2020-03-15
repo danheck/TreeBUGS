@@ -61,10 +61,46 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dgamm
     }
     modelString <- paste0(modelString, "\n}\n")
 
+    # parameter labels in JAGS:
+    covPars <- covTable$covPar
+
+
+
+    ############################### standardization of regression slopes (--> to get correlations)
+
+    if(!is.null(covTable)){
+      modelString <- paste0(modelString,
+                            "\n### standardization of regression slopes",
+                            "(only for continuous predictors)\n\n")
+      slope_std <- gsub("slope_", "slope_std_", covTable$covPar, fixed = TRUE)
+      covPars <- c(covPars, slope_std)
+      for(pp in 1:nrow(covTable)){
+
+        s <- covTable$theta[pp]
+        k <- covTable$covIdx[pp]
+
+        # for partially standardized slopes (z-standardized predictors):
+        # slope_std[pp] <- slope[pp] / sqrt(slope[pp]^2 + sigma[s]^2)
+
+        # for unstandardized predictors:
+        # slope_std[pp] <- slope[pp] * sqrt(covVar[k]) / sqrt(slope[pp]^2 + covVar[k] + sigma[s]^2)
+
+        modelString <- paste0(modelString,
+                              slope_std[pp], " <- ",
+                              covTable$covPar[pp], " * sqrt(covVar[", k, "]) / ",
+                              "sqrt(",
+                              "pow(", covTable$covPar[pp], ",2)",
+                              "* covVar[", k, "]",
+                              " + Sigma[", s, ",", s, "]",
+                              ") \n"
+        )
+      }
+      modelString <- paste0(modelString, "\n")
+    }
+
 
     ############################### HYPERPRIORS     ###############################
 
-    covPars <- covTable$covPar
     X_list <- list()  # list with design matrices for fixed effects)
 
     # inverse-g prior for Zellner-Siow priors (contin. predictors)
