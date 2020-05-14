@@ -5,6 +5,9 @@ warnings_are_errors: TRUE
 r_check_args: '--ignore-vignettes'
 r_build_args: '--no-build-vignettes'
 
+before_install:
+  - sudo apt-get install jags
+
 env:
   - WARNINGS_ARE_ERRORS=1
     _R_CHECK_FORCE_SUGGESTS_=true
