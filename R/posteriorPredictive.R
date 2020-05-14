@@ -49,8 +49,14 @@ posteriorPredictive <- function(fittedModel,
   if(missing(numItems) || is.null(numItems)){
     pred.new <- FALSE
     N <- nrow(mptInfo$data)
-    numItems <-   t(apply(mptInfo$data[,mptInfo$MPT$Category], 1,
-                          function(x)  tapply(x, mptInfo$MPT$Tree, sum)))
+    treeLabels <- unique(mptInfo$MPT$Tree)
+    numItems <- matrix(NA, nrow(mptInfo$data), length(treeLabels))
+    colnames(numItems) <- treeLabels
+    for(tl in treeLabels){
+      numItems[,tl] <-  rowSums(mptInfo$data[,mptInfo$MPT$Tree == tl,drop=FALSE])
+    }
+    # numItems <-   t(apply(mptInfo$data[,mptInfo$MPT$Category,drop=FALSE], 1,
+    #                       function(x)  tapply(x, mptInfo$MPT$Tree, sum)))
 
     ########### sample data for NEW participant!
   }else{
