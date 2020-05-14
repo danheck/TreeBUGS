@@ -63,7 +63,8 @@
 #' @param n.chains number of MCMC chains (sampled in parallel).
 #' @param dic whether to compute DIC using \code{\link[runjags]{extract.runjags}},
 #'     which requires additional sampling. Can also be computed and added after
-#'     fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}
+#'     fitting the model by \code{fittedModel$summary$dic <- runjags::extract(fittedModel$runjags, "dic")}.
+#'     As an alternative information criterion, \code{\link{WAIC}} can be computed for fitted models.
 #' @param ppp number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})
 #'
 #' @param modelfilename Name that the modelfile that is made by the function to work with JAGS should get.

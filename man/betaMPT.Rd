@@ -99,7 +99,8 @@ sampling will still give correct results even if the warning appears:
 
 \item{dic}{whether to compute DIC using \code{\link[runjags]{extract.runjags}},
 which requires additional sampling. Can also be computed and added after
-fitting the model by \code{fittedModel$dic <- extract(fittedModel$runjags, "dic")}}
+fitting the model by \code{fittedModel$summary$dic <- runjags::extract(fittedModel$runjags, "dic")}.
+As an alternative information criterion, \code{\link{WAIC}} can be computed for fitted models.}
 
 \item{ppp}{number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})}
 
