@@ -111,10 +111,6 @@
 #' (comment on article by Browne and Draper).
 #' \emph{Bayesian Analysis, 1}, 515-534.
 #'
-#' Heck, D. W., Arnold, N. R., & Arnold, D. (2018).
-#' TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
-#' \emph{Behavior Research Methods, 50}, 264–284.
-#'
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach.
 #' \emph{Psychometrika, 75}, 70-98.
 #'
