@@ -5,6 +5,10 @@ warnings_are_errors: TRUE
 r_check_args: '--ignore-vignettes'
 r_build_args: '--no-build-vignettes'
 
+before_install:
+  - sudo add-apt-repository ppa:marutter/rrutter4.0 -y
+  - sudo apt-get update
+  - sudo apt-get install r-cran-rjags
 
 env:
   - WARNINGS_ARE_ERRORS=1
@@ -22,7 +26,7 @@ repos:
 matrix:
   include:
     - r: release
-      r_packages:
+      r_binary_packages:
         - devtools
         - Rcpp
         - RcppArmadillo
@@ -31,12 +35,13 @@ matrix:
         - logspline
         - testthat
         - R.rsp
+      r_packages:
         - rjags
         - remotes
         - knitr
         - rmarkdown
     - r: devel
-      r_packages:
+      r_binary_packages:
         - devtools
         - Rcpp
         - RcppArmadillo
@@ -45,6 +50,7 @@ matrix:
         - logspline
         - testthat
         - R.rsp
+      r_packages:
         - rjags
         - remotes
         - knitr
