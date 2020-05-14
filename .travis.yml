@@ -11,6 +11,9 @@ env:
     _R_CHECK_FORCE_SUGGESTS_=true
     _R_CHECK_CRAN_INCOMING_=true
 
+cache:
+  - packages
+  - ccache
 
 repos:
   CRAN: https://cloud.r-project.org
@@ -19,7 +22,7 @@ repos:
 matrix:
   include:
     - r: release
-      r_binary_packages:
+      r_packages:
         - devtools
         - Rcpp
         - RcppArmadillo
@@ -28,13 +31,12 @@ matrix:
         - logspline
         - testthat
         - R.rsp
-      r_packages:
         - rjags
         - remotes
         - knitr
         - rmarkdown
     - r: devel
-      r_binary_packages:
+      r_packages:
         - devtools
         - Rcpp
         - RcppArmadillo
@@ -43,7 +45,6 @@ matrix:
         - logspline
         - testthat
         - R.rsp
-      r_packages:
         - rjags
         - remotes
         - knitr
