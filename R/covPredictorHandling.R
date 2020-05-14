@@ -72,12 +72,13 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dgamm
       modelString <- paste0(modelString,
                             "\n### standardization of regression slopes",
                             "(only for continuous predictors)\n\n")
-      slope_std <- gsub("slope_", "slope_std_", covTable$covPar, fixed = TRUE)
+      select_cont <- which(covTable$predType == "c")
+      slope_std <- gsub("slope_", "slope_std_", covTable$covPar[select_cont], fixed = TRUE)
       covPars <- c(covPars, slope_std)
-      for(pp in 1:nrow(covTable)){
+      for(pp in seq_along(slope_std)){
 
-        s <- covTable$theta[pp]
-        k <- covTable$covIdx[pp]
+        s <- covTable$theta[select_cont[pp]]
+        k <- covTable$covIdx[select_cont[pp]]
 
         # for partially standardized slopes (z-standardized predictors):
         # slope_std[pp] <- slope[pp] / sqrt(slope[pp]^2 + sigma[s]^2)
@@ -87,9 +88,9 @@ covStringPredictor <- function(covTable, S, predFactorLevels=NULL, IVprec="dgamm
 
         modelString <- paste0(modelString,
                               slope_std[pp], " <- ",
-                              covTable$covPar[pp], " * sqrt(covVar[", k, "]) / ",
+                              covTable$covPar[select_cont[pp]], " * sqrt(covVar[", k, "]) / ",
                               "sqrt(",
-                              "pow(", covTable$covPar[pp], ",2)",
+                              "pow(", covTable$covPar[select_cont[pp]], ",2)",
                               "* covVar[", k, "]",
                               " + Sigma[", s, ",", s, "]",
                               ") \n"
