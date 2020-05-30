@@ -1,8 +1,9 @@
-TreeBUGS 1.4.5 (March 2020)
+TreeBUGS 1.4.5 (May 2020)
 ===========
 
 * added standardized regression slopes for latent-trait MPT regression with continuous predictors (i.e., traitMPT with the option predStructure)
 * BayesFactorSlope() plots the posterior distribution of the unstandardized (instead of partially standardized) slope parameter
+* bugfix: posterior predictive check (PPP) for MPT models with a single tree
 
 
 TreeBUGS 1.4.4 (December 2019)
