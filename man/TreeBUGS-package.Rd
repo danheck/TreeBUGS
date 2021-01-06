@@ -53,7 +53,7 @@ Beta-MPT: Multinomial processing tree models for addressing individual differenc
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/denis-arnold/TreeBUGS}
+  \item \url{https://github.com/danheck/TreeBUGS}
 }
 
 }
