@@ -25,7 +25,7 @@ Note that the last category in each MPT tree is dropped, because one category pe
 }
 \examples{
 \dontrun{
-# add posterior predictive samples to fitted model:
+# add posterior predictive samples to fitted model (optional step)
 fittedModel$postpred$freq.pred <-
      posteriorPredictive(fittedModel, M=1000)
 

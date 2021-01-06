@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' # add posterior predictive samples to fitted model:
+#' # add posterior predictive samples to fitted model (optional step)
 #' fittedModel$postpred$freq.pred <-
 #'      posteriorPredictive(fittedModel, M=1000)
 #'
@@ -47,9 +47,10 @@ plotFit <- function(fittedModel, M=1000, stat = "mean", ...){
     pred <- t(sapply(freq.list, colMeans))
     boxplot(pred[,free_cats], xaxt="n", col="gray",
             main="Observed (red) and predicted (boxplot) mean frequencies", las=1, ...)
-    axis(1, 1:length(free_cats), labels = free_cats)
-    xx <- by(seq_along(free_cats), names(free_cats), mean)
-    axis(1, xx,  TreeNames, tick=F, line=NA, mgp=c(3, 2.5, 0))
+    axis(1, seq_along(free_cats), labels = free_cats)
+
+    xx <- by(seq_along(free_cats), tree[cats %in% free_cats], mean)
+    axis(1, xx, TreeNames, tick=F, line=NA, mgp=c(3, 2.5, 0))
     points(1:length(free_cats), colMeans(dat)[free_cats],
            col="red", cex=1.4, pch=17)
     abline(v = cumsum(table(tree) - 1)[1:(length(TreeNames)-1)]+.5, col="gray")
