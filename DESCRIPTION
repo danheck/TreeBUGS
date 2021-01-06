@@ -27,6 +27,7 @@ Imports:
     logspline
 Suggests:
     knitr,
+    rmarkdown,
     testthat,
 	R.rsp
 LinkingTo:
