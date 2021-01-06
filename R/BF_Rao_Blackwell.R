@@ -51,7 +51,8 @@ BayesFactorMPT <- function(models, dataset = 1, resample, batches = 5,
     ab <- approximatePosterior(models[[m]], dataset = dataset, sample = 500)
     betapars[[m]] <- pmax(scale * ab, .1)
 
-    shape.prior[[m]] <- do.call("cbind", models[[m]]$mpt$hyperprior)
+    prior_pars <- do.call("cbind", models[[m]]$mpt$hyperprior)
+    shape.prior[[m]] <- prior_pars[rownames(betapars[[m]] ),,drop=FALSE]
   }
 
   # 3. Loop 1 (rows of P): Model k
