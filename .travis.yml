@@ -5,17 +5,17 @@ warnings_are_errors: TRUE
 r_check_args: '--ignore-vignettes'
 r_build_args: '--no-build-vignettes'
 
+cache:
+  - packages
+  - ccache
+
 before_install:
-  - sudo apt-get install jags
+  - sudo apt-get install jags libgit2-dev
 
 env:
   - WARNINGS_ARE_ERRORS=1
     _R_CHECK_FORCE_SUGGESTS_=true
     _R_CHECK_CRAN_INCOMING_=true
-
-cache:
-  - packages
-  - ccache
 
 repos:
   CRAN: https://cloud.r-project.org
