@@ -2,6 +2,7 @@ TreeBUGS 1.4.6 (January 2021)
 ===========
 
 * Minor bugfix for naming of categories in plotFit() function
+* Minor bugfix for BayesFactorMPT()
 
 
 TreeBUGS 1.4.5 (May 2020)
