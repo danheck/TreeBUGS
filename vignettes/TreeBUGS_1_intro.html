@@ -1,45 +1,68 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Daniel W. Heck, Nina R. Arnold, &amp; Denis Arnold" />
 
-<meta name="date" content="2019-01-30" />
+<meta name="date" content="2021-01-07" />
 
 <title>TreeBUGS: Introduction to Hierarchical MPT Modeling</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -48,9 +71,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -96,7 +119,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -104,6 +127,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -117,9 +141,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,8 +309,12 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
+
+
+
 
 </head>
 
@@ -299,8 +324,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 <h1 class="title toc-ignore">TreeBUGS: Introduction to Hierarchical MPT Modeling</h1>
-<h4 class="author"><em>Daniel W. Heck, Nina R. Arnold, &amp; Denis Arnold</em></h4>
-<h4 class="date"><em>2019-01-30</em></h4>
+<h4 class="author">Daniel W. Heck, Nina R. Arnold, &amp; Denis Arnold</h4>
+<h4 class="date">2021-01-07</h4>
 
 
 
@@ -327,11 +352,11 @@ Lure      FA     (1-Dn)*g
 Lure      CR     (1-Dn)*(1-g)
 Lure      CR     Dn</code></pre>
 <p>Note that category labels (e.g., hit, miss,…) must start with a letter (different to multiTree or HMMTree) and match the column names of . The model equations require the multiplication sign <code>*</code> and parameters should not be summarized, e.g., by <code>a^2*(1-a)</code>. As an input for TreeBUGS, the model file (e.g., <code>&quot;2htm.txt&quot;</code>) needs to be saved in the current working directory. Otherwise, the relative or absolute path to the file must be specified (e.g., <code>models/2htm.txt</code>). To check how TreeBUGS interprets a given .eqn-file, use:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">readEQN</span>(<span class="dt">file =</span> <span class="st">&quot;pathToFile.eqn&quot;</span>,       <span class="co"># relative or absolute path </span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">        <span class="dt">restrictions =</span> <span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>),  <span class="co"># equality constraints</span></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">        <span class="dt">paramOrder =</span> <span class="ot">TRUE</span>)             <span class="co"># show parameter order</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">readEQN</span>(<span class="dt">file =</span> <span class="st">&quot;pathToFile.eqn&quot;</span>,       <span class="co"># relative or absolute path </span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>        <span class="dt">restrictions =</span> <span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>),  <span class="co"># equality constraints</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>        <span class="dt">paramOrder =</span> <span class="ot">TRUE</span>)             <span class="co"># show parameter order</span></span></code></pre></div>
 <p>Equality restrictions on the MPT parameters can either be provided in a list:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">restrictions =<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>, <span class="st">&quot;g=0.5&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>restrictions =<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>, <span class="st">&quot;g=0.5&quot;</span>)</span></code></pre></div>
 <p>or by a path to a text file on the hard drive (e.g., <code>restrictions=&quot;pathToFile.txt&quot;</code>) that contains the equality constraints, one per row:</p>
 <pre><code>Dn=Do
 g=0.5</code></pre>
@@ -351,37 +376,37 @@ g=0.5</code></pre>
 <div id="step-fit-hierarchical-mpt-model" class="section level3">
 <h3>3. Step: Fit Hierarchical MPT Model</h3>
 <p>An hierarchical <strong>Beta-MPT model</strong> is fitted with the following code:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># load the package:</span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw">library</span>(TreeBUGS)</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co"># fit the model:</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">fitHierarchicalMPT &lt;-<span class="st"> </span><span class="kw">betaMPT</span>(</a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">      <span class="dt">eqnfile=</span><span class="st">&quot;2htm.txt&quot;</span>,         <span class="co"># .eqn file</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7">      <span class="dt">data=</span><span class="st">&quot;data_ind.csv&quot;</span>,        <span class="co"># individual data</span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8">      <span class="dt">restrictions=</span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>), <span class="co"># parameter restrictions (or path to file)</span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9">      </a>
-<a class="sourceLine" id="cb6-10" data-line-number="10">      <span class="co">### optional MCMC input:            </span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11">      <span class="dt">n.iter =</span> <span class="dv">20000</span>,             <span class="co"># number of iterations</span></a>
-<a class="sourceLine" id="cb6-12" data-line-number="12">      <span class="dt">n.burnin =</span> <span class="dv">5000</span>,            <span class="co"># number of burnin samples that are removed</span></a>
-<a class="sourceLine" id="cb6-13" data-line-number="13">      <span class="dt">n.thin =</span> <span class="dv">5</span>,                 <span class="co"># thinning rate of removing samples</span></a>
-<a class="sourceLine" id="cb6-14" data-line-number="14">      <span class="dt">n.chains =</span> <span class="dv">3</span>                <span class="co"># number of MCMC chains (run in parallel)</span></a>
-<a class="sourceLine" id="cb6-15" data-line-number="15">)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># load the package:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="kw">library</span>(TreeBUGS)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co"># fit the model:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>fitHierarchicalMPT &lt;-<span class="st"> </span><span class="kw">betaMPT</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>      <span class="dt">eqnfile=</span><span class="st">&quot;2htm.txt&quot;</span>,         <span class="co"># .eqn file</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>      <span class="dt">data=</span><span class="st">&quot;data_ind.csv&quot;</span>,        <span class="co"># individual data</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>      <span class="dt">restrictions=</span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>), <span class="co"># parameter restrictions (or path to file)</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>      </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>      <span class="co">### optional MCMC input:            </span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>      <span class="dt">n.iter =</span> <span class="dv">20000</span>,             <span class="co"># number of iterations</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>      <span class="dt">n.burnin =</span> <span class="dv">5000</span>,            <span class="co"># number of burnin samples that are removed</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>      <span class="dt">n.thin =</span> <span class="dv">5</span>,                 <span class="co"># thinning rate of removing samples</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>      <span class="dt">n.chains =</span> <span class="dv">3</span>                <span class="co"># number of MCMC chains (run in parallel)</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>)</span></code></pre></div>
 <p>A latent-trait model is fitted similarly by replacing <code>betaMPT</code> by <code>traitMPT</code>.</p>
 </div>
 <div id="step-check-convergence-of-mcmc-chains" class="section level3">
 <h3>4. Step: Check convergence of MCMC chains</h3>
 <p>The functions <code>betaMPT</code> and <code>traitMPT</code> return a list that includes the original samples from the MCMC sampler for convergence checks. The MCMC samples are stored in <code>fittedModel$runjags$mcmc</code> as an <code>mcmc.list</code> object (see the package  for an overview of convergence diagniostics). TreeBUGS provides a handy wrapper to access the most important plotting functions:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># Default: Traceplot and density</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw">plot</span>(fitHierarchicalMPT,    <span class="co"># fitted model</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">     <span class="dt">parameter =</span><span class="st">&quot;mean&quot;</span>      <span class="co"># which parameter to plot</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co"># further arguments are passed to ?plot.mcmc.list</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co"># Auto-correlation plots:</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;acf&quot;</span>)</a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co"># Gelman-Rubin plots:</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;gelman&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co"># Default: Traceplot and density</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="kw">plot</span>(fitHierarchicalMPT,    <span class="co"># fitted model</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>     <span class="dt">parameter =</span><span class="st">&quot;mean&quot;</span>      <span class="co"># which parameter to plot</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="co"># further arguments are passed to ?plot.mcmc.list</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="co"># Auto-correlation plots:</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;acf&quot;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="co"># Gelman-Rubin plots:</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;gelman&quot;</span>)</span></code></pre></div>
 <p>See  and  for further convergence statistics and plots. Note that inferences from the model can be invalid if the Markov-Chain Monte-Carlo (MCMC) sampler did not converge!</p>
 </div>
 <div id="step-summarize-and-plot-results" class="section level3">
@@ -392,39 +417,42 @@ g=0.5</code></pre>
 <li>Convergence: <span class="math inline">\(\hat R\)</span>-Statistic (should be close to 1.00 for all parameters, e.g., <span class="math inline">\(\hat R &lt; 1.05\)</span>) and number of effective samples when accounting for auto-correlation (should be large)</li>
 </ul>
 <p>To obtain the summary after fitting the model, simply use:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">summary</span>(fitHierarchicalMPT)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">summary</span>(fitHierarchicalMPT)</span></code></pre></div>
 <p>The following functions allow to plot parameter estimates, distributions, goodness of fit, and raw frequencies:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">plotParam</span>(fitHierarchicalMPT,     <span class="co"># estimated parameters</span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">          <span class="dt">includeIndividual=</span><span class="ot">TRUE</span>  <span class="co"># whether to plot individual estimates</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3">)</a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="kw">plotDistribution</span>(fitHierarchicalMPT)      <span class="co"># estimated hierarchical parameter distribution</span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="kw">plotFit</span>(fitHierarchicalMPT)               <span class="co"># observed vs. predicted mean frequencies</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="kw">plotFit</span>(fitHierarchicalMPT, <span class="dt">stat =</span> <span class="st">&quot;cov&quot;</span>) <span class="co"># observed vs. predicted covariance</span></a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="kw">plotFreq</span>(fitHierarchicalMPT)              <span class="co"># individual and mean raw frequencies per tree</span></a>
-<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="kw">plotPriorPost</span>(fitHierarchicalMPT)         <span class="co"># comparison of prior/posterior (group level parameters)</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">plotParam</span>(fitHierarchicalMPT,     <span class="co"># estimated parameters</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>          <span class="dt">includeIndividual=</span><span class="ot">TRUE</span>  <span class="co"># whether to plot individual estimates</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="kw">plotDistribution</span>(fitHierarchicalMPT)      <span class="co"># estimated hierarchical parameter distribution</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="kw">plotFit</span>(fitHierarchicalMPT)               <span class="co"># observed vs. predicted mean frequencies</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="kw">plotFit</span>(fitHierarchicalMPT, <span class="dt">stat =</span> <span class="st">&quot;cov&quot;</span>) <span class="co"># observed vs. predicted covariance</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="kw">plotFreq</span>(fitHierarchicalMPT)              <span class="co"># individual and mean raw frequencies per tree</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="kw">plotPriorPost</span>(fitHierarchicalMPT)         <span class="co"># comparison of prior/posterior (group level parameters)</span></span></code></pre></div>
 <p>Parameter estimates (posterior mean, median, SD) can be extracted and saved to a file by using:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># matrix for further use within R:</span></a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">tt &lt;-<span class="st"> </span><span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter=</span><span class="st">&quot;theta&quot;</span>, </a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">               <span class="dt">stat=</span><span class="st">&quot;mean&quot;</span>)</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">tt</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co"># save complete summary of individual estimates to file:</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter =</span> <span class="st">&quot;theta&quot;</span>, </a>
-<a class="sourceLine" id="cb10-8" data-line-number="8">         <span class="dt">stat =</span> <span class="st">&quot;summary&quot;</span>, <span class="dt">file =</span> <span class="st">&quot;parameter.csv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="co"># matrix for further use within R:</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>tt &lt;-<span class="st"> </span><span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter=</span><span class="st">&quot;theta&quot;</span>, </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>               <span class="dt">stat=</span><span class="st">&quot;mean&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>tt</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="co"># save complete summary of individual estimates to file:</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter =</span> <span class="st">&quot;theta&quot;</span>, </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>         <span class="dt">stat =</span> <span class="st">&quot;summary&quot;</span>, <span class="dt">file =</span> <span class="st">&quot;parameter.csv&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
 <ul>
-<li><p>Erdfelder, E., Auer, T.-S., Hilbig, B. E., Assfalg, A., Moshagen, M., &amp; Nadarevic, L. (2009). Multinomial processing tree models: A review of the literature. Journal of Psychology, 217, 108–124. <a href="http://doi.org/10.1027/0044-3409.217.3.108" class="uri">http://doi.org/10.1027/0044-3409.217.3.108</a></p></li>
-<li><p>Heck, D. W., &amp; Wagenmakers, E. J. (2016). Adjusted priors for Bayes factors involving reparameterized order constraints. Journal of Mathematical Psychology, 73, 110–116. <a href="http://doi.org/10.1016/j.jmp.2016.05.004" class="uri">http://doi.org/10.1016/j.jmp.2016.05.004</a></p></li>
-<li><p>Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70–98. <a href="http://doi.org/10.1007/s11336-009-9141-0" class="uri">http://doi.org/10.1007/s11336-009-9141-0</a></p></li>
-<li><p>Matzke, D., Dolan, C. V., Batchelder, W. H., &amp; Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205–235.</p></li>
-<li><p>Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42–54. <a href="http://doi.org/10.3758/BRM.42.1.42" class="uri">http://doi.org/10.3758/BRM.42.1.42</a></p></li>
-<li><p>Smith, J. B., &amp; Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167–183. <a href="http://doi.org/10.1016/j.jmp.2009.06.007" class="uri">http://doi.org/10.1016/j.jmp.2009.06.007</a></p></li>
+<li><p>Erdfelder, E., Auer, T.-S., Hilbig, B. E., Assfalg, A., Moshagen, M., &amp; Nadarevic, L. (2009). Multinomial processing tree models: A review of the literature. Journal of Psychology, 217, 108–124. <a href="https://doi.org/10.1027/0044-3409.217.3.108" class="uri">https://doi.org/10.1027/0044-3409.217.3.108</a></p></li>
+<li><p>Heck, D. W., &amp; Wagenmakers, E. J. (2016). Adjusted priors for Bayes factors involving reparameterized order constraints. Journal of Mathematical Psychology, 73, 110–116. <a href="https://doi.org/10.1016/j.jmp.2016.05.004" class="uri">https://doi.org/10.1016/j.jmp.2016.05.004</a></p></li>
+<li><p>Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70–98. <a href="https://doi.org/10.1007/s11336-009-9141-0" class="uri">https://doi.org/10.1007/s11336-009-9141-0</a></p></li>
+<li><p>Matzke, D., Dolan, C. V., Batchelder, W. H., &amp; Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205–235. <a href="https://doi.org/10.1007/s11336-013-9374-9" class="uri">https://doi.org/10.1007/s11336-013-9374-9</a></p></li>
+<li><p>Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42–54. <a href="https://doi.org/10.3758/BRM.42.1.42" class="uri">https://doi.org/10.3758/BRM.42.1.42</a></p></li>
+<li><p>Smith, J. B., &amp; Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167–183. <a href="https://doi.org/10.1016/j.jmp.2009.06.007" class="uri">https://doi.org/10.1016/j.jmp.2009.06.007</a></p></li>
 </ul>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

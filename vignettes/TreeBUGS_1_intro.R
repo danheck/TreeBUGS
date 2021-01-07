@@ -1,12 +1,12 @@
-## ---- eval=F-------------------------------------------------------------
+## ---- eval=F------------------------------------------------------------------
 #  readEQN(file = "pathToFile.eqn",       # relative or absolute path
 #          restrictions = list("Dn=Do"),  # equality constraints
 #          paramOrder = TRUE)             # show parameter order
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  restrictions = list("Dn=Do", "g=0.5")
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  # load the package:
 #  library(TreeBUGS)
 #  
@@ -23,7 +23,7 @@
 #        n.chains = 3                # number of MCMC chains (run in parallel)
 #  )
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  # Default: Traceplot and density
 #  plot(fitHierarchicalMPT,    # fitted model
 #       parameter ="mean"      # which parameter to plot
@@ -36,10 +36,10 @@
 #  # Gelman-Rubin plots:
 #  plot(fitHierarchicalMPT,  parameter = "mean", type = "gelman")
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  summary(fitHierarchicalMPT)
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  plotParam(fitHierarchicalMPT,     # estimated parameters
 #            includeIndividual=TRUE  # whether to plot individual estimates
 #  )
@@ -49,7 +49,7 @@
 #  plotFreq(fitHierarchicalMPT)              # individual and mean raw frequencies per tree
 #  plotPriorPost(fitHierarchicalMPT)         # comparison of prior/posterior (group level parameters)
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  # matrix for further use within R:
 #  tt <- getParam(fitHierarchicalMPT, parameter="theta",
 #                 stat="mean")
