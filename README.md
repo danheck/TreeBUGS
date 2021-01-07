@@ -34,7 +34,7 @@ To install the latest developer version of TreeBUGS from GitHub, run:
 ### Dependencies:
 install.packages(c("devtools", "coda", "runjags", "hypergeo", "testthat",
                    "rjags", "Rcpp", "RcppArmadillo", "logspline"))
-devtools::install_github("denis-arnold/TreeBUGS", build_vignettes = TRUE)
+devtools::install_github("danheck/TreeBUGS", build_vignettes = TRUE)
 ```
 
 To compile C++ code, Windows and Mac require 
