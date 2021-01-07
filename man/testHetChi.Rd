@@ -32,7 +32,7 @@ testHetChi(freq, tree = c(1,1,2,2))
 # => no significant deviation from homogeneity (low power!)
 }
 \references{
-Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. http://doi.org/10.3758/PBR.15.4.713
+Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. \doi{10.3758/PBR.15.4.713}
 }
 \seealso{
 \code{\link{testHetPerm}}, \code{\link{plotFreq}}

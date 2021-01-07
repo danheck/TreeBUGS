@@ -12,7 +12,7 @@
 #' Note that the test assumes independence of observations and item homogeneity when testing participant heterogeneity. The latter assumption can be dropped when using a permutation test (\code{\link{testHetPerm}}).
 #' @seealso \code{\link{testHetPerm}}, \code{\link{plotFreq}}
 #' @author Daniel W. Heck
-#' @references Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. http://doi.org/10.3758/PBR.15.4.713
+#' @references Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. \doi{10.3758/PBR.15.4.713}
 #' @examples
 #' # some made up frequencies:
 #' freq <- matrix(c(13,16,11,13,

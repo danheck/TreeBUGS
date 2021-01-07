@@ -71,11 +71,11 @@ correlationPosterior(r = cors, N = 100, nCPU = 1)
 Ly, A., Marsman, M., & Wagenmakers, E.-J. (2018).
 Analytic posteriors for Pearson’s correlation coefficient.
 \emph{Statistica Neerlandica, 72}, 4–13.
-https://doi.org/10.1111%2Fstan.12111
+\doi{10.1111/stan.12111}
 
-Ly, A., Boehm, U., Heathcote, A., Turner, B. M. , Forstmann, B., Marsman, M., and Matzke, D. (2016).
-A flexible and efficient hierarchical Bayesian approach to the exploration of
-individual differences in cognitive-model-based neuroscience. https://osf.io/evsyv/
+Ly, A., Boehm, U., Heathcote, A., Turner, B. M. , Forstmann, B., Marsman, M., and Matzke, D. (2017). A flexible and efficient hierarchical Bayesian approach to the exploration of
+individual differences in cognitive-model-based neuroscience. \url{https://osf.io/evsyv/}.
+\doi{10.1002/9781119159193}
 }
 \author{
 Daniel W. Heck, Alexander Ly

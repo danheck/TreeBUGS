@@ -15,7 +15,7 @@
 #' Note that the test does still assume independence of observations. However, it does not require item homogeneity when testing participant heterogeneity (in contrast to the chi-square test: \code{\link{testHetChi}}).
 #' @seealso \code{\link{testHetChi}}, \code{\link{plotFreq}}
 #' @author Daniel W. Heck
-#' @references Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. http://doi.org/10.3758/PBR.15.4.713
+#' @references Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. \doi{10.3758/PBR.15.4.713}
 #' @examples
 #' # generate homogeneous data
 #' # (N=15 participants, M=30 items)
