@@ -92,7 +92,7 @@ transformedParameters <- function (fittedModel, transformedParameters,
           colnames(samp)[idx] <- paste0(parsed$transformedParameters[i],"[", 1:N,"]")
           for(n in 1:N){
             samp[,idx[n]] <- apply(mm[,paste0(sel.theta,n,"]"),drop=FALSE], 1,
-                                   function(xx) eval(parse(text=parsed$modelstring[1]),
+                                   function(xx) eval(parse(text=parsed$modelstring[i]),
                                                      list(mean=unlist(xx))))
           }
         }

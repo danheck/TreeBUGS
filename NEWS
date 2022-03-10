@@ -1,3 +1,9 @@
+TreeBUGS 1.4.7 (March 2022)
+===========
+
+* bugfix for computing transformedParameters(..) for more than two parameters at the individual level
+
+
 TreeBUGS 1.4.6 (January 2021)
 ===========
 

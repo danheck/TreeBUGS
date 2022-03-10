@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // betampt
 List betampt(int M, int L, int nthin, arma::mat H, arma::mat a, arma::mat b, arma::vec c, arma::vec map, arma::vec shape, arma::vec rate);
 RcppExport SEXP _TreeBUGS_betampt(SEXP MSEXP, SEXP LSEXP, SEXP nthinSEXP, SEXP HSEXP, SEXP aSEXP, SEXP bSEXP, SEXP cSEXP, SEXP mapSEXP, SEXP shapeSEXP, SEXP rateSEXP) {
