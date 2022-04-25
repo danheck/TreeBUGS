@@ -23,7 +23,7 @@ These steps are explained in more detail in the package vignette, which can be o
 
 ## Installing TreeBUGS
 
-TreeBUGS requires the software [JAGS](http://mcmc-jags.sourceforge.net/). 
+TreeBUGS requires the software [JAGS](https://mcmc-jags.sourceforge.io/). 
 To install the latest release of TreeBUGS from [CRAN](https://cran.r-project.org/web/packages/TreeBUGS), type the following into the R console:
 ```r
 install.packages("TreeBUGS")

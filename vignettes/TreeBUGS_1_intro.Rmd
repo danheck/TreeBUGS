@@ -23,7 +23,7 @@ In the most simple scenario, the following steps are required:
 4. Check convergence of MCMC chains
 5. Summarize and plot results
 
-In the following, these steps are explained in more detail. Note that TreeBUGS requires a recent version of the software JAGS (http://mcmc-jags.sourceforge.net/).
+In the following, these steps are explained in more detail. Note that TreeBUGS requires a recent version of the software JAGS (https://mcmc-jags.sourceforge.io/).
 
 
 

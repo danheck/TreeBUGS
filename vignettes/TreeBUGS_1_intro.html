@@ -12,7 +12,7 @@
 
 <meta name="author" content="Daniel W. Heck, Nina R. Arnold, &amp; Denis Arnold" />
 
-<meta name="date" content="2021-01-07" />
+<meta name="date" content="2022-04-25" />
 
 <title>TreeBUGS: Introduction to Hierarchical MPT Modeling</title>
 
@@ -40,11 +40,20 @@ document.addEventListener('DOMContentLoaded', function(e) {
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -323,9 +332,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">TreeBUGS: Introduction to Hierarchical MPT Modeling</h1>
-<h4 class="author">Daniel W. Heck, Nina R. Arnold, &amp; Denis Arnold</h4>
-<h4 class="date">2021-01-07</h4>
+<h1 class="title toc-ignore">TreeBUGS: Introduction to Hierarchical MPT
+Modeling</h1>
+<h4 class="author">Daniel W. Heck, Nina R. Arnold, &amp; Denis
+Arnold</h4>
+<h4 class="date">2022-04-25</h4>
 
 
 
@@ -334,16 +345,24 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgYAAAJYCAMAAAAuZd4VAAACfFBMVEX9/v0AAAAAAIsBAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkJCY8KCgoLCwsMDAwNDQ0ODg4PDw8QEBAREREREZMSEhITExMUFBQVFRUWFhYXFxcYGBgZGRkaGhoaGpcbGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkqKiorKyssLCwtLS0uLi4vLy8wMDAxMTEyMjIzMzM0NDQ1NTU2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+AgICBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLAACLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnOzs7R0dHU1NT9/v0fnCamAAAA1HRSTlP/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////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" width="150" align="right" hspace="20" style="border:0px"></p>
 <p>In the most simple scenario, the following steps are required:</p>
 <ol style="list-style-type: decimal">
-<li>Define path to existing MPT model file in .eqn format (cf. multiTree; Moshagen, 2010)</li>
-<li>Define path to data set with individual frequencies (.csv file: comma separated, rows=persons, columns=labeled categories)</li>
-<li>Call one of the fitting functions <code>betaMPT</code> or <code>traitMPT</code> (examples below)</li>
+<li>Define path to existing MPT model file in .eqn format
+(cf. multiTree; Moshagen, 2010)</li>
+<li>Define path to data set with individual frequencies (.csv file:
+comma separated, rows=persons, columns=labeled categories)</li>
+<li>Call one of the fitting functions <code>betaMPT</code> or
+<code>traitMPT</code> (examples below)</li>
 <li>Check convergence of MCMC chains</li>
 <li>Summarize and plot results</li>
 </ol>
-<p>In the following, these steps are explained in more detail. Note that TreeBUGS requires a recent version of the software JAGS (<a href="http://mcmc-jags.sourceforge.net/" class="uri">http://mcmc-jags.sourceforge.net/</a>).</p>
+<p>In the following, these steps are explained in more detail. Note that
+TreeBUGS requires a recent version of the software JAGS (<a href="https://mcmc-jags.sourceforge.io/" class="uri">https://mcmc-jags.sourceforge.io/</a>).</p>
 <div id="step-mpt-model-file-in-eqn-syntax" class="section level3">
 <h3>1. Step: MPT model file in EQN syntax</h3>
-<p>The model needs to be passed in the standard .eqn file format (e.g., as in multiTree; Moshagen, 2010). As an example, consider the most simple two-high-threshold model (2HTM), each line defines a single processing path containing tree label, category label, and model equations:</p>
+<p>The model needs to be passed in the standard .eqn file format (e.g.,
+as in multiTree; Moshagen, 2010). As an example, consider the most
+simple two-high-threshold model (2HTM), each line defines a single
+processing path containing tree label, category label, and model
+equations:</p>
 <pre><code>#####Title: 2HTM
 Target  Hit    Do
 Target    Hit    (1-Do)*g
@@ -351,102 +370,148 @@ Target    Miss   (1-Do)*(1-g)
 Lure      FA     (1-Dn)*g
 Lure      CR     (1-Dn)*(1-g)
 Lure      CR     Dn</code></pre>
-<p>Note that category labels (e.g., hit, miss,…) must start with a letter (different to multiTree or HMMTree) and match the column names of . The model equations require the multiplication sign <code>*</code> and parameters should not be summarized, e.g., by <code>a^2*(1-a)</code>. As an input for TreeBUGS, the model file (e.g., <code>&quot;2htm.txt&quot;</code>) needs to be saved in the current working directory. Otherwise, the relative or absolute path to the file must be specified (e.g., <code>models/2htm.txt</code>). To check how TreeBUGS interprets a given .eqn-file, use:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">readEQN</span>(<span class="dt">file =</span> <span class="st">&quot;pathToFile.eqn&quot;</span>,       <span class="co"># relative or absolute path </span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>        <span class="dt">restrictions =</span> <span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>),  <span class="co"># equality constraints</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>        <span class="dt">paramOrder =</span> <span class="ot">TRUE</span>)             <span class="co"># show parameter order</span></span></code></pre></div>
-<p>Equality restrictions on the MPT parameters can either be provided in a list:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>restrictions =<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>, <span class="st">&quot;g=0.5&quot;</span>)</span></code></pre></div>
-<p>or by a path to a text file on the hard drive (e.g., <code>restrictions=&quot;pathToFile.txt&quot;</code>) that contains the equality constraints, one per row:</p>
+<p>Note that category labels (e.g., hit, miss,…) must start with a
+letter (different to multiTree or HMMTree) and match the column names of
+. The model equations require the multiplication sign <code>*</code> and
+parameters should not be summarized, e.g., by <code>a^2*(1-a)</code>. As
+an input for TreeBUGS, the model file (e.g., <code>&quot;2htm.txt&quot;</code>)
+needs to be saved in the current working directory. Otherwise, the
+relative or absolute path to the file must be specified (e.g.,
+<code>models/2htm.txt</code>). To check how TreeBUGS interprets a given
+.eqn-file, use:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">readEQN</span>(<span class="at">file =</span> <span class="st">&quot;pathToFile.eqn&quot;</span>,       <span class="co"># relative or absolute path </span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">restrictions =</span> <span class="fu">list</span>(<span class="st">&quot;Dn=Do&quot;</span>),  <span class="co"># equality constraints</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">paramOrder =</span> <span class="cn">TRUE</span>)             <span class="co"># show parameter order</span></span></code></pre></div>
+<p>Equality restrictions on the MPT parameters can either be provided in
+a list:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>restrictions <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;Dn=Do&quot;</span>, <span class="st">&quot;g=0.5&quot;</span>)</span></code></pre></div>
+<p>or by a path to a text file on the hard drive (e.g.,
+<code>restrictions=&quot;pathToFile.txt&quot;</code>) that contains the equality
+constraints, one per row:</p>
 <pre><code>Dn=Do
 g=0.5</code></pre>
 </div>
 <div id="step-data-set-with-individual-frequencies" class="section level3">
 <h3>2. Step: Data Set with Individual Frequencies</h3>
-<p>Data can be loaded from a comma-separated text file (.csv) in the following format:</p>
+<p>Data can be loaded from a comma-separated text file (.csv) in the
+following format:</p>
 <pre><code>Hit,   Miss,     FA,    CR
 20,      10,      5,    25
 13,       7,      9,    21 
 15,       5,      6,    14
 .....
 </code></pre>
-<p>Note that the first line contains the category labels, which must match the category labels from the .eqn-file. The remaining rows contain individual frequencies. Similarly as for the .eqn file, the path to the data file can either be specified as <code>data_ind.csv</code> if it is in the current working directory, or as an relative or absolute path (e.g., <code>&quot;C:/models/data_ind.csv&quot;</code>).</p>
-<p>When using TreeBUGS within R, a data.frame or matrix with appropriate column names that match the category labels can be provided.</p>
+<p>Note that the first line contains the category labels, which must
+match the category labels from the .eqn-file. The remaining rows contain
+individual frequencies. Similarly as for the .eqn file, the path to the
+data file can either be specified as <code>data_ind.csv</code> if it is
+in the current working directory, or as an relative or absolute path
+(e.g., <code>&quot;C:/models/data_ind.csv&quot;</code>).</p>
+<p>When using TreeBUGS within R, a data.frame or matrix with appropriate
+column names that match the category labels can be provided.</p>
 </div>
 <div id="step-fit-hierarchical-mpt-model" class="section level3">
 <h3>3. Step: Fit Hierarchical MPT Model</h3>
-<p>An hierarchical <strong>Beta-MPT model</strong> is fitted with the following code:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># load the package:</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="kw">library</span>(TreeBUGS)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co"># fit the model:</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>fitHierarchicalMPT &lt;-<span class="st"> </span><span class="kw">betaMPT</span>(</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>      <span class="dt">eqnfile=</span><span class="st">&quot;2htm.txt&quot;</span>,         <span class="co"># .eqn file</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>      <span class="dt">data=</span><span class="st">&quot;data_ind.csv&quot;</span>,        <span class="co"># individual data</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>      <span class="dt">restrictions=</span><span class="kw">list</span>(<span class="st">&quot;Dn=Do&quot;</span>), <span class="co"># parameter restrictions (or path to file)</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>      </span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>      <span class="co">### optional MCMC input:            </span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>      <span class="dt">n.iter =</span> <span class="dv">20000</span>,             <span class="co"># number of iterations</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>      <span class="dt">n.burnin =</span> <span class="dv">5000</span>,            <span class="co"># number of burnin samples that are removed</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>      <span class="dt">n.thin =</span> <span class="dv">5</span>,                 <span class="co"># thinning rate of removing samples</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>      <span class="dt">n.chains =</span> <span class="dv">3</span>                <span class="co"># number of MCMC chains (run in parallel)</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>)</span></code></pre></div>
-<p>A latent-trait model is fitted similarly by replacing <code>betaMPT</code> by <code>traitMPT</code>.</p>
+<p>An hierarchical <strong>Beta-MPT model</strong> is fitted with the
+following code:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load the package:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TreeBUGS)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the model:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>fitHierarchicalMPT <span class="ot">&lt;-</span> <span class="fu">betaMPT</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">eqnfile=</span><span class="st">&quot;2htm.txt&quot;</span>,         <span class="co"># .eqn file</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">data=</span><span class="st">&quot;data_ind.csv&quot;</span>,        <span class="co"># individual data</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">restrictions=</span><span class="fu">list</span>(<span class="st">&quot;Dn=Do&quot;</span>), <span class="co"># parameter restrictions (or path to file)</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      <span class="do">### optional MCMC input:            </span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">n.iter =</span> <span class="dv">20000</span>,             <span class="co"># number of iterations</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">n.burnin =</span> <span class="dv">5000</span>,            <span class="co"># number of burnin samples that are removed</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">n.thin =</span> <span class="dv">5</span>,                 <span class="co"># thinning rate of removing samples</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">n.chains =</span> <span class="dv">3</span>                <span class="co"># number of MCMC chains (run in parallel)</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>A latent-trait model is fitted similarly by replacing
+<code>betaMPT</code> by <code>traitMPT</code>.</p>
 </div>
 <div id="step-check-convergence-of-mcmc-chains" class="section level3">
 <h3>4. Step: Check convergence of MCMC chains</h3>
-<p>The functions <code>betaMPT</code> and <code>traitMPT</code> return a list that includes the original samples from the MCMC sampler for convergence checks. The MCMC samples are stored in <code>fittedModel$runjags$mcmc</code> as an <code>mcmc.list</code> object (see the package  for an overview of convergence diagniostics). TreeBUGS provides a handy wrapper to access the most important plotting functions:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co"># Default: Traceplot and density</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="kw">plot</span>(fitHierarchicalMPT,    <span class="co"># fitted model</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>     <span class="dt">parameter =</span><span class="st">&quot;mean&quot;</span>      <span class="co"># which parameter to plot</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="co"># further arguments are passed to ?plot.mcmc.list</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="co"># Auto-correlation plots:</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;acf&quot;</span>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="co"># Gelman-Rubin plots:</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="kw">plot</span>(fitHierarchicalMPT,  <span class="dt">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;gelman&quot;</span>)</span></code></pre></div>
-<p>See  and  for further convergence statistics and plots. Note that inferences from the model can be invalid if the Markov-Chain Monte-Carlo (MCMC) sampler did not converge!</p>
+<p>The functions <code>betaMPT</code> and <code>traitMPT</code> return a
+list that includes the original samples from the MCMC sampler for
+convergence checks. The MCMC samples are stored in
+<code>fittedModel$runjags$mcmc</code> as an <code>mcmc.list</code>
+object (see the package for an overview of convergence diagniostics).
+TreeBUGS provides a handy wrapper to access the most important plotting
+functions:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default: Traceplot and density</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fitHierarchicalMPT,    <span class="co"># fitted model</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">parameter =</span><span class="st">&quot;mean&quot;</span>      <span class="co"># which parameter to plot</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># further arguments are passed to ?plot.mcmc.list</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto-correlation plots:</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fitHierarchicalMPT,  <span class="at">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="at">type =</span> <span class="st">&quot;acf&quot;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Gelman-Rubin plots:</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fitHierarchicalMPT,  <span class="at">parameter =</span> <span class="st">&quot;mean&quot;</span>, <span class="at">type =</span> <span class="st">&quot;gelman&quot;</span>)</span></code></pre></div>
+<p>See and for further convergence statistics and plots. Note that
+inferences from the model can be invalid if the Markov-Chain Monte-Carlo
+(MCMC) sampler did not converge!</p>
 </div>
 <div id="step-summarize-and-plot-results" class="section level3">
 <h3>5. Step: Summarize and Plot Results</h3>
-<p>TreeBUGS produces an MPT-tailored summary of parameter estimates and convergence statistics:</p>
+<p>TreeBUGS produces an MPT-tailored summary of parameter estimates and
+convergence statistics:</p>
 <ul>
-<li>Information about the parameter posterior distribution: Mean, SD, Median, 2.5% and 97.5% quantiles</li>
-<li>Convergence: <span class="math inline">\(\hat R\)</span>-Statistic (should be close to 1.00 for all parameters, e.g., <span class="math inline">\(\hat R &lt; 1.05\)</span>) and number of effective samples when accounting for auto-correlation (should be large)</li>
+<li>Information about the parameter posterior distribution: Mean, SD,
+Median, 2.5% and 97.5% quantiles</li>
+<li>Convergence: <span class="math inline">\(\hat R\)</span>-Statistic
+(should be close to 1.00 for all parameters, e.g., <span class="math inline">\(\hat R &lt; 1.05\)</span>) and number of effective
+samples when accounting for auto-correlation (should be large)</li>
 </ul>
 <p>To obtain the summary after fitting the model, simply use:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">summary</span>(fitHierarchicalMPT)</span></code></pre></div>
-<p>The following functions allow to plot parameter estimates, distributions, goodness of fit, and raw frequencies:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">plotParam</span>(fitHierarchicalMPT,     <span class="co"># estimated parameters</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>          <span class="dt">includeIndividual=</span><span class="ot">TRUE</span>  <span class="co"># whether to plot individual estimates</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="kw">plotDistribution</span>(fitHierarchicalMPT)      <span class="co"># estimated hierarchical parameter distribution</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="kw">plotFit</span>(fitHierarchicalMPT)               <span class="co"># observed vs. predicted mean frequencies</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="kw">plotFit</span>(fitHierarchicalMPT, <span class="dt">stat =</span> <span class="st">&quot;cov&quot;</span>) <span class="co"># observed vs. predicted covariance</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="kw">plotFreq</span>(fitHierarchicalMPT)              <span class="co"># individual and mean raw frequencies per tree</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="kw">plotPriorPost</span>(fitHierarchicalMPT)         <span class="co"># comparison of prior/posterior (group level parameters)</span></span></code></pre></div>
-<p>Parameter estimates (posterior mean, median, SD) can be extracted and saved to a file by using:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="co"># matrix for further use within R:</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>tt &lt;-<span class="st"> </span><span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter=</span><span class="st">&quot;theta&quot;</span>, </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>               <span class="dt">stat=</span><span class="st">&quot;mean&quot;</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>tt</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="co"># save complete summary of individual estimates to file:</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="kw">getParam</span>(fitHierarchicalMPT, <span class="dt">parameter =</span> <span class="st">&quot;theta&quot;</span>, </span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>         <span class="dt">stat =</span> <span class="st">&quot;summary&quot;</span>, <span class="dt">file =</span> <span class="st">&quot;parameter.csv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fitHierarchicalMPT)</span></code></pre></div>
+<p>The following functions allow to plot parameter estimates,
+distributions, goodness of fit, and raw frequencies:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotParam</span>(fitHierarchicalMPT,     <span class="co"># estimated parameters</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">includeIndividual=</span><span class="cn">TRUE</span>  <span class="co"># whether to plot individual estimates</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plotDistribution</span>(fitHierarchicalMPT)      <span class="co"># estimated hierarchical parameter distribution</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotFit</span>(fitHierarchicalMPT)               <span class="co"># observed vs. predicted mean frequencies</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotFit</span>(fitHierarchicalMPT, <span class="at">stat =</span> <span class="st">&quot;cov&quot;</span>) <span class="co"># observed vs. predicted covariance</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plotFreq</span>(fitHierarchicalMPT)              <span class="co"># individual and mean raw frequencies per tree</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plotPriorPost</span>(fitHierarchicalMPT)         <span class="co"># comparison of prior/posterior (group level parameters)</span></span></code></pre></div>
+<p>Parameter estimates (posterior mean, median, SD) can be extracted and
+saved to a file by using:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># matrix for further use within R:</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>tt <span class="ot">&lt;-</span> <span class="fu">getParam</span>(fitHierarchicalMPT, <span class="at">parameter=</span><span class="st">&quot;theta&quot;</span>, </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">stat=</span><span class="st">&quot;mean&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>tt</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># save complete summary of individual estimates to file:</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">getParam</span>(fitHierarchicalMPT, <span class="at">parameter =</span> <span class="st">&quot;theta&quot;</span>, </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">stat =</span> <span class="st">&quot;summary&quot;</span>, <span class="at">file =</span> <span class="st">&quot;parameter.csv&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
 <ul>
-<li><p>Erdfelder, E., Auer, T.-S., Hilbig, B. E., Assfalg, A., Moshagen, M., &amp; Nadarevic, L. (2009). Multinomial processing tree models: A review of the literature. Journal of Psychology, 217, 108–124. <a href="https://doi.org/10.1027/0044-3409.217.3.108" class="uri">https://doi.org/10.1027/0044-3409.217.3.108</a></p></li>
-<li><p>Heck, D. W., &amp; Wagenmakers, E. J. (2016). Adjusted priors for Bayes factors involving reparameterized order constraints. Journal of Mathematical Psychology, 73, 110–116. <a href="https://doi.org/10.1016/j.jmp.2016.05.004" class="uri">https://doi.org/10.1016/j.jmp.2016.05.004</a></p></li>
-<li><p>Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70–98. <a href="https://doi.org/10.1007/s11336-009-9141-0" class="uri">https://doi.org/10.1007/s11336-009-9141-0</a></p></li>
-<li><p>Matzke, D., Dolan, C. V., Batchelder, W. H., &amp; Wagenmakers, E.-J. (2015). Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items. Psychometrika, 80, 205–235. <a href="https://doi.org/10.1007/s11336-013-9374-9" class="uri">https://doi.org/10.1007/s11336-013-9374-9</a></p></li>
-<li><p>Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42–54. <a href="https://doi.org/10.3758/BRM.42.1.42" class="uri">https://doi.org/10.3758/BRM.42.1.42</a></p></li>
-<li><p>Smith, J. B., &amp; Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167–183. <a href="https://doi.org/10.1016/j.jmp.2009.06.007" class="uri">https://doi.org/10.1016/j.jmp.2009.06.007</a></p></li>
+<li><p>Erdfelder, E., Auer, T.-S., Hilbig, B. E., Assfalg, A., Moshagen,
+M., &amp; Nadarevic, L. (2009). Multinomial processing tree models: A
+review of the literature. Journal of Psychology, 217, 108–124. <a href="https://doi.org/10.1027/0044-3409.217.3.108" class="uri">https://doi.org/10.1027/0044-3409.217.3.108</a></p></li>
+<li><p>Heck, D. W., &amp; Wagenmakers, E. J. (2016). Adjusted priors for
+Bayes factors involving reparameterized order constraints. Journal of
+Mathematical Psychology, 73, 110–116. <a href="https://doi.org/10.1016/j.jmp.2016.05.004" class="uri">https://doi.org/10.1016/j.jmp.2016.05.004</a></p></li>
+<li><p>Klauer, K. C. (2010). Hierarchical multinomial processing tree
+models: A latent-trait approach. Psychometrika, 75, 70–98. <a href="https://doi.org/10.1007/s11336-009-9141-0" class="uri">https://doi.org/10.1007/s11336-009-9141-0</a></p></li>
+<li><p>Matzke, D., Dolan, C. V., Batchelder, W. H., &amp; Wagenmakers,
+E.-J. (2015). Bayesian estimation of multinomial processing tree models
+with heterogeneity in participants and items. Psychometrika, 80,
+205–235. <a href="https://doi.org/10.1007/s11336-013-9374-9" class="uri">https://doi.org/10.1007/s11336-013-9374-9</a></p></li>
+<li><p>Moshagen, M. (2010). multiTree: A computer program for the
+analysis of multinomial processing tree models. Behavior Research
+Methods, 42, 42–54. <a href="https://doi.org/10.3758/BRM.42.1.42" class="uri">https://doi.org/10.3758/BRM.42.1.42</a></p></li>
+<li><p>Smith, J. B., &amp; Batchelder, W. H. (2010). Beta-MPT:
+Multinomial processing tree models for addressing individual
+differences. Journal of Mathematical Psychology, 54, 167–183. <a href="https://doi.org/10.1016/j.jmp.2009.06.007" class="uri">https://doi.org/10.1016/j.jmp.2009.06.007</a></p></li>
 </ul>
 </div>
 
