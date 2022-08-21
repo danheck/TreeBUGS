@@ -19,7 +19,7 @@ getSamples <- function (fittedModel, parameter = "mean", select = "all",
                         names = "par_label"){
 
   parnames <- fittedModel$mptInfo$thetaUnique
-  if (missing(select) || select == "all")
+  if (missing(select) || identical(select, "all"))
     select <- parnames
   else
     if (!all(select %in% parnames))
@@ -28,15 +28,19 @@ getSamples <- function (fittedModel, parameter = "mean", select = "all",
 
   S <- length(parnames)
   var <- ""
-  # matches <- grep(parameter, varnames(fittedModel$runjags$mcmc), value = TRUE)
+
   idx <-  match(select, parnames)
-  if (S > 1 || (parameter == "theta" && S == 1))
+  # matches <- grep(parameter, varnames(fittedModel$runjags$mcmc), value = TRUE)
+  if (S > 1L && parameter == "theta") {
+    var <- paste0("[", outer(idx, seq_len(nrow(fittedModel$mptInfo$data)), FUN = "paste", sep = ","), "]")
+  } else if (S > 1L || (parameter == "theta" && S == 1)) {
     var <- paste0("[" , idx, "]")
-  else if (S > 1 && parameter == "theta")
-    var <- paste0("[", outer(idx, seq(nrow(fittedModel$mptInfo$data)),
-                             "paste", sep = ","), "]")
-  else if (S > 1 && parameter == "rho")
-    var <-  paste0("[", outer(idx, idx, "paste", sep = ","), "]")
+  } else if (S > 1L && parameter == "rho") {
+    var <- paste0("[", outer(idx, idx, FUN = "paste", sep = ","), "]")
+  }
+
+
+  # print(paste0(parameter, var))
   mcmc <- fittedModel$runjags$mcmc[,paste0(parameter, var), drop = FALSE]
 
   if (parameter != "rho")
