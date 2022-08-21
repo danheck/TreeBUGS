@@ -93,8 +93,8 @@
 #' are decomposed by the scaling parameter \eqn{\xi} and the raw deviation \eqn{\epsilon_i}
 #' (cf. Gelman, 2006):
 #'      \deqn{\delta_i = \xi \cdot \epsilon_i}
-#'      \deqn{\epsilon_i \sim \text{Normal}(0,\sigma^2)}
-#'      \deqn{\sigma^2 \sim \text{Inverse-} \chi^2(df)}
+#'      \deqn{\epsilon_i \sim Normal(0,\sigma^2)}
+#'      \deqn{\sigma^2 \sim Inverse-\chi^2(df)}
 #' Note that the default prior for \eqn{\xi} should be changed to \code{xi="dnorm(0,1)"}, which
 #' results in a half-Cauchy prior (Gelman, 2006).
 #'
