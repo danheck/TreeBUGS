@@ -1,3 +1,10 @@
+TreeBUGS 1.4.8 (August 2022)
+===========
+
+* check issue with HTML5 code (align, hspace)
+* improved documentation of the probit regression in traitMPT()
+
+
 TreeBUGS 1.4.7 (March 2022)
 ===========
 

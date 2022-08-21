@@ -50,7 +50,7 @@ individual MPT parameters will be sampled. Either the path to a .csv file
 first row must contain covariate labels).
 Alternatively: a data frame or matrix (rows=individuals, columns = variables;
 covariate labels as column names).
-Note that in \code{betaMPT}, correlatios are computed for discrete variables
+Note that in \code{betaMPT}, correlations are computed for discrete variables
 that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})}
 
 \item{corProbit}{whether to use probit-transformed MPT parameters to compute

@@ -39,11 +39,12 @@ zero vs. positive/negative/unequal to zero.
 }
 \details{
 The Bayes factor is computed with the Savage-Dickey method, which is defined as the ratio of the
-density of the posterior and the density of the prior evalauted at \code{slope=0}.
+density of the posterior and the density of the prior evaluated at \code{slope=0} (Heck, 2019).
 Note that this method cannot be used with default JZS priors (\code{IVprec="dgamma(.5,.5)"})
-if more than one predictor is added for an MPT parameter. As a remedy, a g-prior (normal distribution)
-can be used on the slopes by setting the hyperprior parameter \eqn{g} to a
-fixed constant when fitting the model: \code{traitMPT(..., IVprec = 1)}.
+if more than one predictor is added for an MPT parameter.
+As a remedy, a g-prior (normal distribution) can be used on the slopes by
+setting the hyperprior parameter \eqn{g} to a fixed constant when fitting
+the model: \code{traitMPT(..., IVprec = 1)} (see Heck, 2019).
 }
 \examples{
 \dontrun{
@@ -60,4 +61,10 @@ summary(fit)
 
 BayesFactorSlope(fit, "slope_D1_age", direction = "<")
 }
+}
+\references{
+Heck, D. W. (2019). A caveat on the Savage-Dickey density ratio:
+The case of computing Bayes factors for regression parameters.
+\emph{British Journal of Mathematical and Statistical Psychology, 72},
+316–333. \doi{10.1111/bmsp.12150}
 }

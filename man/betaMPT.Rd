@@ -55,7 +55,7 @@ individual MPT parameters will be sampled. Either the path to a .csv file
 first row must contain covariate labels).
 Alternatively: a data frame or matrix (rows=individuals, columns = variables;
 covariate labels as column names).
-Note that in \code{betaMPT}, correlatios are computed for discrete variables
+Note that in \code{betaMPT}, correlations are computed for discrete variables
 that are coded numerically (in \code{traitMPT}, this can be suppressed by using \code{predType="f"})}
 
 \item{transformedParameters}{list with parameter transformations that should
@@ -72,7 +72,7 @@ Default for beta-MPT: MPT parameters are used on the probability scale [0,1].}
 
 \item{alpha}{Hyperprior for the shape parameters \eqn{\alpha} of the group-level
 beta distributions (in JAGS syntax). Default: Truncated gamma distributions for
-\eqn{\alpha} and \eqn{\beta} with shape 1 and rate .1 and truncated to be larger than 1 (see\link{plotPrior}.
+\eqn{\alpha} and \eqn{\beta} with shape 1 and rate 0.1 and truncated to be larger than 1 (see \link{plotPrior}).
 A named vector can be used to specify separate hyperpriors for each MPT
 parameter (if unnamed, the order of parameters is determined by the default
 order as shown by \code{\link{readEQN}} with \code{paramOrder = TRUE}).
@@ -104,7 +104,7 @@ As an alternative information criterion, \code{\link{WAIC}} can be computed for 
 
 \item{ppp}{number of samples to compute  posterior predictive p-value (see \code{\link{posteriorPredictive}})}
 
-\item{modelfilename}{Name that the modelfile that is made by the function to work with JAGS should get.
+\item{modelfilename}{name of the generated JAGS model file.
 Default is to write this information to the tempdir as required by CRAN standards.}
 
 \item{parEstFile}{Name of the file to with the estimates should be stored (e.g., "parEstFile.txt")}
@@ -121,7 +121,7 @@ Possible arguments for \code{autoextend.jags} are:
 (the last of these arguments restricts sampling  to 30 minutes,
 see  \link[runjags]{autoextend.jags}).}
 
-\item{...}{further rguments to be passed to the JAGS sampling function
+\item{...}{further arguments to be passed to the JAGS sampling function
 (i.e., to \code{\link[runjags]{run.jags}}. Note that reproducible results are obtained
 by setting a random seed before fitting a model (i.e., \code{set.seed(12345)} ).}
 }
@@ -164,10 +164,12 @@ summary(fit)
 Heck, D. W., Arnold, N. R., & Arnold, D. (2018).
 TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
 \emph{Behavior Research Methods, 50}, 264–284.
+\doi{10.3758/s13428-017-0869-7}
 
 Smith, J. B., & Batchelder, W. H. (2010).
 Beta-MPT: Multinomial processing tree models for addressing individual differences.
 \emph{Journal of Mathematical Psychology, 54}, 167-183.
+\doi{10.1016/j.jmp.2009.06.007}
 }
 \author{
 Daniel W. Heck, Nina R. Arnold, Denis Arnold

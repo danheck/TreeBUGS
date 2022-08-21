@@ -6,14 +6,15 @@
 #' @inheritParams betaMPT
 #' @param predStructure  Defines which variables in \code{covData} are included
 #'     as predictors for which MPT parameters. Either the path to the file that
-#'     specifies the assigment of MPT parameters to covariates (that is, each row
+#'     specifies the assignment of MPT parameters to covariates (that is, each row
 #'     assigns one or more MPT parameters to one or more covariates, separated
 #'     by a semicolon, e.g., \code{Do g; age extraversion}). Can also be provided
 #'     as a list, e.g., \code{list("Do Dn ; age", "g ; extraversion"}).
 #'     Note that no correlations of MPT parameters and predictors are computed.
 #'     However, for continuous covariates, the standardized slope parameters
 #'     \code{slope_std_parameter_predictor} can be interpreted as a correlation
-#'     if a single predictor is included for the corresponding MPT parameter.
+#'     if a single predictor is included for the corresponding MPT parameter
+#'     (see Jobst et al., 2020).
 #' @param predType a character vector specifying the type of continuous or
 #'     discrete predictors in each column of \code{covData}:
 #'     \code{"c"} = continuous covariate (which are centered to have a mean of zero);
@@ -38,11 +39,11 @@
 #' @param IVprec hyperprior on the precision parameter \eqn{g} (= the inverse of the variance)
 #'     of the standardized slope parameters of continuous covariates.
 #'     The default \code{IVprec=dgamma(.5,.5)} defines a mixture of \eqn{g}-priors
-#'     (also known as JZS or Cauchy) wit the scale parameter \eqn{s=1}. Different
-#'     scales \eqn{s} can be used via: \code{IVprec=dgamma(.5,.5*s^2)}.
+#'     (also known as JZS or Cauchy prior) with the scale parameter \eqn{s=1}. Different
+#'     scale parameters \eqn{s} can be set via: \code{IVprec=dgamma(.5,.5*s^2)}.
 #'     A numeric constant \code{IVprec=1} implies a \eqn{g}-prior (a normal distribution).
-#'     For ease of interpretation, TreeBUGS reports unstandardized regression coefficients.
-#'     See details below.
+#'     For ease of interpretation, TreeBUGS reports both unstandardized
+#'     and standardized regression coefficients. See details below.
 #'
 #' @section Regression Extensions:
 #' Continuous and discrete predictors are added on the latent-probit scale via:
@@ -52,19 +53,27 @@
 #' Note that both centering and recoding is done internally.
 #' TreeBUGS reports unstandardized regression coefficients \eqn{\beta} that correspond to the
 #' scale/SD of the predictor variables. Hence, slope estimates will be very small if the
-#' covariate has a large variance.
+#' covariate has a large variance. TreeBUGS also reports standardized slope parameters
+#' (labeled with \code{std}) which are standardized both with respect to the
+#' variance of the predictor variables and the variance in the individual MPT
+#' parameters. If a single predictor variable is included,
+#' the standardized slope can be interpreted as a correlation coefficient (Jobst et al., 2020).
 #'
-#' For continuous predictors, the default prior \code{IVprec = "dgamma(.5,.5)"} implies
-#' a Cauchy prior on each standardized \eqn{\beta}. This prior is similar to the
+#' For continuous predictor variables, the default prior \code{IVprec = "dgamma(.5,.5)"} implies
+#' a Cauchy prior on the \eqn{\beta} parameters (standardized with respect to the variance of
+#' the predictor variables). This prior is similar to the
 #' Jeffreys-Zellner-Siow (JZS) prior with scale parameter \eqn{s=1}
 #' (for details, see: Rouder et. al, 2012; Rouder & Morey, 2012).
-#' In contrast to the JZS prior for standard linear regression as in Rouder & Morey (2012),
+#' In contrast to the JZS prior for standard linear regression by Rouder & Morey (2012),
 #' TreeBUGS implements a latent-probit regression where the prior on the coefficients
-#' \eqn{\beta} is only scaled with respect to the
-#' covariates but not with respect to the residual variance (since this is not a parameter in probit regression).
+#' \eqn{\beta} is only standardized/scaled with respect to the continuous predictor variables
+#' but not with respect to the residual variance (since this is not a parameter in probit regression).
 #' If small effects are expected, smaller scale values \eqn{s} can be used by changing the default to
-#' \code{IVprec = 'dgamma(.5, .5*s^2)'}.
-#' To use a standard-normal priors on the standardized slopes, use \code{IVprec = 'dcat(1)'}.
+#' \code{IVprec = 'dgamma(.5, .5*s^2)'} (by plugging in a specific number for \code{s}).
+#' To use a standard-normal instead of a Cauchy prior distribution, use \code{IVprec = 'dcat(1)'}.
+#' Bayes factors for slope parameters of continuous predictors can be computed
+#' with the function \link{BayesFactorSlope}.
+#'
 #'
 #' @section Uncorrelated Latent-Trait Values:
 #' The standard latent-trait MPT model assumes a multivariate normal distribution
@@ -80,12 +89,12 @@
 #' To fit the model, the scale matrix \code{V} is set to \code{NA}
 #' (V is only relevant for the multivariate Wishart prior) and the prior
 #' on \code{xi} is changed: \code{traitMPT(..., V=NA, xi="dnorm(0,1)")}.
-#' The model assumes that the latent-trait values \eqn{\delta[i]} (=random-intercepts)
-#' are decomposed by the scaling parameter \eqn{\xi} and the raw deviation \eqn{\epsilon[i]}
+#' The model assumes that the latent-trait values \eqn{\delta_i} (=random-intercepts)
+#' are decomposed by the scaling parameter \eqn{\xi} and the raw deviation \eqn{\epsilon_i}
 #' (cf. Gelman, 2006):
-#'      \deqn{\delta[i] = \xi * \epsilon[i]}
-#'      \deqn{\epsilon[i] ~ Normal(0,\sigma^2)}
-#'      \deqn{\sigma^2 ~ Inverse_Chisquare(df)}
+#'      \deqn{\delta_i = \xi \cdot \epsilon_i}
+#'      \deqn{\epsilon_i \sim \text{Normal}(0,\sigma^2)}
+#'      \deqn{\sigma^2 \sim \text{Inverse-} \chi^2(df)}
 #' Note that the default prior for \eqn{\xi} should be changed to \code{xi="dnorm(0,1)"}, which
 #' results in a half-Cauchy prior (Gelman, 2006).
 #'
@@ -105,26 +114,35 @@
 #' Heck, D. W., Arnold, N. R., & Arnold, D. (2018).
 #' TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
 #' \emph{Behavior Research Methods, 50}, 264–284.
+#' \doi{10.3758/s13428-017-0869-7}
 #'
 #' @references
 #' Gelman, A. (2006). Prior distributions for variance parameters in hierarchical models
 #' (comment on article by Browne and Draper).
 #' \emph{Bayesian Analysis, 1}, 515-534.
 #'
+#' Jobst, L. J., Heck, D. W., & Moshagen, M. (2020). A comparison of correlation
+#' and regression approaches for multinomial processing tree models.
+#' \emph{Journal of Mathematical Psychology, 98}, 102400.
+#' \doi{10.1016/j.jmp.2020.102400}
+#'
 #' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach.
-#' \emph{Psychometrika, 75}, 70-98.
+#' \emph{Psychometrika, 75}, 70-98. \doi{10.1007/s11336-009-9141-0}
 #'
 #' Matzke, D., Dolan, C. V., Batchelder, W. H., & Wagenmakers, E.-J. (2015).
 #' Bayesian estimation of multinomial processing tree models with heterogeneity in participants and items.
-#' \emph{Psychometrika, 80}, 205-235.
+#' \emph{Psychometrika, 80}, 205-235. \doi{10.1007/s11336-013-9374-9}
 #'
 #' Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012).
 #' Default Bayes factors for ANOVA designs.
 #' \emph{Journal of Mathematical Psychology, 56}, 356-374.
+#' \doi{10.1016/j.jmp.2012.08.001}
 #'
 #' Rouder, J. N., & Morey, R. D. (2012).
 #' Default Bayes Factors for Model Selection in Regression.
 #' \emph{Multivariate Behavioral Research, 47}, 877-903.
+#' \doi{10.1080/00273171.2012.734737}
+#'
 #'
 #' @examples
 #' \dontrun{
