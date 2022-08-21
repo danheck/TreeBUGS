@@ -41,10 +41,10 @@ Plot Convergence for Hierarchical MPT Models
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{betaMPT}: Plot convergence for beta MPT
+\item \code{plot(betaMPT)}: Plot convergence for beta MPT
 
-\item \code{simpleMPT}: Plot convergence for nonhierarchical MPT model
+\item \code{plot(simpleMPT)}: Plot convergence for nonhierarchical MPT model
 
-\item \code{traitMPT}: Plot convergence for latent-trait MPT
+\item \code{plot(traitMPT)}: Plot convergence for latent-trait MPT
+
 }}
-
