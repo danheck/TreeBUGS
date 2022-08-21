@@ -13,7 +13,7 @@ vignette: >
   
 ## General Procedure of Using TreeBUGS
   
-<img src="../man/figures/TreeBUGS.png" width="150" align="right" hspace="20" style="border:0px">
+<img src="../man/figures/TreeBUGS.png" width="150" style="float: right; border:0px">
 
 In the most simple scenario, the following steps are required:
 

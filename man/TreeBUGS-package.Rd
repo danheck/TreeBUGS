@@ -7,7 +7,7 @@
 \title{TreeBUGS: Hierarchical Multinomial Processing Tree Modeling}
 \description{
 {
-\if{html}{\figure{TreeBUGS.png}{options: width=120 alt ="TreeBUGS" align="right" hspace="20"}}
+\if{html}{\figure{TreeBUGS.png}{options: width='120' alt ='logo' style='float: right'}}
 \if{latex}{\figure{TreeBUGS.png}{options: width=0.5in}}
 
 Uses standard MPT files in the .eqn-format (Moshagen, 2010) to fit hierarchical Bayesian MPT models.
