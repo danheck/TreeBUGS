@@ -56,9 +56,9 @@ double sliceAB(double x,
   int cnt = 0;
   while( (norm(yy) > eps)  & (cnt < steps) ){
     cnt++;
-    if( ( (yy(0)<0) & (yy(1)>0) ) | ( (yy(0)>0) & (yy(1)<0) )){
+    if( ( (yy(0)<0) && (yy(1)>0) ) || ( (yy(0)>0) && (yy(1)<0) )){
       xx(2) = xx(1);
-    }else if( ( (yy(2)<0) & (yy(1)>0) ) | ( (yy(2)>0) & (yy(1)<0) )){
+    }else if( ( (yy(2)<0) && (yy(1)>0) ) || ( (yy(2)>0) && (yy(1)<0) )){
       xx(0) = xx(1);
     }
 
@@ -82,9 +82,9 @@ double sliceAB(double x,
   cnt = 0;
   while( (norm(yy) > eps)  & (cnt < steps) ){
     cnt++;
-    if( ( (yy(0)<0) & (yy(1)>0) ) | ( (yy(0)>0) & (yy(1)<0) )){
+    if( ( (yy(0)<0) && (yy(1)>0) ) || ( (yy(0)>0) && (yy(1)<0) )){
       xx(2) = xx(1);
-    }else if( ( (yy(2)<0) & (yy(1)>0) ) | ( (yy(2)>0) & (yy(1)<0) )){
+    }else if( ( (yy(2)<0) && (yy(1)>0) ) || ( (yy(2)>0) && (yy(1)<0) )){
       xx(0) = xx(1);
     }
     xx(1) = (xx(2)-xx(0))/2 + xx(0);
