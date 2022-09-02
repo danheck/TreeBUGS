@@ -1,6 +1,6 @@
 Package: TreeBUGS
-Version: 1.4.8
-Date: 2022-08-21
+Version: 1.4.9
+Date: 2022-09-02
 Title: Hierarchical Multinomial Processing Tree Modeling
 Authors@R: c(person("Daniel W.", "Heck", email="dheck@uni-marburg.de", role=c("aut","cre"),
                     comment = c(ORCID = "0000-0002-6302-9252")),
@@ -48,7 +48,8 @@ Description: User-friendly analysis of hierarchical multinomial processing tree 
     Gibbs sampler in C++ (only for nonhierarchical and beta MPT models). Provides 
     tests of heterogeneity and MPT-tailored summaries and plotting functions.
     A detailed documentation is available in Heck, Arnold, & Arnold (2018) 
-    <DOI:10.3758/s13428-017-0869-7>.
+    <DOI:10.3758/s13428-017-0869-7> and a tutorial on MPT modeling can be found 
+    in Schmidt, Erdfelder, & Heck (2022) <DOI:10.31234/osf.io/gh8md>.
 License: GPL-3
 Encoding: UTF-8
 URL: https://github.com/danheck/TreeBUGS

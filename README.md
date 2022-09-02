@@ -58,6 +58,14 @@ TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling.
 https://doi.org/10.3758/s13428-017-0869-7
 
 
+## Tutorial on MPT Modeling
+
+A tutorial paper on multinomial processing tree models (including hierarchical model fitting with TreeBUGS) can be found here:
+
+Schmidt, O., Erdfelder, E., & Heck, D. W. (2022). Tutorial on multinomial processing tree modeling: How to develop, test, and extend MPT models. https://psyarxiv.com/gh8md/
+
+
+
 ### References
 
 * Batchelder, W. H., & Riefer, D. M. (1999). 
