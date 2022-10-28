@@ -1,5 +1,7 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TreeBUGS)](http://cran.r-project.org/package=TreeBUGS)
-[![License](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+![CRAN/METACRAN](https://img.shields.io/cran/l/TreeBUGS)
+[![monthly downloads](http://cranlogs.r-pkg.org/badges/TreeBUGS)](http://cranlogs.r-pkg.org/badges/TreeBUGS)
+[![total downloads](http://cranlogs.r-pkg.org/badges/grand-total/TreeBUGS)](http://cranlogs.r-pkg.org/badges/grand-total/TreeBUGS)
 
 
 # TreeBUGS
@@ -20,6 +22,14 @@ In the most simple user scenario, the following steps are required:
 5. Summarize and plot results using functions tailored to MPT models
 
 These steps are explained in more detail in the package vignette, which can be opened in R by typing `vignette("TreeBUGS")`. 
+
+
+## Tutorial on MPT Modeling
+
+A tutorial paper on multinomial processing tree models (including hierarchical model fitting with TreeBUGS) can be found here:
+
+- Schmidt, O., Erdfelder, E., & Heck, D. W. (2022). Tutorial on multinomial processing tree modeling: How to develop, test, and extend MPT models. *PsyArXiv*. https://psyarxiv.com/gh8md/
+
 
 ## Installing TreeBUGS
 
@@ -48,25 +58,18 @@ curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
 sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 ```
 
+
 ## Citation
 
 If you use TreeBUGS, please cite the software as follows:
 
-Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (2018). 
+- Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (2018). 
 TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. 
 *Behavior Research Methods, 50*, 264-284. 
 https://doi.org/10.3758/s13428-017-0869-7
 
 
-## Tutorial on MPT Modeling
-
-A tutorial paper on multinomial processing tree models (including hierarchical model fitting with TreeBUGS) can be found here:
-
-Schmidt, O., Erdfelder, E., & Heck, D. W. (2022). Tutorial on multinomial processing tree modeling: How to develop, test, and extend MPT models. https://psyarxiv.com/gh8md/
-
-
-
-### References
+## References
 
 * Batchelder, W. H., & Riefer, D. M. (1999). 
 Theoretical and empirical review of multinomial process tree modeling. 
