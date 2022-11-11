@@ -1,7 +1,8 @@
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TreeBUGS)](http://cran.r-project.org/package=TreeBUGS)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/TreeBUGS)](https://cran.r-project.org/package=TreeBUGS)
+[![Workflow](https://github.com/danheck/TreeBUGS/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/danheck/TreeBUGS/actions/workflows/check-standard.yaml)
 ![CRAN/METACRAN](https://img.shields.io/cran/l/TreeBUGS)
-[![monthly downloads](http://cranlogs.r-pkg.org/badges/TreeBUGS)](http://cranlogs.r-pkg.org/badges/TreeBUGS)
-[![total downloads](http://cranlogs.r-pkg.org/badges/grand-total/TreeBUGS)](http://cranlogs.r-pkg.org/badges/grand-total/TreeBUGS)
+[![monthly downloads](https://cranlogs.r-pkg.org/badges/TreeBUGS)](https://cranlogs.r-pkg.org/badges/TreeBUGS)
+[![total downloads](https://cranlogs.r-pkg.org/badges/grand-total/TreeBUGS)](https://cranlogs.r-pkg.org/badges/grand-total/TreeBUGS)
 
 
 # TreeBUGS
