@@ -24,32 +24,34 @@ WAIC(
 
 \item{n.thin}{Thinning rate.}
 
-\item{summarize}{whether to summarize the WAIC values which are computed separately
-for each observed node.}
+\item{summarize}{whether to summarize the WAIC values which are computed
+separately for each observed node.}
 }
 \value{
-If \code{summarize=TRUE} (default), a vector containing the WAIC penalty term
-\code{"p_waic"}, \code{"deviance"}, \code{"waic"}, and the corresponding
-standard error \code{"se_waic"}.
+If \code{summarize=TRUE} (default), a vector containing the WAIC
+penalty term \code{"p_waic"}, \code{"deviance"}, \code{"waic"}, and the
+corresponding standard error \code{"se_waic"}.
 
 If \code{summarize=FALSE}, a list containing three vectors \code{p_waic},
 \code{deviance}, and \code{waic} with separate values for each observed node
- (i.e., for all combinations of persons and free categories).
+(i.e., for all combinations of persons and free categories).
 }
 \description{
 Implementation of the WAIC for model comparison.
 }
 \details{
-WAIC provides an approximation of predictive accuracy with respect to out-of-sample deviance.
-The uncertainty of the WAIC for the given number of observed nodes
-(i.e., number of free categories times the number of participants)
-is quantified by the standard error of WAIC \code{"se_waic"} (cf. Vehtari et al., 2017).
-In contrast, to assess whether the approximation uncertainty due to MCMC sampling
-(not sample size) is sufficiently low, it is a good idea to fit each model twice and compute WAIC
-again to assess the stability of the WAIC values.
+WAIC provides an approximation of predictive accuracy with respect
+to out-of-sample deviance. The uncertainty of the WAIC for the given number
+of observed nodes (i.e., number of free categories times the number of
+participants) is quantified by the standard error of WAIC \code{"se_waic"}
+(cf. Vehtari et al., 2017). In contrast, to assess whether the approximation
+uncertainty due to MCMC sampling (not sample size) is sufficiently low, it is
+a good idea to fit each model twice and compute WAIC again to assess the
+stability of the WAIC values.
 
-For more details, see Vehtari et al. (2017) and the following discussion about
-the JAGS implementation (which is currently an experimental feature of JAGS 4.3.0):
+For more details, see Vehtari et al. (2017) and the following discussion
+about the JAGS implementation (which is currently an experimental feature of
+JAGS 4.3.0):
 
 \url{https://sourceforge.net/p/mcmc-jags/discussion/610036/thread/8211df61/}
 }
@@ -62,11 +64,14 @@ WAIC(fit)
 
 
 #### pairwise comparison of two models:
+
 # (1) compute WAIC per model
 waic1 <- WAIC(fit1, summarize = FALSE)
 waic2 <- WAIC(fit2, summarize = FALSE)
+
 # (2) WAIC differences (per observation!)
 waic_diff <- waic1$waic - waic2$waic
+
 # (3) standard error of the WAIC differences:
 n_obs <- length(waic_diff)
 c(
@@ -77,7 +82,7 @@ c(
 
 }
 \references{
-Vehtari, A., Gelman, A., & Gabry, J. (2017). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC. Statistics and
-Computing, 27(5), 1413–1432. doi:10.1007/s11222-016-9696-4
+Vehtari, A., Gelman, A., & Gabry, J. (2017). Practical Bayesian
+model evaluation using leave-one-out cross-validation and WAIC. Statistics
+and Computing, 27(5), 1413–1432. doi:10.1007/s11222-016-9696-4
 }

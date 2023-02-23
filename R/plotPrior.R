@@ -1,29 +1,49 @@
-
 #' Plot Prior Distributions
 #'
-#' Plots prior distributions for group means, standard deviation, and correlations of MPT parameters across participants.
-#' @param M number of random samples to approximate priors of group-level parameters
-#' @param probitInverse which latent-probit parameters (for \code{\link{traitMPT}} model) to transform to probability scale. Either \code{"none"}, \code{"mean"} (simple transformation \eqn{\Phi(\mu)}), or \code{"mean_sd"} (see \code{\link{probitInverse}})
+#' Plots prior distributions for group means, standard deviation, and
+#' correlations of MPT parameters across participants.
+#'
+#' @param M number of random samples to approximate priors of group-level
+#'   parameters
+#' @param probitInverse which latent-probit parameters (for
+#'   \code{\link{traitMPT}} model) to transform to probability scale. Either
+#'   \code{"none"}, \code{"mean"} (simple transformation \eqn{\Phi(\mu)}), or
+#'   \code{"mean_sd"} (see \code{\link{probitInverse}})
 #' @param ... further arguments passed to \code{plot}
 #' @inheritParams priorPredictive
-#' @details This function samples from a set of hyperpriors (either for hierarchical traitMPT or betaMPT structure) to approximate the implied prior distributions on the parameters of interest (group-level mean, SD, and correlations of MPT parameters). Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and precision (= 1/variance).
-#' @export
+#'
+#' @details This function samples from a set of hyperpriors (either for
+#'   hierarchical traitMPT or betaMPT structure) to approximate the implied
+#'   prior distributions on the parameters of interest (group-level mean, SD,
+#'   and correlations of MPT parameters). Note that the normal distribution
+#'   \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and
+#'   precision (= 1/variance).
 #' @seealso \code{\link{priorPredictive}}
+#'
 #' @examples
 #' \dontrun{
 #' # default priors for traitMPT:
 #' plotPrior(list(
-#'   mu = "dnorm(0,1)", xi = "dunif(0,10)",
-#'   V = diag(2), df = 2 + 1
+#'   mu = "dnorm(0, 1)",
+#'   xi = "dunif(0, 10)",
+#'   V = diag(2),
+#'   df = 2 + 1
 #' ), M = 4000)
 #'
 #' # default priors for betaMPT:
 #' plotPrior(list(
-#'   alpha = "dgamma(1,.1)",
-#'   beta = "dgamma(1,.1)"
+#'   alpha = "dgamma(1, 0.1)",
+#'   beta = "dgamma(1, 0.1)"
 #' ), M = 4000)
 #' }
-plotPrior <- function(prior, probitInverse = "mean", M = 5000, nCPU = 3, ...) {
+#' @export
+plotPrior <- function(
+    prior,
+    probitInverse = "mean",
+    M = 5000,
+    nCPU = 3,
+    ...
+) {
   ############### prior samples
   samples <- sampleHyperprior(prior, M, # S=1,
     probitInverse = probitInverse, truncSig = .995, nCPU = nCPU

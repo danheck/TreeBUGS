@@ -1,27 +1,43 @@
-
 #' Marginal Likelihood for Simple MPT
 #'
-#' Computes the marginal likelihood for simple (fixed-effects, nonhierarchical) MPT models.
+#' Computes the marginal likelihood for simple (fixed-effects, nonhierarchical)
+#' MPT models.
 #'
 #' @inheritParams simpleMPT
-#' @param method either \code{"importance"} (importance sampling using a mixture of uniform and beta-aproximation of the posterior) or \code{"prior"} (brute force Monte Carlo sampling from prior)
-#' @param posterior number of posterior samples used to approximate importance-sampling densities (i.e., beta distributions)
+#' @param method either \code{"importance"} (importance sampling using a mixture
+#'   of uniform and beta-aproximation of the posterior) or \code{"prior"} (brute
+#'   force Monte Carlo sampling from prior)
+#' @param posterior number of posterior samples used to approximate
+#'   importance-sampling densities (i.e., beta distributions)
 #' @param dataset for which data set should Bayes factors be computed?
-#' @param mix mixture proportion of the uniform distribution for the importance-sampling density
-#' @param scale how much should posterior-beta approximations be downscaled to get fatter importance-sampling density
+#' @param mix mixture proportion of the uniform distribution for the
+#'   importance-sampling density
+#' @param scale how much should posterior-beta approximations be downscaled to
+#'   get fatter importance-sampling density
 #' @param samples total number of samples from parameter space
-#' @param batches number of batches. Used to compute a standard error of the estimate.
+#' @param batches number of batches. Used to compute a standard error of the
+#'   estimate.
 #' @param show whether to show progress
 #' @param cores number of CPUs used
 #'
-#' @details
-#' Currently, this is only implemented for a single data set!
+#' @details Currently, this is only implemented for a single data set!
 #'
-#' If \code{method = "prior"}, a brute-force Monte Carlo method is used and parameters are directly sampled from the prior.Then, the likelihood is evaluated for these samples and averaged (fast, but inefficient).
+#' If \code{method = "prior"}, a brute-force Monte Carlo method is used and
+#' parameters are directly sampled from the prior.Then, the likelihood is
+#' evaluated for these samples and averaged (fast, but inefficient).
 #'
-#' Alternatively, an importance sampler is used if \code{method = "importance"}, and the posterior distributions of the MPT parameters are approximated by independent beta distributions. Then each parameter \eqn{s} is sampled from the importance density:
+#' Alternatively, an importance sampler is used if \code{method = "importance"},
+#' and the posterior distributions of the MPT parameters are approximated by
+#' independent beta distributions. Then each parameter \eqn{s} is sampled from
+#' the importance density:
 #'
 #' \eqn{mix*U(0,1) + (1-mix)*Beta(scale*a_s, scale*b_s)}
+#'
+#' @seealso \code{\link{BayesFactorMPT}}
+#' @references Vandekerckhove, J. S., Matzke, D., & Wagenmakers, E. (2015).
+#'   Model comparison and the principle of parsimony. In Oxford Handbook of
+#'   Computational and Mathematical Psychology (pp. 300-319). New York, NY:
+#'   Oxford University Press.
 #'
 #' @examples
 #' # 2-High-Threshold Model
@@ -59,14 +75,23 @@
 #' mean(bf) # BF
 #' sd(bf) / sqrt(length(bf)) # standard error of BF estimate
 #'
-#' @seealso \code{\link{BayesFactorMPT}}
-#' @references
-#' Vandekerckhove, J. S., Matzke, D., & Wagenmakers, E. (2015). Model comparison and the principle of parsimony. In Oxford Handbook of Computational and Mathematical Psychology (pp. 300-319). New York, NY: Oxford University Press.
 #' @export
-marginalMPT <- function(eqnfile, data, restrictions, alpha = 1, beta = 1,
-                        dataset = 1, method = "importance", posterior = 500,
-                        mix = .05, scale = .9, samples = 10000, batches = 10,
-                        show = TRUE, cores = 1) {
+marginalMPT <- function(
+    eqnfile,
+    data,
+    restrictions,
+    alpha = 1,
+    beta = 1,
+    dataset = 1,
+    method = "importance",
+    posterior = 500,
+    mix = .05,
+    scale = .9,
+    samples = 10000,
+    batches = 10,
+    show = TRUE,
+    cores = 1
+) {
   if (mix < 0 | mix > 1 | scale < 0 | scale > 1) {
     stop("The tuning parameters 'mix' and 'scale' must be in the interval [0,1].")
   }

@@ -19,64 +19,66 @@ genTraitMPT(
 \arguments{
 \item{N}{number of participants}
 
-\item{numItems}{number of responses per tree (a named vector with tree labels)}
+\item{numItems}{number of responses per tree (a named vector with tree
+labels)}
 
-\item{eqnfile}{The (relative or full) path to the file that specifies the MPT model
-(standard .eqn syntax). Note that category labels must start with a letter
-(different to multiTree) and match the column names of \code{data}.
+\item{eqnfile}{The (relative or full) path to the file that specifies the MPT
+model (standard .eqn syntax). Note that category labels must start with a
+letter (different to multiTree) and match the column names of \code{data}.
 Alternatively, the EQN-equations can be provided within R as a character
 value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file
 is reserved for comments and always ignored.}
 
-\item{restrictions}{Specifies which parameters should be
-(a) constant (e.g., \code{"a=b=.5"}) or
-(b) constrained to be identical (e.g., \code{"Do=Dn"}) or
-(c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}).
-Either given as the path to a text file with restrictions per row or
-as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}.
+\item{restrictions}{Specifies which parameters should be (a) constant (e.g.,
+\code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"})
+or (c) treated as fixed effects (i.e., identical for all participants;
+\code{"a=b=FE"}). Either given as the path to a text file with restrictions
+per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}.
 Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly
 interpreted as equality constraints.}
 
-\item{mean}{named vector of data-generating group means of the individual MPT parameters
-on the probability scale.
-If the vector is not named, the internal order of parameters is used
-(can be obtained using \code{\link{readEQN}}).}
+\item{mean}{named vector of data-generating group means of the individual MPT
+parameters on the probability scale. If the vector is not named, the
+internal order of parameters is used (can be obtained using
+\code{\link{readEQN}}).}
 
-\item{mu}{an alternative way to define the group-level means on the latent-probit scale
-(i.e., \code{mu = qnorm(mean)} or equivalently, \code{mean = pnorm(mu)}).}
+\item{mu}{an alternative way to define the group-level means on the
+latent-probit scale (i.e., \code{mu = qnorm(mean)} or equivalently,
+\code{mean = pnorm(mu)}).}
 
-\item{sigma}{(named) vector of group standard deviations of
-individual MPT parameters on the latent probit scale.
-Default is zero (no person heterogeneity).}
+\item{sigma}{(named) vector of group standard deviations of individual MPT
+parameters on the latent probit scale. Default is zero (no person
+heterogeneity).}
 
 \item{rho}{(named) correlation matrix for individual MPT parameters on the
 latent probit scale. Must be symmetric and positive definite (e.g., no
-correlations of 1 or -1 allowed).
-Default: a diagonal matrix (i.e., zero correlations).}
+correlations of 1 or -1 allowed). Default: a diagonal matrix (i.e., zero
+correlations).}
 
 \item{warning}{whether to show warning in case the naming of data-generating
 parameters are unnamed or do not match}
 }
 \value{
 a list including the generated frequencies per person (\code{data})
-    and the sampled individual parameters (\code{parameters}) on the probit
-    and probability scale (\code{thetaLatent} and \code{theta}, respectively).
+  and the sampled individual parameters (\code{parameters}) on the probit and
+  probability scale (\code{thetaLatent} and \code{theta}, respectively).
 }
 \description{
 Generating a data set with known parameter structure using the Trait-MPT.
 Useful for simulations and robustness checks.
 }
 \details{
-This functions implements a two-step sampling procedure. First, the person
-parameters on the latent probit-scale are sampled from the multivariate normal
-distribution (based on the mean \code{mu = qnorm(mean)}, the standard deviations
-\code{sigma}, and the correlation matrix \code{rho}).
+This functions implements a two-step sampling procedure. First, the
+person parameters on the latent probit-scale are sampled from the
+multivariate normal distribution (based on the mean \code{mu = qnorm(mean)},
+the standard deviations \code{sigma}, and the correlation matrix \code{rho}).
 These person parameters are then transformed to the probability scale using
-the probit-link.
-In a last step, observed frequencies are sampled for each person using the MPT equations.
+the probit-link. In a last step, observed frequencies are sampled for each
+person using the MPT equations.
 
-Note that the user can generate more complex structures for the latent person parameters,
-and then supply these person parameters to the function \code{\link{genMPT}}.
+Note that the user can generate more complex structures for the latent person
+parameters, and then supply these person parameters to the function
+\code{\link{genMPT}}.
 }
 \examples{
 # Example: Standard Two-High-Threshold Model (2HTM)
@@ -99,7 +101,8 @@ head(genDat$data, 3)
 plotFreq(genDat$data, eqn = EQNfile)
 }
 \references{
-Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
+Klauer, K. C. (2010). Hierarchical multinomial processing tree
+  models: A latent-trait approach. Psychometrika, 75, 70-98.
 }
 \seealso{
 \code{\link{genMPT}}

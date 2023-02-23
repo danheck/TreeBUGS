@@ -1,31 +1,33 @@
 
 # general model fitting function
 # type: "traitMPT" or "betaMPT"
-fitModel <- function(type,
-                     eqnfile, # statistical model stuff
-                     data,
-                     restrictions,
-                     covData,
-                     predStructure, # predictor structure
-                     predType, # c("c," f", "r")
-                     transformedParameters,
-                     corProbit = TRUE,
-                     hyperprior,
-                     # MCMC stuff:
-                     n.iter = 20000,
-                     n.adapt = 2000,
-                     n.burnin = 2000,
-                     n.thin = 5,
-                     n.chains = 3,
-                     dic = FALSE,
-                     ppp = 0,
-                     # File Handling stuff:
-                     modelfilename,
-                     parEstFile,
-                     posteriorFile,
-                     autojags = NULL,
-                     call = NULL,
-                     ...) {
+fitModel <- function(
+    type,
+    eqnfile, # statistical model stuff
+    data,
+    restrictions,
+    covData,
+    predStructure, # predictor structure
+    predType, # c("c," f", "r")
+    transformedParameters,
+    corProbit = TRUE,
+    hyperprior,
+    # MCMC stuff:
+    n.iter = 20000,
+    n.adapt = 2000,
+    n.burnin = 2000,
+    n.thin = 5,
+    n.chains = 3,
+    dic = FALSE,
+    ppp = 0,
+    # File Handling stuff:
+    modelfilename,
+    parEstFile,
+    posteriorFile,
+    autojags = NULL,
+    call = NULL,
+    ...
+) {
   if (missing(restrictions)) restrictions <- NULL
   if (missing(covData)) covData <- NULL
   if (missing(transformedParameters)) transformedParameters <- NULL

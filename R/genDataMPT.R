@@ -1,12 +1,18 @@
 #' Generate MPT Frequencies
 #'
 #' Uses a matrix of individual MPT parameters to generate MPT frequencies.
-#' @param theta matrix of MPT parameters (rows: individuals; columns: parameters). Parameters are assigned by column names of the matrix. all of the parameters in the model file need to be included.
-#' @param numItems number of responses per tree (a named vector with tree labels)
+#'
+#' @param theta matrix of MPT parameters (rows: individuals; columns:
+#'   parameters). Parameters are assigned by column names of the matrix. all of
+#'   the parameters in the model file need to be included.
+#' @param numItems number of responses per tree (a named vector with tree
+#'   labels)
 #' @inheritParams betaMPT
 #' @param warning whether to show warning in case the naming of data-generating
-#'    parameters are unnamed or do not match
-#' @seealso \code{\link{genTraitMPT}} and \code{\link{genBetaMPT}} to generate data for latent normal/beta hierarchical distributions.
+#'   parameters are unnamed or do not match
+#' @seealso \code{\link{genTraitMPT}} and \code{\link{genBetaMPT}} to generate
+#'   data for latent normal/beta hierarchical distributions.
+#'
 #' @examples
 #' # Example: Standard Two-High-Threshold Model (2HTM)
 #' EQNfile <- system.file("MPTmodels/2htm.eqn", package = "TreeBUGS")
@@ -24,7 +30,13 @@
 #' )
 #' genDat
 #' @export
-genMPT <- function(theta, numItems, eqnfile, restrictions, warning = TRUE) {
+genMPT <- function(
+    theta,
+    numItems,
+    eqnfile,
+    restrictions,
+    warning = TRUE
+) {
   if (missing(restrictions)) {
     restrictions <- NULL
   }

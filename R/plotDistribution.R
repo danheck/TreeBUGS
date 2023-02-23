@@ -1,20 +1,30 @@
-
 #' Plot Distribution of Individual Estimates
 #'
-#' Plots histograms of the posterior-means of individual MPT parameters against the group-level distribution given by the posterior-mean of the hierarchical parameters (e.g., the beta distribution in case of the beta-MPT)
+#' Plots histograms of the posterior-means of individual MPT parameters against
+#' the group-level distribution given by the posterior-mean of the hierarchical
+#' parameters (e.g., the beta distribution in case of the beta-MPT)
 #'
-#' @param fittedModel fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})
-#' @param scale only for latent-trait MPT: should estimates be plotted on the \code{"latent"}
-#'     or the \code{"probability"} scale (i.e., as MPT parameters).
-#'     Can be abbreviated by \code{"l"}  and \code{"p"}.
-#' @param ... further arguments passed to \code{\link{hist}} (e.g., \code{breaks=50} to get a more fine-grained histogram)
+#' @param fittedModel fitted latent-trait or beta MPT model
+#'   (\code{\link{traitMPT}}, \code{\link{betaMPT}})
+#' @param scale only for latent-trait MPT: should estimates be plotted on the
+#'   \code{"latent"} or the \code{"probability"} scale (i.e., as MPT
+#'   parameters). Can be abbreviated by \code{"l"}  and \code{"p"}.
+#' @param ... further arguments passed to \code{\link{hist}} (e.g.,
+#'   \code{breaks=50} to get a more fine-grained histogram)
 #'
-#' @details For the latent-trait MPT, differences due to continuous predictors or discrete factors are currently not considered in the group-level predictions (red density).
-#' Under such a model, individual estimates are not predicted to be normally distributed on the latent scale as shown in the plot.
+#' @details For the latent-trait MPT, differences due to continuous predictors
+#'   or discrete factors are currently not considered in the group-level
+#'   predictions (red density). Under such a model, individual estimates are not
+#'   predicted to be normally distributed on the latent scale as shown in the
+#'   plot.
 #'
 #' @seealso \code{\link{plot.traitMPT}}
 #' @export
-plotDistribution <- function(fittedModel, scale = "probability", ...) {
+plotDistribution <- function(
+    fittedModel,
+    scale = "probability",
+    ...
+) {
   mfrow <- par()$mfrow
   mar <- par()$mar
   scale <- match.arg(scale, c("probability", "latent"))

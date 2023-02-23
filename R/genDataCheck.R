@@ -1,6 +1,4 @@
-
 ################### HELPER FUNCTIONS ####################################
-
 
 checkNumItems <- function(numItems, treeLabels) {
   if (any(sort(treeLabels) != sort(names(numItems)))) {

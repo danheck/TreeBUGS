@@ -8,14 +8,17 @@
 # #' @param parString  additional lines added to sample transformed parameters (e.g., parameter differences for testing)
 # #' @author Daniel Heck
 # #' @export
-makeModelFile <- function(model, # either "betaMPT" or "traitMPT"
-                          filename, mergedTree, S,
-                          hyperprior, # list (either with alpha+beta or with mu+xi)
-                          corString = NULL, # model string to compute correlations
-                          predString = NULL, # model string to include predictors (in traitMPT)
-                          parString = "",
-                          groupMatT1 = NULL, # a G x 2 matrix that contains the grouping indices for T1 per group (column 1:2 = from:to)
-                          fixedPar = NULL) {
+makeModelFile <- function(
+    model, # either "betaMPT" or "traitMPT"
+    filename, mergedTree, S,
+    hyperprior, # list (either with alpha+beta or with mu+xi)
+    corString = NULL, # model string to compute correlations
+    predString = NULL, # model string to include predictors (in traitMPT)
+    parString = "",
+    groupMatT1 = NULL, # a G x 2 matrix that contains the grouping indices for T1 per group (column 1:2 = from:to)
+    fixedPar = NULL
+) {
+
   treeNames <- as.character(sort(unique(mergedTree$Tree)))
   NOT <- length(treeNames)
   count <- 1

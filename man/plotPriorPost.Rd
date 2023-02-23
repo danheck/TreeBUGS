@@ -16,19 +16,25 @@ plotPriorPost(
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
-\item{probitInverse}{which latent-probit parameters (for \code{\link{traitMPT}} model) to transform to probability scale. Either \code{"none"}, \code{"mean"} (simple transformation \eqn{\Phi(\mu)}), or \code{"mean_sd"} (see \code{\link{probitInverse}})}
+\item{probitInverse}{which latent-probit parameters (for
+\code{\link{traitMPT}} model) to transform to probability scale. Either
+\code{"none"}, \code{"mean"} (simple transformation \eqn{\Phi(\mu)}), or
+\code{"mean_sd"} (see \code{\link{probitInverse}})}
 
 \item{M}{number of random samples to approximate prior distributions}
 
 \item{ci}{credibility interval indicated by vertical red lines}
 
-\item{nCPU}{number of CPUs used for parallel sampling. For large models and many participants, this may require a lot of memory.}
+\item{nCPU}{number of CPUs used for parallel sampling. For large models and
+many participants, this may require a lot of memory.}
 
 \item{...}{arguments passed to \code{\link{boxplot}}}
 }
 \description{
-Allows to judge how much the data informed the parameter posterior distributions compared to the prior.
+Allows to judge how much the data informed the parameter posterior
+distributions compared to the prior.
 }
 \details{
-Prior distributions are shown as blue, dashed lines, whereas posterior distributions are shown as solid, black lines.
+Prior distributions are shown as blue, dashed lines, whereas
+  posterior distributions are shown as solid, black lines.
 }

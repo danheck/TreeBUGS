@@ -2,26 +2,30 @@
 % Please edit documentation in R/within_subject_EQN.R
 \name{withinSubjectEQN}
 \alias{withinSubjectEQN}
-\title{Make Within-Subject EQN Files}
+\title{Generate EQN Files for Within-Subject Designs}
 \usage{
 withinSubjectEQN(eqnfile, labels, constant, save)
 }
 \arguments{
-\item{eqnfile}{The (relative or full) path to the file that specifies the MPT model
-(standard .eqn syntax). Note that category labels must start with a letter
-(different to multiTree) and match the column names of \code{data}.
+\item{eqnfile}{The (relative or full) path to the file that specifies the MPT
+model (standard .eqn syntax). Note that category labels must start with a
+letter (different to multiTree) and match the column names of \code{data}.
 Alternatively, the EQN-equations can be provided within R as a character
 value (cf. \code{\link{readEQN}}). Note that the first line of an .eqn-file
 is reserved for comments and always ignored.}
 
-\item{labels}{a character vector defining the labels that are added to the parameters in each within-subject condition}
+\item{labels}{a character vector defining the labels that are added to the
+parameters in each within-subject condition}
 
-\item{constant}{optional: a character vector defining which parameters are constrained to be constant across within-conditions}
+\item{constant}{optional: a character vector defining which parameters are
+constrained to be constant across within-conditions}
 
-\item{save}{optional: path to an EQN output file. By default, the model is return as a string character}
+\item{save}{optional: path to an EQN output file. By default, the model is
+return as a string character}
 }
 \description{
-Replicates an MPT model multiple times with different tree, category, and parameter labels for within-subject factorial designs
+Replicates an MPT model multiple times with different tree, category, and
+parameter labels for within-subject factorial designs.
 }
 \examples{
 # Example: Standard Two-High-Threshold Model (2HTM)

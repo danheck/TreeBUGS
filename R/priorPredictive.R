@@ -1,16 +1,29 @@
 #' Prior Predictive Samples
 #'
-#' Samples full data sets (i.e., individual response frequencies) or group-level MPT parameters based on prior distribution for group-level parameters.
+#' Samples full data sets (i.e., individual response frequencies) or group-level
+#' MPT parameters based on prior distribution for group-level parameters.
 #'
 #' @inheritParams betaMPT
-#' @param prior a named list defining the priors. For the \link{traitMPT}, the default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S), df=S+1)}, where S is the number of free parameters. For the \link{betaMPT}, the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}. Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized as in JAGS by the mean and precision (= 1/variance).
-#' @param numItems vector with the number of items per MPT tree (either named or assigned to alphabetically ordered tree labels)
+#' @param prior a named list defining the priors. For the \link{traitMPT}, the
+#'   default is \code{list(mu = "dnorm(0,1)", xi="dunif(0,10)", V=diag(S),
+#'   df=S+1)}, where S is the number of free parameters. For the \link{betaMPT},
+#'   the default is \code{list(alpha ="dgamma(1,.1)", beta = "dgamma(1,.1)")}.
+#'   Note that the normal distribution \code{"dnorm(mu,prec)"} is parameterized
+#'   as in JAGS by the mean and precision (= 1/variance).
+#' @param numItems vector with the number of items per MPT tree (either named or
+#'   assigned to alphabetically ordered tree labels)
 #' @param N number of participants per replication
-#' @param level either \code{"data"} (returns individual frequencies) or \code{"parameter"} (returns group-level MPT parameters; \code{M} and \code{numItems} are ignored)
-#' @param M number of prior predictive samples (i.e., data sets with \code{N} participants).
-#' @param nCPU number of CPUs used for parallel sampling. For large models and many participants, this may require a lot of memory.
-#' @return a list of \code{M} matrices with individual frequencies (rows=participants, columns=MPT categories). A single matrix is returned if \code{M=1} or \code{level="parameter"}.
-#' @export
+#' @param level either \code{"data"} (returns individual frequencies) or
+#'   \code{"parameter"} (returns group-level MPT parameters; \code{M} and
+#'   \code{numItems} are ignored)
+#' @param M number of prior predictive samples (i.e., data sets with \code{N}
+#'   participants).
+#' @param nCPU number of CPUs used for parallel sampling. For large models and
+#'   many participants, this may require a lot of memory.
+#' @return a list of \code{M} matrices with individual frequencies
+#'   (rows=participants, columns=MPT categories). A single matrix is returned if
+#'   \code{M=1} or \code{level="parameter"}.
+#'
 #' @examples
 #' eqnfile <- system.file("MPTmodels/2htm.eqn",
 #'   package = "TreeBUGS"
@@ -46,8 +59,17 @@
 #'
 #' @importFrom parallel clusterExport makeCluster stopCluster parLapply parApply
 #' @importFrom  stats cor cov2cor density rmultinom
-priorPredictive <- function(prior, eqnfile, restrictions,
-                            numItems, level = "data", N = 1, M = 100, nCPU = 4) {
+#' @export
+priorPredictive <- function(
+    prior,
+    eqnfile,
+    restrictions,
+    numItems,
+    level = "data",
+    N = 1,
+    M = 100,
+    nCPU = 4
+) {
   if (missing(restrictions)) restrictions <- NULL
   # 1. get MPT model
   mpt <- readEQN(eqnfile, restrictions = restrictions)

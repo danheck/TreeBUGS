@@ -6,35 +6,39 @@
 #' @inheritParams betaMPT
 #' @inheritParams genMPT
 #' @param N number of participants
-#' @param mean named vector of data-generating group means of the individual MPT parameters
-#'     on the probability scale.
-#'     If the vector is not named, the internal order of parameters is used
-#'     (can be obtained using \code{\link{readEQN}}).
-#' @param mu an alternative way to define the group-level means on the latent-probit scale
-#'     (i.e., \code{mu = qnorm(mean)} or equivalently, \code{mean = pnorm(mu)}).
-#' @param sigma (named) vector of group standard deviations of
-#'     individual MPT parameters on the latent probit scale.
-#'     Default is zero (no person heterogeneity).
+#' @param mean named vector of data-generating group means of the individual MPT
+#'   parameters on the probability scale. If the vector is not named, the
+#'   internal order of parameters is used (can be obtained using
+#'   \code{\link{readEQN}}).
+#' @param mu an alternative way to define the group-level means on the
+#'   latent-probit scale (i.e., \code{mu = qnorm(mean)} or equivalently,
+#'   \code{mean = pnorm(mu)}).
+#' @param sigma (named) vector of group standard deviations of individual MPT
+#'   parameters on the latent probit scale. Default is zero (no person
+#'   heterogeneity).
 #' @param rho (named) correlation matrix for individual MPT parameters on the
-#'     latent probit scale. Must be symmetric and positive definite (e.g., no
-#'     correlations of 1 or -1 allowed).
-#'     Default: a diagonal matrix (i.e., zero correlations).
+#'   latent probit scale. Must be symmetric and positive definite (e.g., no
+#'   correlations of 1 or -1 allowed). Default: a diagonal matrix (i.e., zero
+#'   correlations).
 #'
-#' @details
-#' This functions implements a two-step sampling procedure. First, the person
-#' parameters on the latent probit-scale are sampled from the multivariate normal
-#' distribution (based on the mean \code{mu = qnorm(mean)}, the standard deviations
-#' \code{sigma}, and the correlation matrix \code{rho}).
+#' @details This functions implements a two-step sampling procedure. First, the
+#' person parameters on the latent probit-scale are sampled from the
+#' multivariate normal distribution (based on the mean \code{mu = qnorm(mean)},
+#' the standard deviations \code{sigma}, and the correlation matrix \code{rho}).
 #' These person parameters are then transformed to the probability scale using
-#' the probit-link.
-#' In a last step, observed frequencies are sampled for each person using the MPT equations.
+#' the probit-link. In a last step, observed frequencies are sampled for each
+#' person using the MPT equations.
 #'
-#' Note that the user can generate more complex structures for the latent person parameters,
-#' and then supply these person parameters to the function \code{\link{genMPT}}.
+#' Note that the user can generate more complex structures for the latent person
+#' parameters, and then supply these person parameters to the function
+#' \code{\link{genMPT}}.
 #'
 #' @return a list including the generated frequencies per person (\code{data})
-#'     and the sampled individual parameters (\code{parameters}) on the probit
-#'     and probability scale (\code{thetaLatent} and \code{theta}, respectively).
+#'   and the sampled individual parameters (\code{parameters}) on the probit and
+#'   probability scale (\code{thetaLatent} and \code{theta}, respectively).
+#' @references Klauer, K. C. (2010). Hierarchical multinomial processing tree
+#'   models: A latent-trait approach. Psychometrika, 75, 70-98.
+#' @seealso \code{\link{genMPT}}
 #'
 #' @examples
 #' # Example: Standard Two-High-Threshold Model (2HTM)
@@ -55,12 +59,18 @@
 #' )
 #' head(genDat$data, 3)
 #' plotFreq(genDat$data, eqn = EQNfile)
-#' @references Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
-#' @seealso \code{\link{genMPT}}
 #' @export
-genTraitMPT <- function(N, numItems, eqnfile, restrictions,
-                        mean, mu, sigma, rho,
-                        warning = TRUE) {
+genTraitMPT <- function(
+    N,
+    numItems,
+    eqnfile,
+    restrictions,
+    mean,
+    mu,
+    sigma,
+    rho,
+    warning = TRUE
+) {
   if (missing(restrictions)) {
     restrictions <- NULL
   }

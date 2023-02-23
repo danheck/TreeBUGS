@@ -7,17 +7,31 @@
 testHetChi(freq, tree)
 }
 \arguments{
-\item{freq}{matrix with observed frequencies (rows: persons/items; columns: categories). Can also be the path to a .csv file with frequencies (comma-separated; first line defines category labels)}
+\item{freq}{matrix with observed frequencies (rows: persons/items; columns:
+categories). Can also be the path to a .csv file with frequencies
+(comma-separated; first line defines category labels)}
 
-\item{tree}{a vector defining which columns of x belong to separate multinomial distributions (i.e., MPT trees). For instance, if \code{x} has five categories from two MPT trees: \code{tree=c(1,1,2,2,2)} or \code{tree=c("t1","t1","t2","t2","t2")}}
+\item{tree}{a vector defining which columns of x belong to separate
+multinomial distributions (i.e., MPT trees). For instance, if \code{x} has
+five categories from two MPT trees: \code{tree=c(1,1,2,2,2)} or
+\code{tree=c("t1","t1","t2","t2","t2")}}
 }
 \description{
-Tests whether whether participants (items) are homogeneous under the assumption of item (participant) homogeneity.
+Tests whether whether participants (items) are homogeneous under the
+assumption of item (participant) homogeneity.
 }
 \details{
-If an item/person has zero frequencies on all categories in an MPT tree, these zeros are neglected when computing mean frequencies per column. As an example, consider a simple recognition test with a fixed assignments of words to the learn/test list. In such an experiment, all learned words will result in hits or misses (i.e., the MPT tree of old items), whereas new words are always false alarms/correct rejections and thus belong to the MPT tree of new items (this is not necessarily the case if words are assigned randomly).
+If an item/person has zero frequencies on all categories in an MPT
+tree, these zeros are neglected when computing mean frequencies per column.
+As an example, consider a simple recognition test with a fixed assignments of
+words to the learn/test list. In such an experiment, all learned words will
+result in hits or misses (i.e., the MPT tree of old items), whereas new words
+are always false alarms/correct rejections and thus belong to the MPT tree of
+new items (this is not necessarily the case if words are assigned randomly).
 
-Note that the test assumes independence of observations and item homogeneity when testing participant heterogeneity. The latter assumption can be dropped when using a permutation test (\code{\link{testHetPerm}}).
+Note that the test assumes independence of observations and item homogeneity
+when testing participant heterogeneity. The latter assumption can be dropped
+when using a permutation test (\code{\link{testHetPerm}}).
 }
 \examples{
 # some made up frequencies:
@@ -36,7 +50,9 @@ testHetChi(freq, tree = c(1, 1, 2, 2))
 # => no significant deviation from homogeneity (low power!)
 }
 \references{
-Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. \doi{10.3758/PBR.15.4.713}
+Smith, J. B., & Batchelder, W. H. (2008). Assessing individual
+  differences in categorical data. Psychonomic Bulletin & Review, 15,
+  713-731. \doi{10.3758/PBR.15.4.713}
 }
 \seealso{
 \code{\link{testHetPerm}}, \code{\link{plotFreq}}

@@ -1,28 +1,37 @@
-
-
-
 #' Plot Raw Frequencies
 #'
 #' Plot observed individual and mean frequencies.
 #'
-#' @param x either a fitted hierarchical MPT model (see \code{\link{traitMPT}}, \code{\link{betaMPT}});
-#'     or a matrix/data frame of response frequencies (can be provided as a path to a .csv-file with individual frequencies).
+#' @param x either a fitted hierarchical MPT model (see \code{\link{traitMPT}},
+#'   \code{\link{betaMPT}}); or a matrix/data frame of response frequencies (can
+#'   be provided as a path to a .csv-file with individual frequencies).
 #' @param freq whether to plot absolute frequencies or relative frequencies
-#'     (which sum up to one within each tree; only if \code{x} is a hierarchical model or if \code{eqnfile} is provided)
-#' @param select a numeric vector with participant indices to select which raw frequencies to plot
-#'     (default: \code{"all"})
-#' @param boxplot if \code{FALSE}, lines and points are drawn instead of boxplots
-#' @param eqnfile optional: EQN description of an MPT model, that is, either the path to an EQN file or as a character string
-#'     (only used if \code{x} refers to a matrix/data frame or .csv-file)
+#'   (which sum up to one within each tree; only if \code{x} is a hierarchical
+#'   model or if \code{eqnfile} is provided)
+#' @param select a numeric vector with participant indices to select which raw
+#'   frequencies to plot (default: \code{"all"})
+#' @param boxplot if \code{FALSE}, lines and points are drawn instead of
+#'   boxplots
+#' @param eqnfile optional: EQN description of an MPT model, that is, either the
+#'   path to an EQN file or as a character string (only used if \code{x} refers
+#'   to a matrix/data frame or .csv-file)
 #' @param ... further arguments passed to \code{boxplot} and \code{plot}
-#' @export
+#'
 #' @examples
 #' # get frequency data and EQN file
 #' freq <- subset(arnold2013, group == "encoding", select = -(1:4))
 #' eqn <- system.file("MPTmodels/2htsm.eqn", package = "TreeBUGS")
 #' plotFreq(freq, eqnfile = eqn)
 #' plotFreq(freq, freq = FALSE, eqnfile = eqn)
-plotFreq <- function(x, freq = TRUE, select = "all", boxplot = TRUE, eqnfile, ...) {
+#' @export
+plotFreq <- function(
+    x,
+    freq = TRUE,
+    select = "all",
+    boxplot = TRUE,
+    eqnfile,
+    ...
+) {
   if (inherits(x, c("betaMPT", "traitMPT"))) {
     dat <- x$mptInfo$data
   } else if (inherits(x, "character")) {

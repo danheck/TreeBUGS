@@ -11,21 +11,24 @@ probitInverse(mu, sigma, fittedModel = NULL)
 
 \item{sigma}{latent-probit SD of normal distribution}
 
-\item{fittedModel}{optional: fitted \link{traitMPT} model. If provided, the bivariate inverse-probit transform is applied to all MCMC samples (and \code{mu} and \code{sigma} are ignored).}
+\item{fittedModel}{optional: fitted \link{traitMPT} model. If provided, the
+bivariate inverse-probit transform is applied to all MCMC samples (and
+\code{mu} and \code{sigma} are ignored).}
 }
 \value{
 implied mean and SD on probability scale
 }
 \description{
-Transform latent group-level normal distribution (latent-trait MPT) into mean and SD on probability scale.
+Transform latent group-level normal distribution (latent-trait MPT) into mean
+and SD on probability scale.
 }
 \examples{
 ####### compare bivariate vs. univariate transformation
-probitInverse(mu = .8, sigma = c(.25, .5, .75, 1))
-pnorm(.8)
+probitInverse(mu = 0.8, sigma = c(0.25, 0.5, 0.75, 1))
+pnorm(0.8)
 
 # full distribution
-prob <- pnorm(rnorm(10000, .8, .7))
+prob <- pnorm(rnorm(10000, mean = 0.8, sd = 0.7))
 hist(prob, 80, col = "gray", xlim = 0:1)
 
 \dontrun{

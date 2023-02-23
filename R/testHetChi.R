@@ -1,18 +1,33 @@
-
 #' Chi-Square Test of Heterogeneity
 #'
-#' Tests whether whether participants (items) are homogeneous under the assumption of item (participant) homogeneity.
+#' Tests whether whether participants (items) are homogeneous under the
+#' assumption of item (participant) homogeneity.
 #'
-#' @param freq matrix with observed frequencies (rows: persons/items; columns: categories). Can also be the path to a .csv file with frequencies (comma-separated; first line defines category labels)
-#' @param tree a vector defining which columns of x belong to separate multinomial distributions (i.e., MPT trees). For instance, if \code{x} has five categories from two MPT trees: \code{tree=c(1,1,2,2,2)} or \code{tree=c("t1","t1","t2","t2","t2")}
-## @param rows
-#' @details
-#' If an item/person has zero frequencies on all categories in an MPT tree, these zeros are neglected when computing mean frequencies per column. As an example, consider a simple recognition test with a fixed assignments of words to the learn/test list. In such an experiment, all learned words will result in hits or misses (i.e., the MPT tree of old items), whereas new words are always false alarms/correct rejections and thus belong to the MPT tree of new items (this is not necessarily the case if words are assigned randomly).
+#' @param freq matrix with observed frequencies (rows: persons/items; columns:
+#'   categories). Can also be the path to a .csv file with frequencies
+#'   (comma-separated; first line defines category labels)
+#' @param tree a vector defining which columns of x belong to separate
+#'   multinomial distributions (i.e., MPT trees). For instance, if \code{x} has
+#'   five categories from two MPT trees: \code{tree=c(1,1,2,2,2)} or
+#'   \code{tree=c("t1","t1","t2","t2","t2")}
 #'
-#' Note that the test assumes independence of observations and item homogeneity when testing participant heterogeneity. The latter assumption can be dropped when using a permutation test (\code{\link{testHetPerm}}).
+#' @details If an item/person has zero frequencies on all categories in an MPT
+#' tree, these zeros are neglected when computing mean frequencies per column.
+#' As an example, consider a simple recognition test with a fixed assignments of
+#' words to the learn/test list. In such an experiment, all learned words will
+#' result in hits or misses (i.e., the MPT tree of old items), whereas new words
+#' are always false alarms/correct rejections and thus belong to the MPT tree of
+#' new items (this is not necessarily the case if words are assigned randomly).
+#'
+#' Note that the test assumes independence of observations and item homogeneity
+#' when testing participant heterogeneity. The latter assumption can be dropped
+#' when using a permutation test (\code{\link{testHetPerm}}).
 #' @seealso \code{\link{testHetPerm}}, \code{\link{plotFreq}}
 #' @author Daniel W. Heck
-#' @references Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. \doi{10.3758/PBR.15.4.713}
+#' @references Smith, J. B., & Batchelder, W. H. (2008). Assessing individual
+#'   differences in categorical data. Psychonomic Bulletin & Review, 15,
+#'   713-731. \doi{10.3758/PBR.15.4.713}
+#'
 #' @examples
 #' # some made up frequencies:
 #' freq <- matrix(
@@ -29,7 +44,10 @@
 #' testHetChi(freq, tree = c(1, 1, 2, 2))
 #' # => no significant deviation from homogeneity (low power!)
 #' @export
-testHetChi <- function(freq, tree) {
+testHetChi <- function(
+    freq,
+    tree
+) {
   # gen2htm <- genBetaMPT(24, c(Target=100,Lure=100), htm,
   #                       mean=c(Do=.7, Dn=.7, g=.4),
   #                       sd=c(Do=0.05, Dn=0.05, g=0.05))

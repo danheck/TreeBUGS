@@ -14,15 +14,22 @@ betweenSubjectMPT(
 )
 }
 \arguments{
-\item{model1}{fitted hierarchical MPT model for first between-subjects condition}
+\item{model1}{fitted hierarchical MPT model for first between-subjects
+condition}
 
-\item{model2}{fitted hierarchical MPT model for second between-subjects condition}
+\item{model2}{fitted hierarchical MPT model for second between-subjects
+condition}
 
-\item{par1}{label of parameter from first model for which statistic should be computed}
+\item{par1}{label of parameter from first model for which statistic should be
+computed}
 
-\item{par2}{label of parameter from second model. Default: The same parameter as in the first model}
+\item{par2}{label of parameter from second model. Default: The same parameter
+as in the first model}
 
-\item{stat}{one or more functions of the parameters using \code{"x"} and \code{"y"} as placeholders for the parameters from the first and second model, respectively. Default: Compute (A) the difference between parameters and (B) a Bayesian p-value (by counting how often x<y).}
+\item{stat}{one or more functions of the parameters using \code{"x"} and
+\code{"y"} as placeholders for the parameters from the first and second
+model, respectively. Default: Compute (A) the difference between parameters
+and (B) a Bayesian p-value (by counting how often x<y).}
 
 \item{plot}{whether to plot the convergence of the difference in parameters}
 }
@@ -35,7 +42,8 @@ a list of the class \code{betweenMPT} with the values:
 }
 }
 \description{
-Computes differencesor other statistics of MPT parameters for two hierarchical MPT models fitted separately to between-subjects data
+Computes differencesor other statistics of MPT parameters for two
+hierarchical MPT models fitted separately to between-subjects data
 }
 \author{
 Daniel Heck

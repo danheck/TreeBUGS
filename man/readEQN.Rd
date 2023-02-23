@@ -7,36 +7,51 @@
 readEQN(file, restrictions = NULL, paramOrder = FALSE, parse = FALSE)
 }
 \arguments{
-\item{file}{The (full path to the) file that specifies the MPT model (standard .eqn syntax). Note that category labels must start with a letter (different to multiTree) and match the column names of \code{data}. Alternatively, the EQN-equations can be provided within R as a character value (see examples). Note that the first line of an .eqn-file is reserved for comments and always ignored.}
+\item{file}{The (full path to the) file that specifies the MPT model
+(standard .eqn syntax). Note that category labels must start with a letter
+(different to multiTree) and match the column names of \code{data}.
+Alternatively, the EQN-equations can be provided within R as a character
+value (see examples). Note that the first line of an .eqn-file is reserved
+for comments and always ignored.}
 
-\item{restrictions}{Specifies which parameters should be
-(a) constant (e.g., \code{"a=b=.5"}) or
-(b) constrained to be identical (e.g., \code{"Do=Dn"}) or
-(c) treated as fixed effects (i.e., identical for all participants; \code{"a=b=FE"}).
-Either given as the path to a text file with restrictions per row or
-as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}.
+\item{restrictions}{Specifies which parameters should be (a) constant (e.g.,
+\code{"a=b=.5"}) or (b) constrained to be identical (e.g., \code{"Do=Dn"})
+or (c) treated as fixed effects (i.e., identical for all participants;
+\code{"a=b=FE"}). Either given as the path to a text file with restrictions
+per row or as a list of restrictions, e.g., \code{list("D1=D2","g=0.5")}.
 Note that numbers in .eqn-equations (e.g., \code{d*(1-g)*.50}) are directly
 interpreted as equality constraints.}
 
-\item{paramOrder}{if TRUE, the order of MPT parameters as interally used is printed.}
+\item{paramOrder}{if TRUE, the order of MPT parameters as interally used is
+printed.}
 
-\item{parse}{whether to return a parsed MPT model description in terms of the matrices \eqn{a} and \eqn{b} (the powers of the \eqn{\theta} and \eqn{(1-\theta)}, respectively, and the vector of constants \eqn{c}. Each branch probability is then given as \eqn{c_{i}  \prod_{s} \theta^{a_{i,s}}(1-\theta)^{b_{i,s}})}}
+\item{parse}{whether to return a parsed MPT model description in terms of the
+matrices \eqn{a} and \eqn{b} (the powers of the \eqn{\theta} and
+\eqn{(1-\theta)}, respectively, and the vector of constants \eqn{c}. Each
+branch probability is then given as \eqn{c_{i}  \prod_{s}
+\theta^{a_{i,s}}(1-\theta)^{b_{i,s}})}}
 }
 \description{
-Function to import MPT models from standard .eqn model files as used, for instance, by multiTree (Moshagen, 2010).
+Function to import MPT models from standard .eqn model files as used, for
+instance, by multiTree (Moshagen, 2010).
 }
 \details{
-The file format should adhere to the standard .eqn-syntax (note that the first line is skipped and can be used for comments). In each line, a separate branch of the MPT model is specified using the tree label, category label, and the model equations in full form (multiplication sign `*` required; not abbreviations such as `a^2` allowed).
+The file format should adhere to the standard .eqn-syntax (note that
+  the first line is skipped and can be used for comments). In each line, a
+  separate branch of the MPT model is specified using the tree label,
+  category label, and the model equations in full form (multiplication sign
+  `*` required; not abbreviations such as `a^2` allowed).
 
-As an example, the standard two-high threshold model (2HTM) is defined as follows:
+As an example, the standard two-high threshold model (2HTM) is defined as
+follows:
 
- \tabular{lllll}{
-\code{Target } \tab \tab \code{Hit}             \tab \tab \code{Do} \cr
-\code{Target}  \tab \tab \code{Hit}             \tab \tab \code{(1-Do)*g} \cr
-\code{Target}  \tab \tab \code{Miss}            \tab \tab \code{(1-Do)*(1-g)} \cr
-\code{Lure}    \tab \tab \code{FalseAlarm}      \tab \tab \code{(1-Dn)*g}  \cr
-\code{Lure}    \tab \tab \code{CorrectReject}   \tab \tab \code{(1-Dn)*(1-g)} \cr
-\code{Lure}    \tab \tab \code{CorrectReject  } \tab \tab \code{Dn}
+\tabular{lllll}{
+  \code{Target } \tab \tab \code{Hit}             \tab \tab \code{Do}           \cr
+  \code{Target}  \tab \tab \code{Hit}             \tab \tab \code{(1-Do)*g}     \cr
+  \code{Target}  \tab \tab \code{Miss}            \tab \tab \code{(1-Do)*(1-g)} \cr
+  \code{Lure}    \tab \tab \code{FalseAlarm}      \tab \tab \code{(1-Dn)*g}     \cr
+  \code{Lure}    \tab \tab \code{CorrectReject}   \tab \tab \code{(1-Dn)*(1-g)} \cr
+  \code{Lure}    \tab \tab \code{CorrectReject  } \tab \tab \code{Dn}
 }
 }
 \examples{
@@ -48,7 +63,7 @@ readEQN(file = EQNfile, paramOrder = TRUE)
 
 # with equality constraint:
 readEQN(
-  file = EQNfile, restrictions = list("Dn=Do", "g=0.5"),
+  file = EQNfile, restrictions = list("Dn = Do", "g = 0.5"),
   paramOrder = TRUE
 )
 
@@ -64,7 +79,9 @@ model <-
 readEQN(model, paramOrder = TRUE)
 }
 \references{
-Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
+Moshagen, M. (2010). multiTree: A computer program for the
+  analysis of multinomial processing tree models. Behavior Research Methods,
+  42, 42-54.
 }
 \author{
 Daniel Heck, Denis Arnold, Nina Arnold

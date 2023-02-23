@@ -1,13 +1,14 @@
 #' Get Posterior Samples from Fitted MPT Model
 #'
-#' Extracts MCMC posterior samples as an \code{coda::mcmc.list} and relabels the MCMC variables.
+#' Extracts MCMC posterior samples as an \code{coda::mcmc.list} and relabels the
+#' MCMC variables.
 #'
 #' @inheritParams getParam
 #' @inheritParams plotParam
 #' @param names whether and how to rename the variables in the MCMC output:
-#'     \code{par} (internal parameter labels such as \code{mu[1]}),
-#'     \code{label} (MPT label from EQN file such as \code{"d"}), or
-#'     \code{par_name} (concatenation of both such as \code{"mu[1]_d"}).
+#'   \code{par} (internal parameter labels such as \code{mu[1]}), \code{label}
+#'   (MPT label from EQN file such as \code{"d"}), or \code{par_name}
+#'   (concatenation of both such as \code{"mu[1]_d"}).
 #'
 #' @importFrom coda varnames niter nvar nchain mcmc.list
 #' @examples
@@ -15,8 +16,12 @@
 #' getSamples(fittedModel, "mu", select = c("d", "g"))
 #' }
 #' @export
-getSamples <- function(fittedModel, parameter = "mean", select = "all",
-                       names = "par_label") {
+getSamples <- function(
+    fittedModel,
+    parameter = "mean",
+    select = "all",
+    names = "par_label"
+) {
   parnames <- fittedModel$mptInfo$thetaUnique
   if (missing(select) || identical(select, "all")) {
     select <- parnames

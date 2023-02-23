@@ -1,31 +1,35 @@
-
 #' Get Transformed Parameters
 #'
-#' Computes transformations of MPT parameters based on the MCMC posterior samples
-#' (e.g., differences of parameters).
+#' Computes transformations of MPT parameters based on the MCMC posterior
+#' samples (e.g., differences of parameters).
 #'
 #' @param fittedModel either a fitted latent-trait or beta MPT model
-#'     (\code{\link{traitMPT}}, \code{\link{betaMPT}}) or an \code{\link[coda]{mcmc.list}}.
-
+#'   (\code{\link{traitMPT}}, \code{\link{betaMPT}}) or an
+#'   \code{\link[coda]{mcmc.list}}.
 #' @param transformedParameters list with parameter transformations that should
-#'     be computed based on the posterior samples (e.g., for testing parameter
-#'     differences: \code{list("diffD=Do-Dn")}).
+#'   be computed based on the posterior samples (e.g., for testing parameter
+#'   differences: \code{list("diffD=Do-Dn")}).
 #' @param level whether to compute transformations of \code{"group"} or
-#'     \code{"individual"} estimates
+#'   \code{"individual"} estimates
 #' @param nCPU number of CPU cores across which the MCMC chains are distributed
 #'
-#' @return an \link[coda]{mcmc.list} of posterior samples for the transformed parameters
+#' @return an \link[coda]{mcmc.list} of posterior samples for the transformed
+#'   parameters
 #' @examples
 #' \dontrun{
 #' tt <- transformedParameters(fittedModel,
-#'   list("diff=a-b", "p=a>b"),
+#'   list("diff = a-b", "p = a>b"),
 #'   level = "individual"
 #' )
 #' summary(tt)
 #' }
 #' @export
-transformedParameters <- function(fittedModel, transformedParameters,
-                                  level = "group", nCPU = 4) {
+transformedParameters <- function(
+    fittedModel,
+    transformedParameters,
+    level = "group",
+    nCPU = 4
+) {
   if (inherits(fittedModel, c("mcmc", "mcmc.list"))) {
     mcmc <- fittedModel
     if (inherits(fittedModel, "mcmc")) {

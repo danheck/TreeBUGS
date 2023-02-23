@@ -11,17 +11,22 @@ plotFit(fittedModel, M = 1000, stat = "mean", ...)
 
 \item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
 
-\item{stat}{whether to plot mean frequencies (\code{"mean"}) or covariances of individual frequencies (\code{"cov"})}
+\item{stat}{whether to plot mean frequencies (\code{"mean"}) or covariances
+of individual frequencies (\code{"cov"})}
 
 \item{...}{arguments passed to \code{\link{boxplot}}}
 }
 \description{
-Plots observed means/covariances of individual frequencies against the means/covariances sampled from the posterior distribution (posterior predictive distribution).
+Plots observed means/covariances of individual frequencies against the
+means/covariances sampled from the posterior distribution (posterior
+predictive distribution).
 }
 \details{
-If posterior predictive p-values were computed when fitting the model
-(e.g., by adding the argument \code{traitMPT(...,ppp=1000)} ), the stored posterior samples are re-used for plotting.
-Note that the last category in each MPT tree is dropped, because one category per multinomial distribution is fixed.
+If posterior predictive p-values were computed when fitting the
+  model (e.g., by adding the argument \code{traitMPT(...,ppp=1000)} ), the
+  stored posterior samples are re-used for plotting. Note that the last
+  category in each MPT tree is dropped, because one category per multinomial
+  distribution is fixed.
 }
 \examples{
 \dontrun{

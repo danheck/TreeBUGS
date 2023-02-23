@@ -1,16 +1,20 @@
 #' Get Parameter Posterior Statistics
 #'
-#' Returns posterior statistics (e.g., mean, median) for the parameters of a hierarchical MPT model.
+#' Returns posterior statistics (e.g., mean, median) for the parameters of a
+#' hierarchical MPT model.
 #'
-#' @param fittedModel a fitted latent-trait MPT model (see \code{\link{traitMPT}})
-#'     or beta MPT model (see \code{\link{betaMPT}})
-#' @param parameter which parameter(s) of the (hierarchical) MPT model should be returned?
-#'    (see details in \code{\link{getParam}}).
+#' @param fittedModel a fitted latent-trait MPT model (see
+#'   \code{\link{traitMPT}}) or beta MPT model (see \code{\link{betaMPT}})
+#' @param parameter which parameter(s) of the (hierarchical) MPT model should be
+#'   returned? (see details in \code{\link{getParam}}).
 #' @param stat whether to get the posterior \code{"mean"}, \code{"median"},
-#'     \code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility interval)
-#' @param file filename to export results in .csv format (e.g., \code{file="est_param.csv"})
+#'   \code{"sd"}, or \code{"summary"} (includes mean, SD, and 95\% credibility
+#'   interval)
+#' @param file filename to export results in .csv format (e.g.,
+#'   \code{file="est_param.csv"})
 #'
-#' @details This function is a convenient way to get the information stored in \code{fittedModel$mcmc.summ}.
+#' @details This function is a convenient way to get the information stored in
+#'   \code{fittedModel$mcmc.summ}.
 #'
 #' The latent-trait MPT includes the following parameters:
 #' \itemize{
@@ -29,6 +33,9 @@
 #' \item \code{"theta"} (individual MPT parameters)
 #' }
 #'
+#' @author Daniel Heck
+#' @seealso \code{\link{getGroupMeans}} mean group estimates
+#'
 #' @examples
 #' \dontrun{
 #' # mean estimates per person:
@@ -40,11 +47,13 @@
 #'   stat = "summary", file = "ind_summ.csv"
 #' )
 #' }
-#'
-#' @author Daniel Heck
-#' @seealso \code{\link{getGroupMeans}} mean group estimates
 #' @export
-getParam <- function(fittedModel, parameter = "mean", stat = "mean", file = NULL) {
+getParam <- function(
+    fittedModel,
+    parameter = "mean",
+    stat = "mean",
+    file = NULL
+) {
   if (!inherits(fittedModel, c("betaMPT", "traitMPT"))) {
     stop("Only for hierarchical MPT models (see ?traitMPT & ?betaMPT).")
   }

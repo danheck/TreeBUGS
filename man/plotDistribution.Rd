@@ -7,20 +7,27 @@
 plotDistribution(fittedModel, scale = "probability", ...)
 }
 \arguments{
-\item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
+\item{fittedModel}{fitted latent-trait or beta MPT model
+(\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
-\item{scale}{only for latent-trait MPT: should estimates be plotted on the \code{"latent"}
-or the \code{"probability"} scale (i.e., as MPT parameters).
-Can be abbreviated by \code{"l"}  and \code{"p"}.}
+\item{scale}{only for latent-trait MPT: should estimates be plotted on the
+\code{"latent"} or the \code{"probability"} scale (i.e., as MPT
+parameters). Can be abbreviated by \code{"l"}  and \code{"p"}.}
 
-\item{...}{further arguments passed to \code{\link{hist}} (e.g., \code{breaks=50} to get a more fine-grained histogram)}
+\item{...}{further arguments passed to \code{\link{hist}} (e.g.,
+\code{breaks=50} to get a more fine-grained histogram)}
 }
 \description{
-Plots histograms of the posterior-means of individual MPT parameters against the group-level distribution given by the posterior-mean of the hierarchical parameters (e.g., the beta distribution in case of the beta-MPT)
+Plots histograms of the posterior-means of individual MPT parameters against
+the group-level distribution given by the posterior-mean of the hierarchical
+parameters (e.g., the beta distribution in case of the beta-MPT)
 }
 \details{
-For the latent-trait MPT, differences due to continuous predictors or discrete factors are currently not considered in the group-level predictions (red density).
-Under such a model, individual estimates are not predicted to be normally distributed on the latent scale as shown in the plot.
+For the latent-trait MPT, differences due to continuous predictors
+  or discrete factors are currently not considered in the group-level
+  predictions (red density). Under such a model, individual estimates are not
+  predicted to be normally distributed on the latent scale as shown in the
+  plot.
 }
 \seealso{
 \code{\link{plot.traitMPT}}

@@ -1,13 +1,26 @@
 #' Data of a Source-Monitoring Experiment
 #'
-#' Dataset of a source-monitoring experiment by Arnold, Bayen, Kuhlmann, and Vaterrodt (2013) using a 2 (Source; within) x 3 (Expectancy; within) x 2 (Time of Schema Activation; between) mixed factorial design.
-#' @details
-#' Eighty-four participants had to learn statements that were either presented by a doctor or a lawyer (Source) and were either typical for doctors, typical for lawyers, or neutral (Expectancy). These two types of statements were completely crossed in a balanced way, resulting in a true contingency of zero between Source and Expectancy. Whereas the profession schemata were activated at the time of encoding for half of the participants (encoding condition), the other half were told about the profession of the sources just before the test (retrieval condition). After the test, participants were asked to judge the contingency between item type and source (perceived contingency pc).
+#' Dataset of a source-monitoring experiment by Arnold, Bayen, Kuhlmann, and
+#' Vaterrodt (2013) using a 2 (Source; within) x 3 (Expectancy; within) x 2
+#' (Time of Schema Activation; between) mixed factorial design.
+#'
+#' @details Eighty-four participants had to learn statements that were either
+#' presented by a doctor or a lawyer (Source) and were either typical for
+#' doctors, typical for lawyers, or neutral (Expectancy). These two types of
+#' statements were completely crossed in a balanced way, resulting in a true
+#' contingency of zero between Source and Expectancy. Whereas the profession
+#' schemata were activated at the time of encoding for half of the participants
+#' (encoding condition), the other half were told about the profession of the
+#' sources just before the test (retrieval condition). After the test,
+#' participants were asked to judge the contingency between item type and source
+#' (perceived contingency pc).
+#'
 #' @format A data frame 13 variables:
 #' \describe{
 #'   \item{\code{subject}}{Participant code}
 #'   \item{\code{age}}{Age in years}
-#'   \item{\code{group}}{ Between-subject factor "Time of Schema Activation": Retrieval vs. encoding condition}
+#'   \item{\code{group}}{ Between-subject factor "Time of Schema Activation":
+#'                         Retrieval vs. encoding condition}
 #'   \item{\code{pc}}{perceived contingency}
 #'   \item{\code{EE}}{Frequency of "Source E" responses to items from source "E"}
 #'   \item{\code{EU}}{Frequency of "Source U" responses to items from source "E"}
@@ -19,10 +32,10 @@
 #'   \item{\code{NU}}{Frequency of "Source U" responses to new items}
 #'   \item{\code{NN}}{Frequency of "New" responses to new items}
 #' }
-#' @references Arnold, N. R., Bayen, U. J., Kuhlmann, B. G., & Vaterrodt, B. (2013).
-#' Hierarchical modeling of contingency-based source monitoring:
-#' A test of the probability-matching account.
-#' Psychonomic Bulletin & Review, 20, 326-333.
+#' @references Arnold, N. R., Bayen, U. J., Kuhlmann, B. G., & Vaterrodt, B.
+#'   (2013). Hierarchical modeling of contingency-based source monitoring: A
+#'   test of the probability-matching account. Psychonomic Bulletin & Review,
+#'   20, 326-333.
 #'
 #' @examples
 #' head(arnold2013)

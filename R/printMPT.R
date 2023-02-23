@@ -1,4 +1,8 @@
-printSummary <- function(x, model, ...) {
+printSummary <- function(
+    x,
+    model,
+    ...
+) {
   cat("Call: \n")
   print(x$call)
   cat("\n")

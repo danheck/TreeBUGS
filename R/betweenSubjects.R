@@ -1,13 +1,20 @@
-
 #' Between-Subject Comparison of Parameters
 #'
-#' Computes differencesor other statistics of MPT parameters for two hierarchical MPT models fitted separately to between-subjects data
+#' Computes differencesor other statistics of MPT parameters for two
+#' hierarchical MPT models fitted separately to between-subjects data
 #'
-#' @param model1 fitted hierarchical MPT model for first between-subjects condition
-#' @param model2 fitted hierarchical MPT model for second between-subjects condition
-#' @param par1 label of parameter from first model for which statistic should be computed
-#' @param par2 label of parameter from second model. Default: The same parameter as in the first model
-#' @param stat one or more functions of the parameters using \code{"x"} and \code{"y"} as placeholders for the parameters from the first and second model, respectively. Default: Compute (A) the difference between parameters and (B) a Bayesian p-value (by counting how often x<y).
+#' @param model1 fitted hierarchical MPT model for first between-subjects
+#'   condition
+#' @param model2 fitted hierarchical MPT model for second between-subjects
+#'   condition
+#' @param par1 label of parameter from first model for which statistic should be
+#'   computed
+#' @param par2 label of parameter from second model. Default: The same parameter
+#'   as in the first model
+#' @param stat one or more functions of the parameters using \code{"x"} and
+#'   \code{"y"} as placeholders for the parameters from the first and second
+#'   model, respectively. Default: Compute (A) the difference between parameters
+#'   and (B) a Bayesian p-value (by counting how often x<y).
 #' @param plot whether to plot the convergence of the difference in parameters
 #'
 #' @return a list of the class \code{betweenMPT} with the values:
@@ -17,13 +24,16 @@
 #'  \item \code{mcmc}: the MCMC samples of the differences in parameters
 #' }
 #' @author Daniel Heck
-#' @export
 #' @importFrom coda mcmc.list mcmc
-betweenSubjectMPT <- function(model1, model2,
-                              par1, par2 = par1,
-                              stat = c("x-y", "x<y"),
-                              # level = "group",
-                              plot = FALSE) {
+#' @export
+betweenSubjectMPT <- function(
+    model1,
+    model2,
+    par1,
+    par2 = par1,
+    stat = c("x-y", "x<y"),
+    plot = FALSE
+) {
   ################ check input
 
   if (!inherits(model1, c("betaMPT", "traitMPT", "simpleMPT")) ||

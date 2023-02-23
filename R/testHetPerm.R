@@ -1,21 +1,38 @@
-
 #' Permutation Test of Heterogeneity
 #'
-#' Tests whether whether participants (items) are homogeneous without assuming item (participant) homogeneity.
+#' Tests whether whether participants (items) are homogeneous without assuming
+#' item (participant) homogeneity.
 #'
-#' @param data matrix or data frame with three columns: person code/index, item label, response category. Can also be the path to a .csv file with frequencies (comma-separated; first line defines category labels)
-#' @param tree a list that defines which categories belong to the same multinomial distribution (i.e., the the same MPT tree). For instance: \code{tree = list(tree.old = c("hit","cr"), tree.new = c("fa","miss"))}. Category labels must match the values of the third column of \code{data}
-#' @param source whether to test for \code{"person"} or \code{"item"} homogeneity
-# @param stat which statistic to use (either \code{"var"} or \code{"chisq"})
+#' @param data matrix or data frame with three columns: person code/index, item
+#'   label, response category. Can also be the path to a .csv file with
+#'   frequencies (comma-separated; first line defines category labels)
+#' @param tree a list that defines which categories belong to the same
+#'   multinomial distribution (i.e., the the same MPT tree). For instance:
+#'   \code{tree = list(tree.old = c("hit","cr"), tree.new = c("fa","miss"))}.
+#'   Category labels must match the values of the third column of \code{data}
+#' @param source whether to test for \code{"person"} or \code{"item"}
+#'   homogeneity
 #' @param rep number of permutations to be sampled
-#' @param nCPU number of CPUs used for parallel Monte Carlo sampling of permutations
-#' @details
-#' If an item/person has zero frequencies on all categories in an MPT tree, these zeros are neglected when computing mean frequencies per column. As an example, consider a simple recognition test with a fixed assignments of words to the learn/test list. In such an experiment, all learned words will result in hits or misses (i.e., the MPT tree of old items), whereas new words are always false alarms/correct rejections and thus belong to the MPT tree of new items (this is not necessarily the case if words are assigned randomly).
+#' @param nCPU number of CPUs used for parallel Monte Carlo sampling of
+#'   permutations
 #'
-#' Note that the test does still assume independence of observations. However, it does not require item homogeneity when testing participant heterogeneity (in contrast to the chi-square test: \code{\link{testHetChi}}).
+#' @details If an item/person has zero frequencies on all categories in an MPT
+#' tree, these zeros are neglected when computing mean frequencies per column.
+#' As an example, consider a simple recognition test with a fixed assignments of
+#' words to the learn/test list. In such an experiment, all learned words will
+#' result in hits or misses (i.e., the MPT tree of old items), whereas new words
+#' are always false alarms/correct rejections and thus belong to the MPT tree of
+#' new items (this is not necessarily the case if words are assigned randomly).
+#'
+#' Note that the test does still assume independence of observations. However,
+#' it does not require item homogeneity when testing participant heterogeneity
+#' (in contrast to the chi-square test: \code{\link{testHetChi}}).
 #' @seealso \code{\link{testHetChi}}, \code{\link{plotFreq}}
 #' @author Daniel W. Heck
-#' @references Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. \doi{10.3758/PBR.15.4.713}
+#' @references Smith, J. B., & Batchelder, W. H. (2008). Assessing individual
+#'   differences in categorical data. Psychonomic Bulletin & Review, 15,
+#'   713-731. \doi{10.3758/PBR.15.4.713}
+#'
 #' @examples
 #' # generate homogeneous data
 #' # (N=15 participants, M=30 items)
@@ -37,12 +54,13 @@
 #' tmp <- testHetPerm(data, tree, rep = 200, nCPU = 1)
 #' tmp[2:3]
 #' @export
-testHetPerm <- function(data,
-                        tree,
-                        source = "person",
-                        # stat = "var",
-                        rep = 1000,
-                        nCPU = 4) {
+testHetPerm <- function(
+    data,
+    tree,
+    source = "person",
+    rep = 1000,
+    nCPU = 4
+) {
   # some made up data for a simple memory recognition experiment:
   # data <- data.frame(id =   c(1,1,1,1,1,1,1,3,3,3,3,3,3,3,3),
   #                    item = c(1,2,3,4,5,1,2,3,4,5,1,2,3,4,5),

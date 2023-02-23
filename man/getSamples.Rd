@@ -12,21 +12,22 @@ getSamples(
 )
 }
 \arguments{
-\item{fittedModel}{a fitted latent-trait MPT model (see \code{\link{traitMPT}})
-or beta MPT model (see \code{\link{betaMPT}})}
+\item{fittedModel}{a fitted latent-trait MPT model (see
+\code{\link{traitMPT}}) or beta MPT model (see \code{\link{betaMPT}})}
 
-\item{parameter}{which parameter(s) of the (hierarchical) MPT model should be returned?
-(see details in \code{\link{getParam}}).}
+\item{parameter}{which parameter(s) of the (hierarchical) MPT model should be
+returned? (see details in \code{\link{getParam}}).}
 
 \item{select}{character vector of parameters to be plotted (e.g., \code{select = c("d", "g")}. Can be used to plot subsets of parameters and change the order of parameters.}
 
 \item{names}{whether and how to rename the variables in the MCMC output:
-\code{par} (internal parameter labels such as \code{mu[1]}),
-\code{label} (MPT label from EQN file such as \code{"d"}), or
-\code{par_name} (concatenation of both such as \code{"mu[1]_d"}).}
+\code{par} (internal parameter labels such as \code{mu[1]}), \code{label}
+(MPT label from EQN file such as \code{"d"}), or \code{par_name}
+(concatenation of both such as \code{"mu[1]_d"}).}
 }
 \description{
-Extracts MCMC posterior samples as an \code{coda::mcmc.list} and relabels the MCMC variables.
+Extracts MCMC posterior samples as an \code{coda::mcmc.list} and relabels the
+MCMC variables.
 }
 \examples{
 \dontrun{

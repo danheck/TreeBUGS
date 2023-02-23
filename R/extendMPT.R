@@ -4,15 +4,22 @@
 #'
 #' @param fittedModel a fitted \code{\link{traitMPT}} or \code{\link{betaMPT}}
 #' @inheritParams betaMPT
-#' @param ... further arguments passed to \code{extend.jags} (see arguments listed in: \link[runjags]{run.jags}).
+#' @param ... further arguments passed to \code{extend.jags} (see arguments
+#'   listed in: \link[runjags]{run.jags}).
 #'
-#' When drawing more samples, JAGS requires an additional adaptation phase, in which the MCMC
-#' sampling procedure is adjusted. Note that the MCMC sampling will still
-#' give correct results even if the warning appears: "Adaptation incomplete."
-#' (this just means that sampling efficiency is not optimal).
+#'   When drawing more samples, JAGS requires an additional adaptation phase, in
+#'   which the MCMC sampling procedure is adjusted. Note that the MCMC sampling
+#'   will still give correct results even if the warning appears: "Adaptation
+#'   incomplete." (this just means that sampling efficiency is not optimal).
 #'
 #' @export
-extendMPT <- function(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0, ...) {
+extendMPT <- function(
+    fittedModel,
+    n.iter = 10000,
+    n.adapt = 1000,
+    n.burnin = 0,
+    ...
+) {
   args <- list(...)
   if ("n.thin" %in% names(args)) {
     warning("Thinnning interval cannot be changed and is ignored!")

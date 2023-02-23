@@ -1,14 +1,19 @@
 #' Plot Posterior Predictive Mean Frequencies
 #'
-#' Plots observed means/covariances of individual frequencies against the means/covariances sampled from the posterior distribution (posterior predictive distribution).
+#' Plots observed means/covariances of individual frequencies against the
+#' means/covariances sampled from the posterior distribution (posterior
+#' predictive distribution).
 #'
 #' @inheritParams posteriorPredictive
-#' @param stat whether to plot mean frequencies (\code{"mean"}) or covariances of individual frequencies (\code{"cov"})
+#' @param stat whether to plot mean frequencies (\code{"mean"}) or covariances
+#'   of individual frequencies (\code{"cov"})
 #' @param ... arguments passed to \code{\link{boxplot}}
 #'
-#' @details If posterior predictive p-values were computed when fitting the model
-#' (e.g., by adding the argument \code{traitMPT(...,ppp=1000)} ), the stored posterior samples are re-used for plotting.
-#' Note that the last category in each MPT tree is dropped, because one category per multinomial distribution is fixed.
+#' @details If posterior predictive p-values were computed when fitting the
+#'   model (e.g., by adding the argument \code{traitMPT(...,ppp=1000)} ), the
+#'   stored posterior samples are re-used for plotting. Note that the last
+#'   category in each MPT tree is dropped, because one category per multinomial
+#'   distribution is fixed.
 #'
 #' @examples
 #' \dontrun{
@@ -20,7 +25,12 @@
 #' plotFit(fittedModel, stat = "mean")
 #' }
 #' @export
-plotFit <- function(fittedModel, M = 1000, stat = "mean", ...) {
+plotFit <- function(
+    fittedModel,
+    M = 1000,
+    stat = "mean",
+    ...
+) {
   stat <- match.arg(stat, c("mean", "cov"))
 
   # get information about model:

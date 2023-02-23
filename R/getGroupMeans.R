@@ -1,27 +1,35 @@
 #' Get Mean Parameters per Group
 #'
-#' For hierarchical latent-trait MPT models with discrete predictor variables
-#' as fitted with \code{traitMPT(..., predStructure = list("f"))}.
+#' For hierarchical latent-trait MPT models with discrete predictor variables as
+#' fitted with \code{traitMPT(..., predStructure = list("f"))}.
 #'
 #' @param traitMPT a fitted \code{\link{traitMPT}} model
 #' @param factor whether to get group estimates for all combinations of factor
-#'     levels (default) or only for specific factors (requires the names of the covariates in covData)
+#'   levels (default) or only for specific factors (requires the names of the
+#'   covariates in covData)
 #' @param probit whether to use probit scale or probability scale
-#' @param file filename to export results in .csv format (e.g., \code{file="fit_group.csv"})
-#' @param mcmc if \code{TRUE}, the raw MCMC samples for the group means are returned
-#'    as an \code{\link[coda]{mcmc.list}} object. This allows pairwise tests of group means
-#'    (see \code{\link{transformedParameters}}).
+#' @param file filename to export results in .csv format (e.g.,
+#'   \code{file="fit_group.csv"})
+#' @param mcmc if \code{TRUE}, the raw MCMC samples for the group means are
+#'   returned as an \code{\link[coda]{mcmc.list}} object. This allows pairwise
+#'   tests of group means (see \code{\link{transformedParameters}}).
+#'
+#' @seealso \code{\link{getParam}} for parameter estimates
+#' @author Daniel Heck
 #'
 #' @examples
 #' \dontrun{
 #' # save group means (probability scale):
 #' getGroupMeans(traitMPT, file = "groups.csv")
 #' }
-#' @seealso \code{\link{getParam}} for parameter estimates
-#' @author Daniel Heck
 #' @export
-getGroupMeans <- function(traitMPT, factor = "all", probit = FALSE,
-                          file = NULL, mcmc = FALSE) {
+getGroupMeans <- function(
+    traitMPT,
+    factor = "all",
+    probit = FALSE,
+    file = NULL,
+    mcmc = FALSE
+) {
   if (is.null(traitMPT$mptInfo$predTable)) {
     stop("Model does not contain discrete predictors.")
   }

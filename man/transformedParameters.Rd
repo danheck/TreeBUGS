@@ -13,7 +13,8 @@ transformedParameters(
 }
 \arguments{
 \item{fittedModel}{either a fitted latent-trait or beta MPT model
-(\code{\link{traitMPT}}, \code{\link{betaMPT}}) or an \code{\link[coda]{mcmc.list}}.}
+(\code{\link{traitMPT}}, \code{\link{betaMPT}}) or an
+\code{\link[coda]{mcmc.list}}.}
 
 \item{transformedParameters}{list with parameter transformations that should
 be computed based on the posterior samples (e.g., for testing parameter
@@ -25,16 +26,17 @@ differences: \code{list("diffD=Do-Dn")}).}
 \item{nCPU}{number of CPU cores across which the MCMC chains are distributed}
 }
 \value{
-an \link[coda]{mcmc.list} of posterior samples for the transformed parameters
+an \link[coda]{mcmc.list} of posterior samples for the transformed
+  parameters
 }
 \description{
-Computes transformations of MPT parameters based on the MCMC posterior samples
-(e.g., differences of parameters).
+Computes transformations of MPT parameters based on the MCMC posterior
+samples (e.g., differences of parameters).
 }
 \examples{
 \dontrun{
 tt <- transformedParameters(fittedModel,
-  list("diff=a-b", "p=a>b"),
+  list("diff = a-b", "p = a>b"),
   level = "individual"
 )
 summary(tt)

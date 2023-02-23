@@ -3,13 +3,18 @@
 #' TreeBUGS-specific MCMC summary for \code{mcmc.list}-objects.
 #'
 #' @param mcmc a \code{\link[coda]{mcmc.list}} object
-#' @param batchSize size of batches of parameters used to reduce memory load when
-#'     computing posterior summary statistics (including Rhat and effective sample size).
+#' @param batchSize size of batches of parameters used to reduce memory load
+#'   when computing posterior summary statistics (including Rhat and effective
+#'   sample size).
 #' @param probs quantile probabilities used to compute credibility intervals
 #'
-#' @export
 #' @importFrom coda varnames
-summarizeMCMC <- function(mcmc, batchSize = 50, probs = c(.025, .50, .975)) {
+#' @export
+summarizeMCMC <- function(
+    mcmc,
+    batchSize = 50,
+    probs = c(.025, .50, .975)
+) {
   if (inherits(mcmc, c("traitMPT", "betaMPT", "simpleMPT"))) {
     mcmc <- mcmc$runjags$mcmc
   }

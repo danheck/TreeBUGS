@@ -1,21 +1,31 @@
-
-
 #' Compute Posterior Predictive P-Values
 #'
 #' Computes posterior predictive p-values to test model fit.
+#'
 #' @inheritParams posteriorPredictive
-#' @param T2 whether to compute T2 statistic to check coveriance structure (can take a lot of time).
-#'   If some participants do not have responses for some trees, (co)variances are
-#'   computed by pairwise deletion of the corresponding persons.
-#' @param type whether the T1 statistic of expected means is computed using Person's \code{"X2"} or the likelihood-ratio statistic \code{"G2"}
+#' @param T2 whether to compute T2 statistic to check coveriance structure (can
+#'   take a lot of time). If some participants do not have responses for some
+#'   trees, (co)variances are computed by pairwise deletion of the corresponding
+#'   persons.
+#' @param type whether the T1 statistic of expected means is computed using
+#'   Person's \code{"X2"} or the likelihood-ratio statistic \code{"G2"}
+#'
 #' @author Daniel Heck
-#' @references
-#' Klauer, K. C. (2010). Hierarchical multinomial processing tree models: A latent-trait approach. Psychometrika, 75, 70-98.
-#' @export
+#' @references Klauer, K. C. (2010). Hierarchical multinomial processing tree
+#' models: A latent-trait approach. Psychometrika, 75, 70-98.
+#'
 #' @importFrom  stats cov
 #' @importFrom  utils combn
 #' @importFrom parallel clusterMap
-PPP <- function(fittedModel, M = 1000, nCPU = 4, T2 = TRUE, type = "X2") {
+#' @export
+PPP <- function(
+    fittedModel,
+    M = 1000,
+    nCPU = 4,
+    T2 = TRUE,
+    type = "X2"
+){
+
   cats <- fittedModel$mptInfo$MPT$Category
   tree <- fittedModel$mptInfo$MPT$Tree
   TreeNames <- unique(tree)

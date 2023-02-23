@@ -1,12 +1,17 @@
-
 # prior:
 #   (A) betaMPT: list(alpha="dgamma(1,.1)", beta="dgamma(1,.1)")
 #   (B) traitMPT: list(mu="dnorm(0,1)", xi="dunif(0,10)", df=3, V=diag(2))
 # M: number of samples
 #' @importFrom MASS mvrnorm
 #' @importFrom rjags jags.model coda.samples
-sampleHyperprior <- function(prior, M, S = 1,
-                             probitInverse = "mean", truncSig = .995, nCPU = 4) {
+sampleHyperprior <- function(
+    prior,
+    M,
+    S = 1,
+    probitInverse = "mean",
+    truncSig = .995,
+    nCPU = 4
+) {
   if (all(c("mu", "xi", "V", "df") %in% names(prior))) {
     prior <- prior[c("mu", "xi", "V", "df")]
     model <- "traitMPT"

@@ -1,6 +1,4 @@
 
-
-
 ################### covariate handling of: covData, covStructure   ###################
 
 # test files (Daniel):

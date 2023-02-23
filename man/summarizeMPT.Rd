@@ -7,19 +7,24 @@
 summarizeMPT(mcmc, mptInfo, probs = c(0.025, 0.5, 0.975), summ = NULL)
 }
 \arguments{
-\item{mcmc}{the actual mcmc.list output of the sampler of a fitted MPT model (accesible via \code{fittedModel$runjags$mcmc})}
+\item{mcmc}{the actual mcmc.list output of the sampler of a fitted MPT model
+(accesible via \code{fittedModel$runjags$mcmc})}
 
-\item{mptInfo}{the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})}
+\item{mptInfo}{the internally stored information about the fitted MPT model
+(accesible via \code{fittedModel$mptInfo})}
 
 \item{probs}{quantile probabilities used to compute credibility intervals}
 
 \item{summ}{optional argument for internal use}
 }
 \description{
-Provide clean and readable summary statistics tailored to MPT models based on the JAGS output.
+Provide clean and readable summary statistics tailored to MPT models based on
+the JAGS output.
 }
 \details{
-The MPT-specific summary is computed directly after fitting a model. However, this function might be used manually after removing MCMC samples (e.g., extending the burnin period).
+The MPT-specific summary is computed directly after fitting a model.
+  However, this function might be used manually after removing MCMC samples
+  (e.g., extending the burnin period).
 }
 \examples{
 # Remove additional burnin samples and recompute MPT summary

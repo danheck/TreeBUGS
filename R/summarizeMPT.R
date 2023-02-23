@@ -1,16 +1,19 @@
 #' Summarize JAGS Output for Hierarchical MPT Models
 #'
-#' Provide clean and readable summary statistics tailored to MPT models based on the JAGS output.
+#' Provide clean and readable summary statistics tailored to MPT models based on
+#' the JAGS output.
 #'
-# @param model either \code{"betaMPT"} or \code{"traitMPT"}
 #' @inheritParams summarizeMCMC
-#' @param mcmc the actual mcmc.list output of the sampler of a fitted MPT model (accesible via \code{fittedModel$runjags$mcmc})
-#' @param mptInfo the internally stored information about the fitted MPT model (accesible via \code{fittedModel$mptInfo})
-# @param dic whether to compute DIC statistic for model selection (requires additional sampling!)
-# @param M number of posterior predictive samples to compute T1 statistic
+#' @param mcmc the actual mcmc.list output of the sampler of a fitted MPT model
+#'   (accesible via \code{fittedModel$runjags$mcmc})
+#' @param mptInfo the internally stored information about the fitted MPT model
+#'   (accesible via \code{fittedModel$mptInfo})
 #' @param summ optional argument for internal use
-# @param ... further arguments passed to \code{\link[coda]{dic.samples}} (e.g., \code{n.iter})
-#' @details The MPT-specific summary is computed directly after fitting a model. However, this function might be used manually after removing MCMC samples (e.g., extending the burnin period).
+#'
+#' @details The MPT-specific summary is computed directly after fitting a model.
+#'   However, this function might be used manually after removing MCMC samples
+#'   (e.g., extending the burnin period).
+#'
 #' @examples
 #' # Remove additional burnin samples and recompute MPT summary
 #' \dontrun{
@@ -19,9 +22,14 @@
 #' new.mpt.summary <- summarizeMPT(mcmc.subsamp, fittedModel$mptInfo)
 #' new.mpt.summary
 #' }
-#' @export
 #' @import rjags
-summarizeMPT <- function(mcmc, mptInfo, probs = c(.025, .50, .975), summ = NULL) {
+#' @export
+summarizeMPT <- function(
+    mcmc,
+    mptInfo,
+    probs = c(.025, .50, .975),
+    summ = NULL
+) {
   if (is.null(summ) | !all(paste0(probs * 100, "%") %in% colnames(summ))) {
     summ <- summarizeMCMC(mcmc, probs = probs)
   }

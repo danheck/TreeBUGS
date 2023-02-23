@@ -7,23 +7,39 @@
 testHetPerm(data, tree, source = "person", rep = 1000, nCPU = 4)
 }
 \arguments{
-\item{data}{matrix or data frame with three columns: person code/index, item label, response category. Can also be the path to a .csv file with frequencies (comma-separated; first line defines category labels)}
+\item{data}{matrix or data frame with three columns: person code/index, item
+label, response category. Can also be the path to a .csv file with
+frequencies (comma-separated; first line defines category labels)}
 
-\item{tree}{a list that defines which categories belong to the same multinomial distribution (i.e., the the same MPT tree). For instance: \code{tree = list(tree.old = c("hit","cr"), tree.new = c("fa","miss"))}. Category labels must match the values of the third column of \code{data}}
+\item{tree}{a list that defines which categories belong to the same
+multinomial distribution (i.e., the the same MPT tree). For instance:
+\code{tree = list(tree.old = c("hit","cr"), tree.new = c("fa","miss"))}.
+Category labels must match the values of the third column of \code{data}}
 
-\item{source}{whether to test for \code{"person"} or \code{"item"} homogeneity}
+\item{source}{whether to test for \code{"person"} or \code{"item"}
+homogeneity}
 
 \item{rep}{number of permutations to be sampled}
 
-\item{nCPU}{number of CPUs used for parallel Monte Carlo sampling of permutations}
+\item{nCPU}{number of CPUs used for parallel Monte Carlo sampling of
+permutations}
 }
 \description{
-Tests whether whether participants (items) are homogeneous without assuming item (participant) homogeneity.
+Tests whether whether participants (items) are homogeneous without assuming
+item (participant) homogeneity.
 }
 \details{
-If an item/person has zero frequencies on all categories in an MPT tree, these zeros are neglected when computing mean frequencies per column. As an example, consider a simple recognition test with a fixed assignments of words to the learn/test list. In such an experiment, all learned words will result in hits or misses (i.e., the MPT tree of old items), whereas new words are always false alarms/correct rejections and thus belong to the MPT tree of new items (this is not necessarily the case if words are assigned randomly).
+If an item/person has zero frequencies on all categories in an MPT
+tree, these zeros are neglected when computing mean frequencies per column.
+As an example, consider a simple recognition test with a fixed assignments of
+words to the learn/test list. In such an experiment, all learned words will
+result in hits or misses (i.e., the MPT tree of old items), whereas new words
+are always false alarms/correct rejections and thus belong to the MPT tree of
+new items (this is not necessarily the case if words are assigned randomly).
 
-Note that the test does still assume independence of observations. However, it does not require item homogeneity when testing participant heterogeneity (in contrast to the chi-square test: \code{\link{testHetChi}}).
+Note that the test does still assume independence of observations. However,
+it does not require item homogeneity when testing participant heterogeneity
+(in contrast to the chi-square test: \code{\link{testHetChi}}).
 }
 \examples{
 # generate homogeneous data
@@ -47,7 +63,9 @@ tmp <- testHetPerm(data, tree, rep = 200, nCPU = 1)
 tmp[2:3]
 }
 \references{
-Smith, J. B., & Batchelder, W. H. (2008). Assessing individual differences in categorical data. Psychonomic Bulletin & Review, 15, 713-731. \doi{10.3758/PBR.15.4.713}
+Smith, J. B., & Batchelder, W. H. (2008). Assessing individual
+  differences in categorical data. Psychonomic Bulletin & Review, 15,
+  713-731. \doi{10.3758/PBR.15.4.713}
 }
 \seealso{
 \code{\link{testHetChi}}, \code{\link{plotFreq}}

@@ -1,11 +1,16 @@
-#' Make Within-Subject EQN Files
+#' Generate EQN Files for Within-Subject Designs
 #'
-#' Replicates an MPT model multiple times with different tree, category, and parameter labels for within-subject factorial designs
+#' Replicates an MPT model multiple times with different tree, category, and
+#' parameter labels for within-subject factorial designs.
 #'
 #' @inheritParams betaMPT
-#' @param labels a character vector defining the labels that are added to the parameters in each within-subject condition
-#' @param constant optional: a character vector defining which parameters are constrained to be constant across within-conditions
-#' @param save optional: path to an EQN output file. By default, the model is return as a string character
+#' @param labels a character vector defining the labels that are added to the
+#'   parameters in each within-subject condition
+#' @param constant optional: a character vector defining which parameters are
+#'   constrained to be constant across within-conditions
+#' @param save optional: path to an EQN output file. By default, the model is
+#'   return as a string character
+#'
 #' @examples
 #' # Example: Standard Two-High-Threshold Model (2HTM)
 #' EQNfile <- system.file("MPTmodels/2htm.eqn",
@@ -13,7 +18,12 @@
 #' )
 #' withinSubjectEQN(EQNfile, c("high", "low"), constant = c("g"))
 #' @export
-withinSubjectEQN <- function(eqnfile, labels, constant, save) {
+withinSubjectEQN <- function(
+    eqnfile,
+    labels,
+    constant,
+    save
+) {
   tree <- readEQN(eqnfile)
   param <- colnames(readEQN(eqnfile, parse = TRUE)$a)
   if (!missing(constant)) {

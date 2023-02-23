@@ -16,19 +16,21 @@ getGroupMeans(
 \item{traitMPT}{a fitted \code{\link{traitMPT}} model}
 
 \item{factor}{whether to get group estimates for all combinations of factor
-levels (default) or only for specific factors (requires the names of the covariates in covData)}
+levels (default) or only for specific factors (requires the names of the
+covariates in covData)}
 
 \item{probit}{whether to use probit scale or probability scale}
 
-\item{file}{filename to export results in .csv format (e.g., \code{file="fit_group.csv"})}
+\item{file}{filename to export results in .csv format (e.g.,
+\code{file="fit_group.csv"})}
 
-\item{mcmc}{if \code{TRUE}, the raw MCMC samples for the group means are returned
-as an \code{\link[coda]{mcmc.list}} object. This allows pairwise tests of group means
-(see \code{\link{transformedParameters}}).}
+\item{mcmc}{if \code{TRUE}, the raw MCMC samples for the group means are
+returned as an \code{\link[coda]{mcmc.list}} object. This allows pairwise
+tests of group means (see \code{\link{transformedParameters}}).}
 }
 \description{
-For hierarchical latent-trait MPT models with discrete predictor variables
-as fitted with \code{traitMPT(..., predStructure = list("f"))}.
+For hierarchical latent-trait MPT models with discrete predictor variables as
+fitted with \code{traitMPT(..., predStructure = list("f"))}.
 }
 \examples{
 \dontrun{

@@ -1,27 +1,32 @@
-
 #' Generate Data for Beta MPT Models
 #'
-#' Generating a data file with known parameter structure using the Beta-MPT. Useful for simulations and robustness checks.
+#' Generating a data file with known parameter structure using the Beta-MPT.
+#' Useful for simulations and robustness checks.
+#'
 #' @inheritParams betaMPT
 #' @inheritParams genMPT
 #' @param N number of participants
-#' @param mean Named vector of true group means of individual MPT parameters.
-#'     If the vector is not named, the internal order of parameters is used
-#'     (can be obtained using \code{\link{readEQN}}).
-#' @param sd named vector of group standard deviations of individual MPT parameters.
+#' @param mean Named vector of true group means of individual MPT parameters. If
+#'   the vector is not named, the internal order of parameters is used (can be
+#'   obtained using \code{\link{readEQN}}).
+#' @param sd named vector of group standard deviations of individual MPT
+#'   parameters.
 #' @param alpha Alternative specification of the group-level distribution using
-#'     the shape parameters of the beta distribution (see \link{dbeta}).
+#'   the shape parameters of the beta distribution (see \link{dbeta}).
 #' @param beta see \code{alpha}
 #'
-#' @details
-#' Data are generated in a two-step procedure. First, person parameters are sampled
-#' from the specified beta distributions for each paramter (either based on mean/sd
-#' or based on alpha/beta). In a second step, response frequencies are sampled
-#' for each person using \code{\link{genMPT}}.
+#' @details Data are generated in a two-step procedure. First, person parameters
+#' are sampled from the specified beta distributions for each paramter (either
+#' based on mean/sd or based on alpha/beta). In a second step, response
+#' frequencies are sampled for each person using \code{\link{genMPT}}.
 #'
+#' @return a list including the generated frequencies (\code{data}) and the
+#'   true, underlying parameters (\code{parameters}) on the group and individual
+#'   level.
 #' @seealso \code{\link{genMPT}}
-#' @return a list including the generated frequencies (\code{data}) and the true,
-#' underlying parameters (\code{parameters}) on the group and individual level.
+#' @references Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial
+#'   processing tree models for addressing individual differences. Journal of
+#'   Mathematical Psychology, 54, 167-183.
 #'
 #' @examples
 #' # Example: Standard Two-High-Threshold Model (2HTM)
@@ -36,12 +41,18 @@
 #' head(genDat$data, 3)
 #' plotFreq(genDat$data, eqn = EQNfile)
 #' @importFrom stats  rbeta
-#' @references Smith, J. B., & Batchelder, W. H. (2010). Beta-MPT: Multinomial processing tree models for addressing individual differences. Journal of Mathematical Psychology, 54, 167-183.
 #' @export
-genBetaMPT <- function(N, numItems, eqnfile, restrictions,
-                       mean = NULL, sd = NULL,
-                       alpha = NULL, beta = NULL,
-                       warning = TRUE) {
+genBetaMPT <- function(
+    N,
+    numItems,
+    eqnfile,
+    restrictions,
+    mean = NULL,
+    sd = NULL,
+    alpha = NULL,
+    beta = NULL,
+    warning = TRUE
+) {
   if (missing(restrictions)) {
     restrictions <- NULL
   }

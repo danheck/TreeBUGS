@@ -9,8 +9,9 @@ summarizeMCMC(mcmc, batchSize = 50, probs = c(0.025, 0.5, 0.975))
 \arguments{
 \item{mcmc}{a \code{\link[coda]{mcmc.list}} object}
 
-\item{batchSize}{size of batches of parameters used to reduce memory load when
-computing posterior summary statistics (including Rhat and effective sample size).}
+\item{batchSize}{size of batches of parameters used to reduce memory load
+when computing posterior summary statistics (including Rhat and effective
+sample size).}
 
 \item{probs}{quantile probabilities used to compute credibility intervals}
 }

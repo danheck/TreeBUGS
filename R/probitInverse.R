@@ -1,18 +1,23 @@
-
 #' Probit-Inverse of Group-Level Normal Distribution
 #'
-#' Transform latent group-level normal distribution (latent-trait MPT) into mean and SD on probability scale.
+#' Transform latent group-level normal distribution (latent-trait MPT) into mean
+#' and SD on probability scale.
+#'
 #' @param mu latent-probit mean of normal distribution
 #' @param sigma latent-probit SD of normal distribution
-#' @param fittedModel optional: fitted \link{traitMPT} model. If provided, the bivariate inverse-probit transform is applied to all MCMC samples (and \code{mu} and \code{sigma} are ignored).
+#' @param fittedModel optional: fitted \link{traitMPT} model. If provided, the
+#'   bivariate inverse-probit transform is applied to all MCMC samples (and
+#'   \code{mu} and \code{sigma} are ignored).
+#'
 #' @return implied mean and SD on probability scale
+#'
 #' @examples
 #' ####### compare bivariate vs. univariate transformation
-#' probitInverse(mu = .8, sigma = c(.25, .5, .75, 1))
-#' pnorm(.8)
+#' probitInverse(mu = 0.8, sigma = c(0.25, 0.5, 0.75, 1))
+#' pnorm(0.8)
 #'
 #' # full distribution
-#' prob <- pnorm(rnorm(10000, .8, .7))
+#' prob <- pnorm(rnorm(10000, mean = 0.8, sd = 0.7))
 #' hist(prob, 80, col = "gray", xlim = 0:1)
 #'
 #' \dontrun{
@@ -20,10 +25,15 @@
 #' mean_sd <- probitInverse(fittedModel = fit)
 #' summarizeMCMC(mean_sd)
 #' }
-#' @export
 #' @importFrom coda varnames
 #' @importFrom stats integrate
-probitInverse <- function(mu, sigma, fittedModel = NULL) {
+#' @export
+probitInverse <- function(
+    mu,
+    sigma,
+    fittedModel = NULL
+) {
+
   probitInverseVec <- Vectorize(
     function(mu, sigma) {
       mp <- vp <- NA

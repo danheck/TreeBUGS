@@ -9,22 +9,24 @@ extendMPT(fittedModel, n.iter = 10000, n.adapt = 1000, n.burnin = 0, ...)
 \arguments{
 \item{fittedModel}{a fitted \code{\link{traitMPT}} or \code{\link{betaMPT}}}
 
-\item{n.iter}{Number of iterations per chain (including burnin samples).
-See \code{\link[runjags]{run.jags}} for details.}
+\item{n.iter}{Number of iterations per chain (including burnin samples). See
+\code{\link[runjags]{run.jags}} for details.}
 
-\item{n.adapt}{number of adaption samples to adjust MCMC sampler in JAGS.
-The sampler will be more efficient if it is tuned well. However, MCMC
-sampling will still give correct results even if the warning appears:
-"Adaptation incomplete." (this just means that sampling efficiency could be better).}
+\item{n.adapt}{number of adaption samples to adjust MCMC sampler in JAGS. The
+sampler will be more efficient if it is tuned well. However, MCMC sampling
+will still give correct results even if the warning appears: "Adaptation
+incomplete." (this just means that sampling efficiency could be better).}
 
-\item{n.burnin}{Number of samples for burnin (samples will not be stored and removed from n.iter)}
+\item{n.burnin}{Number of samples for burnin (samples will not be stored and
+removed from n.iter)}
 
-\item{...}{further arguments passed to \code{extend.jags} (see arguments listed in: \link[runjags]{run.jags}).
+\item{...}{further arguments passed to \code{extend.jags} (see arguments
+  listed in: \link[runjags]{run.jags}).
 
-When drawing more samples, JAGS requires an additional adaptation phase, in which the MCMC
-sampling procedure is adjusted. Note that the MCMC sampling will still
-give correct results even if the warning appears: "Adaptation incomplete."
-(this just means that sampling efficiency is not optimal).}
+  When drawing more samples, JAGS requires an additional adaptation phase, in
+  which the MCMC sampling procedure is adjusted. Note that the MCMC sampling
+  will still give correct results even if the warning appears: "Adaptation
+  incomplete." (this just means that sampling efficiency is not optimal).}
 }
 \description{
 Adds more MCMC samples to the fitted MPT model.

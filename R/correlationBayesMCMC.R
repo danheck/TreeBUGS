@@ -1,47 +1,51 @@
 #' Posterior Distribution for Correlations
 #'
 #' Adjusts the posterior distribution of correlations for the sampling error of
-#' a population correlation according to the sample size
-#' (i.e., the number of participants; Ly, Marsman, & Wagenmakers, 2018).
+#' a population correlation according to the sample size (i.e., the number of
+#' participants; Ly, Marsman, & Wagenmakers, 2018).
 #'
-#' @param fittedModel a fitted \link{betaMPT} or \link{traitMPT} model with covariates
-#'     (added during fitting by the argument \code{covData})
-#' @param r optional: a vector of posterior correlations (instead of \code{fittedModel})
-#' @param N only if \code{r} is used: the number of participants the correlation is based on
-#' @param kappa parameter for the prior of the correlation, that is, a scaled beta distribution:
-#'     Beta(1/kappa, 1/kappa).
-#'     The default \code{kappa=1} defines a uniform distribution on [-1,1],
-#'     whereas \code{kappa<1} defines a unimodal prior centered around zero.
-#' @param precision precision on the interval [-1,1] to approximate the posterior density
-#' @param maxiter maximum number of iterations in \code{\link[hypergeo]{genhypergeo}}.
-#'     Higher values might be necessary to increase numerical stability for large correlations (r>.95).
-#' @param plot whether to plot (a) the unadjusted posterior correlations (gray histogram)
-#'     and (b) the corrected posterior (black line with red credibility intervals)
-#' @param nCPU number of CPUs used for parallel computation of posterior distribution
+#' @param fittedModel a fitted \link{betaMPT} or \link{traitMPT} model with
+#'   covariates (added during fitting by the argument \code{covData})
+#' @param r optional: a vector of posterior correlations (instead of
+#'   \code{fittedModel})
+#' @param N only if \code{r} is used: the number of participants the correlation
+#'   is based on
+#' @param kappa parameter for the prior of the correlation, that is, a scaled
+#'   beta distribution: Beta(1/kappa, 1/kappa). The default \code{kappa=1}
+#'   defines a uniform distribution on [-1,1], whereas \code{kappa<1} defines a
+#'   unimodal prior centered around zero.
+#' @param precision precision on the interval [-1,1] to approximate the
+#'   posterior density
+#' @param maxiter maximum number of iterations in
+#'   \code{\link[hypergeo]{genhypergeo}}. Higher values might be necessary to
+#'   increase numerical stability for large correlations (r>.95).
+#' @param plot whether to plot (a) the unadjusted posterior correlations (gray
+#'   histogram) and (b) the corrected posterior (black line with red credibility
+#'   intervals)
+#' @param nCPU number of CPUs used for parallel computation of posterior
+#'   distribution
 #' @param M number of subsamples from the fitted model
 #' @param ci credibility interval
 #'
-#' @details
-#' This function
-#' (1) uses all posterior samples of a correlation to
-#' (2) derive the posterior of the correlation corrected for sampling error and
-#' (3) averages these densities across the posterior samples.
-#' Thereby, the method accounts for estimation uncertainty of the MPT model
-#' (due to the use of the posterior samples) and also for sampling error of the
-#' population correlation due to sample size
-#' (cf. Ly, Boehm, Heathcote, Turner, Forstmann, Marsman, & Matzke, 2016).
+#' @details This function (1) uses all posterior samples of a correlation to (2)
+#' derive the posterior of the correlation corrected for sampling error and (3)
+#' averages these densities across the posterior samples. Thereby, the method
+#' accounts for estimation uncertainty of the MPT model (due to the use of the
+#' posterior samples) and also for sampling error of the population correlation
+#' due to sample size (cf. Ly, Boehm, Heathcote, Turner, Forstmann, Marsman, &
+#' Matzke, 2016).
 #'
-#' @references
-#' Ly, A., Marsman, M., & Wagenmakers, E.-J. (2018).
-#' Analytic posteriors for Pearson’s correlation coefficient.
-#' \emph{Statistica Neerlandica, 72}, 4–13.
-#' \doi{10.1111/stan.12111}
+#' @references Ly, A., Marsman, M., & Wagenmakers, E.-J. (2018). Analytic
+#' posteriors for Pearson’s correlation coefficient. \emph{Statistica
+#' Neerlandica, 72}, 4–13. \doi{10.1111/stan.12111}
 #'
-#' Ly, A., Boehm, U., Heathcote, A., Turner, B. M. , Forstmann, B., Marsman, M., and Matzke, D. (2017). A flexible and efficient hierarchical Bayesian approach to the exploration of
-#' individual differences in cognitive-model-based neuroscience. \url{https://osf.io/evsyv/}.
-#' \doi{10.1002/9781119159193}
-#'
+#'   Ly, A., Boehm, U., Heathcote, A., Turner, B. M. , Forstmann, B., Marsman,
+#'   M., and Matzke, D. (2017). A flexible and efficient hierarchical Bayesian
+#'   approach to the exploration of individual differences in
+#'   cognitive-model-based neuroscience. \url{https://osf.io/evsyv/}.
+#'   \doi{10.1002/9781119159193}
 #' @author Daniel W. Heck, Alexander Ly
+#'
 #' @examples
 #' # test effect of number of participants:
 #' set.seed(123)
@@ -51,9 +55,18 @@
 #'
 #' @importFrom parallel clusterEvalQ clusterSplit
 #' @export
-correlationPosterior <- function(fittedModel, r, N, kappa = 1, ci = .95,
-                                 M = 1000, precision = .005, maxiter = 10000,
-                                 plot = TRUE, nCPU = 4) {
+correlationPosterior <- function(
+    fittedModel,
+    r,
+    N,
+    kappa = 1,
+    ci = .95,
+    M = 1000,
+    precision = .005,
+    maxiter = 10000,
+    plot = TRUE,
+    nCPU = 4
+) {
   rho <- seq(-1, 1, by = precision)
   if (!missing(fittedModel) && !is.null(fittedModel)) {
     N <- nrow(fittedModel$mptInfo$data)

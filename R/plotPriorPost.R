@@ -1,16 +1,25 @@
-
 #' Plot Prior vs. Posterior Distribution
 #'
-#' Allows to judge how much the data informed the parameter posterior distributions compared to the prior.
+#' Allows to judge how much the data informed the parameter posterior
+#' distributions compared to the prior.
+#'
 #' @inheritParams plotFit
 #' @inheritParams priorPredictive
 #' @inheritParams plotPrior
 #' @param M number of random samples to approximate prior distributions
-# @param scale whether to scale the plots to give a complete picture of the \code{"prior"} or posterior (\code{scale="post"})
 #' @param ci credibility interval indicated by vertical red lines
-#' @details Prior distributions are shown as blue, dashed lines, whereas posterior distributions are shown as solid, black lines.
+#'
+#' @details Prior distributions are shown as blue, dashed lines, whereas
+#'   posterior distributions are shown as solid, black lines.
 #' @export
-plotPriorPost <- function(fittedModel, probitInverse = "mean", M = 2e5, ci = .95, nCPU = 3, ...) {
+plotPriorPost <- function(
+    fittedModel,
+    probitInverse = "mean",
+    M = 2e5,
+    ci = .95,
+    nCPU = 3,
+    ...
+) {
   mfrow <- par()$mfrow
 
   S <- length(fittedModel$mptInfo$thetaUnique)
