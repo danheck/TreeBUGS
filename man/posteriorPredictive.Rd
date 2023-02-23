@@ -34,6 +34,6 @@ Draw predicted frequencies based on posterior distribution of (a) individual est
 # add posterior predictive samples to fitted model
 #     (facilitates plotting using ?plotFit)
 fittedModel$postpred$freq.pred <-
-     posteriorPredictive(fittedModel, M=1000)
+  posteriorPredictive(fittedModel, M = 1000)
 }
 }

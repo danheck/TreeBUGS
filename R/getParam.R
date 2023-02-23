@@ -35,60 +35,68 @@
 #' getParam(fittedModel, parameter = "theta")
 #'
 #' # save summary of individual estimates:
-#' getParam(fittedModel, parameter = "theta",
-#'          stat = "summary", file= "ind_summ.csv")}
+#' getParam(fittedModel,
+#'   parameter = "theta",
+#'   stat = "summary", file = "ind_summ.csv"
+#' )
+#' }
 #'
 #' @author Daniel Heck
 #' @seealso \code{\link{getGroupMeans}} mean group estimates
 #' @export
-getParam <- function(fittedModel, parameter="mean", stat="mean", file = NULL){
-
-  if(! inherits(fittedModel, c("betaMPT", "traitMPT")))
+getParam <- function(fittedModel, parameter = "mean", stat = "mean", file = NULL) {
+  if (!inherits(fittedModel, c("betaMPT", "traitMPT"))) {
     stop("Only for hierarchical MPT models (see ?traitMPT & ?betaMPT).")
+  }
 
   thetaUnique <- fittedModel$mptInfo$thetaUnique
   S <- length(thetaUnique)
   summ <- fittedModel$mcmc.summ # summary(fittedModel$mcmc)
   allnam <- rownames(summ)
-  select <- setdiff(grep(parameter,allnam) , grep(".pred",allnam))
-  if(length(select) == 0)
+  select <- setdiff(grep(parameter, allnam), grep(".pred", allnam))
+  if (length(select) == 0) {
     stop("parameter not found.")
+  }
 
   label <- c("Mean", "SD", "2.5%", "97.5%")
   sel.stat <- switch(stat,
-                     "mean" = "Mean",
-                     "sd" = "SD",
-                     "median" = "50%",
-                     "summary" = label,
-                     stop("statistic not supported."))
-  par <-  summ[select, sel.stat, drop = FALSE]
+    "mean" = "Mean",
+    "sd" = "SD",
+    "median" = "50%",
+    "summary" = label,
+    stop("statistic not supported.")
+  )
+  par <- summ[select, sel.stat, drop = FALSE]
 
-  if(stat != "summary"){
-    if(length(par) == S){
-      rownames(par) <- paste0(grep(parameter,allnam, value = TRUE),
-                              names(par), "_", thetaUnique)
-    }else if(parameter == "theta"){
-      par <- matrix(par, ncol=S, byrow=TRUE)
+  if (stat != "summary") {
+    if (length(par) == S) {
+      rownames(par) <- paste0(
+        grep(parameter, allnam, value = TRUE),
+        names(par), "_", thetaUnique
+      )
+    } else if (parameter == "theta") {
+      par <- matrix(par, ncol = S, byrow = TRUE)
       colnames(par) <- thetaUnique
       rownames(par) <- rownames(fittedModel$mptInfo$data)
-    }else if(parameter == "rho"){
-      par <- getRhoMatrix (thetaUnique, par)
+    } else if (parameter == "rho") {
+      par <- getRhoMatrix(thetaUnique, par)
     }
-  }else{
-    if(length(select) == S){
-      rownames(par) <- paste0(grep(parameter,allnam, value = TRUE),
-                              rownames(par), "_", thetaUnique)
-    }else if(parameter == "theta"){
-      par <- matrix(t(par), ncol=S*4, byrow=TRUE)
-      colnames(par) <- paste0( rep(thetaUnique, each=4), "_" , label)
+  } else {
+    if (length(select) == S) {
+      rownames(par) <- paste0(
+        grep(parameter, allnam, value = TRUE),
+        rownames(par), "_", thetaUnique
+      )
+    } else if (parameter == "theta") {
+      par <- matrix(t(par), ncol = S * 4, byrow = TRUE)
+      colnames(par) <- paste0(rep(thetaUnique, each = 4), "_", label)
     }
   }
 
-  if(!is.null(file)){
-    if(is.null(dim(par))) par <- t(par)
+  if (!is.null(file)) {
+    if (is.null(dim(par))) par <- t(par)
     write.csv(par, file = file, row.names = FALSE)
   }
 
   par
 }
-

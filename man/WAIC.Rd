@@ -69,8 +69,10 @@ waic2 <- WAIC(fit2, summarize = FALSE)
 waic_diff <- waic1$waic - waic2$waic
 # (3) standard error of the WAIC differences:
 n_obs <- length(waic_diff)
-c(diff = sum(waic_diff),
-  se_diff = sqrt(n_obs) * sd(waic_diff))
+c(
+  diff = sum(waic_diff),
+  se_diff = sqrt(n_obs) * sd(waic_diff)
+)
 }
 
 }

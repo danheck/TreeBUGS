@@ -49,8 +49,10 @@
 #' waic_diff <- waic1$waic - waic2$waic
 #' # (3) standard error of the WAIC differences:
 #' n_obs <- length(waic_diff)
-#' c(diff = sum(waic_diff),
-#'   se_diff = sqrt(n_obs) * sd(waic_diff))
+#' c(
+#'   diff = sum(waic_diff),
+#'   se_diff = sqrt(n_obs) * sd(waic_diff)
+#' )
 #' }
 #'
 #' @references
@@ -60,19 +62,18 @@
 #' @importFrom rjags jags.samples jags.model load.module
 #' @export
 WAIC <- function(fittedModel, n.adapt = 1000, n.chains = 3, n.iter = 10000, n.thin = 1,
-                 summarize = TRUE){
-
+                 summarize = TRUE) {
   stopifnot(inherits(fittedModel, c("traitMPT", "betaMPT")))
   load.module("dic")
 
   # use last MCMC samples as initial values
   mcmc <- fittedModel$runjags$mcmc
   M <- nrow(mcmc[[1]])
-  init <- mcmc[M,]
+  init <- mcmc[M, ]
   cc <- length(init)
   initvec <- c(init, init[sample(cc, max(0, n.chains - cc), replace = TRUE)])[1:n.chains]
   inits <- list()
-  for(i in seq_along(initvec)){
+  for (i in seq_along(initvec)) {
     inits[[i]] <- list("mu" = initvec[[i]][grep("mu", names(initvec[[i]]))])
   }
 
@@ -83,32 +84,38 @@ WAIC <- function(fittedModel, n.adapt = 1000, n.chains = 3, n.iter = 10000, n.th
 
   # construct new JAGS model
   mod <- jags.model(textConnection(fittedModel$runjags$model),
-                    datlist[-length(datlist)], n.chains = n.chains,
-                    n.adapt=n.adapt, inits = inits)
+    datlist[-length(datlist)],
+    n.chains = n.chains,
+    n.adapt = n.adapt, inits = inits
+  )
 
   # the WAIC feature is still experimental! (requires JAGS 4.3.0)
   # returns deviance + waic penalty for each observed node (= free category per person)
   # cf.: https://sourceforge.net/p/mcmc-jags/discussion/610036/thread/8211df61/
-  samples <- jags.samples(mod, c("deviance", "WAIC"), type= "mean",
-                          n.iter = n.iter, thin = n.thin)
+  samples <- jags.samples(mod, c("deviance", "WAIC"),
+    type = "mean",
+    n.iter = n.iter, thin = n.thin
+  )
 
   samples$p_waic <- samples$WAIC
   samples$waic <- samples$deviance + samples$p_waic
   attributes(samples$waic) <- attributes(samples$p_waic) <- attributes(samples$deviance)
   samples$WAIC <- NULL
 
-  if (!summarize)
+  if (!summarize) {
     return(samples)
+  }
 
   # standard error for WAIC (cf. Vehtari et al., 2017)
-  n_obs <- length(samples$waic)  # = number of free categories times nubmer of persons
+  n_obs <- length(samples$waic) # = number of free categories times nubmer of persons
   se_waic <- sqrt(n_obs) * sd(samples$waic)
 
   tmp <- sapply(samples, sum)
-  waic <- c("p_waic" = tmp[["p_waic"]],
-            "deviance" = tmp[["deviance"]],
-            "waic" = tmp[["waic"]],
-            "se_waic" = se_waic)
+  waic <- c(
+    "p_waic" = tmp[["p_waic"]],
+    "deviance" = tmp[["deviance"]],
+    "waic" = tmp[["waic"]],
+    "se_waic" = se_waic
+  )
   return(waic)
 }
-

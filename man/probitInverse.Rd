@@ -21,16 +21,16 @@ Transform latent group-level normal distribution (latent-trait MPT) into mean an
 }
 \examples{
 ####### compare bivariate vs. univariate transformation
-probitInverse(mu=.8, sigma=c(.25,.5,.75,1))
+probitInverse(mu = .8, sigma = c(.25, .5, .75, 1))
 pnorm(.8)
 
 # full distribution
 prob <- pnorm(rnorm(10000, .8, .7))
-hist(prob, 80, col="gray", xlim=0:1)
+hist(prob, 80, col = "gray", xlim = 0:1)
 
 \dontrun{
 # transformation for fitted model
-mean_sd <- probitInverse(fittedModel=fit)
+mean_sd <- probitInverse(fittedModel = fit)
 summarizeMCMC(mean_sd)
 }
 }

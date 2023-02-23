@@ -49,13 +49,15 @@ the model: \code{traitMPT(..., IVprec = 1)} (see Heck, 2019).
 \examples{
 \dontrun{
 # latent-trait MPT model for the encoding condition (see ?arnold2013):
-EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+EQNfile <- system.file("MPTmodels/2htsm.eqn", package = "TreeBUGS")
 d.enc <- subset(arnold2013, group == "encoding")
 
-fit <- traitMPT(EQNfile, data = d.enc[, -(1:4)], n.thin=5,
-                restrictions=list("D1=D2=D3","d1=d2","a=g"),
-                covData = d.enc[,c("age", "pc")],
-                predStructure = list("D1 ; age"))
+fit <- traitMPT(EQNfile,
+  data = d.enc[, -(1:4)], n.thin = 5,
+  restrictions = list("D1=D2=D3", "d1=d2", "a=g"),
+  covData = d.enc[, c("age", "pc")],
+  predStructure = list("D1 ; age")
+)
 plot(fit, parameter = "slope", type = "default")
 summary(fit)
 

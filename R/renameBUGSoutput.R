@@ -4,8 +4,7 @@
 # rename BUGSoutput object for further use
 renameBUGSoutput <- function(BUGSoutput,
                              thetaUnique,
-                             model=c("traitMPT", "betaMPT")){
-
+                             model = c("traitMPT", "betaMPT")) {
   rownames(BUGSoutput$median$theta) <-
     rownames(BUGSoutput$mean$theta) <-
     rownames(BUGSoutput$sd$theta) <-
@@ -14,7 +13,7 @@ renameBUGSoutput <- function(BUGSoutput,
     names(BUGSoutput$median$mean) <-
     thetaUnique
 
-  if(model == "traitMPT"){
+  if (model == "traitMPT") {
     rownames(BUGSoutput$median$rho) <-
       rownames(BUGSoutput$mean$rho) <-
       rownames(BUGSoutput$sd$rho) <-
@@ -28,7 +27,7 @@ renameBUGSoutput <- function(BUGSoutput,
       names(BUGSoutput$sd$sigma) <-
       names(BUGSoutput$median$sigma) <-
       thetaUnique
-  }else if (model == "betaMPT"){
+  } else if (model == "betaMPT") {
     names(BUGSoutput$mean$alph) <-
       names(BUGSoutput$mean$bet) <-
       names(BUGSoutput$sd$alph) <-

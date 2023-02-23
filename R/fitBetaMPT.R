@@ -120,40 +120,41 @@
 #' @examples
 #' \dontrun{
 #' # fit beta-MPT model for encoding condition (see ?arnold2013):
-#' EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+#' EQNfile <- system.file("MPTmodels/2htsm.eqn", package = "TreeBUGS")
 #' d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
-#' fit <- betaMPT(EQNfile, d.encoding, n.thin=5,
-#'                restrictions=list("D1=D2=D3","d1=d2","a=g"))
+#' fit <- betaMPT(EQNfile, d.encoding,
+#'   n.thin = 5,
+#'   restrictions = list("D1=D2=D3", "d1=d2", "a=g")
+#' )
 #' # convergence
 #' plot(fit, parameter = "mean", type = "default")
 #' summary(fit)
 #' }
 #' @export
-betaMPT <- function (eqnfile, data, restrictions, covData,
-                     transformedParameters, corProbit=FALSE,
-                     alpha = "dgamma(1,.1)T(1,)", beta = "dgamma(1,.1)T(1,)",
-
-                     # MCMC stuff:
-                     n.iter=20000, n.adapt=2000, n.burnin=2000, n.thin=5,
-                     n.chains=3, dic =FALSE, ppp = 0,
-
-                     # File Handling stuff:
-                     modelfilename, parEstFile,posteriorFile,
-                     autojags = NULL,   ...){
-
-  fitModel(type="betaMPT", eqnfile=eqnfile,
-           data=data,restrictions=restrictions,
-           covData=covData,
-           transformedParameters=transformedParameters,
-           corProbit=corProbit,
-           hyperprior=list(alpha=alpha, beta=beta),
-           n.iter=n.iter, n.adapt = n.adapt,
-           n.burnin=n.burnin, n.thin=n.thin,
-           n.chains=n.chains, dic =dic,  ppp = ppp,
-           modelfilename=modelfilename,
-           parEstFile=parEstFile,
-           posteriorFile=posteriorFile,
-           autojags=autojags,
-           call = match.call(),
-           ...)
+betaMPT <- function(eqnfile, data, restrictions, covData,
+                    transformedParameters, corProbit = FALSE,
+                    alpha = "dgamma(1,.1)T(1,)", beta = "dgamma(1,.1)T(1,)",
+                    # MCMC stuff:
+                    n.iter = 20000, n.adapt = 2000, n.burnin = 2000, n.thin = 5,
+                    n.chains = 3, dic = FALSE, ppp = 0,
+                    # File Handling stuff:
+                    modelfilename, parEstFile, posteriorFile,
+                    autojags = NULL, ...) {
+  fitModel(
+    type = "betaMPT", eqnfile = eqnfile,
+    data = data, restrictions = restrictions,
+    covData = covData,
+    transformedParameters = transformedParameters,
+    corProbit = corProbit,
+    hyperprior = list(alpha = alpha, beta = beta),
+    n.iter = n.iter, n.adapt = n.adapt,
+    n.burnin = n.burnin, n.thin = n.thin,
+    n.chains = n.chains, dic = dic, ppp = ppp,
+    modelfilename = modelfilename,
+    parEstFile = parEstFile,
+    posteriorFile = posteriorFile,
+    autojags = autojags,
+    call = match.call(),
+    ...
+  )
 }

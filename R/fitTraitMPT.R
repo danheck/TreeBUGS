@@ -147,55 +147,54 @@
 #' @examples
 #' \dontrun{
 #' # fit beta-MPT model for encoding condition (see ?arnold2013):
-#' EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+#' EQNfile <- system.file("MPTmodels/2htsm.eqn", package = "TreeBUGS")
 #' d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
-#' fit <- traitMPT(EQNfile, d.encoding, n.thin=5,
-#'                 restrictions=list("D1=D2=D3","d1=d2","a=g"))
+#' fit <- traitMPT(EQNfile, d.encoding,
+#'   n.thin = 5,
+#'   restrictions = list("D1=D2=D3", "d1=d2", "a=g")
+#' )
 #' # convergence
 #' plot(fit, parameter = "mean", type = "default")
 #' summary(fit)
 #' }
 #' @export
 traitMPT <- function(eqnfile, data, restrictions, covData, predStructure,
-                     predType,  # one of: c("c," f", "r")
-                     transformedParameters, corProbit=TRUE,
-
+                     predType, # one of: c("c," f", "r")
+                     transformedParameters, corProbit = TRUE,
                      # hyperpriors:
                      mu = "dnorm(0,1)", xi = "dunif(0,10)",
-                     V, df, IVprec = "dgamma(.5,.5)",  # IVprec=1(=g)   => beta ~ dnorm(0,1/sqrt(g))
-
+                     V, df, IVprec = "dgamma(.5,.5)", # IVprec=1(=g)   => beta ~ dnorm(0,1/sqrt(g))
                      # MCMC stuff:
-                     n.iter=20000, n.adapt = 2000, n.burnin=2000,  n.thin=5,
-                     n.chains=3, dic =FALSE, ppp = 0,
-
+                     n.iter = 20000, n.adapt = 2000, n.burnin = 2000, n.thin = 5,
+                     n.chains = 3, dic = FALSE, ppp = 0,
                      # File Handling stuff:
-                     modelfilename, parEstFile,posteriorFile,
-                     autojags=NULL,   ...){
+                     modelfilename, parEstFile, posteriorFile,
+                     autojags = NULL, ...) {
+  if (missing(V)) V <- NULL
+  if (missing(df)) df <- NULL
+  hyperprior <- list(mu = mu, xi = xi, V = V, df = df, IVprec = IVprec)
 
-  if(missing(V)) V <- NULL
-  if(missing(df)) df <- NULL
-  hyperprior <- list(mu=mu, xi=xi, V=V, df=df, IVprec=IVprec)
-
-  fitModel(type="traitMPT", eqnfile=eqnfile,
-           data=data,restrictions=restrictions,
-           covData=covData,
-           predStructure=predStructure,
-           predType=predType,    # c("c," f", "r")
-           transformedParameters=transformedParameters,
-           corProbit=corProbit,
-           hyperprior=hyperprior,
-           n.iter=n.iter,
-           n.adapt = n.adapt,
-           n.burnin=n.burnin,
-           n.thin=n.thin,
-           n.chains=n.chains,
-           dic =dic,
-           ppp = ppp,
-           modelfilename=modelfilename,
-           parEstFile=parEstFile,
-           posteriorFile=posteriorFile,
-           autojags=autojags,
-           call = match.call(),
-           ...)
+  fitModel(
+    type = "traitMPT", eqnfile = eqnfile,
+    data = data, restrictions = restrictions,
+    covData = covData,
+    predStructure = predStructure,
+    predType = predType, # c("c," f", "r")
+    transformedParameters = transformedParameters,
+    corProbit = corProbit,
+    hyperprior = hyperprior,
+    n.iter = n.iter,
+    n.adapt = n.adapt,
+    n.burnin = n.burnin,
+    n.thin = n.thin,
+    n.chains = n.chains,
+    dic = dic,
+    ppp = ppp,
+    modelfilename = modelfilename,
+    parEstFile = parEstFile,
+    posteriorFile = posteriorFile,
+    autojags = autojags,
+    call = match.call(),
+    ...
+  )
 }
-

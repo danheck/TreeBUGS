@@ -27,7 +27,7 @@ Note that the last category in each MPT tree is dropped, because one category pe
 \dontrun{
 # add posterior predictive samples to fitted model (optional step)
 fittedModel$postpred$freq.pred <-
-     posteriorPredictive(fittedModel, M=1000)
+  posteriorPredictive(fittedModel, M = 1000)
 
 # plot model fit
 plotFit(fittedModel, stat = "mean")

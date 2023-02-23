@@ -1,16 +1,16 @@
 ---
-title: "TreeBUGS: Extended Modeling Possibilities"
+title: "TreeBUGS: Advanced MPT Modeling"
 author: "Daniel W. Heck, Nina R. Arnold, & Denis Arnold"
 date: "`r Sys.Date()`"
 number_section: true
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{TreeBUGS: Extended Modeling}
+  %\VignetteIndexEntry{TreeBUGS: Advanced MPT Modeling}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
   
-## Extended Modeling Possibilities
+## Advanced MPT Modeling
 
 ### A) Including Continuous Covariates
 
@@ -34,13 +34,14 @@ Overall, the code could look like this:
 
 ```{r, eval=F}
 fitMPT <- traitMPT(
-    eqnfile = "2htm.txt", 
-    data = "data_ind.csv",   
-    restrictions = list("Dn=Do", "g=.5"),  
-    covData = "data_covariates.csv", 
-    corProbit = TRUE,
-    predStructure = list("Do ; IQ"), # IQ as predictor for Do=Dn
-    ...)
+  eqnfile = "2htm.txt",
+  data = "data_ind.csv",
+  restrictions = list("Dn=Do", "g=.5"),
+  covData = "data_covariates.csv",
+  corProbit = TRUE,
+  predStructure = list("Do ; IQ"), # IQ as predictor for Do=Dn
+  ...
+)
 ```
 
 After fitting the model, the results are summarized by `summary(fitMPT)`.
@@ -61,14 +62,17 @@ In the latent-trait model, it is possible to include discrete factors as predict
 
 Note that the same parameter covariance structure is assumed in each group. Given that this assumtion holds, it might result in more reliable parameter estimates than specifying a separate MPT tree for each condition (and thus assuming a separate parameter covariance matrix in each group). An example might be: 
 
-```{r, eval=F}
-fitMPT <- traitMPT(eqnfile = "2htm.txt", 
-    data = "data_ind.csv",   
-    covData = "data_covariates.csv", 
-    predStructure = list("Do ; factor1", 
-                         "Dn ; factor2"), # discrete factors
-    predType = c("c", "c", "f", "r")
-    ...)
+```{r, eval = FALSE}
+fitMPT <- traitMPT(
+  eqnfile = "2htm.txt",
+  data = "data_ind.csv",
+  covData = "data_covariates.csv",
+  predStructure = list(
+    "Do ; factor1",
+    "Dn ; factor2"
+  ), # discrete factors
+  predType = c("c", "c", "f", "r")
+)
 ```
 
 Estimated group estimates for each parameter can be obtained by 
@@ -86,8 +90,10 @@ Multiple factors can in principle be included, but currently it is not possible 
 The argument `transformedParameters` allows to sample parameters that result as some determinstic function of the estimated MPT parameters. This is helpful to test differences between two core MPT parameters or obtain reparameterized versions of the parameters (e.g., for testing order constraints). For instance, the difference between two MPT parameters can be computed using
 
 ```{r, eval=FALSE}
-transformedParameters = list("deltaG = G_1-G_2",     # difference of parameters
-                             "G1_larger = G_1>G_2")  # Bayesian p-value / testing order constraints
+transformedParameters <- list(
+  "deltaG = G_1-G_2", # difference of parameters
+  "G1_larger = G_1>G_2"
+) # Bayesian p-value / testing order constraints
 ```
 
 If the parameters are different, the 95% posterior interval of the parameter `deltaG` should exclude zero. 
@@ -109,20 +115,22 @@ Simulated data sets are in general useful to check the robustness of the estimat
 ```{r, eval=FALSE}
 # beta-MPT
 genBeta <- genBetaMPT(
-              N = 100,                            # number of participants     
-              numItems = c(Target=250, Lure=250), # number of responses per tree
-              eqnfile = "2htm.eqn",               # path to MPT file
-              mean = c(Do=.7, Dn=.7, g=.5),       # true group-level parameters
-              sd =   c(Do=.1, Dn=.1, g=.05))      # SD of individual parameters
+  N = 100, # number of participants
+  numItems = c(Target = 250, Lure = 250), # number of responses per tree
+  eqnfile = "2htm.eqn", # path to MPT file
+  mean = c(Do = .7, Dn = .7, g = .5), # true group-level parameters
+  sd = c(Do = .1, Dn = .1, g = .05)
+) # SD of individual parameters
 
 # latent-trait MPT
 genTrait <- genTraitMPT(
-              N = 100,                             # number of participants     
-              numItems = c(Target=250, Lure=250),  # number of responses per tree
-              eqnfile = "2htm.eqn",                # path to MPT file
-              mean = c(Do=.7, Dn=.7, g=.5),        # true group-level parameters
-              sigma =   c(Do=.25, Dn=.25, g=.05),  # SD of latent (!) individual parameters
-              rho = diag(3))                       # correlation matrix. here: no correlation
+  N = 100, # number of participants
+  numItems = c(Target = 250, Lure = 250), # number of responses per tree
+  eqnfile = "2htm.eqn", # path to MPT file
+  mean = c(Do = .7, Dn = .7, g = .5), # true group-level parameters
+  sigma = c(Do = .25, Dn = .25, g = .05), # SD of latent (!) individual parameters
+  rho = diag(3)
+) # correlation matrix. here: no correlation
 ```
 
 The resulting data sets contain both the generated frequencies (`genTrait$data`) and the data-generating group and individual parameters (`genTrait$parameters`)

@@ -25,7 +25,7 @@ The MPT-specific summary is computed directly after fitting a model. However, th
 # Remove additional burnin samples and recompute MPT summary
 \dontrun{
 # start later or thin (see ?window)
-mcmc.subsamp <- window(fittedModel$runjags$mcmc, start=3001, thin=2)
+mcmc.subsamp <- window(fittedModel$runjags$mcmc, start = 3001, thin = 2)
 new.mpt.summary <- summarizeMPT(mcmc.subsamp, fittedModel$mptInfo)
 new.mpt.summary
 }

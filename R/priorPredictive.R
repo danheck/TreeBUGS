@@ -13,86 +13,97 @@
 #' @export
 #' @examples
 #' eqnfile <- system.file("MPTmodels/2htm.eqn",
-#'                        package="TreeBUGS")
+#'   package = "TreeBUGS"
+#' )
 #' ### beta-MPT:
-#' prior <- list(alpha="dgamma(1,.1)",
-#'               beta="dgamma(1,.1)")
+#' prior <- list(
+#'   alpha = "dgamma(1,.1)",
+#'   beta = "dgamma(1,.1)"
+#' )
 #'
 #' ### prior-predictive frequencies:
 #' priorPredictive(prior, eqnfile,
-#'                 restrictions=list("g=.5","Do=Dn"),
-#'                 numItems=c(50,50), N=10, M=1, nCPU=1)
+#'   restrictions = list("g=.5", "Do=Dn"),
+#'   numItems = c(50, 50), N = 10, M = 1, nCPU = 1
+#' )
 #'
 #' ### prior samples of group-level parameters:
-#' priorPredictive(prior, eqnfile, level = "parameter",
-#'                 restrictions=list("g=.5","Do=Dn"),
-#'                 M=5, nCPU=1)
+#' priorPredictive(prior, eqnfile,
+#'   level = "parameter",
+#'   restrictions = list("g=.5", "Do=Dn"),
+#'   M = 5, nCPU = 1
+#' )
 #'
 #' ### latent-trait MPT
-#' priorPredictive(prior=list(mu="dnorm(0,1)", xi="dunif(0,10)",
-#'                            df=3, V=diag(2)),
-#'                 eqnfile, restrictions=list("g=.5"),
-#'                 numItems=c(50,50), N=10, M=1, nCPU=1)
+#' priorPredictive(
+#'   prior = list(
+#'     mu = "dnorm(0,1)", xi = "dunif(0,10)",
+#'     df = 3, V = diag(2)
+#'   ),
+#'   eqnfile, restrictions = list("g=.5"),
+#'   numItems = c(50, 50), N = 10, M = 1, nCPU = 1
+#' )
 #'
 #' @importFrom parallel clusterExport makeCluster stopCluster parLapply parApply
 #' @importFrom  stats cor cov2cor density rmultinom
 priorPredictive <- function(prior, eqnfile, restrictions,
-                            numItems, level = "data", N=1, M=100, nCPU=4){
-
+                            numItems, level = "data", N = 1, M = 100, nCPU = 4) {
   if (missing(restrictions)) restrictions <- NULL
   # 1. get MPT model
   mpt <- readEQN(eqnfile, restrictions = restrictions)
   merged <- thetaHandling(mpt, restrictions)
   S <- max(merged$SubPar$theta)
-  thetaNames <-  merged$SubPar[,1:2]
-  thetaUnique <- thetaNames[rownames(unique(thetaNames[2])),]$Parameter
+  thetaNames <- merged$SubPar[, 1:2]
+  thetaUnique <- thetaNames[rownames(unique(thetaNames[2])), ]$Parameter
 
   # 2. sample group-level parameters
-  phi <- sampleHyperprior(prior=prior, M=M, S=S, nCPU=nCPU)
-  if("alpha" %in% names(prior)){
-   colnames(phi$alpha) <- colnames(phi$beta) <- thetaUnique
-  }else{
+  phi <- sampleHyperprior(prior = prior, M = M, S = S, nCPU = nCPU)
+  if ("alpha" %in% names(prior)) {
+    colnames(phi$alpha) <- colnames(phi$beta) <- thetaUnique
+  } else {
     colnames(phi$mu) <- colnames(phi$sigma) <- thetaUnique
     dimnames(phi$rho) <- list(thetaUnique, thetaUnique, NULL)
     phi$mean <- phi$sd <- NULL
   }
 
-  if(level == "data"){
+  if (level == "data") {
     # 3. sample participants
     freq.list <- list()
-    getData <- function(mm){
-      if(! "rho" %in% names(phi)){
+    getData <- function(mm) {
+      if (!"rho" %in% names(phi)) {
         freq <- genBetaMPT(N, numItems, eqnfile, restrictions,
-                           alpha=phi$alpha[mm,], beta=phi$beta[mm,],
-                           warning=FALSE)$data
-      }else{
-        freq <- genTraitMPT(N, numItems, eqnfile,restrictions,
-                            mean=pnorm(phi$mu[mm,]), sigma=phi$sigma[mm,],
-                            rho=phi$rho[,,mm], warning=FALSE)$data
+          alpha = phi$alpha[mm, ], beta = phi$beta[mm, ],
+          warning = FALSE
+        )$data
+      } else {
+        freq <- genTraitMPT(N, numItems, eqnfile, restrictions,
+          mean = pnorm(phi$mu[mm, ]), sigma = phi$sigma[mm, ],
+          rho = phi$rho[, , mm], warning = FALSE
+        )$data
       }
       freq
     }
-    if(nCPU >1){
+    if (nCPU > 1) {
       cl <- makeCluster(nCPU)
-      clusterExport(cl, c("S","N","numItems", "eqnfile", "restrictions"),
-                    envir=environment())
+      clusterExport(cl, c("S", "N", "numItems", "eqnfile", "restrictions"),
+        envir = environment()
+      )
       # loop across replications:
       freq.list <- parLapply(cl, 1:M, getData)
       stopCluster(cl)
-    }else{
+    } else {
       freq.list <- lapply(1:M, getData)
     }
 
     # remove strange list structure:
-    if(M == 1){
+    if (M == 1) {
       res <- freq.list[[1]]
-    }else{
+    } else {
       res <- freq.list[1:min(M, length(freq.list))]
     }
     attr(res, "true") <- phi
-  }else{
+  } else {
     res <- phi
   }
   res
 }
-

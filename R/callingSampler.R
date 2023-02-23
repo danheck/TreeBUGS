@@ -22,31 +22,32 @@ callingSampler <- function(model,
                            data,
                            modelfile,
                            S,
-                           fixedPar=NULL,
-                           transformedPar=NULL,
-                           covPars=NULL,
-                           covData=NULL,
-                           X_list=list(),   # list with design matrices for fixed effects
+                           fixedPar = NULL,
+                           transformedPar = NULL,
+                           covPars = NULL,
+                           covData = NULL,
+                           X_list = list(), # list with design matrices for fixed effects
                            # groupT1=NULL,    # list with groupMatT1 und NgroupT1  for splitted T1 statistic
-                           hyperpriors=NULL,
-                           n.iter=20000,
-                           n.adapt=2000,
-                           n.burnin=2000,
-                           n.update= 2000,
-                           n.thin=5,
-                           n.chains=3,
-                           autojags=NULL,
+                           hyperpriors = NULL,
+                           n.iter = 20000,
+                           n.adapt = 2000,
+                           n.burnin = 2000,
+                           n.update = 2000,
+                           n.thin = 5,
+                           n.chains = 3,
+                           autojags = NULL,
                            # savetable = NULL,
-                           ...){
+                           ...) {
+  if (is.na(n.burnin)) {
+    n.burnin <- n.iter / 2
+  }
 
-  if(is.na(n.burnin)){n.burnin=n.iter/2}
-
-  if(model == "betaMPT"){
-    parameters <- list("theta", "alph","bet", "mean", "sd")
-  }else{
+  if (model == "betaMPT") {
+    parameters <- list("theta", "alph", "bet", "mean", "sd")
+  } else {
     parameters <- list("theta", "mu", "mean", "rho", "sigma")
   }
-  if(!is.null(fixedPar)){
+  if (!is.null(fixedPar)) {
     parameters <- c(parameters, "thetaFE")
   }
 
@@ -55,61 +56,66 @@ callingSampler <- function(model,
 
 
   ### prepare data for JAGS
-  treeNames=unique(mergedTree$Tree)
-  NresponsesTree=vector("numeric",length=length(treeNames))
+  treeNames <- unique(mergedTree$Tree)
+  NresponsesTree <- vector("numeric", length = length(treeNames))
 
-  for(i in 1:length(treeNames)){
-    NresponsesTree[i]=length(which(mergedTree$Tree==treeNames[i]))
+  for (i in 1:length(treeNames)) {
+    NresponsesTree[i] <- length(which(mergedTree$Tree == treeNames[i]))
   }
 
   # make character vector with data object names
   data <- c("subjs", "S")
-  index=0
-  for(i in 1:length(treeNames)){
-
+  index <- 0
+  for (i in 1:length(treeNames)) {
     ### variable names in JAGS
-    name.response <- paste("response",treeNames[i],sep=".")
-    name.items <- paste("items",treeNames[i],sep=".")
+    name.response <- paste("response", treeNames[i], sep = ".")
+    name.items <- paste("items", treeNames[i], sep = ".")
 
-    assign(name.items, rowSums(responses[(index+1):(index+NresponsesTree[i])]))
+    assign(name.items, rowSums(responses[(index + 1):(index + NresponsesTree[i])]))
 
     # check whether any N=0
-    rowsums <- rowSums(responses[(index+1):(index+NresponsesTree[i])])
-    if (any(is.na(rowsums)) || any(rowsums == 0))
-      warning("One or more participants do not have responses for tree",
-              treeNames[i], ". As a solution, the critical participants might be excluded.")
+    rowsums <- rowSums(responses[(index + 1):(index + NresponsesTree[i])])
+    if (any(is.na(rowsums)) || any(rowsums == 0)) {
+      warning(
+        "One or more participants do not have responses for tree",
+        treeNames[i], ". As a solution, the critical participants might be excluded."
+      )
+    }
 
-    assign(name.response,  matrix(as.vector(t(responses[(index+1):(index+NresponsesTree[i])])),
-                                  ncol=NresponsesTree[i],nrow=subjs,byrow=TRUE))
+    assign(name.response, matrix(as.vector(t(responses[(index + 1):(index + NresponsesTree[i])])),
+      ncol = NresponsesTree[i], nrow = subjs, byrow = TRUE
+    ))
 
-    index=index+NresponsesTree[i]
+    index <- index + NresponsesTree[i]
 
     data <- c(data, name.response, name.items)
   }
 
 
-  if (model == "traitMPT"){
+  if (model == "traitMPT") {
     df <- hyperpriors$df
     V <- hyperpriors$V
     data <- c(data, "V", "df")
 
-    if (length(X_list) != 0){
-      for (pp in 1:length(X_list))
+    if (length(X_list) != 0) {
+      for (pp in 1:length(X_list)) {
         assign(names(X_list)[pp], X_list[[pp]])
+      }
       data <- c(data, names(X_list))
     }
   }
 
-  if (!is.null(covData) & !any(dim(covData) == 0)){
-
+  if (!is.null(covData) & !any(dim(covData) == 0)) {
     covData <- as.matrix(covData)
-    if (anyNA(covData)){
-      warning("Data frame with covariates contains missing values (NA).",
-              "\n  This is likely to cause problems for JAGS.")
+    if (anyNA(covData)) {
+      warning(
+        "Data frame with covariates contains missing values (NA).",
+        "\n  This is likely to cause problems for JAGS."
+      )
     }
 
     # covData only required for predictors/discrete factors:
-    if (!is.null(covPars)){
+    if (!is.null(covPars)) {
       # standardization:
       covVar <- diag(cov(covData))
       # covData <- as.matrix(scale(covData))
@@ -117,32 +123,35 @@ callingSampler <- function(model,
     }
   }
 
-  parametervector=c(unlist(parameters), transformedPar, covPars)
+  parametervector <- c(unlist(parameters), transformedPar, covPars)
 
   ############################## starting values
   inits <- function() {
-    if (model == "betaMPT"){
-      ini <- list("theta"=matrix(runif(subjs*S), S, subjs))
+    if (model == "betaMPT") {
+      ini <- list("theta" = matrix(runif(subjs * S), S, subjs))
     } else {
       # draw appropriate random starting values:
       mu <- xi <- rep(NA, S)
-      for(s in 1:S){
-        tmp <- ifelse(length(hyperpriors$mu)<=1,hyperpriors$mu[1],hyperpriors$mu[s])
-        mu[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
+      for (s in 1:S) {
+        tmp <- ifelse(length(hyperpriors$mu) <= 1, hyperpriors$mu[1], hyperpriors$mu[s])
+        mu[s] <- eval(parse(text = sub("d", "r", sub("(", "(1,", tmp, fixed = TRUE))))
 
-        if(hyperpriors$xi[1] == "dunif(0,10)"){
-          xi[s] <- runif(1,.2,1)             # less extreme starting values
-        }else{
-          tmp <- ifelse(length(hyperpriors$xi)<=1,hyperpriors$xi[1],hyperpriors$xi[s])
-          xi[s] <- eval(parse(text=sub("d","r", sub("(","(1,", tmp,  fixed=TRUE))))
+        if (hyperpriors$xi[1] == "dunif(0,10)") {
+          xi[s] <- runif(1, .2, 1) # less extreme starting values
+        } else {
+          tmp <- ifelse(length(hyperpriors$xi) <= 1, hyperpriors$xi[1], hyperpriors$xi[s])
+          xi[s] <- eval(parse(text = sub("d", "r", sub("(", "(1,", tmp, fixed = TRUE))))
         }
       }
-      ini <- list("delta.part.raw" = matrix(rnorm(subjs*S, -1,1), S, subjs),
-                  "xi"=xi,"mu" = mu)
+      ini <- list(
+        "delta.part.raw" = matrix(rnorm(subjs * S, -1, 1), S, subjs),
+        "xi" = xi, "mu" = mu
+      )
 
       # starts with small correlations and scaling parameters close to 1
-      if (!anyNA(hyperpriors$V))
-        ini$T.prec.part <- as.matrix(rWishart(1,df+30,V)[,,1])
+      if (!anyNA(hyperpriors$V)) {
+        ini$T.prec.part <- as.matrix(rWishart(1, df + 30, V)[, , 1])
+      }
 
       # check starting values:
       # hist(replicate(1000,cov2cor(solve(rWishart(1,4+1+30,diag(2))[,,1]))[1,2]))
@@ -150,36 +159,45 @@ callingSampler <- function(model,
     }
     ini
   }
-  inits.list <- replicate(n.chains, inits(), simplify=FALSE)
-  for(i in 1:length(inits.list)){
-    inits.list[[i]]$.RNG.name <- c("base::Wichmann-Hill",
-                                   "base::Marsaglia-Multicarry",
-                                   "base::Super-Duper",
-                                   "base::Mersenne-Twister")[1+ (i-1)%% 4]
-    inits.list[[i]]$.RNG.seed <-  sample.int(1e4, 1)
+  inits.list <- replicate(n.chains, inits(), simplify = FALSE)
+  for (i in 1:length(inits.list)) {
+    inits.list[[i]]$.RNG.name <- c(
+      "base::Wichmann-Hill",
+      "base::Marsaglia-Multicarry",
+      "base::Super-Duper",
+      "base::Mersenne-Twister"
+    )[1 + (i - 1) %% 4]
+    inits.list[[i]]$.RNG.seed <- sample.int(1e4, 1)
   }
 
-  n.samples <- ceiling((n.iter-n.burnin)/n.thin)
-  if(n.samples > 20000)
-    warning("Note: Your present MCMC settings for n.burnin/n.iter/n.thin\n",
-            "      imply that more than 20,000 samples are stored per parameter per chain.\n",
-            "      This might result in problems due to an overload of your computers memory (RAM).")
+  n.samples <- ceiling((n.iter - n.burnin) / n.thin)
+  if (n.samples > 20000) {
+    warning(
+      "Note: Your present MCMC settings for n.burnin/n.iter/n.thin\n",
+      "      imply that more than 20,000 samples are stored per parameter per chain.\n",
+      "      This might result in problems due to an overload of your computers memory (RAM)."
+    )
+  }
 
-  data.list <-  lapply(data, get, envir=environment())
+  data.list <- lapply(data, get, envir = environment())
   names(data.list) <- data
-  if (any(c("initlist", "inits", "init") %in% names(list(...)))){
-    samples <- run.jags(model = modelfile, monitor=c(parametervector, "deviance"),
-                        data=data.list, n.chains=n.chains,
-                        burnin=n.burnin, adapt=n.adapt,  sample=n.samples, thin=n.thin,
-                        modules=c("dic","glm"), summarise=FALSE, method="parallel", ...)
+  if (any(c("initlist", "inits", "init") %in% names(list(...)))) {
+    samples <- run.jags(
+      model = modelfile, monitor = c(parametervector, "deviance"),
+      data = data.list, n.chains = n.chains,
+      burnin = n.burnin, adapt = n.adapt, sample = n.samples, thin = n.thin,
+      modules = c("dic", "glm"), summarise = FALSE, method = "parallel", ...
+    )
   } else {
-    samples <- run.jags(model = modelfile, monitor=c(parametervector, "deviance"),
-                        data=data.list, inits=inits.list, n.chains=n.chains,
-                        burnin=n.burnin, adapt=n.adapt,  sample=n.samples, thin=n.thin,
-                        modules=c("dic","glm"), summarise=FALSE, method="parallel", ...)
+    samples <- run.jags(
+      model = modelfile, monitor = c(parametervector, "deviance"),
+      data = data.list, inits = inits.list, n.chains = n.chains,
+      burnin = n.burnin, adapt = n.adapt, sample = n.samples, thin = n.thin,
+      modules = c("dic", "glm"), summarise = FALSE, method = "parallel", ...
+    )
   }
 
-  if(!is.null(autojags)){
+  if (!is.null(autojags)) {
     stopifnot(is.list(autojags))
 
     cat("#####################################\n
@@ -188,23 +206,32 @@ callingSampler <- function(model,
         #####################################\n")
     #       recompile(samples, n.iter=n.iter)
     #       samples <- autojags(samples, n.update = n.update)
-    if (any(c("n.iter") %in% names(autojags)))
-      warning("The arguments in 'autojags' are passed to the function: \n",
-              "   runjags::autoextend.jags, which uses different labels for sampling argument than TreeBUGS.\n",
-              "   Instead of 'n.iter', 'startsamples' may be used (see ?runjags::autoextend.jags). ")
-    if ("n.adapt" %in% names(autojags))  names(autojags)["n.adapt"] <- "adapt"
-    if ("n.burnin" %in% names(autojags))  names(autojags)["n.adapt"] <- "startburnin"
-    if ("n.thin" %in% names(autojags))  names(autojags)["n.adapt"] <- "thin"
-    samples <- do.call(autoextend.jags,
-                       c(list(runjags.object = samples,
-                              summarise=FALSE),
-                         autojags))  # additional user arguments
+    if (any(c("n.iter") %in% names(autojags))) {
+      warning(
+        "The arguments in 'autojags' are passed to the function: \n",
+        "   runjags::autoextend.jags, which uses different labels for sampling argument than TreeBUGS.\n",
+        "   Instead of 'n.iter', 'startsamples' may be used (see ?runjags::autoextend.jags). "
+      )
+    }
+    if ("n.adapt" %in% names(autojags)) names(autojags)["n.adapt"] <- "adapt"
+    if ("n.burnin" %in% names(autojags)) names(autojags)["n.adapt"] <- "startburnin"
+    if ("n.thin" %in% names(autojags)) names(autojags)["n.adapt"] <- "thin"
+    samples <- do.call(
+      autoextend.jags,
+      c(
+        list(
+          runjags.object = samples,
+          summarise = FALSE
+        ),
+        autojags
+      )
+    ) # additional user arguments
   }
 
-  return(samples)   # own summary
+  return(samples) # own summary
 }
 
 # data generation for categorical point-mass distribution
-rcat <- function(n, const){
+rcat <- function(n, const) {
   rep(const, n)
 }

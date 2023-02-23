@@ -36,13 +36,16 @@ head(arnold2013)
 
 \dontrun{
 # fit hierarchical MPT model for encoding condition:
-EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+EQNfile <- system.file("MPTmodels/2htsm.eqn", package = "TreeBUGS")
 d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
-fit <- betaMPTcpp(EQNfile, d.encoding, n.thin=5,
-                  restrictions=list("D1=D2=D3","d1=d2","a=g"))
+fit <- betaMPTcpp(EQNfile, d.encoding,
+  n.thin = 5,
+  restrictions = list("D1=D2=D3", "d1=d2", "a=g")
+)
 # convergence
 plot(fit, parameter = "mean", type = "default")
-summary(fit)}
+summary(fit)
+}
 }
 \references{
 Arnold, N. R., Bayen, U. J., Kuhlmann, B. G., & Vaterrodt, B. (2013).

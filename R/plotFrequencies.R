@@ -19,29 +19,27 @@
 #' @examples
 #' # get frequency data and EQN file
 #' freq <- subset(arnold2013, group == "encoding", select = -(1:4))
-#' eqn <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+#' eqn <- system.file("MPTmodels/2htsm.eqn", package = "TreeBUGS")
 #' plotFreq(freq, eqnfile = eqn)
 #' plotFreq(freq, freq = FALSE, eqnfile = eqn)
-plotFreq <- function(x, freq=TRUE, select="all", boxplot=TRUE, eqnfile,...){
-
-
-  if(inherits(x, c("betaMPT", "traitMPT"))){
+plotFreq <- function(x, freq = TRUE, select = "all", boxplot = TRUE, eqnfile, ...) {
+  if (inherits(x, c("betaMPT", "traitMPT"))) {
     dat <- x$mptInfo$data
-  }else if(inherits(x, "character")){
+  } else if (inherits(x, "character")) {
     dat <- read.csv(x)
-  }else{
+  } else {
     try(dat <- as.data.frame(x))
   }
 
-  if(inherits(x, c("betaMPT", "traitMPT"))){
+  if (inherits(x, c("betaMPT", "traitMPT"))) {
     treeNames <- x$mptInfo$MPT$Tree
     treeLabels <- unique(treeNames)
-  }else if(!missing(eqnfile)){
-    tmp <- unique(readEQN(eqnfile)[,1:2])
+  } else if (!missing(eqnfile)) {
+    tmp <- unique(readEQN(eqnfile)[, 1:2])
     treeNames <- tmp$Tree
     treeLabels <- unique(treeNames)
-    try(dat <- dat[,colnames(dat) %in% tmp$Category])
-  }else{
+    try(dat <- dat[, colnames(dat) %in% tmp$Category])
+  } else {
     treeNames <- rep("", ncol(dat))
     treeLabels <- ""
   }
@@ -49,54 +47,60 @@ plotFreq <- function(x, freq=TRUE, select="all", boxplot=TRUE, eqnfile,...){
   K <- ncol(dat)
   N <- nrow(dat)
 
-  if(select == "all"){
+  if (select == "all") {
     select <- 1:N
-  }else{
-    if(!is.numeric(select)  || any(select != round(select)) )
+  } else {
+    if (!is.numeric(select) || any(select != round(select))) {
       stop("Please use an integer vector to select participants.")
-    dat <- dat[select, ,drop=FALSE]
+    }
+    dat <- dat[select, , drop = FALSE]
     N <- nrow(dat)
   }
 
   # absolute frequencies
-  if(!freq){
+  if (!freq) {
     # relative frequencies (per tree)
-    for(t in 1:length(treeLabels)){
+    for (t in 1:length(treeLabels)) {
       sel <- treeNames == treeLabels[t]
-      dat[,sel] <- dat[,sel] / rep(rowSums(dat[,sel]), each=sum(sel))
+      dat[, sel] <- dat[, sel] / rep(rowSums(dat[, sel]), each = sum(sel))
     }
   }
 
   means <- colMeans(dat)
 
-  if(boxplot == TRUE){
-    boxplot(dat, ylab=ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"),
-            xlab="", main=ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"), las=1, ...)
-    lines(1:K, means, col="red", lwd=2)
-  }else{
-    plot(1:K, rep(NA, K), ylim=c(0, max(dat)), col=1, lwd=3, pch=16, xaxt="n", las=1, ...,
-         ylab=ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"),
-         xlab="", main=ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"))
+  if (boxplot == TRUE) {
+    boxplot(dat,
+      ylab = ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"),
+      xlab = "", main = ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"), las = 1, ...
+    )
+    lines(1:K, means, col = "red", lwd = 2)
+  } else {
+    plot(1:K, rep(NA, K),
+      ylim = c(0, max(dat)), col = 1, lwd = 3, pch = 16, xaxt = "n", las = 1, ...,
+      ylab = ifelse(freq, "Absolute frequency", "Relative frequency (per tree)"),
+      xlab = "", main = ifelse(freq, "Absolute frequency", "Relative frequency (per tree)")
+    )
     axis(1, 1:K, colnames(dat))
-    for(treelab in treeLabels){
+    for (treelab in treeLabels) {
       sel <- treeNames == treelab
-      for(i in 1:N){
-        lines((1:K)[sel], dat[i,sel], col=rainbow(N, alpha=.4)[i])
-        points((1:K)[sel], dat[i,sel], col=rainbow(N, alpha=.6)[i], pch=16)
+      for (i in 1:N) {
+        lines((1:K)[sel], dat[i, sel], col = rainbow(N, alpha = .4)[i])
+        points((1:K)[sel], dat[i, sel], col = rainbow(N, alpha = .6)[i], pch = 16)
       }
-      lines((1:K)[sel], means[sel], col=1, lwd=3)
+      lines((1:K)[sel], means[sel], col = 1, lwd = 3)
     }
-
   }
 
   xt <- .5
-  for(k in 2:K){
-    if( treeNames[k] != treeNames[k-1]){
-      abline(v=k-.5)
-      xt <- c(xt, k-.5)
+  for (k in 2:K) {
+    if (treeNames[k] != treeNames[k - 1]) {
+      abline(v = k - .5)
+      xt <- c(xt, k - .5)
     }
   }
-  xt <- c(xt, K+.5)
-  axis(1, xt[1:(length(xt)-1)]+ diff(xt)/2,
-       treeLabels, mgp=c(100,3,10))
+  xt <- c(xt, K + .5)
+  axis(1, xt[1:(length(xt) - 1)] + diff(xt) / 2,
+    treeLabels,
+    mgp = c(100, 3, 10)
+  )
 }

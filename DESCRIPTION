@@ -1,15 +1,20 @@
 Package: TreeBUGS
-Version: 1.4.9
-Date: 2022-09-02
+Version: 1.5.0
+Date: 2023-02-23
 Title: Hierarchical Multinomial Processing Tree Modeling
-Authors@R: c(person("Daniel W.", "Heck", email="dheck@uni-marburg.de", role=c("aut","cre"),
+Authors@R: c(person("Daniel W.", "Heck", role=c("aut","cre"),
+                    email="daniel.heck@uni-marburg.de", 
                     comment = c(ORCID = "0000-0002-6302-9252")),
-             person("Nina R.", "Arnold", email="arnold@uni-mannheim.de", role = c("aut","dtc")),
-             person("Denis", "Arnold", email="denis.arnold@uni-tuebingen.de", role = c("aut")),
-             person("Alexander", "Ly", email="a.ly@uva.nl", role = c("ctb")),
-             person("Marius", "Barth", email="marius.barth@uni-koeln.de", role = c("ctb"),
+             person("Nina R.", "Arnold", role = c("aut","dtc"), 
+                    email="arnold@uni-mannheim.de"),
+             person("Denis", "Arnold", role = c("aut"), 
+                    email="denis.arnold@uni-tuebingen.de"),
+             person("Alexander", "Ly", role = c("ctb"), 
+                    email="a.ly@uva.nl"),
+             person("Marius", "Barth", role = c("ctb"),
+                    email="marius.barth@uni-koeln.de",
                     comment = c(ORCID = "0000-0002-3421-6665")))
-Maintainer: Daniel W. Heck <dheck@uni-marburg.de>
+Maintainer: Daniel W. Heck <daniel.heck@uni-marburg.de>
 Depends:
     R (>= 4.0.0)
 Imports:
@@ -53,5 +58,5 @@ Description: User-friendly analysis of hierarchical multinomial processing tree 
 License: GPL-3
 Encoding: UTF-8
 URL: https://github.com/danheck/TreeBUGS
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 LazyData: TRUE

@@ -34,8 +34,9 @@ Computes transformations of MPT parameters based on the MCMC posterior samples
 \examples{
 \dontrun{
 tt <- transformedParameters(fittedModel,
-                            list("diff=a-b","p=a>b"),
-                            level="individual")
+  list("diff=a-b", "p=a>b"),
+  level = "individual"
+)
 summary(tt)
 }
 }

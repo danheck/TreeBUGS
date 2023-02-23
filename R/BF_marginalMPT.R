@@ -32,8 +32,10 @@
 #'    Lure    FA   (1-d)*g
 #'    Lure    CR   (1-d)*(1-g)
 #'    Lure    CR   d"
-#' data <- c(Hit = 46, Miss = 14,
-#'           FA = 14, CR = 46)
+#' data <- c(
+#'   Hit = 46, Miss = 14,
+#'   FA = 14, CR = 46
+#' )
 #'
 #' # weakly informative prior for guessing
 #' aa <- c(d = 1, g = 2)
@@ -42,141 +44,173 @@
 #'
 #' # compute marginal likelihood
 #' htm <- marginalMPT(eqn, data,
-#'                    alpha = aa, beta = bb,
-#'                    posterior = 200, samples = 1000)
+#'   alpha = aa, beta = bb,
+#'   posterior = 200, samples = 1000
+#' )
 #' # second model: g=.50
 #' htm.g50 <- marginalMPT(eqn, data, list("g=.5"),
-#'                        alpha = aa, beta = bb,
-#'                        posterior = 200, samples = 1000)
+#'   alpha = aa, beta = bb,
+#'   posterior = 200, samples = 1000
+#' )
 #'
 #' # Bayes factor
 #' # (per batch to get estimation error)
 #' bf <- htm.g50$p.per.batch / htm$p.per.batch
-#' mean(bf)                 # BF
-#' sd(bf)/sqrt(length(bf))  # standard error of BF estimate
+#' mean(bf) # BF
+#' sd(bf) / sqrt(length(bf)) # standard error of BF estimate
 #'
 #' @seealso \code{\link{BayesFactorMPT}}
 #' @references
 #' Vandekerckhove, J. S., Matzke, D., & Wagenmakers, E. (2015). Model comparison and the principle of parsimony. In Oxford Handbook of Computational and Mathematical Psychology (pp. 300-319). New York, NY: Oxford University Press.
 #' @export
-marginalMPT <- function (eqnfile, data, restrictions, alpha = 1, beta = 1,
-                         dataset = 1, method = "importance", posterior = 500,
-                         mix = .05, scale = .9, samples = 10000, batches = 10,
-                         show = TRUE, cores = 1){
-  if (mix < 0 | mix > 1 | scale < 0 | scale > 1)
-    stop ("The tuning parameters 'mix' and 'scale' must be in the interval [0,1].")
-  if (is.character(data))
+marginalMPT <- function(eqnfile, data, restrictions, alpha = 1, beta = 1,
+                        dataset = 1, method = "importance", posterior = 500,
+                        mix = .05, scale = .9, samples = 10000, batches = 10,
+                        show = TRUE, cores = 1) {
+  if (mix < 0 | mix > 1 | scale < 0 | scale > 1) {
+    stop("The tuning parameters 'mix' and 'scale' must be in the interval [0,1].")
+  }
+  if (is.character(data)) {
     data <- readData(data)
-  if (!is.vector(data) && nrow(data) > 1)
-    data <- data[dataset,]
+  }
+  if (!is.vector(data) && nrow(data) > 1) {
+    data <- data[dataset, ]
+  }
 
   ############### 1. fit MPT / get MPT structure
   tmp <- capture.output(
-    mod <- simpleMPT(eqnfile = eqnfile, data = data, restrictions = restrictions,
-                     n.iter = ifelse(method=="importance",posterior+200,5),
-                     n.burnin = ifelse(method=="importance", 200, 2),
-                     n.thin = 1, n.chains = 1, alpha = alpha, beta = beta))
+    mod <- simpleMPT(
+      eqnfile = eqnfile, data = data, restrictions = restrictions,
+      n.iter = ifelse(method == "importance", posterior + 200, 5),
+      n.burnin = ifelse(method == "importance", 200, 2),
+      n.thin = 1, n.chains = 1, alpha = alpha, beta = beta
+    )
+  )
 
-  if (method == "importance"){
-    betapar <- approximatePosterior(mod)*scale
+  if (method == "importance") {
+    betapar <- approximatePosterior(mod) * scale
     sampling <- sample.importance
-  } else if (method == "prior"){
+  } else if (method == "prior") {
     sampling <- sample.prior
     betapar <- NULL
   }
   t0 <- Sys.time()
   if (show) cat("Sampling parameters to estimate marginal likelihood...\n")
 
-  n.per.batch <- ceiling(samples/batches)
+  n.per.batch <- ceiling(samples / batches)
   if (cores > 1) {
     cl <- makeCluster(cores)
-    samp <- parSapply(cl, 1:batches, sampling, mod = mod, betapar = betapar,
-                      mix = mix, samples = n.per.batch, show = show)
+    samp <- parSapply(cl, 1:batches, sampling,
+      mod = mod, betapar = betapar,
+      mix = mix, samples = n.per.batch, show = show
+    )
     stopCluster(cl)
   } else {
-    samp <- sapply(1:batches, sampling, mod = mod, betapar = betapar,
-                   mix = mix, samples = n.per.batch, show = show)
+    samp <- sapply(1:batches, sampling,
+      mod = mod, betapar = betapar,
+      mix = mix, samples = n.per.batch, show = show
+    )
   }
   t1 <- Sys.time()
 
   ############### 4. Aproximate integral + batch SE
-  p <- c(mean = mean(c(samp)), SE=sd(c(samp)) / sqrt(length(samp)))
+  p <- c(mean = mean(c(samp)), SE = sd(c(samp)) / sqrt(length(samp)))
   p.batch <- colMeans(samp)
-  p.batch <- c("p" = mean(p.batch),
-               "SE_p" = sd(p.batch)/sqrt(batches),
-               "log_p" = mean(log(p.batch)),
-               "SE_log_p" = sd(log(p.batch))/sqrt(batches))
+  p.batch <- c(
+    "p" = mean(p.batch),
+    "SE_p" = sd(p.batch) / sqrt(batches),
+    "log_p" = mean(log(p.batch)),
+    "SE_log_p" = sd(log(p.batch)) / sqrt(batches)
+  )
 
-  res <- list("p" = p,
-              "p.batch" = p.batch,
-              "p.per.batch" = colMeans(samp),
-              "prior" = do.call("cbind", mod$mptInfo$hyperprior),
-              "data" = mod$mptInfo$data,
-              "sampler" = list("method" = method,
-                               "samples" = samples,
-                               "time" = t1-t0))
-  if (method == "importance"){
+  res <- list(
+    "p" = p,
+    "p.batch" = p.batch,
+    "p.per.batch" = colMeans(samp),
+    "prior" = do.call("cbind", mod$mptInfo$hyperprior),
+    "data" = mod$mptInfo$data,
+    "sampler" = list(
+      "method" = method,
+      "samples" = samples,
+      "time" = t1 - t0
+    )
+  )
+  if (method == "importance") {
     res$sampler$mix <- mix
     res$sampler$scale <- scale
   }
   class(res) <- "marginalMPT"
-  if (show)
-    cat("\nFinished in ", format(t1-t0))
-  return (res)
+  if (show) {
+    cat("\nFinished in ", format(t1 - t0))
+  }
+  return(res)
 }
 
 
 # mixture: mix*U(0,1) + (1-mix)*Beta(a,b)
 # sampling:
-rmix <- function (i, samples, betapar, mix){
+rmix <- function(i, samples, betapar, mix) {
   n.unif <- rbinom(1, samples, mix)
-  c(runif(n.unif),
-    rbeta(samples - n.unif, betapar[i,1], betapar[i,2]))
+  c(
+    runif(n.unif),
+    rbeta(samples - n.unif, betapar[i, 1], betapar[i, 2])
+  )
 }
 # density:
-dmix <- function (x, betapar, mix)
-  sum(log(mix + (1-mix)*dbeta(x, betapar[,1], betapar[,2])))
+dmix <- function(x, betapar, mix) {
+  sum(log(mix + (1 - mix) * dbeta(x, betapar[, 1], betapar[, 2])))
+}
 
 
 sample.importance <- function(b, samples, mod,
-                              betapar, mix, show = FALSE){
+                              betapar, mix, show = FALSE) {
   S <- length(mod$mptInfo$thetaUnique)
   const <- logMultinomCoefficient(mod)
-  if (show) cat(b,"")
+  if (show) cat(b, "")
   xx <- sapply(1:nrow(betapar), rmix,
-               samples=samples, betapar=betapar, mix=mix)
+    samples = samples, betapar = betapar, mix = mix
+  )
   gx <- apply(xx, 1, dmix, betapar = betapar, mix = mix)
   # prior:
   px <- rep(0, samples)
-  for(s in 1:S)
-    px <- px + dbeta(xx[,s], log = TRUE,
-                     shape1 = mod$mptInfo$hyperprior$alpha[s],
-                     shape2 = mod$mptInfo$hyperprior$beta[s])
+  for (s in 1:S) {
+    px <- px + dbeta(xx[, s],
+      log = TRUE,
+      shape1 = mod$mptInfo$hyperprior$alpha[s],
+      shape2 = mod$mptInfo$hyperprior$beta[s]
+    )
+  }
   # likelihood:
-  fx <- c(loglikMPT(xx, h=unlist(mod$mptInfo$data),
-                    a = mod$mptInfo$MPT$a,
-                    b = mod$mptInfo$MPT$b,
-                    c = mod$mptInfo$MPT$c,
-                    map = mod$mptInfo$MPT$map))
+  fx <- c(loglikMPT(xx,
+    h = unlist(mod$mptInfo$data),
+    a = mod$mptInfo$MPT$a,
+    b = mod$mptInfo$MPT$b,
+    c = mod$mptInfo$MPT$c,
+    map = mod$mptInfo$MPT$map
+  ))
   # importance weights wx <- px-gx
   exp(fx + px - gx + const)
 }
 
 sample.prior <- function(b, samples, mod,
-                         betapar = NULL, mix = NULL, show = FALSE){
+                         betapar = NULL, mix = NULL, show = FALSE) {
   S <- length(mod$mptInfo$thetaUnique)
   const <- logMultinomCoefficient(mod)
-  if (show) cat(b,"")
+  if (show) cat(b, "")
   xx <- matrix(NA, samples, S)
-  for (s in 1:S)
-    xx[,s] <- rbeta(samples,
-                    shape1 = mod$mptInfo$hyperprior$alpha[s],
-                    shape2 = mod$mptInfo$hyperprior$beta[s])
+  for (s in 1:S) {
+    xx[, s] <- rbeta(samples,
+      shape1 = mod$mptInfo$hyperprior$alpha[s],
+      shape2 = mod$mptInfo$hyperprior$beta[s]
+    )
+  }
   # likelihood:
-  fx <- c(loglikMPT(xx, h=unlist(mod$mptInfo$data),
-                    a = mod$mptInfo$MPT$a,
-                    b = mod$mptInfo$MPT$b,
-                    c = mod$mptInfo$MPT$c,
-                    map = mod$mptInfo$MPT$map))
+  fx <- c(loglikMPT(xx,
+    h = unlist(mod$mptInfo$data),
+    a = mod$mptInfo$MPT$a,
+    b = mod$mptInfo$MPT$b,
+    c = mod$mptInfo$MPT$c,
+    map = mod$mptInfo$MPT$map
+  ))
   exp(fx + const)
 }

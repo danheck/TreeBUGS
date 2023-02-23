@@ -47,8 +47,11 @@ The beta MPT includes the following parameters:
 getParam(fittedModel, parameter = "theta")
 
 # save summary of individual estimates:
-getParam(fittedModel, parameter = "theta",
-         stat = "summary", file= "ind_summ.csv")}
+getParam(fittedModel,
+  parameter = "theta",
+  stat = "summary", file = "ind_summ.csv"
+)
+}
 
 }
 \seealso{

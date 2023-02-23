@@ -53,95 +53,113 @@
 #' @export
 correlationPosterior <- function(fittedModel, r, N, kappa = 1, ci = .95,
                                  M = 1000, precision = .005, maxiter = 10000,
-                                 plot = TRUE, nCPU = 4){
-
+                                 plot = TRUE, nCPU = 4) {
   rho <- seq(-1, 1, by = precision)
-  if (!missing(fittedModel) && !is.null(fittedModel)){
+  if (!missing(fittedModel) && !is.null(fittedModel)) {
     N <- nrow(fittedModel$mptInfo$data)
     chains <- length(fittedModel$runjags$mcmc)
     M.fit <- nrow(fittedModel$runjags$mcmc[[1]])
 
     sel.idx <- grep("cor_", varnames(fittedModel$runjags$mcmc))
-    if (length(sel.idx) == 0){
+    if (length(sel.idx) == 0) {
       stop("No correlations were sampled in fitted MPT model!")
     }
     # if(inherits(fittedModel, "betaMPT")
     #   sel.idx <- c(sel.idx, grep("rho", varnames(fittedModel$runjags$mcmc)))
-    r <- do.call("rbind",
-                 fittedModel$runjags$mcmc[sample(M.fit, min(M.fit, ceiling(M/chains))),
-                                          sel.idx])
+    r <- do.call(
+      "rbind",
+      fittedModel$runjags$mcmc[
+        sample(M.fit, min(M.fit, ceiling(M / chains))),
+        sel.idx
+      ]
+    )
   } else {
-    if (missing(N) || anyNA(N) || length(N) != 1 || N != round(N))
+    if (missing(N) || anyNA(N) || length(N) != 1 || N != round(N)) {
       stop("Number of participants 'N' missing or not an integer!")
-    if (missing(r) || is.null(r))
+    }
+    if (missing(r) || is.null(r)) {
       stop("Correlation posterior samples 'r' missing!")
+    }
 
     r <- as.matrix(r)
-    if (is.null(colnames(r))) colnames(r) <- paste0("corr",1:ncol(r))
+    if (is.null(colnames(r))) colnames(r) <- paste0("corr", 1:ncol(r))
   }
   if (anyNA(r)) stop("Posterior correlations contain missings!")
 
   # dots <- list(...)
-  singleCorrelation <- function(r.samples, na.rm = TRUE){
-    posteriorRho <- function(ss)
+  singleCorrelation <- function(r.samples, na.rm = TRUE) {
+    posteriorRho <- function(ss) {
       .posteriorRho(n = N, r = ss, rho = rho, kappa = kappa, maxiter = maxiter)
+    }
     # # do.call(.posteriorRho,
     #   #         args = c(list(n = N, r = ss, rho = rho, kappa = kappa), dots))
     rowMeans(sapply(r.samples, posteriorRho), na.rm = na.rm)
   }
 
-  if (nCPU > 1){
+  if (nCPU > 1) {
     cl <- makeCluster(nCPU)
     tmp <- clusterEvalQ(cl, library(hypergeo))
-    clusterExport(cl, c("kappa", "N","precision","rho","maxiter"
-                        # ".scaledBeta", ".priorRho",".aFunction",".bFunction", ".hFunction",
-                        # ".jeffreysApproxH", ".bf10Exact", ".bf10JeffreysIntegrate",".posteriorRho"
-                        ),
-    envir = environment())
-    if (ncol(r) > 1){
+    clusterExport(cl, c(
+      "kappa", "N", "precision", "rho", "maxiter"
+      # ".scaledBeta", ".priorRho",".aFunction",".bFunction", ".hFunction",
+      # ".jeffreysApproxH", ".bf10Exact", ".bf10JeffreysIntegrate",".posteriorRho"
+    ),
+    envir = environment()
+    )
+    if (ncol(r) > 1) {
       # split by column / correlation
       r.post <- t(parApply(cl, r, 2, singleCorrelation))
     } else {
       # one correlation: split samples
-      post.rho <- clusterMap(cl, singleCorrelation, r.samples = clusterSplit(cl, c(r)),
-                             SIMPLIFY = TRUE)
+      post.rho <- clusterMap(cl, singleCorrelation,
+        r.samples = clusterSplit(cl, c(r)),
+        SIMPLIFY = TRUE
+      )
       r.post <- t(rowMeans(post.rho))
     }
     stopCluster(cl)
-
   } else {
     r.post <- t(apply(r, 2, singleCorrelation))
   }
 
   critical <- singleCorrelation(max(abs(r)), na.rm = FALSE)
-  if(anyNA(critical))
-    warning("Numerical instability. Try to increase maxiter (e.g., maxiter=1e7).\n",
-            "   This is probably due to very high correlations: abs(r)>.95.\n",
-            "   Note that NAs are omitted by default.")
+  if (anyNA(critical)) {
+    warning(
+      "Numerical instability. Try to increase maxiter (e.g., maxiter=1e7).\n",
+      "   This is probably due to very high correlations: abs(r)>.95.\n",
+      "   Note that NAs are omitted by default."
+    )
+  }
 
   colnames(r.post) <- rho
   attr(r.post, "kappa") <- kappa
 
-  idx <- apply(r.post*precision, 1, function(fx)
-    c(max(which(cumsum(fx) < (1-ci)/2)),
+  idx <- apply(r.post * precision, 1, function(fx) {
+    c(
+      max(which(cumsum(fx) < (1 - ci) / 2)),
       max(which(cumsum(fx) < .50)),
-      min(which(cumsum(fx) > (1+ci)/2))))
-  summ <- t(apply(idx,2,function(i) rho[i]))
-  colnames(summ) <- c(paste0(100*(1-ci)/2,"%") , "50%", paste0(100*(1+ci)/2,"%") )
+      min(which(cumsum(fx) > (1 + ci) / 2))
+    )
+  })
+  summ <- t(apply(idx, 2, function(i) rho[i]))
+  colnames(summ) <- c(paste0(100 * (1 - ci) / 2, "%"), "50%", paste0(100 * (1 + ci) / 2, "%"))
 
-  if (plot){
+  if (plot) {
     mfrow <- par()$mfrow
-    if (ncol(r)==2)
-      par(mfrow = c(1,2))
-    if(ncol(r)>=4)
-      par(mfrow = c(2,2))
-    for(i in 1:ncol(r)){
-      hist(r[,i],min(60, max(25,round(nrow(r)/3))),
-           freq=FALSE, xlim=c(-1,1), col="gray",border="gray",
-           ylab="Density",
-           xlab="Correlation", main=rownames(r.post)[i])
-      lines(rho, r.post[i,])
-      abline(v=summ[i,c(1,3)], col=2)
+    if (ncol(r) == 2) {
+      par(mfrow = c(1, 2))
+    }
+    if (ncol(r) >= 4) {
+      par(mfrow = c(2, 2))
+    }
+    for (i in 1:ncol(r)) {
+      hist(r[, i], min(60, max(25, round(nrow(r) / 3))),
+        freq = FALSE, xlim = c(-1, 1), col = "gray", border = "gray",
+        ylab = "Density",
+        xlab = "Correlation", main = rownames(r.post)[i]
+      )
+      lines(rho, r.post[i, ])
+      abline(v = summ[i, c(1, 3)], col = 2)
     }
     par(mfrow = mfrow)
   }

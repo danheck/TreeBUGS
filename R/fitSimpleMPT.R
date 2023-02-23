@@ -21,37 +21,39 @@
 #' @examples
 #' \dontrun{
 #' # fit nonhierarchical MPT model for aggregated data (see ?arnold2013):
-#' EQNfile <- system.file("MPTmodels/2htsm.eqn", package="TreeBUGS")
+#' EQNfile <- system.file("MPTmodels/2htsm.eqn", package = "TreeBUGS")
 #' d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
 #' fit <- simpleMPT(EQNfile, colSums(d.encoding),
-#'                 restrictions=list("D1=D2=D3","d1=d2","a=g"))
+#'   restrictions = list("D1=D2=D3", "d1=d2", "a=g")
+#' )
 #' # convergence
 #' plot(fit)
 #' summary(fit)
 #' }
 #' @export
 simpleMPT <- function(eqnfile, data, restrictions,
-                      n.iter=2000, n.burnin = 500,
-                      n.thin = 3,  n.chains=3, ppp = 0,
+                      n.iter = 2000, n.burnin = 500,
+                      n.thin = 3, n.chains = 3, ppp = 0,
                       alpha = 1, beta = 1,
                       parEstFile, posteriorFile,
-                      cores = 1){
-
-  hyperprior <- list(alpha=alpha, beta=beta)
-  if(!is.character(data) && is.null(dim(data))){
+                      cores = 1) {
+  hyperprior <- list(alpha = alpha, beta = beta)
+  if (!is.character(data) && is.null(dim(data))) {
     data <- matrix(data, nrow = 1, dimnames = list(NULL, names(data)))
   }
 
-  fittedModel <- fitModelCpp("simpleMPT", eqnfile=eqnfile,
-                             data=data, restrictions=restrictions,
-                             hyperprior=hyperprior,
-                             n.iter=n.iter,
-                             n.burnin=n.burnin, n.thin=n.thin,
-                             n.chains=n.chains,  ppp = ppp,
-                             parEstFile=parEstFile,
-                             posteriorFile=posteriorFile,
-                             call = match.call(),
-                             cores = cores)
+  fittedModel <- fitModelCpp("simpleMPT",
+    eqnfile = eqnfile,
+    data = data, restrictions = restrictions,
+    hyperprior = hyperprior,
+    n.iter = n.iter,
+    n.burnin = n.burnin, n.thin = n.thin,
+    n.chains = n.chains, ppp = ppp,
+    parEstFile = parEstFile,
+    posteriorFile = posteriorFile,
+    call = match.call(),
+    cores = cores
+  )
 
   fittedModel
 }

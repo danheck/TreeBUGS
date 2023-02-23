@@ -26,6 +26,7 @@ Replicates an MPT model multiple times with different tree, category, and parame
 \examples{
 # Example: Standard Two-High-Threshold Model (2HTM)
 EQNfile <- system.file("MPTmodels/2htm.eqn",
-                       package="TreeBUGS")
-withinSubjectEQN(EQNfile, c("high","low"), constant=c("g"))
+  package = "TreeBUGS"
+)
+withinSubjectEQN(EQNfile, c("high", "low"), constant = c("g"))
 }

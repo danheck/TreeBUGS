@@ -1,4 +1,4 @@
-#'	Read multiTree files
+#' 	Read multiTree files
 #'
 #' Function to import MPT models from standard .eqn model files as used, for instance, by multiTree (Moshagen, 2010).
 #'
@@ -22,12 +22,15 @@
 #' @examples
 #' # Example: Standard Two-High-Threshold Model (2HTM)
 #' EQNfile <- system.file("MPTmodels/2htm.eqn",
-#'                        package="TreeBUGS")
+#'   package = "TreeBUGS"
+#' )
 #' readEQN(file = EQNfile, paramOrder = TRUE)
 #'
 #' # with equality constraint:
-#' readEQN(file = EQNfile, restrictions = list("Dn=Do", "g=0.5"),
-#'         paramOrder = TRUE)
+#' readEQN(
+#'   file = EQNfile, restrictions = list("Dn=Do", "g=0.5"),
+#'   paramOrder = TRUE
+#' )
 #'
 #' # define MPT model directly within R
 #' model <-
@@ -38,34 +41,37 @@
 #'   new fa (1-d)*g
 #'   new cr (1-d)*(1-g)
 #'   new cr d"
-#' readEQN(model, paramOrder=TRUE)
+#' readEQN(model, paramOrder = TRUE)
 #' @author Daniel Heck, Denis Arnold, Nina Arnold
 #' @references Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
 #' @export
-readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
+readEQN <- function(file, restrictions = NULL, paramOrder = FALSE, parse = FALSE) {
+  if (missing(restrictions)) restrictions <- NULL
 
-  if(missing(restrictions)) restrictions <- NULL
-
-  isPath <- !grepl("\n", x=file, ignore.case = TRUE)
-  if (!isPath){
+  isPath <- !grepl("\n", x = file, ignore.case = TRUE)
+  if (!isPath) {
     model <- file
     file <- tempfile(pattern = "MPTmodel", tmpdir = tempdir(), fileext = ".eqn")
-    cat(paste0(model,"\n"), file=file)
+    cat(paste0(model, "\n"), file = file)
   }
   # read first line if it contains model equations
   nvars <- max(count.fields(file, sep = "", skip = 1))
-  multiTreeDefinition <- read.csv(file, header = FALSE, comment.char = "#",
-                                  blank.lines.skip = TRUE, sep= "", strip.white = TRUE,
-                                  stringsAsFactors = FALSE, skip = 1,
-                                  col.names = paste0("V",seq(nvars)))
+  multiTreeDefinition <- read.csv(file,
+    header = FALSE, comment.char = "#",
+    blank.lines.skip = TRUE, sep = "", strip.white = TRUE,
+    stringsAsFactors = FALSE, skip = 1,
+    col.names = paste0("V", seq(nvars))
+  )
 
   # number of branches implied by number of rows in model file:
   numberOfBranches <- nrow(multiTreeDefinition)
   cols <- ncol(multiTreeDefinition)
-  Tree <- data.frame(Tree = paste0("T_",multiTreeDefinition$V1),
-                     Category = multiTreeDefinition$V2,
-                     Equation = NA_character_, stringsAsFactors = FALSE)
-  Tree$Equation <- apply(multiTreeDefinition[,3:cols, drop=FALSE], 1, paste0, collapse="")
+  Tree <- data.frame(
+    Tree = paste0("T_", multiTreeDefinition$V1),
+    Category = multiTreeDefinition$V2,
+    Equation = NA_character_, stringsAsFactors = FALSE
+  )
+  Tree$Equation <- apply(multiTreeDefinition[, 3:cols, drop = FALSE], 1, paste0, collapse = "")
 
   TreeRestr <- thetaHandling(Tree, restrictions)
 
@@ -81,44 +87,52 @@ readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
   numTree <- length(unique(Tree$Tree))
   tt <- 1:S
   names(tt) <- freeParameters
-  if(paramOrder){
+  if (paramOrder) {
     cat("Free parameters are used in the following order:\n")
     print(tt)
     cat("\n")
 
-    if(!is.null(restrictions)){
+    if (!is.null(restrictions)) {
       cat("Parameter constraints:\n")
-      for(i in 1:length(TreeRestr$restrictions)){
-        cat(TreeRestr$restrictions[[i]],"\n")
+      for (i in 1:length(TreeRestr$restrictions)) {
+        cat(TreeRestr$restrictions[[i]], "\n")
       }
       cat("\n")
     }
 
-    if(S> numCat-numTree){
-      cat("Note that the model is not identified and requires at least ",
-          S-numCat+numTree ,"equality constraint(s).\n\n")
+    if (S > numCat - numTree) {
+      cat(
+        "Note that the model is not identified and requires at least ",
+        S - numCat + numTree, "equality constraint(s).\n\n"
+      )
     }
   }
 
   # check MPT model
   par <- runif(length(allParameters))
   names(par) <- allParameters
-  prob <- sapply(Tree$Equation, function(ff) eval(parse(text=ff), as.list(par)))
+  prob <- sapply(Tree$Equation, function(ff) eval(parse(text = ff), as.list(par)))
   sumPerTree <- as.vector(by(prob, Tree$Tree, sum))
-  if(any(prob<0) | any(prob>1)){
-    error <- paste0("Check .eqn-file. Model equations return values outside the iterval [0,1]:\n  ",
-                    paste0("Line ", (1:length(prob))[prob<0 | prob>1],": ",
-                           unique(Tree$Equation)[prob<0 | prob>1], collapse=", "))
+  if (any(prob < 0) | any(prob > 1)) {
+    error <- paste0(
+      "Check .eqn-file. Model equations return values outside the iterval [0,1]:\n  ",
+      paste0("Line ", (1:length(prob))[prob < 0 | prob > 1], ": ",
+        unique(Tree$Equation)[prob < 0 | prob > 1],
+        collapse = ", "
+      )
+    )
     warning(error)
   }
-  if(any(round(sumPerTree,8) != 1)){
-    error <- paste0("Check .eqn-file. Probabilities do not sum up in trees:\n  ",
-                    paste0(unique(Tree$Tree)[round(sumPerTree,8) != 1], collapse=", "),
-                    "\n  (note that the first line of the .eqn-file ist ignored!)")
+  if (any(round(sumPerTree, 8) != 1)) {
+    error <- paste0(
+      "Check .eqn-file. Probabilities do not sum up in trees:\n  ",
+      paste0(unique(Tree$Tree)[round(sumPerTree, 8) != 1], collapse = ", "),
+      "\n  (note that the first line of the .eqn-file ist ignored!)"
+    )
     warning(error)
   }
 
-  if (parse){
+  if (parse) {
     tmp <- Tree
     mpt <- parseEQN(Tree)
     Tree <- parseRestrictions(mpt, restrictions)
@@ -129,13 +143,15 @@ readEQN <- function(file, restrictions=NULL, paramOrder = FALSE, parse=FALSE){
 }
 
 # identifiability check
-isIdentifiable <- function(S, Tree){
+isIdentifiable <- function(S, Tree) {
   numCat <- length(unique(Tree$Category))
   numTree <- length(unique(Tree$Tree))
 
-  if(S> numCat-numTree){
-    error <- paste0("Note that the model is not identified and requires at least ",
-                    S-numCat+numTree ,"equality constraints.")
+  if (S > numCat - numTree) {
+    error <- paste0(
+      "Note that the model is not identified and requires at least ",
+      S - numCat + numTree, "equality constraints."
+    )
     warning(error)
   }
 }

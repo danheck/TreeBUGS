@@ -26,12 +26,16 @@ This function samples from a set of hyperpriors (either for hierarchical traitMP
 \examples{
 \dontrun{
 # default priors for traitMPT:
-plotPrior(list(mu = "dnorm(0,1)", xi="dunif(0,10)",
-          V=diag(2), df=2+1), M=4000)
+plotPrior(list(
+  mu = "dnorm(0,1)", xi = "dunif(0,10)",
+  V = diag(2), df = 2 + 1
+), M = 4000)
 
 # default priors for betaMPT:
-plotPrior(list(alpha ="dgamma(1,.1)",
-          beta = "dgamma(1,.1)"), M=4000)
+plotPrior(list(
+  alpha = "dgamma(1,.1)",
+  beta = "dgamma(1,.1)"
+), M = 4000)
 }
 }
 \seealso{

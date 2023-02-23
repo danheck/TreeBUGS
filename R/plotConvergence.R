@@ -3,14 +3,14 @@
 
 #' @export
 #' @describeIn plot Plot convergence for beta MPT
-plot.betaMPT <- function(x, parameter="mean", type="default", ...){
-  plot.traitMPT(x,parameter=parameter, type=type,...)
+plot.betaMPT <- function(x, parameter = "mean", type = "default", ...) {
+  plot.traitMPT(x, parameter = parameter, type = type, ...)
 }
 
 #' @export
 #' @describeIn plot Plot convergence for nonhierarchical MPT model
-plot.simpleMPT <- function(x, type="default", ...){
-  plot.traitMPT(x,parameter="theta", type=type,...)
+plot.simpleMPT <- function(x, type = "default", ...) {
+  plot.traitMPT(x, parameter = "theta", type = type, ...)
 }
 
 
@@ -38,7 +38,7 @@ plot.simpleMPT <- function(x, type="default", ...){
 #' @export
 #' @describeIn plot Plot convergence for latent-trait MPT
 #' @importFrom coda traceplot acfplot gelman.plot as.mcmc.list varnames crosscorr.plot autocorr.plot densplot
-plot.traitMPT <- function(x, parameter="mean", type="default", ...){
+plot.traitMPT <- function(x, parameter = "mean", type = "default", ...) {
   mcmc <- x$runjags$mcmc
   allnam <- varnames(mcmc)
   thetaUnique <- x$mptInfo$thetaUnique
@@ -46,59 +46,68 @@ plot.traitMPT <- function(x, parameter="mean", type="default", ...){
   parameter <- gsub(" ", "", parameter, fixed = TRUE)
 
   # unnecessary rho-parameters
-  if (parameter == "rho"){
+  if (parameter == "rho") {
     rho.idx <- outer(1:S, 1:S, paste, sep = ",")
     rho.double <- paste0("rho[", rho.idx[lower.tri(rho.idx, diag = TRUE)], "]")
     allnam <- setdiff(allnam, rho.double)
-    mcmc <- mcmc[,allnam]
+    mcmc <- mcmc[, allnam]
   }
   parameter <- name2idx(parameter, thetaUnique)
 
-  idx <- setdiff(grep(parameter, allnam, fixed = TRUE),
-                 grep(".pred", allnam, fixed = TRUE))
-  if(length(idx) <=0){
+  idx <- setdiff(
+    grep(parameter, allnam, fixed = TRUE),
+    grep(".pred", allnam, fixed = TRUE)
+  )
+  if (length(idx) <= 0) {
     stop("Parameter not found in MCMC object.")
   }
-  if(parameter == "theta"){
-    allnam[idx] <-  paste0(allnam[idx], rep(thetaUnique,"_", length(idx)/2))
+  if (parameter == "theta") {
+    allnam[idx] <- paste0(allnam[idx], rep(thetaUnique, "_", length(idx) / 2))
   } else {
     allnam <- idx2name(allnam, thetaUnique)
   }
   coda::varnames(mcmc) <- allnam
 
   switch(type,
-         "trace" = traceplot(mcmc[,idx],...),
-         "acf" = acfplot(mcmc[,idx],...),
-         "gelman" = gelman.plot(mcmc[,idx],...),
-         "crosscorr" = crosscorr.plot(mcmc[,idx],...),
-         "autocorr" = autocorr.plot(mcmc[,idx],...),
-         "density" = densplot(mcmc[,idx],...),
-         "default" = plot(mcmc[,idx],...),
-         stop("Check 'type' for possible plots." )
+    "trace" = traceplot(mcmc[, idx], ...),
+    "acf" = acfplot(mcmc[, idx], ...),
+    "gelman" = gelman.plot(mcmc[, idx], ...),
+    "crosscorr" = crosscorr.plot(mcmc[, idx], ...),
+    "autocorr" = autocorr.plot(mcmc[, idx], ...),
+    "density" = densplot(mcmc[, idx], ...),
+    "default" = plot(mcmc[, idx], ...),
+    stop("Check 'type' for possible plots.")
   )
-
 }
 
-idx2name <- function(parnames, thetaUnique){
-  for (i in seq_along(thetaUnique)){
+idx2name <- function(parnames, thetaUnique) {
+  for (i in seq_along(thetaUnique)) {
     parnames <- gsub(paste0("[", i),
-                     paste0("[", thetaUnique[i]),
-                     parnames, fixed = TRUE)
+      paste0("[", thetaUnique[i]),
+      parnames,
+      fixed = TRUE
+    )
     parnames <- gsub(paste0(i, "]"),
-                     paste0(thetaUnique[i], "]"),
-                     parnames, fixed = TRUE)
+      paste0(thetaUnique[i], "]"),
+      parnames,
+      fixed = TRUE
+    )
   }
   parnames
 }
 
-name2idx <- function(parnames, thetaUnique){
-  for (i in seq_along(thetaUnique)){
+name2idx <- function(parnames, thetaUnique) {
+  for (i in seq_along(thetaUnique)) {
     parnames <- gsub(paste0("[", thetaUnique[i]),
-                     paste0("[", i),
-                     parnames, fixed = TRUE)
+      paste0("[", i),
+      parnames,
+      fixed = TRUE
+    )
     parnames <- gsub(paste0(thetaUnique[i], "]"),
-                     paste0(i, "]"),
-                     parnames, fixed = TRUE)
+      paste0(i, "]"),
+      parnames,
+      fixed = TRUE
+    )
   }
   parnames
 }

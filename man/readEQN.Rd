@@ -42,12 +42,15 @@ As an example, the standard two-high threshold model (2HTM) is defined as follow
 \examples{
 # Example: Standard Two-High-Threshold Model (2HTM)
 EQNfile <- system.file("MPTmodels/2htm.eqn",
-                       package="TreeBUGS")
+  package = "TreeBUGS"
+)
 readEQN(file = EQNfile, paramOrder = TRUE)
 
 # with equality constraint:
-readEQN(file = EQNfile, restrictions = list("Dn=Do", "g=0.5"),
-        paramOrder = TRUE)
+readEQN(
+  file = EQNfile, restrictions = list("Dn=Do", "g=0.5"),
+  paramOrder = TRUE
+)
 
 # define MPT model directly within R
 model <-
@@ -58,7 +61,7 @@ model <-
   new fa (1-d)*g
   new cr (1-d)*(1-g)
   new cr d"
-readEQN(model, paramOrder=TRUE)
+readEQN(model, paramOrder = TRUE)
 }
 \references{
 Moshagen, M. (2010). multiTree: A computer program for the analysis of multinomial processing tree models. Behavior Research Methods, 42, 42-54.
