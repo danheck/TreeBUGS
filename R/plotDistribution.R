@@ -39,6 +39,10 @@ plotDistribution <- function(
 
   for (idx in 1:S) {
     indEsts <- fittedModel$summary$individParameters[idx, , 1]
+    if (all(is.na(indEsts)))
+      stop("No MCMC samples for the individual-level MPT parameters (theta) were stored. \n",
+           "Please re-fit model with the argument:  monitorIndividual = TRUE")
+
     if (inherits(fittedModel, "traitMPT")) {
       sigma <- fittedModel$summary$groupParameters$sigma[, "Mean"]
       # sigma <- fittedModel$mcmc$BUGSoutput$mean$sigma
