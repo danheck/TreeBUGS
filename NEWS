@@ -1,6 +1,7 @@
 TreeBUGS 1.5 (December 2022)
 ===========
 
+* new argument monitorIndividual = TRUE for traitMPT() and betaMPT() allows to disable storage of MCMC samples for individual theta parameters
 * cleaned R code with package "styler"
 
 

@@ -3,16 +3,15 @@
 # type: "traitMPT" or "betaMPT"
 fitModel <- function(
     type,
-    eqnfile, # statistical model stuff
+    eqnfile,
     data,
     restrictions,
     covData,
-    predStructure, # predictor structure
-    predType, # c("c," f", "r")
+    predStructure,
+    predType,   # possible values: c("c","f", "r")
     transformedParameters,
     corProbit = TRUE,
     hyperprior,
-    # MCMC stuff:
     n.iter = 20000,
     n.adapt = 2000,
     n.burnin = 2000,
@@ -20,7 +19,7 @@ fitModel <- function(
     n.chains = 3,
     dic = FALSE,
     ppp = 0,
-    # File Handling stuff:
+    monitorIndividual = TRUE,
     modelfilename,
     parEstFile,
     posteriorFile,
@@ -142,6 +141,7 @@ fitModel <- function(
     n.burnin = n.burnin,
     n.thin = n.thin,
     n.chains = n.chains,
+    monitorIndividual = monitorIndividual,
     autojags = autojags,
     ...
   )

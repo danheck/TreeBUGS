@@ -154,14 +154,20 @@ summarizeMPT <- function(
       correlation = correlation, thetaFE = thetaFE
     )
   }
-  theta.names <- apply(as.matrix(data.frame(lapply(expand.grid("theta[", 1:S, ",", 1:N, "]"), as.character))),
-    1, paste0,
+  theta.names <- apply(
+    X = as.matrix(data.frame(lapply(expand.grid("theta[", 1:S, ",", 1:N, "]"), as.character))),
+    MARGIN = 1,
+    FUN = paste0,
     collapse = ""
   )
-  individParameters <- array(
-    data = summ[theta.names, ],
-    dim = c(S, N, ncol(summ))
-  )
+  if (any(grepl("theta", rownames(summ)))){
+    individParameters <- array(
+      data = summ[theta.names, ],
+      dim = c(S, N, ncol(summ))
+    )
+  } else {
+    individParameters <- array(data = NA, dim = c(S, N, ncol(summ)) )
+  }
   dimnames(individParameters) <- list(
     Parameter = uniqueNames,
     ID = 1:N,

@@ -17,35 +17,40 @@
 # #' @param ... Arguments to be passed to other methods.
 # #' @author Nina R. Arnold, Denis Arnold, Daniel W. Heck
 # #' @export
-callingSampler <- function(model,
-                           mergedTree,
-                           data,
-                           modelfile,
-                           S,
-                           fixedPar = NULL,
-                           transformedPar = NULL,
-                           covPars = NULL,
-                           covData = NULL,
-                           X_list = list(), # list with design matrices for fixed effects
-                           # groupT1=NULL,    # list with groupMatT1 und NgroupT1  for splitted T1 statistic
-                           hyperpriors = NULL,
-                           n.iter = 20000,
-                           n.adapt = 2000,
-                           n.burnin = 2000,
-                           n.update = 2000,
-                           n.thin = 5,
-                           n.chains = 3,
-                           autojags = NULL,
-                           # savetable = NULL,
-                           ...) {
+callingSampler <- function(
+    model,
+    mergedTree,
+    data,
+    modelfile,
+    S,
+    fixedPar = NULL,
+    transformedPar = NULL,
+    covPars = NULL,
+    covData = NULL,
+    X_list = list(), # list with design matrices for fixed effects
+    # groupT1=NULL,    # list with groupMatT1 und NgroupT1  for splitted T1 statistic
+    hyperpriors = NULL,
+    n.iter = 20000,
+    n.adapt = 2000,
+    n.burnin = 2000,
+    n.update = 2000,
+    n.thin = 5,
+    n.chains = 3,
+    monitorIndividual = TRUE,
+    autojags = NULL,
+    ...
+) {
   if (is.na(n.burnin)) {
     n.burnin <- n.iter / 2
   }
 
   if (model == "betaMPT") {
-    parameters <- list("theta", "alph", "bet", "mean", "sd")
+    parameters <- list("alph", "bet", "mean", "sd")
   } else {
-    parameters <- list("theta", "mu", "mean", "rho", "sigma")
+    parameters <- list("mu", "mean", "rho", "sigma")
+  }
+  if (monitorIndividual){
+    parameters <- c(parameters, "theta")
   }
   if (!is.null(fixedPar)) {
     parameters <- c(parameters, "thetaFE")
@@ -183,17 +188,34 @@ callingSampler <- function(model,
   names(data.list) <- data
   if (any(c("initlist", "inits", "init") %in% names(list(...)))) {
     samples <- run.jags(
-      model = modelfile, monitor = c(parametervector, "deviance"),
-      data = data.list, n.chains = n.chains,
-      burnin = n.burnin, adapt = n.adapt, sample = n.samples, thin = n.thin,
-      modules = c("dic", "glm"), summarise = FALSE, method = "parallel", ...
+      model = modelfile,
+      monitor = c(parametervector, "deviance"),
+      data = data.list,
+      n.chains = n.chains,
+      burnin = n.burnin,
+      adapt = n.adapt,
+      sample = n.samples,
+      thin = n.thin,
+      modules = c("dic", "glm"),
+      summarise = FALSE,
+      method = "parallel",
+      ...
     )
   } else {
     samples <- run.jags(
-      model = modelfile, monitor = c(parametervector, "deviance"),
-      data = data.list, inits = inits.list, n.chains = n.chains,
-      burnin = n.burnin, adapt = n.adapt, sample = n.samples, thin = n.thin,
-      modules = c("dic", "glm"), summarise = FALSE, method = "parallel", ...
+      model = modelfile,
+      monitor = c(parametervector, "deviance"),
+      data = data.list,
+      inits = inits.list,
+      n.chains = n.chains,
+      burnin = n.burnin,
+      adapt = n.adapt,
+      sample = n.samples,
+      thin = n.thin,
+      modules = c("dic", "glm"),
+      summarise = FALSE,
+      method = "parallel",
+      ...
     )
   }
 
