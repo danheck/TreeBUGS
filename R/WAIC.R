@@ -8,6 +8,9 @@
 #' @param n.iter number of iterations after burnin.
 #' @param n.thin Thinning rate.
 #' @param summarize deprecated argument only available for backwards compatibility
+#' @param x An object of class \code{waic} or \code{waic_difference} to be printed.
+#' @param e1,e2 Two objects of class \code{waic} to be compared.
+#' @param ... Further arguments that may be passed to print methods.
 #'
 #' @details WAIC provides an approximation of predictive accuracy with respect
 #' to out-of-sample deviance. The uncertainty of the WAIC for the given number
@@ -25,19 +28,25 @@
 #' \url{https://sourceforge.net/p/mcmc-jags/discussion/610036/thread/8211df61/}
 #'
 #' @return
-#' If \code{summarize = FALSE} (the new default), an object of class \code{waic},
-#' basically a list containing three vectors \code{p_waic}, \code{deviance}, and
-#' \code{waic}, with separate values for each observed node
+#' Function `WAIC()` returns an object of class `waic`, which is basically
+#' a list containing three vectors `p_waic`, `deviance`, and `waic`, with
+#' separate values for each observed node
 #' (i.e., for all combinations of persons and free categories).
-#' For these objects, a \code{print()} method exists, which
-#' also calculates the standard error of the estimate.
-#' If \code{summarize = TRUE}, a vector containing \code{p_waic}, \code{deviance},
-#' and \code{waic}.
+#'
+#' For these objects, a `print()` method exists, which
+#' also calculates the standard error of the estimate of WAIC.
+#'
+#' For backwards compatibility, if `WAIC()` is called with `summarize = TRUE`,
+#' a vector with values `p_waic`, `deviance`, `waic`, and `se_waic` is returned.
+#'
+#' WAIC values from two models can be compared by using the `-` operator;
+#' the result is an object of class `waic_difference`.
 #'
 #' @references Vehtari, A., Gelman, A., & Gabry, J. (2017). Practical Bayesian
 #' model evaluation using leave-one-out cross-validation and WAIC. Statistics
 #' and Computing, 27(5), 1413–1432. doi:10.1007/s11222-016-9696-4
 #'
+#' @md
 #' @examples
 #' \dontrun{
 #'
@@ -66,8 +75,7 @@ WAIC <- function(
     n.chains = 3,
     n.iter = 10000,
     n.thin = 1,
-    summarize = FALSE,
-    ...
+    summarize = FALSE
 ){
   stopifnot(inherits(fittedModel, c("traitMPT", "betaMPT")))
   load.module("dic")
@@ -139,7 +147,8 @@ summary.waic <- function(x, ...) {
 #' @export
 
 print.waic <- function(x, ...) {
-  print(unclass(summary(x)))
+  dmp <- print(unclass(summary(x)))
+  invisible(x)
 }
 
 #' @rdname WAIC
@@ -154,7 +163,8 @@ print.waic_difference <- function(x, ...) {
     , std.error = sqrt(length(x)) * sd(x)
   )
   cat("Difference in WAIC (with standard error)\n")
-  print(y)
+  dmp <- print(y)
+  invisible(x)
 }
 
 #' @rdname WAIC

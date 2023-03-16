@@ -13,8 +13,7 @@ WAIC(
   n.chains = 3,
   n.iter = 10000,
   n.thin = 1,
-  summarize = FALSE,
-  ...
+  summarize = FALSE
 )
 
 \method{print}{waic}(x, ...)
@@ -35,16 +34,27 @@ WAIC(
 \item{n.thin}{Thinning rate.}
 
 \item{summarize}{deprecated argument only available for backwards compatibility}
+
+\item{x}{An object of class \code{waic} or \code{waic_difference} to be printed.}
+
+\item{...}{Further arguments that may be passed to print methods.}
+
+\item{e1, e2}{Two objects of class \code{waic} to be compared.}
 }
 \value{
-If \code{summarize = FALSE} (the new default), an object of class \code{waic},
-basically a list containing three vectors \code{p_waic}, \code{deviance}, and
-\code{waic}, with separate values for each observed node
+Function \code{WAIC()} returns an object of class \code{waic}, which is basically
+a list containing three vectors \code{p_waic}, \code{deviance}, and \code{waic}, with
+separate values for each observed node
 (i.e., for all combinations of persons and free categories).
+
 For these objects, a \code{print()} method exists, which
-also calculates the standard error of the estimate.
-If \code{summarize = TRUE}, a vector containing \code{p_waic}, \code{deviance},
-and \code{waic}.
+also calculates the standard error of the estimate of WAIC.
+
+For backwards compatibility, if \code{WAIC()} is called with \code{summarize = TRUE},
+a vector with values \code{p_waic}, \code{deviance}, \code{waic}, and \code{se_waic} is returned.
+
+WAIC values from two models can be compared by using the \code{-} operator;
+the result is an object of class \code{waic_difference}.
 }
 \description{
 Implementation of the WAIC for model comparison.
