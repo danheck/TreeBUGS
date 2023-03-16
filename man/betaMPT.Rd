@@ -20,6 +20,7 @@ betaMPT(
   n.chains = 3,
   dic = FALSE,
   ppp = 0,
+  monitorIndividual = TRUE,
   modelfilename,
   parEstFile,
   posteriorFile,
@@ -108,6 +109,10 @@ computed for fitted models.}
 
 \item{ppp}{number of samples to compute  posterior predictive p-value (see
 \code{\link{posteriorPredictive}})}
+
+\item{monitorIndividual}{whether to store MCMC samples of the MPT
+parameters \code{theta} at the individual level (i.e., the random effects).
+If \code{FALSE}, it is not possible to perform posterior-predictive checks.}
 
 \item{modelfilename}{name of the generated JAGS model file. Default is to
 write this information to the tempdir as required by CRAN standards.}

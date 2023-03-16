@@ -72,6 +72,9 @@
 #' @param ppp number of samples to compute  posterior predictive p-value (see
 #'   \code{\link{posteriorPredictive}})
 #'
+#' @param monitorIndividual whether to store MCMC samples of the MPT
+#'   parameters \code{theta} at the individual level (i.e., the random effects).
+#'   If \code{FALSE}, it is not possible to perform posterior-predictive checks.
 #' @param modelfilename name of the generated JAGS model file. Default is to
 #'   write this information to the tempdir as required by CRAN standards.
 #' @param parEstFile Name of the file to with the estimates should be stored
@@ -150,6 +153,7 @@ betaMPT <- function(
     n.chains = 3,
     dic = FALSE,
     ppp = 0,
+    monitorIndividual = TRUE,
     modelfilename,
     parEstFile,
     posteriorFile,
@@ -157,15 +161,22 @@ betaMPT <- function(
     ...
 ) {
   fitModel(
-    type = "betaMPT", eqnfile = eqnfile,
-    data = data, restrictions = restrictions,
+    type = "betaMPT",
+    eqnfile = eqnfile,
+    data = data,
+    restrictions = restrictions,
     covData = covData,
     transformedParameters = transformedParameters,
     corProbit = corProbit,
     hyperprior = list(alpha = alpha, beta = beta),
-    n.iter = n.iter, n.adapt = n.adapt,
-    n.burnin = n.burnin, n.thin = n.thin,
-    n.chains = n.chains, dic = dic, ppp = ppp,
+    n.iter = n.iter,
+    n.adapt = n.adapt,
+    n.burnin = n.burnin,
+    n.thin = n.thin,
+    n.chains = n.chains,
+    dic = dic,
+    ppp = ppp,
+    monitorIndividual = monitorIndividual,
     modelfilename = modelfilename,
     parEstFile = parEstFile,
     posteriorFile = posteriorFile,

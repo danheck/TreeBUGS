@@ -83,6 +83,10 @@ posteriorPredictive <- function(fittedModel,
         sel.thetaFE
       )
       par.tmp <- as.matrix(fittedModel$runjags$mcmc[[m]][sel.samp, sel.var, drop = FALSE])
+      if (ncol(par.tmp) == 0){
+        stop("No MCMC samples for the individual-level MPT parameters (theta) were stored. \n",
+             "Please re-fit model with the argument:  monitorIndividual = TRUE")
+      }
     } else {
       par.tmp <- matrix(NA, max.samp, S,
         dimnames = list(NULL, paste0("theta[", 1:S, ",1]"))
