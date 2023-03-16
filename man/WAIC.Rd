@@ -2,6 +2,9 @@
 % Please edit documentation in R/WAIC.R
 \name{WAIC}
 \alias{WAIC}
+\alias{print.waic}
+\alias{print.waic_difference}
+\alias{-.waic}
 \title{WAIC: Widely Applicable Information Criterion}
 \usage{
 WAIC(
@@ -10,8 +13,14 @@ WAIC(
   n.chains = 3,
   n.iter = 10000,
   n.thin = 1,
-  summarize = TRUE
+  summarize = FALSE
 )
+
+\method{print}{waic}(x, ...)
+
+\method{print}{waic_difference}(x, ...)
+
+\method{-}{waic}(e1, e2)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
@@ -24,17 +33,28 @@ WAIC(
 
 \item{n.thin}{Thinning rate.}
 
-\item{summarize}{whether to summarize the WAIC values which are computed
-separately for each observed node.}
+\item{summarize}{deprecated argument only available for backwards compatibility}
+
+\item{x}{An object of class \code{waic} or \code{waic_difference} to be printed.}
+
+\item{...}{Further arguments that may be passed to print methods.}
+
+\item{e1, e2}{Two objects of class \code{waic} to be compared.}
 }
 \value{
-If \code{summarize=TRUE} (default), a vector containing the WAIC
-penalty term \code{"p_waic"}, \code{"deviance"}, \code{"waic"}, and the
-corresponding standard error \code{"se_waic"}.
-
-If \code{summarize=FALSE}, a list containing three vectors \code{p_waic},
-\code{deviance}, and \code{waic} with separate values for each observed node
+Function \code{WAIC()} returns an object of class \code{waic}, which is basically
+a list containing three vectors \code{p_waic}, \code{deviance}, and \code{waic}, with
+separate values for each observed node
 (i.e., for all combinations of persons and free categories).
+
+For these objects, a \code{print()} method exists, which
+also calculates the standard error of the estimate of WAIC.
+
+For backwards compatibility, if \code{WAIC()} is called with \code{summarize = TRUE},
+a vector with values \code{p_waic}, \code{deviance}, \code{waic}, and \code{se_waic} is returned.
+
+WAIC values from two models can be compared by using the \code{-} operator;
+the result is an object of class \code{waic_difference}.
 }
 \description{
 Implementation of the WAIC for model comparison.
@@ -66,19 +86,13 @@ WAIC(fit)
 #### pairwise comparison of two models:
 
 # (1) compute WAIC per model
-waic1 <- WAIC(fit1, summarize = FALSE)
-waic2 <- WAIC(fit2, summarize = FALSE)
+waic1 <- WAIC(fit1)
+waic2 <- WAIC(fit2)
 
-# (2) WAIC differences (per observation!)
-waic_diff <- waic1$waic - waic2$waic
-
-# (3) standard error of the WAIC differences:
-n_obs <- length(waic_diff)
-c(
-  diff = sum(waic_diff),
-  se_diff = sqrt(n_obs) * sd(waic_diff)
-)
+# (2) WAIC difference
+waic1 - waic2
 }
+
 
 }
 \references{

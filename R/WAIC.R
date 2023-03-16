@@ -7,8 +7,10 @@
 #' @param n.chains number of chains (no parallel computation).
 #' @param n.iter number of iterations after burnin.
 #' @param n.thin Thinning rate.
-#' @param summarize whether to summarize the WAIC values which are computed
-#'   separately for each observed node.
+#' @param summarize deprecated argument only available for backwards compatibility
+#' @param x An object of class \code{waic} or \code{waic_difference} to be printed.
+#' @param e1,e2 Two objects of class \code{waic} to be compared.
+#' @param ... Further arguments that may be passed to print methods.
 #'
 #' @details WAIC provides an approximation of predictive accuracy with respect
 #' to out-of-sample deviance. The uncertainty of the WAIC for the given number
@@ -25,18 +27,26 @@
 #'
 #' \url{https://sourceforge.net/p/mcmc-jags/discussion/610036/thread/8211df61/}
 #'
-#' @return If \code{summarize=TRUE} (default), a vector containing the WAIC
-#' penalty term \code{"p_waic"}, \code{"deviance"}, \code{"waic"}, and the
-#' corresponding standard error \code{"se_waic"}.
-#'
-#' If \code{summarize=FALSE}, a list containing three vectors \code{p_waic},
-#' \code{deviance}, and \code{waic} with separate values for each observed node
+#' @return
+#' Function `WAIC()` returns an object of class `waic`, which is basically
+#' a list containing three vectors `p_waic`, `deviance`, and `waic`, with
+#' separate values for each observed node
 #' (i.e., for all combinations of persons and free categories).
+#'
+#' For these objects, a `print()` method exists, which
+#' also calculates the standard error of the estimate of WAIC.
+#'
+#' For backwards compatibility, if `WAIC()` is called with `summarize = TRUE`,
+#' a vector with values `p_waic`, `deviance`, `waic`, and `se_waic` is returned.
+#'
+#' WAIC values from two models can be compared by using the `-` operator;
+#' the result is an object of class `waic_difference`.
 #'
 #' @references Vehtari, A., Gelman, A., & Gabry, J. (2017). Practical Bayesian
 #' model evaluation using leave-one-out cross-validation and WAIC. Statistics
 #' and Computing, 27(5), 1413–1432. doi:10.1007/s11222-016-9696-4
 #'
+#' @md
 #' @examples
 #' \dontrun{
 #'
@@ -48,20 +58,15 @@
 #' #### pairwise comparison of two models:
 #'
 #' # (1) compute WAIC per model
-#' waic1 <- WAIC(fit1, summarize = FALSE)
-#' waic2 <- WAIC(fit2, summarize = FALSE)
+#' waic1 <- WAIC(fit1)
+#' waic2 <- WAIC(fit2)
 #'
-#' # (2) WAIC differences (per observation!)
-#' waic_diff <- waic1$waic - waic2$waic
-#'
-#' # (3) standard error of the WAIC differences:
-#' n_obs <- length(waic_diff)
-#' c(
-#'   diff = sum(waic_diff),
-#'   se_diff = sqrt(n_obs) * sd(waic_diff)
-#' )
+#' # (2) WAIC difference
+#' waic1 - waic2
 #' }
 #'
+#'
+#' @rdname WAIC
 #' @importFrom rjags jags.samples jags.model load.module
 #' @export
 WAIC <- function(
@@ -70,7 +75,7 @@ WAIC <- function(
     n.chains = 3,
     n.iter = 10000,
     n.thin = 1,
-    summarize = TRUE
+    summarize = FALSE
 ){
   stopifnot(inherits(fittedModel, c("traitMPT", "betaMPT")))
   load.module("dic")
@@ -93,17 +98,17 @@ WAIC <- function(
 
   # construct new JAGS model
   mod <- jags.model(textConnection(fittedModel$runjags$model),
-    datlist[-length(datlist)],
-    n.chains = n.chains,
-    n.adapt = n.adapt, inits = inits
+                    datlist[-length(datlist)],
+                    n.chains = n.chains,
+                    n.adapt = n.adapt, inits = inits
   )
 
   # the WAIC feature is still experimental! (requires JAGS 4.3.0)
   # returns deviance + waic penalty for each observed node (= free category per person)
   # cf.: https://sourceforge.net/p/mcmc-jags/discussion/610036/thread/8211df61/
   samples <- jags.samples(mod, c("deviance", "WAIC"),
-    type = "mean",
-    n.iter = n.iter, thin = n.thin
+                          type = "mean",
+                          n.iter = n.iter, thin = n.thin
   )
 
   samples$p_waic <- samples$WAIC
@@ -111,20 +116,63 @@ WAIC <- function(
   attributes(samples$waic) <- attributes(samples$p_waic) <- attributes(samples$deviance)
   samples$WAIC <- NULL
 
-  if (!summarize) {
-    return(samples)
-  }
+  # For backwards compatibility, we implement summarize = TRUE
+  if(isTRUE(summarize)) return(summary(structure(samples, class = "waic")))
+
+  structure(
+    samples
+    , class = "waic"
+  )
+}
+
+#' @method summary waic
+#' @keywords internal
+
+summary.waic <- function(x, ...) {
+  structure(
+    c(
+      p_waic     = sum(x[["p_waic"]])
+      , deviance = sum(x[["deviance"]])
+      , waic     = sum(x[["waic"]])
+      # standard error for WAIC (cf. Vehtari et al., 2017)
+      , se_waic  = sqrt(length(x$waic)) * sd(x$waic)
+    )
+    , class = "summary.waic"
+  )
+}
+
+
+#' @rdname WAIC
+#' @method print waic
+#' @export
+
+print.waic <- function(x, ...) {
+  dmp <- print(unclass(summary(x)))
+  invisible(x)
+}
+
+#' @rdname WAIC
+#' @method print waic_difference
+#' @export
+
+print.waic_difference <- function(x, ...) {
 
   # standard error for WAIC (cf. Vehtari et al., 2017)
-  n_obs <- length(samples$waic) # = number of free categories times nubmer of persons
-  se_waic <- sqrt(n_obs) * sd(samples$waic)
-
-  tmp <- sapply(samples, sum)
-  waic <- c(
-    "p_waic" = tmp[["p_waic"]],
-    "deviance" = tmp[["deviance"]],
-    "waic" = tmp[["waic"]],
-    "se_waic" = se_waic
+  y <- c(
+    estimate    = sum(x)
+    , std.error = sqrt(length(x)) * sd(x)
   )
-  return(waic)
+  cat("Difference in WAIC (with standard error)\n")
+  dmp <- print(y)
+  invisible(x)
+}
+
+#' @rdname WAIC
+#' @export
+
+"-.waic" <- function(e1, e2) {
+  structure(
+    e1$waic - e2$waic
+    , class = "waic_difference"
+  )
 }
