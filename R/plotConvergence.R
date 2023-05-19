@@ -82,31 +82,26 @@ plot.traitMPT <- function(x, parameter = "mean", type = "default", ...) {
 
 idx2name <- function(parnames, thetaUnique) {
   for (i in seq_along(thetaUnique)) {
-    parnames <- gsub(paste0("[", i),
-      paste0("[", thetaUnique[i]),
-      parnames,
-      fixed = TRUE
+    parnames <- gsub(paste0("(\\[", i, ")(,|\\])"),
+       paste0("[", thetaUnique[i], "\\2"),
+       parnames
     )
-    parnames <- gsub(paste0(i, "]"),
-      paste0(thetaUnique[i], "]"),
-      parnames,
-      fixed = TRUE
-    )
+    parnames <- gsub(paste0(",", i, "\\]"),
+       paste0(",", thetaUnique[i], "\\]"),
+       parnames)
   }
   parnames
 }
 
 name2idx <- function(parnames, thetaUnique) {
   for (i in seq_along(thetaUnique)) {
-    parnames <- gsub(paste0("[", thetaUnique[i]),
-      paste0("[", i),
-      parnames,
-      fixed = TRUE
+    parnames <- gsub(paste0("(\\[", thetaUnique[i], ")(,|\\])"),
+       paste0("[", i, "\\2"),
+       parnames
     )
-    parnames <- gsub(paste0(thetaUnique[i], "]"),
-      paste0(i, "]"),
-      parnames,
-      fixed = TRUE
+    parnames <- gsub(paste0(",", thetaUnique[i], "\\]"),
+       paste0(",", i, "\\]"),
+       parnames
     )
   }
   parnames
