@@ -125,42 +125,41 @@ WAIC <- function(
   )
 }
 
+
 #' @method summary waic
 #' @keywords internal
-
-summary.waic <- function(x, ...) {
+summary.waic <- function(
+    object,
+    ...
+) {
   structure(
-    c(
-      p_waic     = sum(x[["p_waic"]])
-      , deviance = sum(x[["deviance"]])
-      , waic     = sum(x[["waic"]])
-      # standard error for WAIC (cf. Vehtari et al., 2017)
-      , se_waic  = sqrt(length(x$waic)) * sd(x$waic)
-    )
-    , class = "summary.waic"
-  )
+    c(p_waic     = sum(object[["p_waic"]]),
+      deviance = sum(object[["deviance"]]),
+      waic     = sum(object[["waic"]]),
+      se_waic  = sqrt(length(object$waic)) * sd(object$waic)
+      # --> standard error for WAIC (cf. Vehtari et al., 2017)
+    ), class = "summary.waic")
 }
 
 
 #' @rdname WAIC
 #' @method print waic
 #' @export
-
 print.waic <- function(x, ...) {
   dmp <- print(unclass(summary(x)))
   invisible(x)
 }
 
+
 #' @rdname WAIC
 #' @method print waic_difference
 #' @export
-
 print.waic_difference <- function(x, ...) {
 
   # standard error for WAIC (cf. Vehtari et al., 2017)
   y <- c(
-    estimate    = sum(x)
-    , std.error = sqrt(length(x)) * sd(x)
+    "estimate"  = sum(x),
+    "std.error" = sqrt(length(x)) * sd(x)
   )
   cat("Difference in WAIC (with standard error)\n")
   dmp <- print(y)
@@ -169,10 +168,9 @@ print.waic_difference <- function(x, ...) {
 
 #' @rdname WAIC
 #' @export
-
 "-.waic" <- function(e1, e2) {
   structure(
-    e1$waic - e2$waic
-    , class = "waic_difference"
+    e1$waic - e2$waic,
+    class = "waic_difference"
   )
 }
