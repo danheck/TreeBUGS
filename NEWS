@@ -1,8 +1,10 @@
-TreeBUGS 1.5 (December 2022)
+TreeBUGS 1.5 (May 2023)
 ===========
 
-* new argument monitorIndividual = TRUE for traitMPT() and betaMPT() allows to disable storage of MCMC samples for individual theta parameters
-* cleaned R code with package "styler"
+* new argument monitorIndividual = TRUE for traitMPT() and betaMPT() allows to disable storing MCMC samples for individual theta parameters
+* R code cleaned up with package "styler"
+* bug fix for issue #12 by @soelderer (Paul): plotConvergence() uses strange parameter labels for models with more than 10 parameters
+* bug fix for issue #11 by @mariusbarth: issues with printing of WAIC() results
 
 
 TreeBUGS 1.4.9 (September 2022)
