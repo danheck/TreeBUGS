@@ -103,10 +103,14 @@ BayesFactorMPT <- function(
     ### 4. Loop 2 (entries in row k): Compute transition probabilities
     ###     => P(i|k) = P(y|tk,Mk) * P(tk|Mk) * prod(P(ti|Mk)) * P(Mk)
     # prior for full palette vector:
-    posterior <-
-      exp(loglik + # y | theta_k, M_k
-        prior.current + # theta_k | M_k
-        rowSums(prior.pseudo) - prior.pseudo) # theta_i | M_k
+    log_posterior <-
+      loglik +                             # P(y | theta_k, M_k)
+      prior.current +                      # P(theta_k | M_k)
+      rowSums(prior.pseudo) - prior.pseudo # P(theta_i | M_k)
+
+    # subtract constant to improve computational stability:
+    const <- max(log_posterior)
+    posterior <- exp(log_posterior - const)
     posterior / rowSums(posterior)
   }
   if (cores > 1) {
