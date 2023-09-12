@@ -1,4 +1,10 @@
-TreeBUGS 1.5 (May 2023)
+TreeBUGS 1.5.1 (September 2023)
+===========
+
+* bug fix for numerical instability of Bayes-factor computations when all models do not fit
+
+
+TreeBUGS 1.5.0 (May 2023)
 ===========
 
 * new argument monitorIndividual = TRUE for traitMPT() and betaMPT() allows to disable storing MCMC samples for individual theta parameters
