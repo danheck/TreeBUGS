@@ -29,7 +29,7 @@ These steps are explained in more detail in the package vignette, which can be o
 
 A tutorial paper on multinomial processing tree models (including hierarchical model fitting with TreeBUGS) can be found here:
 
-- Schmidt, O., Erdfelder, E., & Heck, D. W. (2022). Tutorial on multinomial processing tree modeling: How to develop, test, and extend MPT models. *PsyArXiv*. https://psyarxiv.com/gh8md/
+- Schmidt, O., Erdfelder, E., & Heck, D. W. (2023). How to develop, test, and extend multinomial processing tree models: A tutorial. *Psychological Methods*. https://doi.org/10.1037/met0000561 (Preprint: https://psyarxiv.com/gh8md/)
 
 
 ## Installing TreeBUGS
