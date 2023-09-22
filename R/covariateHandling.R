@@ -51,7 +51,7 @@ covHandling <- function(covData,
       # set up table and iterate across all combinations of parameters and covariates
       covTable <- data.frame()
       for (i in 1:length(covStructure)) {
-        covStructure[[i]] <- gsub("\\,", " ", gsub("~", ";", covStructure[[i]]))
+        covStructure[[i]] <- gsub("\\, | \\+", " ", gsub("~", ";", covStructure[[i]]))
         sss <- strsplit(covStructure[[i]], ";")[[1]]
         if (length(sss) != 2) {
           stop(
