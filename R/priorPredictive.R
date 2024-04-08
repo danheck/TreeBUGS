@@ -71,8 +71,10 @@ priorPredictive <- function(
     nCPU = 4
 ) {
   if (missing(restrictions)) restrictions <- NULL
+
   # 1. get MPT model
-  mpt <- readEQN(eqnfile, restrictions = restrictions)
+  mpt <- readEQN(eqnfile)  #, restrictions = restrictions)
+  # REMINDER 2024-04: restrictions were ineffective in readEQN(); only processed by thetaHandling
   merged <- thetaHandling(mpt, restrictions)
   S <- max(merged$SubPar$theta)
   thetaNames <- merged$SubPar[, 1:2]

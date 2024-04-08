@@ -31,16 +31,25 @@ matrices \eqn{a} and \eqn{b} (the powers of the \eqn{\theta} and
 branch probability is then given as \eqn{c_{i}  \prod_{s}
 \theta^{a_{i,s}}(1-\theta)^{b_{i,s}})}}
 }
+\value{
+for the default setting \code{parse = FALSE}, the function returns a \code{data.frame} with the following columns:
+\itemize{
+ \item \code{Tree}: the tree label
+ \item \code{Category}: the category label (must match the columns in the data set)
+ \item \code{Equation}: the model equation without parameter restrictions
+ \item \code{EQN}: the model equation with restricted parameters replaced
+}
+}
 \description{
 Function to import MPT models from standard .eqn model files as used, for
 instance, by multiTree (Moshagen, 2010).
 }
 \details{
 The file format should adhere to the standard .eqn-syntax (note that
-  the first line is skipped and can be used for comments). In each line, a
-  separate branch of the MPT model is specified using the tree label,
-  category label, and the model equations in full form (multiplication sign
-  `*` required; not abbreviations such as `a^2` allowed).
+the first line is skipped and can be used for comments). In each line, a
+separate branch of the MPT model is specified using the tree label,
+category label, and the model equations in full form (multiplication sign
+\code{*} required; not abbreviations such as \code{a^2} allowed).
 
 As an example, the standard two-high threshold model (2HTM) is defined as
 follows:

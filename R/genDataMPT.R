@@ -40,11 +40,12 @@ genMPT <- function(
   if (missing(restrictions)) {
     restrictions <- NULL
   }
+
   # read EQN
+  # REMINDER 2024-04: restrictions were ineffective in readEQN(); only processed by thetaHandling
   Tree <- readEQN(eqnfile)
   mergedTree <- mergeBranches(Tree)
   Tree.restr <- thetaHandling(mergedTree, restrictions)
-  # thetaNames <- getParameter(mergedTree)
   thetaNames <- Tree.restr$SubPar[, 1:2]
   thetaNames <- thetaNames[rownames(unique(thetaNames[2])), ]$Parameter
   treeLabels <- unique(mergedTree$Tree)

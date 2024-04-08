@@ -18,11 +18,12 @@
 #'   \theta^{a_{i,s}}(1-\theta)^{b_{i,s}})}
 #' @inheritParams betaMPT
 #'
-#' @details The file format should adhere to the standard .eqn-syntax (note that
-#'   the first line is skipped and can be used for comments). In each line, a
-#'   separate branch of the MPT model is specified using the tree label,
-#'   category label, and the model equations in full form (multiplication sign
-#'   `*` required; not abbreviations such as `a^2` allowed).
+#' @details
+#' The file format should adhere to the standard .eqn-syntax (note that
+#' the first line is skipped and can be used for comments). In each line, a
+#' separate branch of the MPT model is specified using the tree label,
+#' category label, and the model equations in full form (multiplication sign
+#' \code{*} required; not abbreviations such as \code{a^2} allowed).
 #'
 #' As an example, the standard two-high threshold model (2HTM) is defined as
 #' follows:
@@ -35,6 +36,15 @@
 #'   \code{Lure}    \tab \tab \code{CorrectReject}   \tab \tab \code{(1-Dn)*(1-g)} \cr
 #'   \code{Lure}    \tab \tab \code{CorrectReject  } \tab \tab \code{Dn}
 #' }
+#'
+#' @returns for the default setting \code{parse = FALSE}, the function returns a \code{data.frame} with the following columns:
+#' \itemize{
+#'  \item \code{Tree}: the tree label
+#'  \item \code{Category}: the category label (must match the columns in the data set)
+#'  \item \code{Equation}: the model equation without parameter restrictions
+#'  \item \code{EQN}: the model equation with restricted parameters replaced
+#' }
+#'
 #' @author Daniel Heck, Denis Arnold, Nina Arnold
 #' @references Moshagen, M. (2010). multiTree: A computer program for the
 #'   analysis of multinomial processing tree models. Behavior Research Methods,
@@ -98,7 +108,12 @@ readEQN <- function(
   )
   Tree$Equation <- apply(multiTreeDefinition[, 3:cols, drop = FALSE], 1, paste0, collapse = "")
 
+  # bugfix for unexpected behavior (readEQN not showing restricted EQN model equations)
+  # --> "thetaHandling" returns data frame with two columns:
+  #          Equation = unadjusted EQN equations
+  #          EQN      = adjusted EQN with replaced restricted parameters
   TreeRestr <- thetaHandling(Tree, restrictions)
+  Tree$EQN <- TreeRestr$mergedTree$EQN
 
   allParameters <- getParameter(Tree)
   suppressWarnings(
@@ -162,6 +177,7 @@ readEQN <- function(
     mpt <- parseEQN(Tree)
     Tree <- parseRestrictions(mpt, restrictions)
     Tree$Table <- tmp
+    return(Tree)
   }
 
   return(Tree)

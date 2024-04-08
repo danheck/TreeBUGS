@@ -56,6 +56,8 @@ genBetaMPT <- function(
   if (missing(restrictions)) {
     restrictions <- NULL
   }
+
+  # REMINDER 2024-04: restrictions were ineffective in readEQN(); only processed by thetaHandling
   Tree <- readEQN(eqnfile)
   mergedTree <- mergeBranches(Tree)
   Tree.restr <- thetaHandling(mergedTree, restrictions)

@@ -74,9 +74,9 @@ genTraitMPT <- function(
   if (missing(restrictions)) {
     restrictions <- NULL
   }
+
+  # REMINDER 2024-04: restrictions were ineffective in readEQN(); only processed by thetaHandling
   Tree <- readEQN(eqnfile)
-  # mergedTree <- mergeBranches(Tree)
-  # thetaNames <- getParameter(mergedTree)
   mergedTree <- mergeBranches(Tree)
   Tree.restr <- thetaHandling(mergedTree, restrictions)
   thetaNames <- Tree.restr$SubPar[, 1:2]

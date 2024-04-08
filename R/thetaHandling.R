@@ -6,7 +6,6 @@
 # #' @author Nina R. Arnold, Denis Arnold, Daniel Heck
 # #' @export
 thetaHandling <- function(mergedTree, restrictions) {
-  mergedTree$Eqn <- mergedTree$Equation
   Parameter <- getParameter(mergedTree)
 
   SubPar <- data.frame(
@@ -14,6 +13,9 @@ thetaHandling <- function(mergedTree, restrictions) {
     theta = 1:length(Parameter),
     sub = "", stringsAsFactors = FALSE
   )
+
+  # EQN model equations with replaced parameters
+  mergedTree$EQN <- mergedTree$Equation
 
   ############ only if restrictions are included:
   if (!is.null(restrictions)) {
@@ -31,9 +33,24 @@ thetaHandling <- function(mergedTree, restrictions) {
     for (k in 1:length(restrVector)) {
       splitRestr <- strsplit(restrVector[k], "=")[[1]]
       selFE <- splitRestr %in% c("FE", "FIXED_EFFECT")
-      if (length(splitRestr) == 1) {
-        warning("Restriction not well defined: Equality sign '=' missing in:\n  ", splitRestr)
-      } else if (any(selFE)) {
+      if (length(splitRestr) <= 1) {
+        stop("Restriction not well defined: Equality sign '=' missing in:\n  ", splitRestr)
+      }
+
+      # parameter replacement in EQN model equations:
+      M <- length(splitRestr)
+      for (m in 1:(M-1)){
+        mergedTree$EQN <- gsub(
+          pattern = paste0("(^|\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\))",
+                           splitRestr[m],
+                           "(\\*|\\(|\\)|\\-|\\+|\\+\\(|\\*\\(|\\-\\(|\\+\\)|\\*\\)|\\-\\)|$)"),
+          replacement = paste0("\\1", splitRestr[M], "\\2"),
+          mergedTree$EQN, perl = TRUE
+        )
+      }
+
+      # parameter replacement for theta-parameters in JAGS code:
+      if (any(selFE)) {
         # fixed effect: negative index
         index <- -match(splitRestr[!selFE], SubPar$Parameter)
         SubPar[-index, "theta"] <- index[1] - 1 # substract one to make it different from equality constraints
@@ -151,8 +168,10 @@ thetaHandling <- function(mergedTree, restrictions) {
   }
 
   output <- list(
-    SubPar = SubPar, mergedTree = mergedTree,
-    constants = constants, fixedPar = fixedPar,
+    SubPar = SubPar,
+    mergedTree = mergedTree,
+    constants = constants,
+    fixedPar = fixedPar,
     restrictions = restrictions
   )
 

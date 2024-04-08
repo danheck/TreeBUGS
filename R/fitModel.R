@@ -42,6 +42,7 @@ fitModel <- function(
   }
 
   # MPT structure for JAGS
+  # REMINDER 2024-04: restrictions were ineffective in readEQN(); only processed by thetaHandling
   Tree <- readEQN(eqnfile)
   mergedTree <- mergeBranches(Tree)
   data <- readSubjectData(data, unique(mergedTree$Category))
