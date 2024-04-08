@@ -1,7 +1,7 @@
 TreeBUGS 1.5.2 (April 2024)
 ===========
 
-* Bugfix in readEQN: function no longer ignores the given restrictions but returns two columns ("Equation" without restrictions and "EQN" with restrictions)
+* Bugfix for issue #15 by @singmann: function readEQN() no longer ignores the given restrictions but returns two columns ("Equation" without restrictions and "EQN" with restrictions)
 
 
 TreeBUGS 1.5.1 (September 2023)
