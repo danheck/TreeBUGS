@@ -98,7 +98,8 @@ removed from n.iter)}
 
 \item{n.thin}{Thinning rate.}
 
-\item{n.chains}{number of MCMC chains (sampled in parallel).}
+\item{n.chains}{number of MCMC chains (sampled in parallel, which can be
+changed via the additional argument \code{n.sim = 1}).}
 
 \item{dic}{whether to compute DIC using
 \code{\link[runjags]{extract.runjags}}, which requires additional sampling.
@@ -133,9 +134,12 @@ used). Possible arguments for \code{autoextend.jags} are:
 max.time="30m")} (the last of these arguments restricts sampling  to 30
 minutes, see  \link[runjags]{autoextend.jags}).}
 
-\item{...}{further arguments to be passed to the JAGS sampling function
-(i.e., to \code{\link[runjags]{run.jags}}. Note that reproducible results
-are obtained by setting a random seed before fitting a model (i.e.,
+\item{...}{further arguments passed to the JAGS sampling function
+\code{\link[runjags]{run.jags}}. The number of CPUs/cores for
+the \code{"parallel"} method can be changed via the argument \code{n.sim = 1}.
+It is also possible to provide an existing \code{parallel} cluster object
+via the argument \code{cl}. Reproducible results can be
+obtained by setting a random seed before fitting a model (i.e.,
 \code{set.seed(12345)} ).}
 }
 \value{

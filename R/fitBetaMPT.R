@@ -62,7 +62,8 @@
 #' @param n.burnin Number of samples for burnin (samples will not be stored and
 #'   removed from n.iter)
 #' @param n.thin Thinning rate.
-#' @param n.chains number of MCMC chains (sampled in parallel).
+#' @param n.chains number of MCMC chains (sampled in parallel, which can be
+#'   changed via the additional argument \code{n.sim = 1}).
 #' @param dic whether to compute DIC using
 #'   \code{\link[runjags]{extract.runjags}}, which requires additional sampling.
 #'   Can also be computed and added after fitting the model by
@@ -90,9 +91,12 @@
 #'   \code{list(startburnin = 1000, startsample = 5000, adapt = 2000,
 #'   max.time="30m")} (the last of these arguments restricts sampling  to 30
 #'   minutes, see  \link[runjags]{autoextend.jags}).
-#' @param ... further arguments to be passed to the JAGS sampling function
-#'   (i.e., to \code{\link[runjags]{run.jags}}. Note that reproducible results
-#'   are obtained by setting a random seed before fitting a model (i.e.,
+#' @param ... further arguments passed to the JAGS sampling function
+#'   \code{\link[runjags]{run.jags}}. The number of CPUs/cores for
+#'   the \code{"parallel"} method can be changed via the argument \code{n.sim = 1}.
+#'   It is also possible to provide an existing \code{parallel} cluster object
+#'   via the argument \code{cl}. Reproducible results can be
+#'   obtained by setting a random seed before fitting a model (i.e.,
 #'   \code{set.seed(12345)} ).
 #'
 #' @details Note that, in the Beta-MPT model, correlations of individual MPT

@@ -1,6 +1,6 @@
 Package: TreeBUGS
 Version: 1.5.2
-Date: 2024-04-08
+Date: 2024-05-10
 Title: Hierarchical Multinomial Processing Tree Modeling
 Authors@R: c(person("Daniel W.", "Heck", role=c("aut","cre"),
                     email="daniel.heck@uni-marburg.de", 

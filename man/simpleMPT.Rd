@@ -49,7 +49,8 @@ removed from n.iter)}
 
 \item{n.thin}{Thinning rate.}
 
-\item{n.chains}{number of MCMC chains (sampled in parallel).}
+\item{n.chains}{number of MCMC chains (sampled in parallel, which can be
+changed via the additional argument \code{n.sim = 1}).}
 
 \item{ppp}{number of samples to compute  posterior predictive p-value (see
 \code{\link{posteriorPredictive}})}
