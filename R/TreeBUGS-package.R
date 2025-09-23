@@ -52,7 +52,7 @@
 #' How to develop, test, and extend multinomial processing tree models: A tutorial.
 #' \emph{Psychological Methods}.
 #' \doi{10.1037/met0000561}.
-#' (Preprint: \url{https://psyarxiv.com/gh8md/})
+#' (Preprint: \url{https://osf.io/preprints/psyarxiv/gh8md/})
 #'
 #'
 #' @references
