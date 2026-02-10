@@ -67,8 +67,9 @@ withinSubjectEQN <- function(
   }
 
   res <- do.call("rbind", tree.list)
+  res$EQN <- NULL
   if (!missing(save)) {
     write.table(res, file = save, quote = FALSE, row.names = FALSE, sep = "     ")
   }
-  res
+  print(res, quote = FALSE, row.names = FALSE, sep = "     ")
 }

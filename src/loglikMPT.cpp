@@ -38,7 +38,7 @@ arma::vec loglikMPT(arma::mat theta,  // MPT parameters
       cat(map(k)-1) += branch;  // mixture
     }
     ll(m) = arma::dot(log(cat), h);
-    if(!arma::is_finite(ll(m)))
+    if(!std::isfinite(ll(m)))
       ll(m) = - arma::datum::inf;
   }
   return ll;

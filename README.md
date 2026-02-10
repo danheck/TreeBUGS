@@ -7,7 +7,7 @@
 
 # TreeBUGS
 
-<img src="man/figures/TreeBUGS.png" width="200" style='float: right; border:0px'>
+<img src="man/figures/TreeBUGS.png" width="250" align="right">
 
 TreeBUGS is an R package that facilitates using hierarchical multinomial processing tree (MPT) models that are often used in cognitive psychology (Erdfelder et al., 2009). 
 Specifically, TreeBUGS implements the Bayesian estimation via MCMC sampling for the Beta-MPT (Smith & Batchelder, 2010), the latent-trait MPT model (Klauer, 2010), and standard (fixed-effects) MPT models.
@@ -51,20 +51,19 @@ devtools::install_github("danheck/TreeBUGS", build_vignettes = TRUE)
 To compile C++ code, Windows and Mac require 
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/) and 
 [Xcode Command Line Tools](https://www.maketecheasier.com/install-command-line-tools-without-xcode/), respectively. 
-Moreover, on Mac, it might be necessary to install the library `gfortran` manually by typing the following into the console 
-([required to compile the package `RcppArmadillo`](http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/)):
-
+Moreover, on Mac, it might be necessary to install the library `gfortran` manually, as [required to compile the package `RcppArmadillo`](http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/).
+<!--
 ```
 curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
 sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 ```
-
+-->
 
 ## Citation
 
 If you use TreeBUGS, please cite the software as follows:
 
-- Heck\*, D. W., Arnold\*, N. R., & Arnold, D. (2018). 
+- Heck, D. W., Arnold, N. R., & Arnold, D. (2018). 
 TreeBUGS: An R package for hierarchical multinomial-processing-tree modeling. 
 *Behavior Research Methods, 50*, 264-284. 
 https://doi.org/10.3758/s13428-017-0869-7
