@@ -4,17 +4,32 @@
 \alias{plotFit}
 \title{Plot Posterior Predictive Mean Frequencies}
 \usage{
-plotFit(fittedModel, M = 1000, stat = "mean", ...)
+plotFit(
+  fittedModel,
+  M = 1000,
+  stat = c("mean", "cov", "cor", "sd"),
+  main = NULL,
+  ylab = NULL,
+  col = "gray",
+  ...
+)
 }
 \arguments{
 \item{fittedModel}{fitted latent-trait or beta MPT model (\code{\link{traitMPT}}, \code{\link{betaMPT}})}
 
 \item{M}{number of posterior predictive samples. As a maximum, the number of posterior samples in \code{fittedModel} is used.}
 
-\item{stat}{whether to plot mean frequencies (\code{"mean"}) or covariances
-of individual frequencies (\code{"cov"})}
+\item{stat}{whether to plot mean frequencies (\code{"mean"}), covariances
+of frequencies (\code{"cov"}), standard deviations (\code{"sd"}), or
+correlations (\code{"cor"})}
 
-\item{...}{arguments passed to \code{\link{boxplot}}}
+\item{main}{main title for plot}
+
+\item{ylab}{label for y-axis}
+
+\item{col}{color for boxplots of predicted values}
+
+\item{...}{further arguments passed to \code{\link{boxplot}}}
 }
 \description{
 Plots observed means/covariances of individual frequencies against the
