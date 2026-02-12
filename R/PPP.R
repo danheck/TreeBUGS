@@ -187,7 +187,8 @@ print.postPredP <- function(x, ...) {
 }
 
 matAsList <- function(matrix) {
-  lapply(apply(matrix, 1, list), function(x) x[[1]])
+  unname(split(matrix, f = seq_len(nrow(matrix))))
+  # lapply(apply(matrix, 1, list), function(x) x[[1]])
 }
 
 

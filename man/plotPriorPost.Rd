@@ -28,7 +28,7 @@ plotPriorPost(
 \item{nCPU}{number of CPUs used for parallel sampling. For large models and
 many participants, this may require a lot of memory.}
 
-\item{...}{arguments passed to \code{\link{boxplot}}}
+\item{...}{further arguments passed to \code{\link{boxplot}}}
 }
 \description{
 Allows to judge how much the data informed the parameter posterior
