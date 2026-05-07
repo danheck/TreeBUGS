@@ -17,6 +17,7 @@ fitModel <- function(
     n.burnin = 2000,
     n.thin = 5,
     n.chains = 3,
+    method = "parallel",
     dic = FALSE,
     ppp = 0,
     monitorIndividual = TRUE,
@@ -142,6 +143,7 @@ fitModel <- function(
     n.burnin = n.burnin,
     n.thin = n.thin,
     n.chains = n.chains,
+    method = method,
     monitorIndividual = monitorIndividual,
     autojags = autojags,
     ...

@@ -146,7 +146,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' # fit beta-MPT model for encoding condition (see ?arnold2013):
+#' # fit latent-trait MPT model for encoding condition (see ?arnold2013):
 #' EQNfile <- system.file("MPTmodels/2htsm.eqn", package = "TreeBUGS")
 #' d.encoding <- subset(arnold2013, group == "encoding", select = -(1:4))
 #' fit <- traitMPT(EQNfile, d.encoding,
@@ -177,6 +177,7 @@ traitMPT <- function(
     n.burnin = 2000,
     n.thin = 5,
     n.chains = 3,
+    method = "parallel",
     dic = FALSE,
     ppp = 0,
     monitorIndividual = TRUE,
@@ -205,6 +206,7 @@ traitMPT <- function(
     n.burnin = n.burnin,
     n.thin = n.thin,
     n.chains = n.chains,
+    method = method,
     dic = dic,
     ppp = ppp,
     monitorIndividual = monitorIndividual,

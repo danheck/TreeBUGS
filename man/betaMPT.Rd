@@ -18,6 +18,7 @@ betaMPT(
   n.burnin = 2000,
   n.thin = 5,
   n.chains = 3,
+  method = "parallel",
   dic = FALSE,
   ppp = 0,
   monitorIndividual = TRUE,
@@ -100,6 +101,12 @@ removed from n.iter)}
 
 \item{n.chains}{number of MCMC chains (sampled in parallel, which can be
 changed via the additional argument \code{n.sim = 1}).}
+
+\item{method}{type for sampling (see \code{\link[runjags]{run.jags}} for details).
+Default is \code{"parallel"}, which calls JAGS in multiple chains in parallel.
+If \code{"rjags"} or \code{"rjparallel"} is used, the \code{\link[rjags]{rjags}}
+package is used sequentially or in parallel, which can be faster for
+smaller models and useful for simulations.}
 
 \item{dic}{whether to compute DIC using
 \code{\link[runjags]{extract.runjags}}, which requires additional sampling.

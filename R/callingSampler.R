@@ -36,6 +36,7 @@ callingSampler <- function(
     n.update = 2000,
     n.thin = 5,
     n.chains = 3,
+    method = "parallel",
     monitorIndividual = TRUE,
     autojags = NULL,
     ...
@@ -198,7 +199,7 @@ callingSampler <- function(
       thin = n.thin,
       modules = c("dic", "glm"),
       summarise = FALSE,
-      method = "parallel",
+      method = method,
       ...
     )
   } else {
@@ -214,7 +215,7 @@ callingSampler <- function(
       thin = n.thin,
       modules = c("dic", "glm"),
       summarise = FALSE,
-      method = "parallel",
+      method = method,
       ...
     )
   }
