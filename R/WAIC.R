@@ -128,6 +128,7 @@ WAIC <- function(
 
 #' @method summary waic
 #' @keywords internal
+#' @exportS3Method
 summary.waic <- function(
     object,
     ...
