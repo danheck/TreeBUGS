@@ -24,7 +24,7 @@ A data frame 13 variables:
 }
 }
 \usage{
-arnold2013
+data(arnold2013)
 }
 \description{
 Dataset of a source-monitoring experiment by Arnold, Bayen, Kuhlmann, and
