@@ -1,11 +1,11 @@
-#Generic R files
 .Rhistory
 .Rdata
 .Rproj.user
 .RDataTmp
+.positai
+.claude
 
 Rplot.png
-
 
 #Rcpp files
 src/*.o
